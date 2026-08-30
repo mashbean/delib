@@ -1,6 +1,7 @@
 interface Env {
   ASSETS: Fetcher;
   CALL_IN_ORIGIN?: string;
+  POLIS_SITE_ID?: string;
 }
 
 type AgentPlan = {
@@ -66,7 +67,23 @@ export default {
     }
 
     if (url.pathname === "/api/integrations/polis" && request.method === "POST") {
-      return handlePolisRequest(request);
+      return handlePolisRequest(request, env.POLIS_SITE_ID);
+    }
+
+    if (url.pathname === "/api/integrations/polis/status" && request.method === "GET") {
+      return json({
+        integration: "polis",
+        configured: Boolean(normalizePolisSiteId(env.POLIS_SITE_ID)),
+        setup: "A Pol.is account creates the Site ID; Cloudflare only passes it to Delib.",
+      }, 200);
+    }
+
+    if (url.pathname === "/api/integrations/heyform" && request.method === "POST") {
+      return handleHeyFormRequest(request);
+    }
+
+    if (url.pathname === "/api/integrations/tttc" && request.method === "POST") {
+      return handleTttcRequest(request);
     }
 
     if (url.pathname.startsWith("/api/")) {
@@ -92,6 +109,17 @@ type PolisRequest = {
   siteId?: unknown;
   pageId?: unknown;
   title?: unknown;
+  confirmed?: unknown;
+};
+
+type HeyFormRequest = {
+  form?: unknown;
+  confirmed?: unknown;
+};
+
+type TttcRequest = {
+  title?: unknown;
+  description?: unknown;
   confirmed?: unknown;
 };
 
@@ -177,7 +205,7 @@ export async function handleCallInRequest(
   );
 }
 
-export async function handlePolisRequest(request: Request): Promise<Response> {
+export async function handlePolisRequest(request: Request, defaultSiteId?: string): Promise<Response> {
   if (!isSameOriginRequest(request)) return json({ error: "origin not allowed" }, 403);
   const body = await readJsonRequest<PolisRequest>(request, MAX_INTEGRATION_BODY_BYTES);
   if (body instanceof Response) return body;
@@ -204,9 +232,9 @@ export async function handlePolisRequest(request: Request): Promise<Response> {
   }
 
   if (body.mode === "site") {
-    const siteId = cleanMatchingString(body.siteId, /^[A-Za-z0-9_-]{1,80}$/, 80);
+    const siteId = normalizePolisSiteId(body.siteId) || normalizePolisSiteId(defaultSiteId);
     const title = cleanRequiredString(body.title, 120);
-    if (!siteId) return json({ error: "請貼上 Pol.is 的 Site ID" }, 400);
+    if (!siteId) return json({ error: "請貼上 Pol.is 的 Site ID，或在部署時連接 POLIS_SITE_ID" }, 400);
     if (!title) return json({ error: "先幫這輪對話取一個名字" }, 400);
     const suppliedPageId = cleanMatchingString(body.pageId, /^[A-Za-z0-9._:-]{1,120}$/, 120);
     const pageId = suppliedPageId || `${slugify(title)}-${crypto.randomUUID().slice(0, 8)}`;
@@ -219,6 +247,7 @@ export async function handlePolisRequest(request: Request): Promise<Response> {
         mode: "site",
         status: "ready",
         siteId,
+        siteSource: normalizePolisSiteId(body.siteId) ? "request" : "deployment",
         pageId,
         workspaceUrl: workspaceUrl.toString(),
         storedByDelib: false,
@@ -230,6 +259,62 @@ export async function handlePolisRequest(request: Request): Promise<Response> {
   }
 
   return json({ error: "請選擇已有對話或建立新對話" }, 400);
+}
+
+export async function handleHeyFormRequest(request: Request): Promise<Response> {
+  if (!isSameOriginRequest(request)) return json({ error: "origin not allowed" }, 403);
+  const body = await readJsonRequest<HeyFormRequest>(request, MAX_INTEGRATION_BODY_BYTES);
+  if (body instanceof Response) return body;
+  if (body.confirmed !== true) return json({ error: "開啟前請先確認表單資料會送到 HeyForm" }, 400);
+
+  const formId = parseHeyFormId(body.form);
+  if (!formId) return json({ error: "請貼上有效的 HeyForm 公開表單網址" }, 400);
+  const participantUrl = `https://heyform.net/f/${formId}`;
+  const workspaceUrl = new URL("/integrations/heyform.html", request.url);
+  workspaceUrl.searchParams.set("form", formId);
+
+  return json({
+    integration: "heyform",
+    mode: "existing-form",
+    status: "ready",
+    formId,
+    workspaceUrl: workspaceUrl.toString(),
+    participantUrl,
+    storedByDelib: false,
+    writesWhenOpened: false,
+    writesWhenSubmitted: true,
+  }, 200);
+}
+
+export async function handleTttcRequest(request: Request): Promise<Response> {
+  if (!isSameOriginRequest(request)) return json({ error: "origin not allowed" }, 403);
+  const body = await readJsonRequest<TttcRequest>(request, MAX_INTEGRATION_BODY_BYTES);
+  if (body instanceof Response) return body;
+  if (body.confirmed !== true) return json({ error: "開啟前請先確認資料去識別與人工複核責任" }, 400);
+
+  const title = cleanRequiredString(body.title, 120);
+  const description = cleanOptionalString(body.description, 500);
+  if (!title) return json({ error: "先幫這份分析取一個名字" }, 400);
+
+  const workspaceUrl = new URL("/integrations/tttc.html", request.url);
+  workspaceUrl.searchParams.set("title", title);
+  if (description) workspaceUrl.searchParams.set("description", description);
+  const createUrl = new URL("https://talktothe.city/create");
+  createUrl.searchParams.set("title", title);
+  if (description) createUrl.searchParams.set("description", description);
+
+  return json({
+    integration: "talk-to-the-city",
+    mode: "official-create-workspace",
+    status: "ready",
+    title,
+    workspaceUrl: workspaceUrl.toString(),
+    createUrl: createUrl.toString(),
+    storedByDelib: false,
+    writesWhenOpened: false,
+    writesWhenSubmitted: true,
+    warning: "登入、上傳、模型處理與發布都發生在 Talk to the City；Delib 不會收到資料。",
+  }, 200);
 }
 
 export async function handleAgentRequest(
@@ -405,6 +490,27 @@ export function parsePolisConversationId(value: unknown): string | null {
   }
 }
 
+function normalizePolisSiteId(value: unknown): string | null {
+  return cleanMatchingString(value, /^[A-Za-z0-9_-]{1,80}$/, 80);
+}
+
+export function parseHeyFormId(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const cleaned = value.trim();
+  if (/^[A-Za-z0-9_-]{2,120}$/.test(cleaned)) return cleaned;
+  try {
+    const parsed = new URL(cleaned);
+    if (parsed.protocol !== "https:" || !["heyform.net", "www.heyform.net"].includes(parsed.hostname)) {
+      return null;
+    }
+    const segments = parsed.pathname.split("/").filter(Boolean);
+    if (segments.length !== 2 || segments[0] !== "f") return null;
+    return /^[A-Za-z0-9_-]{2,120}$/.test(segments[1]) ? segments[1] : null;
+  } catch {
+    return null;
+  }
+}
+
 function slugify(value: string): string {
   const latin = value
     .normalize("NFKD")
@@ -479,11 +585,18 @@ function json(data: unknown, status: number): Response {
 function withSecurityHeaders(response: Response, pathname: string): Response {
   const next = new Response(response.body, response);
   const polisWorkspace = pathname === "/integrations/polis.html" || pathname === "/integrations/polis";
+  const heyFormWorkspace = pathname === "/integrations/heyform.html" || pathname === "/integrations/heyform";
+  const tttcWorkspace = pathname === "/integrations/tttc.html" || pathname === "/integrations/tttc";
+  const frameSource = polisWorkspace
+    ? "https://pol.is"
+    : heyFormWorkspace
+      ? "https://heyform.net"
+      : tttcWorkspace
+        ? "https://talktothe.city"
+        : "'none'";
   next.headers.set(
     "Content-Security-Policy",
-    polisWorkspace
-      ? "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-src https://pol.is; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
-      : "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
+    `default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-src ${frameSource}; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'`,
   );
   next.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   next.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");

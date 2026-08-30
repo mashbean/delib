@@ -28,7 +28,9 @@
    `/.well-known/delib/SKILL.md`。
 8. 直接在站內建立七天的 Call-in 活動，不需帳號；
 9. 在站內嵌入既有 Pol.is 對話，或用 Site ID 準備自動建立工作區；
-10. `delib-integrations/v1` 盤點，明確區分可用、需連接、下一批與純目錄。
+10. 在站內嵌入已發布的 HeyForm 表單；
+11. 在站內開啟 Talk to the City 官方建立流程，登入與 CSV 不經 Delib；
+12. `delib-integrations/v1` 盤點，明確區分可用、需連接與純目錄。
 
 目前不保存參與資料、API key 或使用者建立的流程。分享狀態只包含固定
 選項並留在 URL；後續才會加入經明確同意的資料匯入、轉換與公開成果保存。
@@ -64,6 +66,10 @@ Workers Builds 並部署所需資源；Delib 本體可在 Workers Free 的額度
 [Deploy button](https://developers.cloudflare.com/workers/platform/deploy-buttons/) 與
 [Workers limits](https://developers.cloudflare.com/workers/platform/limits/)。
 
+Deploy button 會依 `.dev.vars.example` 提示選填 `POLIS_SITE_ID`。這是
+Pol.is 帳號自動產生的公開識別碼，不是密碼。填入後，自己的 Delib 部署
+便可直接準備新對話網址；Cloudflare 並不建立 Pol.is 帳號或 Site ID。
+
 ## AI key 資料邊界
 
 - key 由使用者貼入，僅保存於該分頁的 `sessionStorage`；
@@ -82,9 +88,19 @@ OpenAI 官方目前建議文字生成使用
   代為呼叫 hosted creator。活動資料留在 Call-in；Delib 只把回傳連結
   放在該分頁的 `sessionStorage`。
 - **Pol.is**：已有對話可直接嵌入。建立模式使用公開的 Site ID 與
-  page ID；第一次開啟工作區時才會在 Pol.is 建立對話。
-- **HeyForm / TTTC**：上游 MetaGov adaptor 已具備建立能力，但仍待完成
-  session-only credential、preview 與 end-to-end verification，因此沒有標成可用。
+  page ID；第一次開啟工作區時才會在 Pol.is 建立對話。完整 Pol.is 需要
+  多個 Docker 服務與 PostgreSQL；Cloudflare Containers 只有付費方案且
+  不供應 PostgreSQL，因此沒有把它標成免費 Cloudflare 一鍵自架。
+- **HeyForm**：貼上已發布的 `heyform.net/f/...` 公開網址即可站內嵌入。
+  建立表單仍在 HeyForm；Delib 不收帳密、cookie 或回答。完整自架需要
+  MongoDB 與 Redis／KeyDB。
+- **Talk to the City**：Delib 預填分析名稱與說明，再嵌入現行官方建立頁。
+  登入、上傳、模型處理與提交都留在 TTTC；第三方登入被 iframe 阻擋時可
+  用同一個預填網址在新分頁繼續。
+
+舊 MetaGov HeyForm／TTTC adaptor 仍保留為互通設計參考，但現行 hosted
+登入與 API 契約已不同；本站不把未驗證的舊端點標示為可直接建立。細節與
+HeyForm 目前的安全公告都列在 audit。
 
 盤點見 [`docs/integration-audit.md`](docs/integration-audit.md)，機器可讀版本在
 [`public/data/integrations.json`](public/data/integrations.json)。

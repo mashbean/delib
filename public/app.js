@@ -40,6 +40,7 @@ let integrations = new Map();
 let currentPlan = null;
 let currentStep = 0;
 let activeFilter = "all";
+let polisDeploymentConnected = false;
 
 const plannerDialog = document.querySelector("#planner-dialog");
 const plannerForm = document.querySelector("#planner-form");
@@ -82,6 +83,7 @@ async function init() {
   renderToolLibrary();
   bindEvents();
   updatePolisMode();
+  loadPolisStatus();
 
   apiKeyInput.value = sessionStorage.getItem("delib:openai-key") || "";
   restoreCallInInstance();
@@ -153,6 +155,15 @@ function bindEvents() {
   document.querySelector("#run-agent").addEventListener("click", runAgent);
   document.querySelector("#call-in-form").addEventListener("submit", createCallIn);
   document.querySelector("#polis-form").addEventListener("submit", preparePolis);
+  document.querySelector("#heyform-form").addEventListener("submit", prepareHeyForm);
+  document.querySelector("#tttc-form").addEventListener("submit", prepareTttc);
+  document.querySelector("#copy-polis-agent").addEventListener("click", () =>
+    copyText(
+      "請幫我連接 Delib 與 Pol.is：先開啟 Pol.is 的帳號整合頁；若需要登入就停下來讓我操作。登入後找出帳號自動產生的 Site ID，再讓我選擇貼進 Delib，或設成 Cloudflare Worker 的 POLIS_SITE_ID。不要讀取、保存或回傳我的密碼與 session cookie。",
+      document.querySelector("#polis-status"),
+      "Agent 連接指令已複製；請貼到支援瀏覽器操作的 Agent。",
+    ),
+  );
   document.querySelectorAll('input[name="polis-mode"]').forEach((input) => {
     input.addEventListener("change", updatePolisMode);
   });
@@ -341,6 +352,9 @@ function launchTool(toolId) {
     if (toolId === "polis" && !document.querySelector("#polis-title").value) {
       document.querySelector("#polis-title").value = suggestedTitle;
     }
+    if (toolId === "talk-to-the-city" && !document.querySelector("#tttc-title").value) {
+      document.querySelector("#tttc-title").value = suggestedTitle;
+    }
   }
   target.scrollIntoView({ block: "start" });
   const firstInput = target.querySelector("input:not([type=checkbox]):not([type=radio])");
@@ -411,10 +425,27 @@ function updatePolisMode() {
   existing.hidden = mode !== "existing";
   site.hidden = mode !== "site";
   document.querySelector("#polis-conversation").required = mode === "existing";
-  document.querySelector("#polis-site-id").required = mode === "site";
+  document.querySelector("#polis-site-id").required = mode === "site" && !polisDeploymentConnected;
   document.querySelector("#polis-title").required = mode === "site";
   document.querySelector("#open-polis").textContent =
     mode === "existing" ? "開啟 Pol.is 工作區" : "準備新的 Pol.is 對話";
+}
+
+async function loadPolisStatus() {
+  try {
+    const response = await fetch("/api/integrations/polis/status", { cache: "no-store" });
+    if (!response.ok) return;
+    const data = await response.json();
+    polisDeploymentConnected = data.configured === true;
+    if (polisDeploymentConnected) {
+      document.querySelector("#polis-site-id").placeholder = "部署時已連接，可留白";
+      document.querySelector("#polis-site-note").textContent =
+        "這個 Delib 部署已連接 Pol.is Site ID；留白即可自動使用。Site ID 是公開識別碼，不是密碼。";
+      updatePolisMode();
+    }
+  } catch {
+    // The normal paste-a-Site-ID path remains usable when status lookup fails.
+  }
 }
 
 async function preparePolis(event) {
@@ -450,6 +481,61 @@ async function preparePolis(event) {
   } finally {
     button.disabled = false;
     updatePolisMode();
+  }
+}
+
+async function prepareHeyForm(event) {
+  event.preventDefault();
+  const status = document.querySelector("#heyform-status");
+  const confirm = document.querySelector("#heyform-confirm");
+  if (!confirm.checked) {
+    status.textContent = "先確認回答會直接交給 HeyForm，而且表單已說明資料用途與保存方式。";
+    confirm.focus();
+    return;
+  }
+  const button = document.querySelector("#open-heyform");
+  button.disabled = true;
+  status.textContent = "正在檢查公開表單網址…";
+  try {
+    const data = await postJson("/api/integrations/heyform", {
+      form: document.querySelector("#heyform-url").value.trim(),
+      confirmed: true,
+    });
+    document.querySelector("#heyform-workspace").href = data.workspaceUrl;
+    document.querySelector("#heyform-result").hidden = false;
+    status.textContent = "工作區網址已準備好；Delib 不會接收或保存表單回答。";
+  } catch (error) {
+    status.textContent = error instanceof Error ? error.message : "HeyForm 工作區暫時沒有準備好。";
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function prepareTttc(event) {
+  event.preventDefault();
+  const status = document.querySelector("#tttc-status");
+  const confirm = document.querySelector("#tttc-confirm");
+  if (!confirm.checked) {
+    status.textContent = "先確認資料已去識別，且分析結果發布前會有人逐項複核。";
+    confirm.focus();
+    return;
+  }
+  const button = document.querySelector("#open-tttc");
+  button.disabled = true;
+  status.textContent = "正在準備官方建立工作區；目前不會上傳資料或建立報告…";
+  try {
+    const data = await postJson("/api/integrations/tttc", {
+      title: document.querySelector("#tttc-title").value.trim(),
+      description: document.querySelector("#tttc-description").value.trim(),
+      confirmed: true,
+    });
+    document.querySelector("#tttc-workspace").href = data.workspaceUrl;
+    document.querySelector("#tttc-result").hidden = false;
+    status.textContent = "工作區已準備好；登入、CSV 與模型處理都不會經過 Delib。";
+  } catch (error) {
+    status.textContent = error instanceof Error ? error.message : "Talk to the City 工作區暫時沒有準備好。";
+  } finally {
+    button.disabled = false;
   }
 }
 

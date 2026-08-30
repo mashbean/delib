@@ -47,5 +47,12 @@ describe("public contracts", () => {
     expect(audit.integrations.find((item) => item.toolId === "polis").readiness).toBe(
       "available-with-connection",
     );
+    expect(audit.integrations.find((item) => item.toolId === "heyform").readiness).toBe(
+      "available-existing-only",
+    );
+    expect(audit.integrations.find((item) => item.toolId === "talk-to-the-city").readiness).toBe(
+      "available-with-upstream-login",
+    );
+    expect(audit.integrations.filter((item) => item.activation === "embedded-workspace")).toHaveLength(3);
   });
 });

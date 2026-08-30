@@ -52,7 +52,7 @@
         "supported": true,
         "platform": "Docker services + PostgreSQL",
         "cloudflareNative": false,
-        "note": "完整 Polis 不是靜態站或單一 Worker，不標示為 Cloudflare 一鍵部署。"
+        "note": "Cloudflare Containers 只有 Workers Paid，且不提供 PostgreSQL；完整 Polis 不標示為免費 Cloudflare 一鍵部署。Delib 自己的一鍵部署可以提示輸入既有 Site ID。"
       },
       "agent": {
         "canCreate": "連接 Site ID 後可以產生工作區；第一次開啟前仍需人確認。",
@@ -60,7 +60,9 @@
       },
       "evidence": [
         "https://github.com/compdemocracy/polis",
-        "https://github.com/compdemocracy/polis/blob/edge/client-admin/src/components/conversations-and-account/Integrate.js"
+        "https://github.com/compdemocracy/polis/blob/edge/client-admin/src/components/conversations-and-account/Integrate.js",
+        "https://developers.cloudflare.com/containers/",
+        "https://developers.cloudflare.com/workers/platform/pricing/"
       ]
     },
     {
@@ -102,37 +104,69 @@
     },
     {
       "toolId": "heyform",
-      "readiness": "next-credentialed",
-      "activation": "account-api",
-      "label": "下一批：貼臨時門票後建立",
-      "summary": "MetaGov adaptor 已具備登入、workspace、表單／投票建立、發布與 embed 能力。",
-      "accountRequired": true,
-      "credentialRequired": true,
-      "freePath": "需使用 HeyForm 或自架 instance 的帳號與方案。",
-      "writesExternalState": true,
-      "agent": {
-        "canCreate": "接上 session-only credential flow 後可建立。",
-        "humanGate": "先預覽問題、發布狀態與資料所在地。"
+      "readiness": "available-existing-only",
+      "activation": "embedded-workspace",
+      "label": "已發布表單直接嵌入",
+      "summary": "貼上 HeyForm 公開表單網址即可留在 Delib 填寫；回答直接送往 HeyForm。",
+      "accountRequired": "參與公開表單不需要 Delib 帳號；建立與管理表單需要 HeyForm 帳號。",
+      "credentialRequired": false,
+      "freePath": "可使用 HeyForm hosted 服務；官方自架需要應用程式、MongoDB 與 Redis／KeyDB。",
+      "writesExternalState": "開啟工作區不寫入；參與者在 HeyForm 送出表單時才寫入。",
+      "retention": "由表單擁有者與 HeyForm 部署政策決定；Delib 不保存回答。",
+      "inAppEndpoint": "/api/integrations/heyform",
+      "selfHost": {
+        "supported": true,
+        "platform": "Docker application + MongoDB + Redis/KeyDB",
+        "cloudflareNative": false,
+        "note": "官方提供 Railway 等自架路徑，不是 Cloudflare Workers 一鍵部署。"
       },
+      "agent": {
+        "canCreate": false,
+        "canEmbedExisting": true,
+        "humanGate": "先檢查表單主辦者、用途、保存期限、撤回方式與公開狀態。"
+      },
+      "knownLimitations": [
+        "現行 hosted 登入文件只列 Google 與 Apple，舊 MetaGov adaptor 的 email/password 契約不可直接沿用。",
+        "官方表單建構器目前有未修補的 stored-XSS 公告，因此 Delib 不代收憑證或自動代建表單。"
+      ],
       "evidence": [
+        "https://docs.heyform.net/features/embed-your-form",
+        "https://docs.heyform.net/open-source/self-hosting",
+        "https://docs.heyform.net/open-source/configuration/authentication",
+        "https://github.com/heyform/heyform",
+        "https://github.com/heyform/heyform/security/advisories/GHSA-chmm-jqpm-3pwx",
         "https://github.com/metagov/ontology/tree/main/adaptors/heyform"
       ]
     },
     {
       "toolId": "talk-to-the-city",
-      "readiness": "next-credentialed",
-      "activation": "account-api",
-      "label": "下一批：貼臨時門票後分析",
-      "summary": "MetaGov adaptor 可用 Firebase token 從 CSV／Google Sheets 建立 Talk to the City report 並輪詢完成。",
+      "readiness": "available-with-upstream-login",
+      "activation": "embedded-workspace",
+      "label": "官方建立流程站內開啟",
+      "summary": "在 Delib 預填名稱與說明，再於站內嵌入的 TTTC 官方頁登入、上傳與建立分析。",
       "accountRequired": true,
-      "credentialRequired": true,
-      "freePath": "取決於 Talk to the City 帳號、模型與當前服務限制。",
-      "writesExternalState": true,
-      "agent": {
-        "canCreate": "接上 session-only Firebase token 與資料預覽後可建立。",
-        "humanGate": "上傳前確認同意、去識別、prompt、來源列與發布範圍。"
+      "credentialRequired": "需要在 Talk to the City frame 內登入；Delib 不接觸 Firebase token。",
+      "freePath": "取決於 Talk to the City 現行服務與模型限制。",
+      "writesExternalState": "開啟工作區不寫入；使用者在 TTTC 官方頁送出後才建立報告。",
+      "retention": "由 Talk to the City 帳號與部署政策決定；Delib 不保存 CSV、token 或報告。",
+      "inAppEndpoint": "/api/integrations/tttc",
+      "selfHost": {
+        "supported": true,
+        "platform": "Next.js + Express + pipeline worker + Firebase + Google Cloud Storage + Redis/PubSub",
+        "cloudflareNative": false,
+        "note": "現行架構不是 GitHub + Cloudflare 免費一鍵部署。"
       },
+      "agent": {
+        "canCreate": "可以準備官方建立工作區；真正登入、上傳與送出仍由人完成。",
+        "humanGate": "上傳前確認同意、去識別、prompt、來源列與發布範圍；發布前逐項核對引文。"
+      },
+      "knownLimitations": [
+        "舊 MetaGov adaptor 的 api.talktothe.city 網域不是現行公開入口，不能聲稱直接 API 建立。",
+        "第三方登入可能被瀏覽器的 iframe 或 cookie 限制阻擋；工作區保留直接開啟按鈕。"
+      ],
       "evidence": [
+        "https://talktothe.city/create",
+        "https://github.com/AIObjectives/tttc-light-js",
         "https://github.com/metagov/ontology/tree/main/adaptors/tttc"
       ]
     }

@@ -26,6 +26,14 @@ projects, but does not imply endorsement by their maintainers.
 - The managed Call-in activation calls the separately deployed
   [Call-in](https://github.com/mashbean/call-in) hosted creator. Call-in is
   Apache-2.0 licensed and keeps its own seven-day event lifecycle.
+- The HeyForm workspace frames a published `https://heyform.net/f/...`
+  participant surface. HeyForm is an independent AGPL-3.0 project; no HeyForm
+  source or participant response is copied into this repository.
+- The Talk to the City workspace frames the maintained
+  `https://talktothe.city/create` interface. Its current source is the
+  Apache-2.0 licensed
+  [tttc-light-js](https://github.com/AIObjectives/tttc-light-js) project;
+  authentication, uploads and model processing remain upstream.
 
 Tool names and trademarks belong to their respective owners. The tool registry
 stores links and factual interoperability metadata; no third-party source code

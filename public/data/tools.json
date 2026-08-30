@@ -62,7 +62,7 @@
       "summary": "以陳述與同意／不同意投票呈現意見群體、共識與分歧，適合大規模非同步聆聽。",
       "url": "https://pol.is/",
       "source": "https://github.com/compdemocracy/polis",
-      "status": "adapter",
+      "status": "integrated",
       "stages": ["eliciting", "deliberating", "reflecting"],
       "goals": ["listen", "understand", "propose"],
       "formats": ["hybrid", "online"],
@@ -70,15 +70,15 @@
       "privacy": ["public", "pseudonymous"],
       "outputs": ["insights", "proposals", "receipt"],
       "hosting": "hosted-or-docker",
-      "handoff": "Metagov ontology 已有直接資料庫 adaptor；完整自架需要 Docker 與 Postgres。"
+      "handoff": "既有對話可嵌入；連接 Pol.is 帳號的 Site ID 後可第一次載入自動建立。完整自架需要 Docker 與 PostgreSQL。"
     },
     {
       "id": "talk-to-the-city",
       "name": "Talk to the City",
       "summary": "把大量文字意見整理成主題、主張與引文，適合訪談、問卷或提問池的 sensemaking。",
-      "url": "https://metagov.org/delib-tools/talk-to-the-city",
-      "source": "https://github.com/metagov/ontology/tree/main/adaptors/tttc",
-      "status": "adapter",
+      "url": "https://talktothe.city/",
+      "source": "https://github.com/AIObjectives/tttc-light-js",
+      "status": "integrated",
       "stages": ["agenda-setting", "eliciting", "learning"],
       "goals": ["listen", "understand", "evidence", "followup"],
       "formats": ["hybrid", "online", "offline"],
@@ -86,7 +86,7 @@
       "privacy": ["public", "pseudonymous"],
       "outputs": ["insights", "evidence", "receipt"],
       "hosting": "hosted-api",
-      "handoff": "Metagov ontology 已有 TTTC client；使用 AI 整理時要保留引文與人工複核。"
+      "handoff": "現行官方建立頁可留在 Delib 開啟；登入與資料上傳仍只交給 TTTC，AI 整理必須保留引文與人工複核。"
     },
     {
       "id": "decidim",
@@ -382,7 +382,7 @@
       "summary": "開源表單與問卷工具，適合作為審議前的報名、背景調查或問題蒐集入口。",
       "url": "https://heyform.net/",
       "source": "https://github.com/heyform/heyform",
-      "status": "adapter",
+      "status": "integrated",
       "stages": ["evaluating", "agenda-setting", "eliciting"],
       "goals": ["listen", "evidence"],
       "formats": ["hybrid", "online", "offline"],
@@ -390,7 +390,7 @@
       "privacy": ["public", "pseudonymous"],
       "outputs": ["questions", "evidence"],
       "hosting": "hosted-or-open-source",
-      "handoff": "Metagov ontology 已有 HeyForm SDK；表單中的個資需與審議意見分開保存。"
+      "handoff": "已發布表單可在 Delib 內嵌入；建立與管理仍留在 HeyForm，表單個資需與審議意見分開保存。"
     }
   ]
 }

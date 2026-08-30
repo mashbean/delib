@@ -18,5 +18,9 @@ Direct actions currently implemented:
 
 - POST /api/integrations/call-in — create a confirmed seven-day hosted event.
 - POST /api/integrations/polis — validate and prepare an embedded Pol.is workspace.
+- GET /api/integrations/polis/status — report whether this deployment has a connected Site ID.
+- POST /api/integrations/heyform — validate and prepare an existing public HeyForm workspace.
+- POST /api/integrations/tttc — prepare the current official Talk to the City create workspace.
 
-Both external-write paths require an explicit `confirmed: true` human gate.
+Every preparation or external-write path requires an explicit `confirmed: true`
+human gate. HeyForm and TTTC credentials and participant data remain upstream.

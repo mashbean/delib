@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta name="description" content="在 Delib 內填寫已發布的 HeyForm 表單。" />
+    <title>HeyForm 工作區 · Delib 審議拼圖</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/styles.css" />
+    <script type="module" src="/integrations/heyform.js"></script>
+  </head>
+  <body class="workspace-body">
+    <a class="skip-link" href="#workspace-main">跳到表單</a>
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <a class="brand" href="/" aria-label="回 Delib 審議拼圖">
+          <span class="brand-mark" aria-hidden="true">⿻</span>
+          <span><strong>Delib</strong><span class="brand-divider">·</span>HeyForm 工作區</span>
+        </a>
+        <a class="button button-small button-ghost" href="/#launch-heyform">回到工具設定</a>
+      </div>
+    </header>
+
+    <main id="workspace-main" class="workspace-main">
+      <div class="wrap workspace-wrap">
+        <div class="workspace-heading">
+          <div>
+            <p class="section-kicker">Embedded collection form</p>
+            <h1>HeyForm 表單</h1>
+            <p id="heyform-workspace-status" class="section-lede" role="status">正在載入已發布表單。</p>
+          </div>
+          <a id="heyform-direct-link" class="button button-ghost" href="https://heyform.net/" target="_blank" rel="noreferrer">改在 HeyForm 開啟 ↗</a>
+        </div>
+
+        <div class="workspace-trust">
+          <strong>資料邊界</strong>
+          <span>表單與回答直接由 HeyForm 接收；Delib 不會看到或複製回答。</span>
+          <span>送出前仍請確認主辦者、用途、保存期限、撤回與聯絡方式。</span>
+        </div>
+
+        <section id="heyform-embed-root" class="external-embed-shell" aria-label="HeyForm 表單">
+          <div class="workspace-loading" aria-hidden="true"></div>
+        </section>
+
+        <p class="source-note">
+          HeyForm 是獨立的開源專案。若內嵌畫面被瀏覽器或網路阻擋，可以使用上方按鈕直接開啟。
+          <a href="https://github.com/heyform/heyform" target="_blank" rel="noreferrer">查看 HeyForm 原始碼 ↗</a>
+        </p>
+      </div>
+    </main>
+  </body>
+</html>

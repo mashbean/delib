@@ -102,9 +102,56 @@ of the returned workspace is the external write that creates the conversation,
 so pause for human confirmation before opening it. Pol.is data remains with the
 selected Pol.is deployment; Delib does not copy it.
 
+If the Delib deployment has a `POLIS_SITE_ID` binding, `siteId` may be omitted.
+Check `GET /api/integrations/polis/status`; it reports only whether a connection
+exists and never returns credentials. A real Pol.is account must generate the
+Site ID. If asked to help connect it, open the Pol.is account integration page,
+pause for the human to log in, then copy only the displayed Site ID. Never read,
+request, save or repeat the account password or session cookie.
+
 Do not call full Pol.is self-hosting a Cloudflare one-click deployment. Upstream
-currently documents a Docker and PostgreSQL stack. Use the hosted/embed path or
-explain the real infrastructure requirement.
+currently documents multiple Docker services and PostgreSQL. Cloudflare
+Containers require Workers Paid and do not provide PostgreSQL. Use the
+hosted/embed path or explain the real infrastructure requirement.
+
+### HeyForm
+
+Delib can open an already published HeyForm participant form in an in-site
+workspace:
+
+```http
+POST https://delib.mashbean.net/api/integrations/heyform
+Content-Type: application/json
+
+{"form":"https://heyform.net/f/dCN9pF7U","confirmed":true}
+```
+
+Confirm the form identifies its organiser, purpose, retention, contact and
+withdrawal path. Delib never receives answers. Do not request a HeyForm account
+password, cookie or administrator URL. Form creation remains upstream: the old
+MetaGov adaptor's email/password contract is stale, and the current HeyForm
+repository has an unpatched form-builder stored-XSS advisory. Self-hosting needs
+the application, MongoDB and Redis/KeyDB; do not call it Cloudflare-native.
+
+### Talk to the City
+
+Delib can prepare the current official create UI with a title and optional
+description:
+
+```http
+POST https://delib.mashbean.net/api/integrations/tttc
+Content-Type: application/json
+
+{"title":"Community interview synthesis","description":"De-identified interviews","confirmed":true}
+```
+
+Opening the returned workspace does not create a report. Authentication, CSV
+upload, model processing and submission occur inside Talk to the City; Delib
+does not receive the Firebase token or source data. Require de-identification
+before upload and human verification of clusters, summaries and quotations
+before publication. The old MetaGov adaptor endpoint is not the current public
+API, so do not ask a non-engineer to extract a Firebase token. If iframe login
+is blocked, use the returned direct create URL in a new tab.
 
 ## Build both gears
 

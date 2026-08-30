@@ -12,7 +12,9 @@ human-readable result + offline gears + care checks
         ↓                              ↓ explicit preview + confirmation
 share URL / JSON / Markdown       direct activation adapters
                                   ├─ Call-in managed creator
-                                  └─ Pol.is embedded workspace
+                                  ├─ Pol.is connected workspace
+                                  ├─ HeyForm published-form workspace
+                                  └─ Talk to the City official create workspace
         ↓ optional
 BYOK OpenAI request OR locally installed Delib skill
 ```
@@ -33,11 +35,18 @@ human gate is mandatory.
 - `POST /api/integrations/polis` validates an existing conversation or a
   public Site ID integration and returns a same-site workspace URL. Loading the
   Site ID workspace is the external write, so it remains a separate click.
+- `GET /api/integrations/polis/status` reports whether the current deployment
+  has a `POLIS_SITE_ID` connection without revealing its value.
+- `POST /api/integrations/heyform` accepts only a canonical public form URL and
+  returns a same-site participant workspace. Answers go directly to HeyForm.
+- `POST /api/integrations/tttc` prepares a same-site wrapper around the current
+  official create page. Authentication, CSV and report creation stay in TTTC.
 - Private Call-in links stay in tab-scoped `sessionStorage` and never enter a
   plan URL or exported public receipt.
 
-All other tools remain read-only recommendations until the credential,
-retention, export and end-to-end creation paths have been verified.
+The remaining tools stay read-only recommendations until the credential,
+retention, export and end-to-end creation paths have been verified. An embedded
+upstream UI is labelled separately from a managed create API.
 
 ## Planned data plane
 

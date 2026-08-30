@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta name="description" content="在 Delib 內準備 Talk to the City 文字意見分析。" />
+    <title>Talk to the City 工作區 · Delib 審議拼圖</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/styles.css" />
+    <script type="module" src="/integrations/tttc.js"></script>
+  </head>
+  <body class="workspace-body">
+    <a class="skip-link" href="#workspace-main">跳到分析建立頁</a>
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <a class="brand" href="/" aria-label="回 Delib 審議拼圖">
+          <span class="brand-mark" aria-hidden="true">⿻</span>
+          <span><strong>Delib</strong><span class="brand-divider">·</span>Talk to the City 工作區</span>
+        </a>
+        <a class="button button-small button-ghost" href="/#launch-talk-to-the-city">回到工具設定</a>
+      </div>
+    </header>
+
+    <main id="workspace-main" class="workspace-main">
+      <div class="wrap workspace-wrap">
+        <div class="workspace-heading">
+          <div>
+            <p class="section-kicker">Sensemaking workspace</p>
+            <h1 id="tttc-workspace-title">Talk to the City</h1>
+            <p id="tttc-workspace-status" class="section-lede" role="status">正在載入官方建立流程。</p>
+          </div>
+          <a id="tttc-direct-link" class="button button-ghost" href="https://talktothe.city/create" target="_blank" rel="noreferrer">改在 TTTC 開啟 ↗</a>
+        </div>
+
+        <div class="workspace-trust">
+          <strong>人工關卡</strong>
+          <span>登入、上傳、模型處理與發布都發生在 Talk to the City；Delib 不接收檔案或 token。</span>
+          <span>上傳前移除不必要的姓名、電話、email 與可回推身分的自由文字；發布前逐一核對引文。</span>
+        </div>
+
+        <section id="tttc-embed-root" class="external-embed-shell external-embed-tall" aria-label="Talk to the City 建立分析">
+          <div class="workspace-loading" aria-hidden="true"></div>
+        </section>
+
+        <p class="source-note">
+          若第三方登入被瀏覽器阻擋，使用上方按鈕在新分頁繼續，標題與說明仍會保留。
+          <a href="https://github.com/AIObjectives/tttc-light-js" target="_blank" rel="noreferrer">查看現行 TTTC 原始碼 ↗</a>
+        </p>
+      </div>
+    </main>
+  </body>
+</html>
