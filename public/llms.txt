@@ -1,0 +1,14 @@
+# Delib · 審議拼圖
+
+Delib helps non-engineers compose offline and online deliberation workflows,
+select open-source tools, and leave an inspectable receipt for the next round.
+
+- Human site: https://delib.mashbean.net/
+- Agent skill: https://delib.mashbean.net/.well-known/delib/SKILL.md
+- Tool registry: https://delib.mashbean.net/data/tools.json
+- Source: https://github.com/mashbean/delib
+
+Recommendations are deterministic and source-linked. AI may explain or format a
+selected workflow but must not invent consensus, participant evidence, or
+decision authority.
+

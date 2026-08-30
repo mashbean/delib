@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://delib.mashbean.net/schemas/delib-bundle/v1.json",
+  "title": "Delib planning bundle v1",
+  "type": "object",
+  "required": ["schema", "exportedAt", "source", "request", "recipe", "dataCard"],
+  "properties": {
+    "schema": { "const": "https://delib.mashbean.net/schemas/delib-bundle/v1.json" },
+    "exportedAt": { "type": "string", "format": "date-time" },
+    "source": {
+      "type": "object",
+      "required": ["generator", "url", "persisted"],
+      "properties": {
+        "generator": { "type": "string" },
+        "url": { "type": "string", "format": "uri" },
+        "persisted": { "const": false }
+      },
+      "additionalProperties": false
+    },
+    "request": {
+      "type": "object",
+      "required": ["goal", "format", "scale", "privacy", "output"],
+      "properties": {
+        "goal": { "enum": ["listen", "understand", "evidence", "propose", "decide", "followup"] },
+        "format": { "enum": ["hybrid", "online", "offline"] },
+        "scale": { "enum": ["small", "medium", "large"] },
+        "privacy": { "enum": ["public", "pseudonymous", "sensitive"] },
+        "output": { "enum": ["questions", "insights", "evidence", "proposals", "decision", "receipt"] }
+      },
+      "additionalProperties": false
+    },
+    "recipe": {
+      "type": "object",
+      "required": ["offlineGears", "tools", "careChecks"],
+      "properties": {
+        "offlineGears": { "type": "array", "items": { "type": "object" } },
+        "tools": { "type": "array", "items": { "type": "object" } },
+        "careChecks": { "type": "array", "minItems": 6, "maxItems": 6, "items": { "type": "object" } }
+      }
+    },
+    "dataCard": {
+      "type": "object",
+      "required": ["containsParticipantData", "containsFreeText", "publicationStatus", "limitations"],
+      "properties": {
+        "containsParticipantData": { "const": false },
+        "containsFreeText": { "const": false },
+        "publicationStatus": { "const": "local-plan-only" },
+        "limitations": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}
+

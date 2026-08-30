@@ -1,0 +1,26 @@
+# Sources and acknowledgements
+
+Delib is an independent open-source project. It links to and describes other
+projects, but does not imply endorsement by their maintainers.
+
+- The progressive-disclosure UX, calm microcopy, three-path landing page and
+  session-only token pattern are adapted from
+  [Matters 記憶吐司](https://github.com/thematters/matters-lifeboat), an MIT
+  licensed project developed as part of the Matters open-source ecosystem.
+- The bounded-agent, public-accountability, corrigibility and sunset checks are
+  adapted from Audrey Tang and Caroline Green's
+  [Civic AI — 6-Pack of Care](https://github.com/audreyt/civic.ai), released
+  under CC0 1.0.
+- The idea that every listening process should close with an inspectable
+  receipt and a response to every participant is informed by
+  [Uncommon Ground](https://github.com/audreyt/uncommon-ground), released under
+  CC0 1.0.
+- The deliberative stages and flat-file interoperability approach are based on
+  Metagov's [Deliberative Tools Gallery](https://metagov.org/delib-tools),
+  [interop specification](https://github.com/metagov/interop/blob/main/specification.md)
+  and [ontology](https://github.com/metagov/ontology).
+
+Tool names and trademarks belong to their respective owners. The tool registry
+stores links and factual interoperability metadata; no third-party source code
+is bundled unless explicitly noted.
+

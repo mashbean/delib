@@ -1,0 +1,12 @@
+{
+  "name": "Delib · 審議拼圖",
+  "short_name": "Delib",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#f6f4ff",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
+

@@ -1,0 +1,38 @@
+{
+  "name": "@mashbean/delib",
+  "version": "0.1.0",
+  "private": true,
+  "description": "審議拼圖：為非工程師組合數位審議工具、資料交接與下一輪行動。",
+  "type": "module",
+  "bin": {
+    "delib": "scripts/install-skill.mjs"
+  },
+  "scripts": {
+    "dev": "wrangler dev",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "deploy:dry": "wrangler deploy --dry-run --env production",
+    "check:scripts": "node --check public/app.js && node --check public/core.js && node --check scripts/install-skill.mjs",
+    "check": "npm run check:scripts && npm run typecheck && npm test && npm run deploy:dry",
+    "deploy": "wrangler deploy",
+    "deploy:production": "wrangler deploy --env production",
+    "install-skill": "node scripts/install-skill.mjs install-skill"
+  },
+  "cloudflare": {
+    "bindings": {
+      "ASSETS": {
+        "description": "Static site assets for the deliberation planner and results page."
+      }
+    }
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260830.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.11",
+    "wrangler": "^4.127.1"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT"
+}

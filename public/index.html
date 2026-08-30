@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="審議拼圖幫助非工程師選擇數位審議工具、組合線下與線上流程，並留下下一輪可使用的成果收據。"
+    />
+    <meta name="theme-color" content="#f6f4ff" />
+    <meta property="og:title" content="Delib · 審議拼圖" />
+    <meta property="og:description" content="把一場審議，拼成下一輪。" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://delib.mashbean.net/" />
+    <title>Delib · 審議拼圖</title>
+    <link rel="canonical" href="https://delib.mashbean.net/" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="stylesheet" href="/styles.css" />
+    <script type="module" src="/app.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳到主要內容</a>
+
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <a class="brand" href="/" aria-label="Delib 審議拼圖首頁">
+          <span class="brand-mark" aria-hidden="true">⿻</span>
+          <span><strong>Delib</strong><span class="brand-divider">·</span>審議拼圖</span>
+        </a>
+        <nav aria-label="主要選單">
+          <a href="#how">怎麼拼</a>
+          <a href="#tools">工具庫</a>
+          <a href="#care">Care check</a>
+          <button class="button button-small button-primary" data-start="listen">開始拼一輪 →</button>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hero">
+        <div class="wrap hero-grid">
+          <div>
+            <p class="kicker">Deliberation, with a next step</p>
+            <h1>把一場審議，<strong>拼成下一輪</strong>。</h1>
+            <p class="lede">
+              不用先會寫程式，也不用先懂 AI Agent。說說你想聽見誰、做到什麼，
+              我們會一起排出線下齒輪、線上工具、資料交接與成果收據。
+            </p>
+            <div class="actions">
+              <button class="button button-primary button-large" data-start="listen">🧩 開始拼一輪</button>
+              <a class="button button-ghost button-large" href="#how">先看看怎麼運作</a>
+            </div>
+            <p class="microcopy">不用註冊 · 推薦規則公開 · 目前不保存參與資料</p>
+          </div>
+
+          <aside class="hero-receipt" aria-label="成果收據預覽">
+            <div class="receipt-topline"><span>這一輪留下什麼</span><span>RECEIPT 01</span></div>
+            <ol>
+              <li><span>01</span><div><strong>人</strong><small>誰參與，誰還沒進來</small></div></li>
+              <li><span>02</span><div><strong>議題</strong><small>共識、歧見與少數聲音</small></div></li>
+              <li><span>03</span><div><strong>責任</strong><small>誰會在什麼時候回覆</small></div></li>
+              <li><span>04</span><div><strong>下一輪</strong><small>可以繼續修正與行動的入口</small></div></li>
+            </ol>
+            <p>一場活動不是終點。可檢查的收據，才是下一輪的起點。</p>
+          </aside>
+        </div>
+      </section>
+
+      <section id="how" class="section flows-section">
+        <div class="wrap">
+          <p class="section-kicker">從今天最想完成的事開始</p>
+          <h2>三條路，都會回到同一個 loop</h2>
+          <p class="section-lede">先選一條最接近現在狀況的；進階設定稍後再出現。</p>
+
+          <div class="flow-grid">
+            <button class="flow-card" data-start="listen">
+              <span class="flow-tag">A · 約 3 分鐘</span>
+              <span class="flow-icon" aria-hidden="true">👂</span>
+              <strong>我有一個問題，想找到合適工具</strong>
+              <span>回答四組白話問題，得到一份有理由、有替代方案的工具推薦。</span>
+              <small>不會只丟給你一長串工具名稱。</small>
+              <b>開始找工具 →</b>
+            </button>
+
+            <button class="flow-card" data-start="followup">
+              <span class="flow-tag">B · 約 5 分鐘</span>
+              <span class="flow-icon" aria-hidden="true">🔄</span>
+              <strong>我已經辦完活動或收完資料</strong>
+              <span>把問題池、投票或公開資料接到分析、回覆與成果頁。</span>
+              <small>目標是留下 closed-loop receipt。</small>
+              <b>安排資料交接 →</b>
+            </button>
+
+            <button class="flow-card" data-start-agent>
+              <span class="flow-tag">C · 約 2 分鐘</span>
+              <span class="flow-icon" aria-hidden="true">🧭</span>
+              <strong>我想讓 AI Agent 一起協作</strong>
+              <span>貼入自己的 API key 產生主持簡報，或下載 bounded、可關閉的 Delib skill。</span>
+              <small>AI 幫忙整理，不替人製造共識。</small>
+              <b>看看兩種方式 →</b>
+            </button>
+          </div>
+
+          <div class="trust-strip">
+            <strong>default-safe</strong>
+            <span>固定選項留在分享連結；自由文字不會自動發布。</span>
+            <span>API key 只活在這個分頁，關掉就清除。</span>
+            <span>敏感資料會先建議本機／人工流程。</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="result" class="section result-section" hidden aria-live="polite">
+        <div class="wrap">
+          <div class="result-heading">
+            <div>
+              <p class="section-kicker">你的第一版審議拼圖</p>
+              <h2 id="result-title">這一輪，先聽見，再回覆。</h2>
+              <p id="result-summary" class="section-lede"></p>
+            </div>
+            <button class="button button-ghost" data-start>編輯需求</button>
+          </div>
+
+          <div id="sensitive-warning" class="warning" hidden>
+            <strong>這組資料屬於高風險內容。</strong>
+            推薦只代表功能可能合適；在確認威脅模型、資料所在地、刪除方式與參與者同意之前，
+            請先使用線下或本機流程，不要直接上傳原始內容。
+          </div>
+
+          <div class="recipe-grid">
+            <section class="recipe-panel">
+              <div class="panel-heading">
+                <span class="panel-number">01</span>
+                <div><p>OFFLINE GEARS</p><h3>線下齒輪</h3></div>
+              </div>
+              <div id="offline-gears" class="gear-list"></div>
+            </section>
+
+            <section class="recipe-panel">
+              <div class="panel-heading">
+                <span class="panel-number">02</span>
+                <div><p>ONLINE TOOLS</p><h3>線上工具</h3></div>
+              </div>
+              <div id="recommended-tools" class="recommendation-list"></div>
+            </section>
+          </div>
+
+          <section class="loops-panel">
+            <div>
+              <span class="loop-label">參與者與主辦者的 loop</span>
+              <h3>讓每個人知道：我說的話去了哪裡？</h3>
+              <p>成果頁要分開呈現原話、工具整理、主持判斷、正式決定與尚未回答的問題。</p>
+            </div>
+            <div>
+              <span class="loop-label">工具開發者的 loop</span>
+              <h3>讓每次卡關都能回到工具與流程</h3>
+              <p>記錄 schema 缺口、轉接失敗、人工補救與使用者放棄點，但不回傳參與內容。</p>
+            </div>
+          </section>
+
+          <div class="result-actions">
+            <button class="button button-primary" id="copy-link">複製成果連結</button>
+            <button class="button button-ghost" id="download-json">下載資料包 JSON</button>
+            <button class="button button-ghost" id="download-markdown">下載執行手冊</button>
+            <button class="button button-dark" data-open-agent>讓 AI 整理主持簡報 →</button>
+          </div>
+          <p id="action-status" class="action-status" role="status"></p>
+        </div>
+      </section>
+
+      <section id="care" class="section care-section">
+        <div class="wrap">
+          <p class="section-kicker">參考 civic.ai · 6-Pack of Care</p>
+          <h2>AI 進場之前，先問六件事</h2>
+          <p class="section-lede">
+            這些不是裝飾性的價值宣言，而是會出現在每份流程成果裡的治理檢查。
+          </p>
+          <div class="care-grid">
+            <article><span>01</span><h3>留意</h3><p>最靠近問題的人看見了什麼？誰還沒被聽見？</p></article>
+            <article><span>02</span><h3>負責</h3><p>誰真的有權決定？失敗時由誰回答？</p></article>
+            <article><span>03</span><h3>勝任</h3><p>工具、資料與主持方法如何被測試與稽核？</p></article>
+            <article><span>04</span><h3>回應</h3><p>參與者如何更正、反對、申訴並要求修復？</p></article>
+            <article><span>05</span><h3>團結</h3><p>流程是否鼓勵跨差異合作，而不是平台綁定？</p></article>
+            <article><span>06</span><h3>共生</h3><p>AI 與工具是否有邊界、能關閉、會到期？</p></article>
+          </div>
+          <p class="source-note">
+            框架來源：<a href="https://civic.ai/" target="_blank" rel="noreferrer">Civic AI</a>。
+            本站把它轉成審議流程檢查；原始內容為 CC0。
+          </p>
+        </div>
+      </section>
+
+      <section id="agent" class="section agent-section">
+        <div class="wrap">
+          <p class="section-kicker">Optional AI collaboration</p>
+          <h2>需要 Agent 時，有兩種入口</h2>
+          <p class="section-lede">不想貼 API key，完全沒關係；skill 路徑可以在自己的環境執行。</p>
+
+          <div class="agent-grid">
+            <section class="agent-card">
+              <span class="flow-tag">方式一 · 單次 API</span>
+              <h3>讓 AI 把拼圖整理成主持簡報</h3>
+              <p>推薦結果仍由公開規則決定。AI 只負責把已選流程整理成節奏、人工關卡與風險提醒。</p>
+              <label for="openai-model">Model</label>
+              <input id="openai-model" value="gpt-5.6" autocomplete="off" spellcheck="false" />
+              <label for="openai-key">OpenAI API key</label>
+              <div class="key-row">
+                <input
+                  id="openai-key"
+                  type="password"
+                  autocomplete="off"
+                  placeholder="sk-…（只存在這個分頁）"
+                  aria-describedby="key-note"
+                />
+                <button class="button button-small button-ghost" id="clear-key" type="button">清除</button>
+              </div>
+              <p id="key-note" class="field-note">
+                按下送出後，key 會經本站 Worker 傳到 OpenAI；本站不保存、不記錄。關閉分頁即清除。
+              </p>
+              <label for="agent-context">補充在地情境（選填）</label>
+              <textarea
+                id="agent-context"
+                rows="4"
+                maxlength="4000"
+                placeholder="例如：參與者主要是附近居民，主辦單位只有諮詢權，兩週內要書面回覆。"
+              ></textarea>
+              <label class="consent-row">
+                <input id="agent-consent" type="checkbox" />
+                <span>我知道這段補充說明會連同流程送到 OpenAI，且不應填入未經同意的個資。</span>
+              </label>
+              <button class="button button-primary" id="run-agent" type="button">產生主持簡報</button>
+              <p id="agent-status" class="action-status" role="status"></p>
+              <pre id="agent-output" class="agent-output" hidden></pre>
+            </section>
+
+            <section class="agent-card skill-card">
+              <span class="flow-tag">方式二 · 啟動 skill</span>
+              <h3>讓自己的 Agent 學會審議拼圖</h3>
+              <p>Skill 會先問服務對象、風險、真正權限、申訴與關閉方式，再帶你來這裡產生可交接的配方。</p>
+              <div class="command-box">
+                <code>npx --yes github:mashbean/delib install-skill</code>
+                <button class="button button-small button-ghost" data-copy-command>複製</button>
+              </div>
+              <div class="skill-actions">
+                <a class="button button-primary" href="/.well-known/delib/SKILL.md" download>下載 SKILL.md</a>
+                <button class="button button-ghost" data-copy-prompt>複製啟動提示</button>
+              </div>
+              <div class="skill-commitments">
+                <strong>這個 Agent 必須：</strong>
+                <ul>
+                  <li>以 bounded local steward 身分協作，不自稱中立決策者；</li>
+                  <li>忠實保存來源、歧見、撤回與不知道；</li>
+                  <li>在範圍變大、要發布或要傳敏感資料前重新取得同意；</li>
+                  <li>讓人能讀、改、申訴、停用並刪除記憶。</li>
+                </ul>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <section id="tools" class="section tools-section">
+        <div class="wrap">
+          <p class="section-kicker">工具目錄 · 最後查核 2026-08-30</p>
+          <div class="tools-heading">
+            <div>
+              <h2><span id="tool-count">25</span> 個工具，不是一張排名榜</h2>
+              <p class="section-lede">先看它能接哪一段、輸出什麼、資料去哪裡，再決定要不要用。</p>
+            </div>
+            <label class="search-field">
+              <span>搜尋工具</span>
+              <input id="tool-search" type="search" placeholder="例如：投票、提問、證據" />
+            </label>
+          </div>
+          <div class="tool-filters" aria-label="依整合狀態篩選">
+            <button class="filter-chip active" data-filter="all">全部</button>
+            <button class="filter-chip" data-filter="integrated">可直接試</button>
+            <button class="filter-chip" data-filter="adapter">已有 adaptor</button>
+            <button class="filter-chip" data-filter="catalog">待接入</button>
+          </div>
+          <div id="tool-library" class="tool-grid"></div>
+          <p id="no-tools" class="empty-state" hidden>找不到符合的工具。換一個比較白話的關鍵字試試？</p>
+          <p class="source-note">
+            目錄以 <a href="https://metagov.org/delib-tools" target="_blank" rel="noreferrer">MetaGov Deliberative Tools Gallery</a>
+            為底，加入 Call-in、OpenBook、Uncommon Ground 與 HeyForm。列入目錄不代表通過安全或採購審查。
+          </p>
+        </div>
+      </section>
+
+      <section class="section final-cta">
+        <div class="wrap">
+          <p class="section-kicker">One closed loop at a time</p>
+          <h2>先拼一輪，再讓下一輪變得更容易。</h2>
+          <button class="button button-primary button-large" data-start="listen">🧩 開始拼一輪</button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap footer-grid">
+        <div>
+          <a class="brand footer-brand" href="/"><span aria-hidden="true">⿻</span><strong>Delib · 審議拼圖</strong></a>
+          <p>給審議工作者、參與者與開源工具維護者的共同轉接層。</p>
+        </div>
+        <div>
+          <strong>開放與來源</strong>
+          <a href="https://github.com/mashbean/delib">Source ↗</a>
+          <a href="https://metagov.org/projects/interop">MetaGov InterOp ↗</a>
+          <a href="https://civic.ai/">Civic AI ↗</a>
+        </div>
+        <div>
+          <strong>資料承諾</strong>
+          <p>目前不保存流程、API key 或參與資料。AI 輸出必須由人複核。</p>
+        </div>
+      </div>
+    </footer>
+
+    <dialog id="planner-dialog" aria-labelledby="planner-title">
+      <form id="planner-form" method="dialog">
+        <div class="dialog-header">
+          <div>
+            <span class="dialog-kicker">DELIBERATION BUILDER</span>
+            <h2 id="planner-title">先完成今天這一輪</h2>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="關閉">×</button>
+        </div>
+
+        <div class="progress-track" aria-hidden="true"><span id="planner-progress"></span></div>
+        <p class="step-count" id="step-count">1 / 4</p>
+
+        <fieldset data-step="0">
+          <legend>你現在最想完成什麼？</legend>
+          <p>選最接近的就好，之後可以回來改。</p>
+          <div class="choice-grid choice-grid-two">
+            <label><input type="radio" name="goal" value="listen" required /><span>👂<strong>聽見更多人的需要</strong><small>蒐集問題、經驗與觀點</small></span></label>
+            <label><input type="radio" name="goal" value="understand" /><span>🧭<strong>整理共識與歧見</strong><small>看見群體、橋接觀點與衝突</small></span></label>
+            <label><input type="radio" name="goal" value="evidence" /><span>🔎<strong>用證據形成議程</strong><small>把資料、經驗與未知分開</small></span></label>
+            <label><input type="radio" name="goal" value="propose" /><span>🛠️<strong>一起形成提案</strong><small>保留修正、反對與整合過程</small></span></label>
+            <label><input type="radio" name="goal" value="decide" /><span>🗳️<strong>排序、投票或決定</strong><small>先公開權限、門檻與方法</small></span></label>
+            <label><input type="radio" name="goal" value="followup" /><span>🔄<strong>回覆並啟動下一輪</strong><small>讓每位參與者知道發生什麼</small></span></label>
+          </div>
+        </fieldset>
+
+        <fieldset data-step="1" hidden>
+          <legend>這場審議主要在哪裡發生？</legend>
+          <p>數位工具只是其中一個齒輪。</p>
+          <div class="choice-grid">
+            <label><input type="radio" name="format" value="hybrid" required /><span>🏘️<strong>線下＋線上</strong><small>現場活動搭配數位互動或後續</small></span></label>
+            <label><input type="radio" name="format" value="online" /><span>🌐<strong>主要在線上</strong><small>同步會議或非同步參與</small></span></label>
+            <label><input type="radio" name="format" value="offline" /><span>🪑<strong>主要在線下</strong><small>數位工具只做蒐集、整理或成果</small></span></label>
+          </div>
+        </fieldset>
+
+        <fieldset data-step="2" hidden>
+          <legend>規模與資料風險是什麼？</legend>
+          <p>這兩件事會改變主持、部署與工具選擇。</p>
+          <div class="split-choices">
+            <div>
+              <strong>大約多少人？</strong>
+              <label><input type="radio" name="scale" value="small" required /><span>50 人以下</span></label>
+              <label><input type="radio" name="scale" value="medium" /><span>50–300 人</span></label>
+              <label><input type="radio" name="scale" value="large" /><span>300 人以上</span></label>
+            </div>
+            <div>
+              <strong>資料可以怎麼處理？</strong>
+              <label><input type="radio" name="privacy" value="public" required /><span>可以公開</span></label>
+              <label><input type="radio" name="privacy" value="pseudonymous" /><span>需要匿名或化名</span></label>
+              <label><input type="radio" name="privacy" value="sensitive" /><span>敏感／高風險</span></label>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset data-step="3" hidden>
+          <legend>這一輪最需要留下什麼？</legend>
+          <p>成果不是漂亮報告，而是下一個人能接手的東西。</p>
+          <div class="choice-grid choice-grid-two">
+            <label><input type="radio" name="output" value="questions" required /><span>❓<strong>問題池</strong><small>待回答、重複與少數問題</small></span></label>
+            <label><input type="radio" name="output" value="insights" /><span>🗺️<strong>共識與歧見</strong><small>群體、橋接觀點與限制</small></span></label>
+            <label><input type="radio" name="output" value="evidence" /><span>📚<strong>證據地圖</strong><small>來源、反證、缺漏與版本</small></span></label>
+            <label><input type="radio" name="output" value="proposals" /><span>🧱<strong>提案</strong><small>修正、反對理由與條件</small></span></label>
+            <label><input type="radio" name="output" value="decision" /><span>✅<strong>決定</strong><small>方法、門檻、理由與申訴</small></span></label>
+            <label><input type="radio" name="output" value="receipt" /><span>🧾<strong>成果收據</strong><small>逐項回覆與下一輪承諾</small></span></label>
+          </div>
+        </fieldset>
+
+        <div class="dialog-actions">
+          <button class="button button-ghost" id="planner-back" type="button" hidden>回上一步</button>
+          <button class="button button-primary" id="planner-next" type="button">下一步</button>
+          <button class="button button-primary" id="planner-submit" type="submit" hidden>產生我的拼圖 →</button>
+        </div>
+        <p id="planner-error" class="form-error" role="alert"></p>
+      </form>
+    </dialog>
+  </body>
+</html>

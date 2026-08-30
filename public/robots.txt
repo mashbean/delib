@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://delib.mashbean.net/sitemap.xml
+
