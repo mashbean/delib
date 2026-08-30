@@ -31,5 +31,21 @@ describe("public contracts", () => {
     expect(schema.$id).toBe("https://delib.mashbean.net/schemas/delib-bundle/v1.json");
     expect(schema.properties.dataCard.properties.containsParticipantData.const).toBe(false);
   });
-});
 
+  it("accounts for every catalog tool in the direct-integration audit", async () => {
+    const tools = JSON.parse(await readFile(new URL("public/data/tools.json", root), "utf8"));
+    const audit = JSON.parse(await readFile(new URL("public/data/integrations.json", root), "utf8"));
+    expect(audit.schema).toBe("delib-integrations/v1");
+    const auditedIds = [
+      ...audit.integrations.map((item) => item.toolId),
+      ...audit.catalogOnly,
+    ];
+    expect(auditedIds).toHaveLength(25);
+    expect(new Set(auditedIds).size).toBe(25);
+    expect(new Set(auditedIds)).toEqual(new Set(tools.tools.map((tool) => tool.id)));
+    expect(audit.integrations.find((item) => item.toolId === "call-in").readiness).toBe("available");
+    expect(audit.integrations.find((item) => item.toolId === "polis").readiness).toBe(
+      "available-with-connection",
+    );
+  });
+});

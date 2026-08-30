@@ -8,14 +8,36 @@ fixed-choice needs wizard
 deterministic recommendation engine ← versioned tool registry
         ↓
 human-readable result + offline gears + care checks
-        ↓
-share URL / delib-bundle JSON / Markdown runbook
+        ├──────────────────────────────┐
+        ↓                              ↓ explicit preview + confirmation
+share URL / JSON / Markdown       direct activation adapters
+                                  ├─ Call-in managed creator
+                                  └─ Pol.is embedded workspace
         ↓ optional
 BYOK OpenAI request OR locally installed Delib skill
 ```
 
 The first release deliberately has no participant-data database. It proves the
 recommendation, handoff and receipt UX before introducing persistent civic data.
+
+## Direct activation plane
+
+`public/data/integrations.json` is a second registry beside the broad tool
+catalog. It records whether Delib can actually create, embed or deploy a tool,
+which account or credential is required, where data is retained, and which
+human gate is mandatory.
+
+- `POST /api/integrations/call-in` validates a small public-deck request,
+  forwards it to the hosted Call-in creator, filters the response and returns
+  public and private capability links. Delib does not persist the event.
+- `POST /api/integrations/polis` validates an existing conversation or a
+  public Site ID integration and returns a same-site workspace URL. Loading the
+  Site ID workspace is the external write, so it remains a separate click.
+- Private Call-in links stay in tab-scoped `sessionStorage` and never enter a
+  plan URL or exported public receipt.
+
+All other tools remain read-only recommendations until the credential,
+retention, export and end-to-end creation paths have been verified.
 
 ## Planned data plane
 
@@ -55,4 +77,3 @@ Each adapter should eventually expose:
 - `validate`: report coverage, omissions and privacy warnings;
 - `import`: create the next tool's input only after human preview;
 - `receipt`: record what happened, what did not, and the next responsible actor.
-

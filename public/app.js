@@ -36,6 +36,7 @@ const RESULT_TITLES = {
 };
 
 let tools = [];
+let integrations = new Map();
 let currentPlan = null;
 let currentStep = 0;
 let activeFilter = "all";
@@ -63,15 +64,27 @@ init().catch((error) => {
 });
 
 async function init() {
-  const response = await fetch("/data/tools.json", { cache: "no-cache" });
-  if (!response.ok) throw new Error("tool registry unavailable");
+  const [response, integrationResponse] = await Promise.all([
+    fetch("/data/tools.json", { cache: "no-cache" }),
+    fetch("/data/integrations.json", { cache: "no-cache" }),
+  ]);
+  if (!response.ok || !integrationResponse.ok) throw new Error("tool registry unavailable");
   const registry = await response.json();
+  const integrationRegistry = await integrationResponse.json();
   tools = Array.isArray(registry.tools) ? registry.tools : [];
+  integrations = new Map(
+    (Array.isArray(integrationRegistry.integrations) ? integrationRegistry.integrations : []).map((item) => [
+      item.toolId,
+      item,
+    ]),
+  );
   document.querySelector("#tool-count").textContent = String(tools.length);
   renderToolLibrary();
   bindEvents();
+  updatePolisMode();
 
   apiKeyInput.value = sessionStorage.getItem("delib:openai-key") || "";
+  restoreCallInInstance();
   const state = stateFromSearch(location.search);
   if (state) renderResult(state, false);
 }
@@ -138,6 +151,11 @@ function bindEvents() {
     agentStatus.textContent = "這個分頁裡的 key 已清除。";
   });
   document.querySelector("#run-agent").addEventListener("click", runAgent);
+  document.querySelector("#call-in-form").addEventListener("submit", createCallIn);
+  document.querySelector("#polis-form").addEventListener("submit", preparePolis);
+  document.querySelectorAll('input[name="polis-mode"]').forEach((input) => {
+    input.addEventListener("change", updatePolisMode);
+  });
   document.querySelectorAll("[data-copy-command]").forEach((button) => {
     button.addEventListener("click", () => copyText("npx --yes github:mashbean/delib install-skill", agentStatus, "安裝指令已複製。"));
   });
@@ -239,9 +257,10 @@ function renderResult(state, scroll) {
 function renderRecommendation(tool) {
   const article = createElement("article", "recommendation");
   const head = createElement("div", "recommendation-head");
+  const integration = launchableIntegration(tool.id);
   head.append(
     createElement("h4", "", tool.name),
-    createElement("span", "status-chip", STATUS_LABELS[tool.status] || "工具目錄"),
+    createElement("span", "status-chip", integration?.label || STATUS_LABELS[tool.status] || "工具目錄"),
   );
   article.append(head, createElement("p", "", tool.summary));
 
@@ -250,6 +269,7 @@ function renderRecommendation(tool) {
   article.append(reasons);
 
   const links = createElement("div", "recommendation-links");
+  if (integration) links.append(launchButton(tool.id, integration));
   links.append(externalLink("查看工具 ↗", tool.url));
   if (tool.deploy) links.append(externalLink("部署到 Cloudflare ↗", tool.deploy));
   if (tool.source && tool.source !== tool.url) links.append(externalLink("來源", tool.source));
@@ -261,7 +281,8 @@ function renderToolLibrary() {
   if (!tools.length) return;
   const term = document.querySelector("#tool-search")?.value.trim().toLocaleLowerCase("zh-Hant") || "";
   const matches = tools.filter((tool) => {
-    if (activeFilter !== "all" && tool.status !== activeFilter) return false;
+    if (activeFilter === "direct" && !launchableIntegration(tool.id)) return false;
+    if (activeFilter !== "all" && activeFilter !== "direct" && tool.status !== activeFilter) return false;
     if (!term) return true;
     const haystack = [tool.name, tool.summary, tool.handoff, ...(tool.stages || []).map((stage) => STAGE_LABELS[stage] || stage)]
       .filter(Boolean)
@@ -276,17 +297,176 @@ function renderToolLibrary() {
 function renderToolCard(tool) {
   const article = createElement("article", "tool-card");
   const top = createElement("div", "tool-card-top");
+  const integration = launchableIntegration(tool.id);
   top.append(
     createElement("h3", "", tool.name),
-    createElement("span", "status-chip", STATUS_LABELS[tool.status] || "工具目錄"),
+    createElement("span", "status-chip", integration?.label || STATUS_LABELS[tool.status] || "工具目錄"),
   );
   const stages = createElement("div", "stage-list");
   for (const stage of tool.stages || []) stages.append(createElement("span", "", STAGE_LABELS[stage] || stage));
   const links = createElement("div", "tool-card-links");
+  if (integration) links.append(launchButton(tool.id, integration));
   links.append(externalLink("查看 ↗", tool.url));
   if (tool.source && tool.source !== tool.url) links.append(externalLink("來源", tool.source));
   article.append(top, createElement("p", "", tool.summary), stages, links);
   return article;
+}
+
+function launchableIntegration(toolId) {
+  const integration = integrations.get(toolId);
+  return integration && ["managed-create", "embedded-workspace"].includes(integration.activation)
+    ? integration
+    : null;
+}
+
+function launchButton(toolId, integration) {
+  const button = createElement(
+    "button",
+    "direct-launch",
+    integration.activation === "managed-create" ? "在這裡建立" : "在這裡開啟",
+  );
+  button.type = "button";
+  button.addEventListener("click", () => launchTool(toolId));
+  return button;
+}
+
+function launchTool(toolId) {
+  const target = document.querySelector(`#launch-${CSS.escape(toolId)}`);
+  if (!target) return;
+  if (currentPlan) {
+    const suggestedTitle = RESULT_TITLES[currentPlan.goal];
+    if (toolId === "call-in" && !document.querySelector("#call-in-title").value) {
+      document.querySelector("#call-in-title").value = suggestedTitle;
+    }
+    if (toolId === "polis" && !document.querySelector("#polis-title").value) {
+      document.querySelector("#polis-title").value = suggestedTitle;
+    }
+  }
+  target.scrollIntoView({ block: "start" });
+  const firstInput = target.querySelector("input:not([type=checkbox]):not([type=radio])");
+  queueMicrotask(() => firstInput?.focus());
+}
+
+async function createCallIn(event) {
+  event.preventDefault();
+  const status = document.querySelector("#call-in-status");
+  const confirm = document.querySelector("#call-in-confirm");
+  if (!confirm.checked) {
+    status.textContent = "先看完建立預覽，再勾選確認；這不是額外條款，只是防止誤建活動。";
+    confirm.focus();
+    return;
+  }
+
+  const button = document.querySelector("#create-call-in");
+  button.disabled = true;
+  button.textContent = "正在建立，大概幾秒鐘…";
+  status.textContent = "只會送出活動名稱、說明與公開簡報網址；不會送出你的審議拼圖。";
+  try {
+    const data = await postJson("/api/integrations/call-in", {
+      title: document.querySelector("#call-in-title").value.trim(),
+      description: document.querySelector("#call-in-description").value.trim(),
+      deckUrl: document.querySelector("#call-in-deck").value.trim(),
+      locale: "zh-Hant-TW",
+      confirmed: true,
+    });
+    sessionStorage.setItem("delib:call-in-instance", JSON.stringify(data));
+    renderCallInInstance(data);
+    status.textContent = "活動已建立。先把私人連結存到安全的地方，再分享參與頁。";
+  } catch (error) {
+    status.textContent = error instanceof Error ? error.message : "Call-in 暫時沒有完成，稍後再試一次。";
+  } finally {
+    button.disabled = false;
+    button.textContent = "建立 Call-in 活動";
+  }
+}
+
+function restoreCallInInstance() {
+  const raw = sessionStorage.getItem("delib:call-in-instance");
+  if (!raw) return;
+  try {
+    const data = JSON.parse(raw);
+    if (data?.status === "ready" && data?.audienceUrl && data?.setupUrl) renderCallInInstance(data);
+    else sessionStorage.removeItem("delib:call-in-instance");
+  } catch {
+    sessionStorage.removeItem("delib:call-in-instance");
+  }
+}
+
+function renderCallInInstance(data) {
+  document.querySelector("#call-in-audience").href = data.audienceUrl;
+  document.querySelector("#call-in-presenter").href = data.presenterUrl;
+  document.querySelector("#call-in-setup").href = data.setupUrl;
+  document.querySelector("#call-in-moderator").href = data.moderatorUrl;
+  const expires = new Intl.DateTimeFormat("zh-Hant-TW", { dateStyle: "long", timeStyle: "short" }).format(
+    new Date(data.expiresAt),
+  );
+  document.querySelector("#call-in-expiry").textContent = `預計保留到 ${expires}。`;
+  document.querySelector("#call-in-result").hidden = false;
+}
+
+function updatePolisMode() {
+  const mode = document.querySelector('input[name="polis-mode"]:checked')?.value || "existing";
+  const existing = document.querySelector("#polis-existing-fields");
+  const site = document.querySelector("#polis-site-fields");
+  existing.hidden = mode !== "existing";
+  site.hidden = mode !== "site";
+  document.querySelector("#polis-conversation").required = mode === "existing";
+  document.querySelector("#polis-site-id").required = mode === "site";
+  document.querySelector("#polis-title").required = mode === "site";
+  document.querySelector("#open-polis").textContent =
+    mode === "existing" ? "開啟 Pol.is 工作區" : "準備新的 Pol.is 對話";
+}
+
+async function preparePolis(event) {
+  event.preventDefault();
+  const status = document.querySelector("#polis-status");
+  const confirm = document.querySelector("#polis-confirm");
+  if (!confirm.checked) {
+    status.textContent = "先確認這個畫面會連到 Pol.is；如果是新對話，第一次開啟才會真的建立。";
+    confirm.focus();
+    return;
+  }
+  const mode = document.querySelector('input[name="polis-mode"]:checked')?.value || "existing";
+  const button = document.querySelector("#open-polis");
+  button.disabled = true;
+  status.textContent = mode === "existing" ? "正在檢查對話網址…" : "正在準備一個可復原的工作區網址…";
+  try {
+    const data = await postJson("/api/integrations/polis", {
+      mode,
+      conversation: document.querySelector("#polis-conversation").value.trim(),
+      siteId: document.querySelector("#polis-site-id").value.trim(),
+      title: document.querySelector("#polis-title").value.trim(),
+      confirmed: true,
+    });
+    const workspace = document.querySelector("#polis-workspace");
+    workspace.href = data.workspaceUrl;
+    document.querySelector("#polis-result").hidden = false;
+    status.textContent =
+      data.writesWhenOpened === true
+        ? "工作區網址已準備好；按下開啟時，Pol.is 才會新增對話。"
+        : "工作區網址已準備好，Delib 沒有複製對話資料。";
+  } catch (error) {
+    status.textContent = error instanceof Error ? error.message : "Pol.is 工作區暫時沒有準備好。";
+  } finally {
+    button.disabled = false;
+    updatePolisMode();
+  }
+}
+
+async function postJson(url, body) {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  let data;
+  try {
+    data = await response.json();
+  } catch {
+    throw new Error("工具回應不完整，這不是你的輸入問題；稍後再試一次。");
+  }
+  if (!response.ok) throw new Error(data.error || "工具暫時沒有完成；稍後再試一次。");
+  return data;
 }
 
 async function copyShareLink() {

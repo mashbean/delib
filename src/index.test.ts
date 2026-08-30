@@ -1,5 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
-import { collectOutputText, handleAgentRequest } from "./index";
+import {
+  collectOutputText,
+  handleAgentRequest,
+  handleCallInRequest,
+  handlePolisRequest,
+  parsePolisConversationId,
+} from "./index";
 
 const plan = {
   goal: "listen",
@@ -92,3 +98,73 @@ describe("handleAgentRequest", () => {
   });
 });
 
+describe("direct integrations", () => {
+  it("parses only public Pol.is conversation identifiers", () => {
+    expect(parsePolisConversationId("https://pol.is/2demo")).toBe("2demo");
+    expect(parsePolisConversationId("https://pol.is/m2demo")).toBe("2demo");
+    expect(parsePolisConversationId("2demo")).toBe("2demo");
+    expect(parsePolisConversationId("https://example.com/2demo")).toBeNull();
+  });
+
+  it("builds an in-site Pol.is workspace without storing credentials", async () => {
+    const response = await handlePolisRequest(
+      new Request("https://delib.example/api/integrations/polis", {
+        method: "POST",
+        headers: { Origin: "https://delib.example", "Content-Type": "application/json" },
+        body: JSON.stringify({ mode: "existing", conversation: "https://pol.is/2demo", confirmed: true }),
+      }),
+    );
+    expect(response.status).toBe(200);
+    const body = (await response.json()) as Record<string, unknown>;
+    expect(body.workspaceUrl).toBe("https://delib.example/integrations/polis.html?conversation=2demo");
+    expect(body.storedByDelib).toBe(false);
+  });
+
+  it("requires a human confirmation before a site embed can create a Pol.is conversation", async () => {
+    const response = await handlePolisRequest(
+      new Request("https://delib.example/api/integrations/polis", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode: "site", siteId: "42", title: "公園議題" }),
+      }),
+    );
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toMatchObject({ error: expect.stringContaining("確認") });
+  });
+
+  it("creates a filtered ephemeral Call-in instance", async () => {
+    const upstream = vi.fn(async () =>
+      Response.json(
+        {
+          eventId: "a".repeat(32),
+          title: "社區說明會",
+          expiresAt: 1_800_000_000_000,
+          audienceUrl: `https://call-in.example/e/${"a".repeat(32)}/`,
+          presenterUrl: `https://call-in.example/e/${"a".repeat(32)}/present/`,
+          setupUrl: `https://call-in.example/e/${"a".repeat(32)}/setup/#access=private-admin-token`,
+          moderatorUrl: `https://call-in.example/e/${"a".repeat(32)}/moderate/#access=private-mod-token`,
+          internal: "must not leak",
+        },
+        { status: 201 },
+      ),
+    );
+    const response = await handleCallInRequest(
+      new Request("https://delib.example/api/integrations/call-in", {
+        method: "POST",
+        headers: { Origin: "https://delib.example", "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: "社區說明會",
+          deckUrl: "https://slides.example/deck/",
+          confirmed: true,
+        }),
+      }),
+      upstream as typeof fetch,
+      "https://call-in.example",
+    );
+    expect(response.status).toBe(201);
+    const body = (await response.json()) as Record<string, unknown>;
+    expect(body.status).toBe("ready");
+    expect(body).not.toHaveProperty("internal");
+    expect(upstream).toHaveBeenCalledOnce();
+  });
+});

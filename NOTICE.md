@@ -19,8 +19,14 @@ projects, but does not imply endorsement by their maintainers.
   Metagov's [Deliberative Tools Gallery](https://metagov.org/delib-tools),
   [interop specification](https://github.com/metagov/interop/blob/main/specification.md)
   and [ontology](https://github.com/metagov/ontology).
+- The Pol.is workspace frames the upstream `https://pol.is/` participation
+  surface over HTTPS. Pol.is is an independent AGPL-3.0 project; its code is
+  not copied into this repository and its service policies apply inside the
+  embedded frame.
+- The managed Call-in activation calls the separately deployed
+  [Call-in](https://github.com/mashbean/call-in) hosted creator. Call-in is
+  Apache-2.0 licensed and keeps its own seven-day event lifecycle.
 
 Tool names and trademarks belong to their respective owners. The tool registry
 stores links and factual interoperability metadata; no third-party source code
 is bundled unless explicitly noted.
-

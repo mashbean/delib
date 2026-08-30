@@ -26,6 +26,9 @@
 6. BYOK OpenAI Responses API 協作；
 7. `skills/delib/SKILL.md` 與機器可讀的
    `/.well-known/delib/SKILL.md`。
+8. 直接在站內建立七天的 Call-in 活動，不需帳號；
+9. 在站內嵌入既有 Pol.is 對話，或用 Site ID 準備自動建立工作區；
+10. `delib-integrations/v1` 盤點，明確區分可用、需連接、下一批與純目錄。
 
 目前不保存參與資料、API key 或使用者建立的流程。分享狀態只包含固定
 選項並留在 URL；後續才會加入經明確同意的資料匯入、轉換與公開成果保存。
@@ -54,7 +57,12 @@ npm run deploy:production
 ```
 
 `production` environment 才會綁定 `delib.mashbean.net`，因此 Deploy Button
-不會嘗試搶用官方網域。
+不會嘗試搶用官方網域。Cloudflare 的 Deploy button 會複製 public repo、設定
+Workers Builds 並部署所需資源；Delib 本體可在 Workers Free 的額度內運作。
+免費方案目前有每日 Worker request 上限，超過上限時請求會失敗，不會被本站
+自動升級成付費方案。詳見 Cloudflare 官方的
+[Deploy button](https://developers.cloudflare.com/workers/platform/deploy-buttons/) 與
+[Workers limits](https://developers.cloudflare.com/workers/platform/limits/)。
 
 ## AI key 資料邊界
 
@@ -67,6 +75,19 @@ npm run deploy:production
 
 OpenAI 官方目前建議文字生成使用
 [Responses API](https://developers.openai.com/api/docs/guides/text)。
+
+## 直接啟用工具
+
+- **Call-in**：使用者預覽七天保存與私人連結邊界後，Delib Worker
+  代為呼叫 hosted creator。活動資料留在 Call-in；Delib 只把回傳連結
+  放在該分頁的 `sessionStorage`。
+- **Pol.is**：已有對話可直接嵌入。建立模式使用公開的 Site ID 與
+  page ID；第一次開啟工作區時才會在 Pol.is 建立對話。
+- **HeyForm / TTTC**：上游 MetaGov adaptor 已具備建立能力，但仍待完成
+  session-only credential、preview 與 end-to-end verification，因此沒有標成可用。
+
+盤點見 [`docs/integration-audit.md`](docs/integration-audit.md)，機器可讀版本在
+[`public/data/integrations.json`](public/data/integrations.json)。
 
 ## Skill
 
@@ -90,4 +111,3 @@ npx --yes github:mashbean/delib install-skill
 ## License
 
 MIT
-

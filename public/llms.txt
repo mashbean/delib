@@ -6,9 +6,17 @@ select open-source tools, and leave an inspectable receipt for the next round.
 - Human site: https://delib.mashbean.net/
 - Agent skill: https://delib.mashbean.net/.well-known/delib/SKILL.md
 - Tool registry: https://delib.mashbean.net/data/tools.json
+- Integration audit: https://delib.mashbean.net/data/integrations.json
+- Integration API: https://delib.mashbean.net/api/integrations
 - Source: https://github.com/mashbean/delib
 
 Recommendations are deterministic and source-linked. AI may explain or format a
 selected workflow but must not invent consensus, participant evidence, or
 decision authority.
 
+Direct actions currently implemented:
+
+- POST /api/integrations/call-in — create a confirmed seven-day hosted event.
+- POST /api/integrations/polis — validate and prepare an embedded Pol.is workspace.
+
+Both external-write paths require an explicit `confirmed: true` human gate.

@@ -11,9 +11,15 @@
   "observability": {
     "enabled": false
   },
+  "vars": {
+    "CALL_IN_ORIGIN": "https://call-in.mashbean.net"
+  },
   "env": {
     "production": {
       "name": "delib",
+      "vars": {
+        "CALL_IN_ORIGIN": "https://call-in.mashbean.net"
+      },
       "routes": [
         {
           "pattern": "delib.mashbean.net",

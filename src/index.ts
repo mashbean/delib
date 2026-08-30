@@ -1,5 +1,6 @@
 interface Env {
   ASSETS: Fetcher;
+  CALL_IN_ORIGIN?: string;
 }
 
 type AgentPlan = {
@@ -20,7 +21,9 @@ type AgentRequest = {
 
 const MAX_BODY_BYTES = 32 * 1024;
 const MAX_CONTEXT_LENGTH = 4_000;
+const MAX_INTEGRATION_BODY_BYTES = 12 * 1024;
 const DEFAULT_MODEL = "gpt-5.6";
+const DEFAULT_CALL_IN_ORIGIN = "https://call-in.mashbean.net";
 
 const AGENT_INSTRUCTIONS = `你是審議流程的協作助理，不是決策者。請使用正體中文，根據已經由規則引擎選出的流程與工具，產生一份簡短、可執行的主持簡報。
 
@@ -53,6 +56,19 @@ export default {
       return handleAgentRequest(request);
     }
 
+    if (url.pathname === "/api/integrations" && request.method === "GET") {
+      const registryUrl = new URL("/data/integrations.json", url);
+      return withSecurityHeaders(await env.ASSETS.fetch(new Request(registryUrl, request)), url.pathname);
+    }
+
+    if (url.pathname === "/api/integrations/call-in" && request.method === "POST") {
+      return handleCallInRequest(request, fetch, env.CALL_IN_ORIGIN || DEFAULT_CALL_IN_ORIGIN);
+    }
+
+    if (url.pathname === "/api/integrations/polis" && request.method === "POST") {
+      return handlePolisRequest(request);
+    }
+
     if (url.pathname.startsWith("/api/")) {
       return json({ error: "not found" }, 404);
     }
@@ -61,6 +77,160 @@ export default {
     return withSecurityHeaders(assetResponse, url.pathname);
   },
 } satisfies ExportedHandler<Env>;
+
+type CallInRequest = {
+  title?: unknown;
+  description?: unknown;
+  deckUrl?: unknown;
+  locale?: unknown;
+  confirmed?: unknown;
+};
+
+type PolisRequest = {
+  mode?: unknown;
+  conversation?: unknown;
+  siteId?: unknown;
+  pageId?: unknown;
+  title?: unknown;
+  confirmed?: unknown;
+};
+
+export async function handleCallInRequest(
+  request: Request,
+  upstreamFetch: typeof fetch = fetch,
+  callInOrigin = DEFAULT_CALL_IN_ORIGIN,
+): Promise<Response> {
+  if (!isSameOriginRequest(request)) return json({ error: "origin not allowed" }, 403);
+
+  const body = await readJsonRequest<CallInRequest>(request, MAX_INTEGRATION_BODY_BYTES);
+  if (body instanceof Response) return body;
+
+  const title = cleanRequiredString(body.title, 120);
+  const description = cleanOptionalString(body.description, 500);
+  const deckUrl = cleanHttpsUrl(body.deckUrl, 2_048);
+  const locale = body.locale === "en" ? "en" : "zh-Hant-TW";
+  if (!title) return json({ error: "先幫活動取一個名字" }, 400);
+  if (!deckUrl) return json({ error: "請貼上可公開開啟的 HTTPS 簡報網址" }, 400);
+  if (body.confirmed !== true) return json({ error: "建立前請先確認資料與保存期限" }, 400);
+
+  let upstream: Response;
+  try {
+    upstream = await upstreamFetch(`${callInOrigin.replace(/\/$/, "")}/api/events`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title, description, deckUrl, locale }),
+    });
+  } catch {
+    return json({ error: "暫時連不上 Call-in，請稍後再試" }, 502);
+  }
+
+  if (!upstream.ok) {
+    return json(
+      {
+        error:
+          upstream.status === 429
+            ? "目前建立活動的人比較多，請稍後再試"
+            : upstream.status === 413
+              ? "這份內容超過 Call-in 的大小限制"
+              : "Call-in 沒有完成建立，請檢查簡報網址後再試",
+      },
+      upstream.status === 429 ? 429 : upstream.status === 413 ? 413 : 502,
+    );
+  }
+
+  let payload: unknown;
+  try {
+    payload = await upstream.json();
+  } catch {
+    return json({ error: "Call-in 回應格式不完整" }, 502);
+  }
+  if (!isRecord(payload)) return json({ error: "Call-in 回應格式不完整" }, 502);
+
+  const eventId = cleanMatchingString(payload.eventId, /^[a-f0-9]{32}$/, 32);
+  const audienceUrl = cleanHttpsUrl(payload.audienceUrl, 2_048);
+  const presenterUrl = cleanHttpsUrl(payload.presenterUrl, 2_048);
+  const setupUrl = cleanHttpsUrl(payload.setupUrl, 4_096, true);
+  const moderatorUrl = cleanHttpsUrl(payload.moderatorUrl, 4_096, true);
+  const expiresAt = typeof payload.expiresAt === "number" ? payload.expiresAt : Number.NaN;
+  if (!eventId || !audienceUrl || !presenterUrl || !setupUrl || !moderatorUrl || !Number.isFinite(expiresAt)) {
+    return json({ error: "Call-in 回應缺少必要資訊" }, 502);
+  }
+
+  return json(
+    {
+      integration: "call-in",
+      status: "ready",
+      eventId,
+      title,
+      expiresAt,
+      audienceUrl,
+      presenterUrl,
+      setupUrl,
+      moderatorUrl,
+      privacy: {
+        retention: "7 days",
+        privateUrls: ["setupUrl", "moderatorUrl"],
+        storedByDelib: false,
+      },
+    },
+    201,
+  );
+}
+
+export async function handlePolisRequest(request: Request): Promise<Response> {
+  if (!isSameOriginRequest(request)) return json({ error: "origin not allowed" }, 403);
+  const body = await readJsonRequest<PolisRequest>(request, MAX_INTEGRATION_BODY_BYTES);
+  if (body instanceof Response) return body;
+  if (body.confirmed !== true) return json({ error: "開啟前請先確認這次會連到 Pol.is" }, 400);
+
+  const workspaceUrl = new URL("/integrations/polis.html", request.url);
+  if (body.mode === "existing") {
+    const conversationId = parsePolisConversationId(body.conversation);
+    if (!conversationId) return json({ error: "找不到有效的 Pol.is 對話代碼或網址" }, 400);
+    workspaceUrl.searchParams.set("conversation", conversationId);
+    return json(
+      {
+        integration: "polis",
+        mode: "existing",
+        status: "ready",
+        conversationId,
+        workspaceUrl: workspaceUrl.toString(),
+        participantUrl: `https://pol.is/${conversationId}`,
+        storedByDelib: false,
+        writesWhenOpened: false,
+      },
+      200,
+    );
+  }
+
+  if (body.mode === "site") {
+    const siteId = cleanMatchingString(body.siteId, /^[A-Za-z0-9_-]{1,80}$/, 80);
+    const title = cleanRequiredString(body.title, 120);
+    if (!siteId) return json({ error: "請貼上 Pol.is 的 Site ID" }, 400);
+    if (!title) return json({ error: "先幫這輪對話取一個名字" }, 400);
+    const suppliedPageId = cleanMatchingString(body.pageId, /^[A-Za-z0-9._:-]{1,120}$/, 120);
+    const pageId = suppliedPageId || `${slugify(title)}-${crypto.randomUUID().slice(0, 8)}`;
+    workspaceUrl.searchParams.set("site", siteId);
+    workspaceUrl.searchParams.set("page", pageId);
+    workspaceUrl.searchParams.set("title", title);
+    return json(
+      {
+        integration: "polis",
+        mode: "site",
+        status: "ready",
+        siteId,
+        pageId,
+        workspaceUrl: workspaceUrl.toString(),
+        storedByDelib: false,
+        writesWhenOpened: true,
+        warning: "第一次開啟工作區時，Pol.is 會在這個 Site ID 下建立對話。",
+      },
+      201,
+    );
+  }
+
+  return json({ error: "請選擇已有對話或建立新對話" }, 400);
+}
 
 export async function handleAgentRequest(
   request: Request,
@@ -172,6 +342,79 @@ export function collectOutputText(payload: unknown): string {
   return texts.join("\n").trim();
 }
 
+async function readJsonRequest<T>(request: Request, maxBytes: number): Promise<T | Response> {
+  const contentLength = Number(request.headers.get("Content-Length") || "0");
+  if (contentLength > maxBytes) return json({ error: "request too large" }, 413);
+  try {
+    const rawBody = await request.text();
+    if (new TextEncoder().encode(rawBody).byteLength > maxBytes) {
+      return json({ error: "request too large" }, 413);
+    }
+    return JSON.parse(rawBody) as T;
+  } catch {
+    return json({ error: "invalid JSON" }, 400);
+  }
+}
+
+function isSameOriginRequest(request: Request): boolean {
+  const origin = request.headers.get("Origin");
+  return !origin || origin === new URL(request.url).origin;
+}
+
+function cleanRequiredString(value: unknown, max: number): string | null {
+  if (typeof value !== "string") return null;
+  const cleaned = value.trim().replace(/\s+/g, " ");
+  return cleaned && cleaned.length <= max ? cleaned : null;
+}
+
+function cleanOptionalString(value: unknown, max: number): string {
+  if (typeof value !== "string") return "";
+  return value.trim().replace(/\s+/g, " ").slice(0, max);
+}
+
+function cleanMatchingString(value: unknown, pattern: RegExp, max: number): string | null {
+  if (typeof value !== "string") return null;
+  const cleaned = value.trim();
+  return cleaned.length <= max && pattern.test(cleaned) ? cleaned : null;
+}
+
+function cleanHttpsUrl(value: unknown, max: number, allowFragment = false): string | null {
+  if (typeof value !== "string" || value.length > max) return null;
+  try {
+    const parsed = new URL(value.trim());
+    if (parsed.protocol !== "https:" || parsed.username || parsed.password) return null;
+    if (!allowFragment && parsed.hash) return null;
+    return parsed.toString();
+  } catch {
+    return null;
+  }
+}
+
+export function parsePolisConversationId(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const cleaned = value.trim();
+  if (/^[A-Za-z0-9_-]{2,80}$/.test(cleaned)) return cleaned;
+  try {
+    const parsed = new URL(cleaned);
+    if (parsed.protocol !== "https:" || !["pol.is", "www.pol.is"].includes(parsed.hostname)) return null;
+    const segment = parsed.pathname.split("/").filter(Boolean)[0] || "";
+    const conversationId = segment.startsWith("m") ? segment.slice(1) : segment;
+    return /^[A-Za-z0-9_-]{2,80}$/.test(conversationId) ? conversationId : null;
+  } catch {
+    return null;
+  }
+}
+
+function slugify(value: string): string {
+  const latin = value
+    .normalize("NFKD")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 60);
+  return latin || "delib-round";
+}
+
 function validatePlan(value: unknown): AgentPlan | null {
   if (!isRecord(value)) return null;
   const allowed = ["goal", "format", "scale", "privacy", "output"] as const;
@@ -235,9 +478,12 @@ function json(data: unknown, status: number): Response {
 
 function withSecurityHeaders(response: Response, pathname: string): Response {
   const next = new Response(response.body, response);
+  const polisWorkspace = pathname === "/integrations/polis.html" || pathname === "/integrations/polis";
   next.headers.set(
     "Content-Security-Policy",
-    "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
+    polisWorkspace
+      ? "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-src https://pol.is; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+      : "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
   );
   next.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   next.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
@@ -250,4 +496,3 @@ function withSecurityHeaders(response: Response, pathname: string): Response {
   }
   return next;
 }
-

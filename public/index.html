@@ -30,6 +30,7 @@
         </a>
         <nav aria-label="主要選單">
           <a href="#how">怎麼拼</a>
+          <a href="#launch">直接啟用</a>
           <a href="#tools">工具庫</a>
           <a href="#care">Care check</a>
           <button class="button button-small button-primary" data-start="listen">開始拼一輪 →</button>
@@ -169,6 +170,135 @@
         </div>
       </section>
 
+      <section id="launch" class="section launch-section">
+        <div class="wrap">
+          <p class="section-kicker">From recommendation to a working room</p>
+          <h2>不用離開這裡，先把工具開起來。</h2>
+          <p class="section-lede">
+            先預覽會建立什麼，再由你按下確認。公開參與連結和私人管理連結會分開顯示，
+            Delib 不保存你的活動或對話內容。
+          </p>
+
+          <div class="launch-grid">
+            <article id="launch-call-in" class="launch-card">
+              <div class="launch-card-heading">
+                <span class="launch-icon" aria-hidden="true">🎙️</span>
+                <div>
+                  <span class="flow-tag">現在可用 · 約 1 分鐘</span>
+                  <h3>建立 Call-in 現場互動</h3>
+                </div>
+              </div>
+              <p>貼一個大家都能開啟的簡報網址，建立提問、反應、投票與主持畫面。免帳號，七天後自動到期。</p>
+
+              <form id="call-in-form" class="launch-form">
+                <label for="call-in-title">活動名稱</label>
+                <input id="call-in-title" name="title" maxlength="120" required placeholder="例如：社區公園說明會" />
+                <label for="call-in-deck">公開簡報網址</label>
+                <input id="call-in-deck" name="deckUrl" type="url" maxlength="2048" required placeholder="https://…" aria-describedby="call-in-deck-note" />
+                <p id="call-in-deck-note" class="field-note">網址必須使用 HTTPS，而且參與者不需要登入就能開啟。</p>
+                <details class="advanced-fields">
+                  <summary>補一句活動說明（選填）</summary>
+                  <label for="call-in-description">活動說明</label>
+                  <textarea id="call-in-description" name="description" rows="3" maxlength="500"></textarea>
+                </details>
+                <div class="write-preview">
+                  <strong>按下建立後會發生：</strong>
+                  <ul>
+                    <li>Call-in 會建立一個獨立活動空間；</li>
+                    <li>活動與回應大約保留七天；</li>
+                    <li>你會收到公開連結與兩個私人管理連結。</li>
+                  </ul>
+                </div>
+                <label class="consent-row">
+                  <input id="call-in-confirm" type="checkbox" />
+                  <span>我確認簡報可以公開開啟，也知道私人管理連結不能放進成果頁。</span>
+                </label>
+                <button class="button button-primary" id="create-call-in" type="submit">建立 Call-in 活動</button>
+                <p id="call-in-status" class="action-status" role="status"></p>
+              </form>
+
+              <section id="call-in-result" class="instance-result" hidden aria-live="polite">
+                <span class="success-mark" aria-hidden="true">✓</span>
+                <h4>活動已經開好了</h4>
+                <p id="call-in-expiry"></p>
+                <div class="public-links">
+                  <strong>可以分享</strong>
+                  <a id="call-in-audience" class="button button-primary" target="_blank" rel="noreferrer">打開參與頁 ↗</a>
+                  <a id="call-in-presenter" class="button button-ghost" target="_blank" rel="noreferrer">打開主持畫面 ↗</a>
+                </div>
+                <details class="private-links">
+                  <summary>私人設定與協作連結</summary>
+                  <p>這兩個網址含有管理權限，只傳給共同主持人。Delib 只把它們留在這個分頁。</p>
+                  <a id="call-in-setup" target="_blank" rel="noreferrer">設定活動 ↗</a>
+                  <a id="call-in-moderator" target="_blank" rel="noreferrer">協作審題 ↗</a>
+                </details>
+              </section>
+
+              <a class="self-host-link" href="https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/call-in" target="_blank" rel="noreferrer">需要自己的保存政策？免費部署獨立 Call-in ↗</a>
+            </article>
+
+            <article id="launch-polis" class="launch-card">
+              <div class="launch-card-heading">
+                <span class="launch-icon" aria-hidden="true">🧭</span>
+                <div>
+                  <span class="flow-tag">現在可用 · 已有對話零設定</span>
+                  <h3>在 Delib 開啟 Pol.is</h3>
+                </div>
+              </div>
+              <p>已有對話就貼網址；要自動建立新對話，第一次需要 Pol.is 帳號裡的 Site ID。</p>
+
+              <form id="polis-form" class="launch-form">
+                <fieldset class="mode-picker">
+                  <legend>你現在是哪一種？</legend>
+                  <label><input type="radio" name="polis-mode" value="existing" checked /><span><strong>我有對話網址</strong><small>貼上就能留在這裡參與</small></span></label>
+                  <label><input type="radio" name="polis-mode" value="site" /><span><strong>我要建立新對話</strong><small>需要一次性的 Site ID</small></span></label>
+                </fieldset>
+
+                <div id="polis-existing-fields">
+                  <label for="polis-conversation">Pol.is 對話網址或代碼</label>
+                  <input id="polis-conversation" maxlength="2048" placeholder="https://pol.is/…" />
+                </div>
+                <div id="polis-site-fields" hidden>
+                  <label for="polis-site-id">Pol.is Site ID</label>
+                  <input id="polis-site-id" maxlength="80" autocomplete="off" placeholder="你的 Site ID" aria-describedby="polis-site-note" />
+                  <p id="polis-site-note" class="field-note">Site ID 是公開的網站識別碼，不是密碼。Delib 不保存它。</p>
+                  <label for="polis-title">這輪對話的名稱</label>
+                  <input id="polis-title" maxlength="120" placeholder="例如：我們想要怎樣的社區公園？" />
+                </div>
+
+                <div class="write-preview">
+                  <strong id="polis-preview-title">按下開啟後會發生：</strong>
+                  <ul id="polis-preview-list">
+                    <li>Pol.is 參與畫面會嵌入 Delib；</li>
+                    <li>Delib 不複製或保存投票與陳述；</li>
+                    <li>資料保存、管理與刪除仍由 Pol.is 負責。</li>
+                  </ul>
+                </div>
+                <label class="consent-row">
+                  <input id="polis-confirm" type="checkbox" />
+                  <span>我知道這個工作區會連到 Pol.is；建立模式第一次開啟時會新增一個對話。</span>
+                </label>
+                <button class="button button-primary" id="open-polis" type="submit">開啟 Pol.is 工作區</button>
+                <p id="polis-status" class="action-status" role="status"></p>
+              </form>
+              <section id="polis-result" class="instance-result compact-result" hidden aria-live="polite">
+                <span class="success-mark" aria-hidden="true">✓</span>
+                <h4>工作區準備好了</h4>
+                <p>連結只包含公開的對話代碼或 Site ID，沒有登入憑證。</p>
+                <a id="polis-workspace" class="button button-primary" target="_blank" rel="noreferrer">留在 Delib 開啟 ↗</a>
+              </section>
+              <p class="boundary-note">Pol.is 完整自架需要 Docker 與 PostgreSQL，因此這裡不把它標成 Cloudflare 一鍵部署。</p>
+            </article>
+          </div>
+
+          <div class="next-integrations">
+            <div><span>下一批</span><strong>HeyForm</strong><p>做成「貼一次臨時門票 → 預覽問題 → 發布表單」流程。</p></div>
+            <div><span>下一批</span><strong>Talk to the City</strong><p>做成「預覽 CSV → 去識別確認 → 建立分析 → 接回成果頁」流程。</p></div>
+            <a href="/data/integrations.json">查看機器可讀盤點 JSON →</a>
+          </div>
+        </div>
+      </section>
+
       <section id="care" class="section care-section">
         <div class="wrap">
           <p class="section-kicker">參考 civic.ai · 6-Pack of Care</p>
@@ -275,6 +405,7 @@
           </div>
           <div class="tool-filters" aria-label="依整合狀態篩選">
             <button class="filter-chip active" data-filter="all">全部</button>
+            <button class="filter-chip" data-filter="direct">站內啟用</button>
             <button class="filter-chip" data-filter="integrated">可直接試</button>
             <button class="filter-chip" data-filter="adapter">已有 adaptor</button>
             <button class="filter-chip" data-filter="catalog">待接入</button>
@@ -292,7 +423,11 @@
         <div class="wrap">
           <p class="section-kicker">One closed loop at a time</p>
           <h2>先拼一輪，再讓下一輪變得更容易。</h2>
-          <button class="button button-primary button-large" data-start="listen">🧩 開始拼一輪</button>
+          <div class="final-actions">
+            <button class="button button-primary button-large" data-start="listen">🧩 開始拼一輪</button>
+            <a class="button button-ghost button-large" href="https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/delib" target="_blank" rel="noreferrer">用免費層部署自己的 Delib ↗</a>
+          </div>
+          <p class="deploy-note">需要 Cloudflare 帳號；在官方免費用量內不收費，部署到自己的 workers.dev 網址，不會動到本站網域。</p>
         </div>
       </section>
     </main>

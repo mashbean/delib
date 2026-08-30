@@ -1,0 +1,161 @@
+{
+  "schema": "delib-integrations/v1",
+  "updatedAt": "2026-08-30",
+  "principles": [
+    "A tool is marked available only when the in-app path was implemented and tested.",
+    "Credentials remain in the browser tab unless the upstream API requires a single pass-through request.",
+    "Every external write has a preview and explicit human confirmation.",
+    "Cloudflare deployment is shown only when the upstream stack actually supports it."
+  ],
+  "integrations": [
+    {
+      "toolId": "call-in",
+      "readiness": "available",
+      "activation": "managed-create",
+      "label": "免帳號直接建立",
+      "summary": "在 Delib 填活動名稱與公開簡報網址，直接建立七天的 Call-in 活動。",
+      "accountRequired": false,
+      "credentialRequired": false,
+      "freePath": "Delib 代為呼叫 Call-in hosted creator；不需 Cloudflare 或 GitHub。",
+      "writesExternalState": true,
+      "retention": "活動、上傳內容與回應在七天後到期。",
+      "inAppEndpoint": "/api/integrations/call-in",
+      "selfHost": {
+        "supported": true,
+        "platform": "Cloudflare Workers + Durable Objects",
+        "freeTier": "SQLite Durable Objects 可用於 Workers Free；超過每日免費額度後該類操作會失敗，不會自動變成付費用量。",
+        "deployUrl": "https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/call-in"
+      },
+      "agent": {
+        "canCreate": true,
+        "humanGate": "建立前確認公開簡報網址、七天保存與私人管理連結。"
+      },
+      "evidence": [
+        "https://github.com/mashbean/call-in",
+        "https://call-in.mashbean.net/",
+        "https://developers.cloudflare.com/durable-objects/platform/pricing/"
+      ]
+    },
+    {
+      "toolId": "polis",
+      "readiness": "available-with-connection",
+      "activation": "embedded-workspace",
+      "label": "已有對話直接嵌入",
+      "summary": "貼上 Pol.is 對話網址即可留在 Delib 參與；有 Site ID 時可用 page_id 第一次載入自動建立。",
+      "accountRequired": "建立與管理新對話需要一次性的 Pol.is 帳號與 Site ID。",
+      "credentialRequired": false,
+      "freePath": "Pol.is 官方主站說明非營利組織與政府可免費使用。",
+      "writesExternalState": "Site ID 模式第一次開啟時會在 Pol.is 建立對話。",
+      "retention": "由 Pol.is 帳號與部署政策決定；Delib 不保存對話資料。",
+      "inAppEndpoint": "/api/integrations/polis",
+      "selfHost": {
+        "supported": true,
+        "platform": "Docker services + PostgreSQL",
+        "cloudflareNative": false,
+        "note": "完整 Polis 不是靜態站或單一 Worker，不標示為 Cloudflare 一鍵部署。"
+      },
+      "agent": {
+        "canCreate": "連接 Site ID 後可以產生工作區；第一次開啟前仍需人確認。",
+        "humanGate": "確認題目、管理責任、Pol.is 帳號與外部資料保存政策。"
+      },
+      "evidence": [
+        "https://github.com/compdemocracy/polis",
+        "https://github.com/compdemocracy/polis/blob/edge/client-admin/src/components/conversations-and-account/Integrate.js"
+      ]
+    },
+    {
+      "toolId": "openbook",
+      "readiness": "direct-viewer",
+      "activation": "evidence-reference",
+      "label": "直接查證",
+      "summary": "不建立專案；直接使用公開預算與來源頁，作為審議的證據齒輪。",
+      "accountRequired": false,
+      "credentialRequired": false,
+      "freePath": "公開網站與開放原始碼。",
+      "writesExternalState": false,
+      "agent": {
+        "canCreate": false,
+        "humanGate": "確認資料年度、地方政府與正式來源。"
+      },
+      "evidence": [
+        "https://mashbean.github.io/Open-Book/",
+        "https://github.com/mashbean/Open-Book"
+      ]
+    },
+    {
+      "toolId": "uncommon-ground",
+      "readiness": "agent-pipeline",
+      "activation": "data-handoff",
+      "label": "資料收完後交給 Agent",
+      "summary": "接收完整問題池，保留來源與撤回狀態，再執行聚類、弧線、查證、逐題回覆與成果組裝。",
+      "accountRequired": false,
+      "credentialRequired": "需要模型時由執行環境自行提供；Delib 不接收研究資料 token。",
+      "freePath": "CC0 pipeline，可在自己的 agent／工作環境執行。",
+      "writesExternalState": false,
+      "agent": {
+        "canCreate": true,
+        "humanGate": "發布前人工檢查來源、撤回、角色、缺漏與每題回覆。"
+      },
+      "evidence": [
+        "https://github.com/audreyt/uncommon-ground"
+      ]
+    },
+    {
+      "toolId": "heyform",
+      "readiness": "next-credentialed",
+      "activation": "account-api",
+      "label": "下一批：貼臨時門票後建立",
+      "summary": "MetaGov adaptor 已具備登入、workspace、表單／投票建立、發布與 embed 能力。",
+      "accountRequired": true,
+      "credentialRequired": true,
+      "freePath": "需使用 HeyForm 或自架 instance 的帳號與方案。",
+      "writesExternalState": true,
+      "agent": {
+        "canCreate": "接上 session-only credential flow 後可建立。",
+        "humanGate": "先預覽問題、發布狀態與資料所在地。"
+      },
+      "evidence": [
+        "https://github.com/metagov/ontology/tree/main/adaptors/heyform"
+      ]
+    },
+    {
+      "toolId": "talk-to-the-city",
+      "readiness": "next-credentialed",
+      "activation": "account-api",
+      "label": "下一批：貼臨時門票後分析",
+      "summary": "MetaGov adaptor 可用 Firebase token 從 CSV／Google Sheets 建立 Talk to the City report 並輪詢完成。",
+      "accountRequired": true,
+      "credentialRequired": true,
+      "freePath": "取決於 Talk to the City 帳號、模型與當前服務限制。",
+      "writesExternalState": true,
+      "agent": {
+        "canCreate": "接上 session-only Firebase token 與資料預覽後可建立。",
+        "humanGate": "上傳前確認同意、去識別、prompt、來源列與發布範圍。"
+      },
+      "evidence": [
+        "https://github.com/metagov/ontology/tree/main/adaptors/tttc"
+      ]
+    }
+  ],
+  "catalogOnly": [
+    "decidim",
+    "deliberative-canvas",
+    "ethelo",
+    "evocracy",
+    "global-brain-algorithm",
+    "go-vocal",
+    "harmonica",
+    "interoperable-cooperative-governance",
+    "iswe-foundation",
+    "ize",
+    "maple",
+    "micropublishing",
+    "moral-graph-elicitation",
+    "pairwise",
+    "policycraft",
+    "power-ranker",
+    "stanford-participatory-budgeting",
+    "swarmcheck",
+    "voice-to-vision"
+  ]
+}

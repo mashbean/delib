@@ -52,6 +52,60 @@ The public registry is at
 `updatedAt` as evidence boundaries. “Catalog” means discovered, not integrated
 or security-reviewed.
 
+## Direct tool activation
+
+Read <https://delib.mashbean.net/data/integrations.json> before claiming that a
+tool can be created, embedded or deployed. The machine-readable API index is
+also available from `GET https://delib.mashbean.net/api/integrations`.
+
+Only set `confirmed: true` after the user has seen the write preview and
+explicitly asked to continue. Planning, recommending or filling a draft does
+not count as permission to create external state.
+
+### Call-in
+
+For a public slide deck, Delib can create a seven-day hosted Call-in event
+without an account:
+
+```http
+POST https://delib.mashbean.net/api/integrations/call-in
+Content-Type: application/json
+
+{
+  "title": "Community meeting",
+  "description": "Optional public description",
+  "deckUrl": "https://example.org/public-slides/",
+  "locale": "zh-Hant-TW",
+  "confirmed": true
+}
+```
+
+Before creation, confirm that the deck is publicly accessible, state the
+seven-day retention period, and explain that `setupUrl` and `moderatorUrl` are
+private capability links. Never place those two URLs in a shared plan, public
+receipt, chat room or query string. Delib does not persist the returned event.
+
+### Pol.is
+
+An existing Pol.is conversation can be opened inside Delib:
+
+```http
+POST https://delib.mashbean.net/api/integrations/polis
+Content-Type: application/json
+
+{"mode":"existing","conversation":"https://pol.is/2demo","confirmed":true}
+```
+
+A site integration can prepare a new workspace with `mode: "site"`, `siteId`
+and `title`. The Site ID is a public identifier, not a password. The first load
+of the returned workspace is the external write that creates the conversation,
+so pause for human confirmation before opening it. Pol.is data remains with the
+selected Pol.is deployment; Delib does not copy it.
+
+Do not call full Pol.is self-hosting a Cloudflare one-click deployment. Upstream
+currently documents a Docker and PostgreSQL stack. Use the hosted/embed path or
+explain the real infrastructure requirement.
+
 ## Build both gears
 
 Every recommendation must include:
