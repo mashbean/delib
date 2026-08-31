@@ -19,6 +19,8 @@ share URL / JSON / Markdown       direct activation adapters
                                   └─ Power Ranker local or ephemeral-room workspace
                                              ↓ organizer review
                                       fragment-only result receipt
+                                             ↓ preview + one-time local draft
+                             Call-in / Harmonica / TTTC / Pol.is next-step form
         ↓ optional
 BYOK OpenAI request OR locally installed Delib skill
 ```
@@ -67,6 +69,12 @@ human gate is mandatory.
   fields for interpretation, missing voices, decision authority, response
   owner and next action. The public `/results/power-ranker.html` page reads the
   receipt after `#`; the fragment is not sent to or stored by the Worker.
+- The result page can derive a `delib-handoff/v1` draft for Call-in,
+  Harmonica, Talk to the City or Pol.is. The handoff excludes pair counts,
+  raw judgments, session IDs, receipt URLs, admin capabilities and credentials.
+  It is stored in same-tab `sessionStorage` for at most two hours, consumed on
+  first load, and only pre-fills the destination form. Every destination keeps
+  its existing preview, validation and explicit-confirmation gate.
 - Private Call-in links stay in tab-scoped `sessionStorage` and never enter a
   plan URL or exported public receipt.
 
@@ -108,6 +116,10 @@ marks pairwise judgments as participant data even when they contain no names.
 `delib-ranking-receipt/v1` accepts aggregates only, preserves that participant-
 data warning, excludes individual linkage, and adds explicitly human-authored
 interpretation and responsibility fields.
+`delib-handoff/v1` is smaller again: it carries only bounded organizer-authored
+summary fields needed for one named destination. It is not an export of the
+ranking receipt and cannot be treated as TTTC qualitative input or Pol.is seed
+statements.
 
 ## Adapter contract
 

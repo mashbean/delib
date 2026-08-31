@@ -107,6 +107,43 @@
             <p id="receipt-source-expiry"></p>
           </section>
 
+          <section class="receipt-handoff" aria-labelledby="receipt-handoff-heading">
+            <div class="receipt-section-heading">
+              <div>
+                <span class="receipt-layer-label receipt-layer-next">接到下一輪</span>
+                <h2 id="receipt-handoff-heading">下一步想開哪一個齒輪？</h2>
+              </div>
+              <p>先看會帶走什麼，再回 Delib 逐欄確認。</p>
+            </div>
+            <div class="handoff-targets" aria-label="選擇下一步工具">
+              <button type="button" data-handoff-target="call-in" aria-pressed="false">
+                <span aria-hidden="true">🎙️</span><strong>成果回報場</strong><small>Call-in</small>
+              </button>
+              <button type="button" data-handoff-target="harmonica" aria-pressed="false">
+                <span aria-hidden="true">🎼</span><strong>補訪缺席聲音</strong><small>Harmonica</small>
+              </button>
+              <button type="button" data-handoff-target="talk-to-the-city" aria-pressed="false">
+                <span aria-hidden="true">🧩</span><strong>整理下一輪文字</strong><small>Talk to the City</small>
+              </button>
+              <button type="button" data-handoff-target="polis" aria-pressed="false">
+                <span aria-hidden="true">🧭</span><strong>開放新陳述</strong><small>Pol.is</small>
+              </button>
+            </div>
+            <aside id="receipt-handoff-preview" class="handoff-preview" hidden aria-live="polite">
+              <div>
+                <span class="memory-toast-mark" aria-hidden="true">✓</span>
+                <div>
+                  <strong id="receipt-handoff-target-label"></strong>
+                  <p>會帶入草稿：</p>
+                  <ul id="receipt-handoff-fields"></ul>
+                </div>
+              </div>
+              <p id="receipt-handoff-boundary" class="handoff-boundary"></p>
+              <p class="field-note">草稿只存在同一個分頁，最多兩小時；進入設定頁後即從暫存中刪除。現在不會建立外部活動或上傳資料。</p>
+              <button id="receipt-handoff-continue" class="button button-primary" type="button">帶到設定頁</button>
+            </aside>
+          </section>
+
           <footer class="receipt-actions">
             <div>
               <strong>讓成果回到下一輪</strong>

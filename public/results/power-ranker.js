@@ -5,6 +5,12 @@ import {
   rankingReceiptSummary,
   rankingReceiptToMarkdown,
 } from "/ranking-receipt-core.js";
+import {
+  RECEIPT_HANDOFF_STORAGE_KEY,
+  RECEIPT_HANDOFF_TARGETS,
+  createReceiptHandoff,
+  receiptHandoffTargetUrl,
+} from "/receipt-handoff-core.js";
 
 const receipt = rankingReceiptFromHash(location.hash);
 const error = document.querySelector("#receipt-page-error");
@@ -61,6 +67,27 @@ function renderReceipt(value) {
 }
 
 function bindReceiptActions(value) {
+  let selectedHandoff = null;
+  document.querySelectorAll("[data-handoff-target]").forEach((button) => {
+    button.addEventListener("click", () => {
+      selectedHandoff = createReceiptHandoff({ receipt: value, target: button.dataset.handoffTarget });
+      document.querySelectorAll("[data-handoff-target]").forEach((candidate) => {
+        const active = candidate === button;
+        candidate.classList.toggle("active", active);
+        candidate.setAttribute("aria-pressed", String(active));
+      });
+      renderHandoffPreview(selectedHandoff);
+    });
+  });
+  document.querySelector("#receipt-handoff-continue").addEventListener("click", () => {
+    if (!selectedHandoff) return;
+    try {
+      sessionStorage.setItem(RECEIPT_HANDOFF_STORAGE_KEY, JSON.stringify(selectedHandoff));
+      location.assign(receiptHandoffTargetUrl(selectedHandoff, location.origin));
+    } catch {
+      actionStatus.textContent = "瀏覽器無法暫存這份草稿；請改用複製成果摘要。";
+    }
+  });
   document.querySelector("#receipt-copy-summary").addEventListener("click", async () => {
     try {
       await navigator.clipboard.writeText(`${rankingReceiptSummary(value)}\n${location.href}`);
@@ -75,6 +102,22 @@ function bindReceiptActions(value) {
   document.querySelector("#receipt-download-md").addEventListener("click", () =>
     downloadFile(rankingReceiptToMarkdown(value), "delib-power-ranker-receipt.md", "text/markdown"),
   );
+}
+
+function renderHandoffPreview(handoff) {
+  const target = RECEIPT_HANDOFF_TARGETS[handoff.target];
+  document.querySelector("#receipt-handoff-target-label").textContent = target.label;
+  document.querySelector("#receipt-handoff-fields").replaceChildren(
+    ...target.carried.map((field) => {
+      const item = document.createElement("li");
+      item.textContent = field;
+      return item;
+    }),
+  );
+  document.querySelector("#receipt-handoff-boundary").textContent = target.omitted;
+  const preview = document.querySelector("#receipt-handoff-preview");
+  preview.hidden = false;
+  preview.querySelector("button").focus();
 }
 
 function renderRankingList(root, ranking) {

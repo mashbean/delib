@@ -218,6 +218,12 @@ nav > a:hover { color: var(--purple-dark); }
 .inline-actions, .resource-links { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 10px; font-size: .8rem; font-weight: 700; }
 .text-button { appearance: none; padding: 0; border: 0; background: transparent; color: var(--purple-ink); cursor: pointer; font: inherit; text-decoration: underline; text-underline-offset: 3px; }
 .resource-links { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); }
+.handoff-toast {
+  margin: 0 0 20px; padding: 16px 18px; border: 1px solid #b5d75b; border-left: 5px solid var(--lime);
+  border-radius: var(--radius-sm); background: var(--lime-soft); color: #355b58;
+}
+.handoff-toast strong { color: var(--green); }
+.handoff-toast p { margin: 4px 0 0; font-size: .84rem; }
 .next-integrations { display: grid; grid-template-columns: 1fr 1fr auto; gap: 14px; align-items: center; margin-top: 22px; padding: 20px; border: 1px dashed #c6bfd7; border-radius: var(--radius-md); background: rgb(255 255 255 / 60%); }
 .next-integrations > div { display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; }
 .next-integrations span { color: var(--purple-ink); font-size: .7rem; font-weight: 800; text-transform: uppercase; }
@@ -360,6 +366,36 @@ nav > a:hover { color: var(--purple-dark); }
   padding: 30px; border: 1px solid #d6d0ec; border-radius: var(--radius-md); background: var(--purple-soft);
 }
 .receipt-actions > div:first-child p { margin: 4px 0 0; color: var(--muted); }
+.receipt-handoff {
+  padding: 30px; border: 1px solid #d6d0ec; border-radius: var(--radius-md); background: #fff;
+  box-shadow: var(--shadow-sm);
+}
+.receipt-handoff .receipt-section-heading > p { max-width: 310px; margin: 4px 0 0; color: var(--muted); font-size: .84rem; }
+.receipt-handoff h2 { margin: 8px 0 14px; font-size: clamp(1.55rem, 4vw, 2.15rem); }
+.handoff-targets { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 22px; }
+.handoff-targets button {
+  display: grid; gap: 4px; min-width: 0; padding: 18px 14px; border: 1px solid var(--line);
+  border-radius: var(--radius-sm); background: var(--canvas); color: var(--ink); cursor: pointer; text-align: left;
+}
+.handoff-targets button > span { font-size: 1.35rem; }
+.handoff-targets button small { color: var(--muted); }
+.handoff-targets button:hover, .handoff-targets button:focus-visible, .handoff-targets button.active {
+  border-color: var(--purple-dark); background: var(--purple-soft); box-shadow: 0 0 0 1px var(--purple-dark);
+}
+.handoff-preview {
+  margin-top: 14px; padding: 19px; border: 1px solid #b5d75b; border-radius: var(--radius-sm);
+  background: var(--lime-soft); color: #355b58;
+}
+.handoff-preview > div { display: flex; gap: 13px; align-items: flex-start; }
+.handoff-preview strong { color: var(--green); }
+.handoff-preview p { margin: 4px 0 0; }
+.handoff-preview ul { margin: 5px 0 0; padding-left: 1.2rem; }
+.handoff-preview .button { margin-top: 14px; }
+.handoff-boundary { padding-top: 12px; border-top: 1px solid #c9dda0; font-weight: 700; }
+.memory-toast-mark {
+  display: grid; place-items: center; width: 30px; height: 30px; flex: 0 0 auto;
+  border-radius: 50%; background: var(--lime); color: #294001; font-weight: 900;
+}
 
 .care-section { background: var(--green-soft); }
 .care-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 42px; }
@@ -487,12 +523,13 @@ fieldset > p { color: var(--muted); margin: 7px 0 22px; }
   .workspace-heading { align-items: flex-start; flex-direction: column; }
   .public-receipt-hero { grid-template-columns: 1fr; padding: 26px 20px; gap: 26px; }
   .receipt-stamp { width: 100%; transform: none; }
-  .receipt-section, .receipt-data-card, .receipt-actions { padding: 22px 18px; }
+  .receipt-section, .receipt-data-card, .receipt-actions, .receipt-handoff { padding: 22px 18px; }
   .receipt-section-heading { flex-direction: column; gap: 4px; }
   .receipt-section-heading > a { white-space: normal; }
   .receipt-decision > div + div { border-left: 0; border-top: 1px solid var(--line); padding-left: 0; padding-top: 24px; }
   .receipt-data-card p { grid-column: auto; }
   .receipt-next-action dl > div { grid-template-columns: 1fr; gap: 2px; }
+  .handoff-targets { grid-template-columns: 1fr 1fr; }
   .polis-embed-shell, .external-embed-shell { padding: 6px; min-height: 620px; }
   .loops-panel > div + div { border-left: 0; border-top: 1px solid var(--line); padding-left: 0; padding-top: 24px; }
   .search-field { width: 100%; min-width: 0; }

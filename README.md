@@ -33,7 +33,8 @@
 12. 使用 tab-only Harmonica API key 直接建立 AI 對話 session，或複製 MCP 啟動提示；
 13. 使用內建 Power Ranker 完成本機成對排序，或建立 24 小時／7 天自動清除的多人結果收件室；
 14. 把群體彙整接成 `delib-ranking-receipt/v1` 成果頁，分開呈現工具計算、主辦者解讀、未納入聲音、決策狀態與下一步責任；
-15. `delib-integrations/v1` 與 `delib-hosting/v1` 盤點，明確區分可用、共用託管、元件、研究與阻擋項目。
+15. 從成果頁預覽並帶入 `delib-handoff/v1` 草稿，接續 Call-in 成果回報、Harmonica 補訪、TTTC 文字整理或 Pol.is 新一輪；
+16. `delib-integrations/v1` 與 `delib-hosting/v1` 盤點，明確區分可用、共用託管、元件、研究與阻擋項目。
 
 Delib 伺服器不保存 API key 或使用者建立的流程。Power Ranker 預設仍可完全
 在瀏覽器處理；只有主辦者明確選擇短期收件室時，才會保存公開題目、去連結化
@@ -43,6 +44,10 @@ pair counts 與隨機 session ID 的 SHA-256 雜湊。逐份原始判斷不落�
 成果收據只接受至少三份不重複 session 的去連結化群體彙整；公開資料編碼在網址 fragment，瀏覽器載入
 頁面時不會把它送給 Worker。Delib 不另存收據，但拿到完整連結的人可以閱讀與
 再次分享，因此產生前仍需人工確認。
+成果接續草稿只包含主辦者已公開的解讀、限制與下一步，不含 pair counts、
+個別判斷、session ID、管理連結或 credential。草稿只活在同一分頁的
+`sessionStorage`，兩小時內有效且讀取一次即刪除；帶入後仍須通過目的工具原本的
+欄位檢查與人工確認，才會發生外部寫入。
 
 ## 本機開發
 
@@ -118,6 +123,9 @@ OpenAI 官方目前建議文字生成使用
   `delib-ranking/v1` JSON／CSV；有群體彙整後，主辦者可補上解讀、缺席聲音、
   決策狀態與下一責任者，產生 fragment-only 成果頁、JSON 與 Markdown。
   成果頁不含個別 session 或逐題判斷，模型分數也不會被標成支持率或共識證明。
+  成果頁另可把最小必要的主辦者摘要帶回 Delib，預填 Call-in、Harmonica、TTTC
+  或 Pol.is 的下一輪草稿。TTTC 仍須另行上傳已去識別的原始文字資料；Pol.is
+  不會自動新增種子陳述；Call-in 的公開簡報網址也不會因長收據連結而被假裝填好。
 
 舊 MetaGov HeyForm／TTTC adaptor 仍保留為互通設計參考，但現行 hosted
 登入與 API 契約已不同；本站不把未驗證的舊端點標示為可直接建立。細節與

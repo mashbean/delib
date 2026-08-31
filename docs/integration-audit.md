@@ -32,7 +32,7 @@ button.
 | HeyForm | Validate an existing public form URL and embed the published participant form in Delib. | No Delib credential. Creating and administering a form stays in HeyForm. Delib never asks for a password or cookie. | Self-hosting needs the application, MongoDB and Redis/KeyDB; official docs point to hosted/container platforms, not Cloudflare Workers. | Available: existing only. |
 | Talk to the City | Pre-fill title and description, then embed the current official `/create` UI. Login, CSV upload, model processing and submission all remain inside TTTC. | The user logs in to TTTC in its own frame; Delib never receives the Firebase token. | Current source uses Next/Express, Firebase, Google Cloud Storage, Redis/PubSub and model services, not a Cloudflare-only stack. | Available with upstream login. |
 | Harmonica | Create a conversational session through the official REST API, then return the participant workspace and official management page. The same task can be handed to `harmonica-mcp`. | A `hm_live_` key remains in the browser tab and is sent through the Worker only for the confirmed request. | Official hosted accounts offer a free starting path. Full AGPL self-hosting still needs PostgreSQL, Auth0, model/embedding and vector/file services. | Available with API key. |
-| Power Ranker | Choose a fully local share link or a 24-hour／seven-day room. Room submissions are immediately reduced to pair counts; public aggregates appear at three sessions, and organizers can delete early. Aggregate results can become a fragment-only public receipt after the organizer states interpretation, missing voices, authority and next responsibility. | None. Local exports contain a random pseudonymous session ID. Rooms keep only its SHA-256 hash for deduplication; the private admin token stays after `#` and is stripped from receipts. | Static mode and receipt rendering need no storage. Room mode uses one SQLite Durable Object per room and works within Workers Free limits; excess operations fail. | Available locally or with ephemeral room and result receipt. |
+| Power Ranker | Choose a fully local share link or a 24-hour／seven-day room. Room submissions are immediately reduced to pair counts; public aggregates appear at three sessions, and organizers can delete early. Aggregate results can become a fragment-only public receipt after the organizer states interpretation, missing voices, authority and next responsibility. The receipt can then prepare a one-time local draft for Call-in, Harmonica, TTTC or Pol.is without carrying aggregate records. | None. Local exports contain a random pseudonymous session ID. Rooms keep only its SHA-256 hash for deduplication; the private admin token stays after `#` and is stripped from receipts and next-step drafts. | Static mode, receipt rendering and same-tab handoff need no storage. Room mode uses one SQLite Durable Object per room and works within Workers Free limits; excess operations fail. | Available locally or with ephemeral room, result receipt and next-step draft. |
 
 The remaining seventeen gallery tools stay `catalog-only` until we have verified
 their creation API, embed policy, export contract, authentication, retention,
@@ -64,6 +64,13 @@ UI, optional expiring rooms, a participant-aware ranking schema and a separate
 aggregate-only result receipt. The receipt keeps tool calculation, organizer
 interpretation and formal status as distinct layers; it does not treat spectral
 weights as vote percentages or proof of consensus.
+
+The next-step draft is deliberately not a generic data pipe. Call-in receives
+only a title and summary and still requires a separately verified public deck
+URL. Harmonica receives a bounded follow-up brief but no API key. TTTC receives
+an analysis title and de-identification reminder, not CSV or receipt data.
+Pol.is receives new-conversation mode and a title, not seed statements or a
+Site ID. The destination form remains the external-write boundary.
 
 Pol.is requires an additional ownership gate. Its implicit creation flow sends
 moderation and seed links to the Site ID owner. A shared operator Site ID would

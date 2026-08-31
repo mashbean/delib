@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://delib.mashbean.net/schemas/delib-handoff/v1.json",
+  "title": "Delib result receipt handoff",
+  "description": "A short-lived same-tab draft that carries only bounded organizer-authored result summaries into a supported next-step tool.",
+  "type": "object",
+  "required": ["schema", "kind", "target", "createdAt", "expiresAt", "source", "draft", "dataCard"],
+  "properties": {
+    "schema": { "const": "https://delib.mashbean.net/schemas/delib-handoff/v1.json" },
+    "kind": { "const": "receipt-handoff" },
+    "target": { "enum": ["call-in", "harmonica", "talk-to-the-city", "polis"] },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "expiresAt": { "type": "string", "format": "date-time" },
+    "source": {
+      "type": "object",
+      "required": ["tool", "title"],
+      "properties": {
+        "tool": { "const": "power-ranker" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 120 }
+      },
+      "additionalProperties": false
+    },
+    "draft": {
+      "type": "object",
+      "description": "Target-specific bounded fields. Consumers must apply the target form's normal validation and explicit confirmation gate."
+    },
+    "dataCard": {
+      "type": "object",
+      "required": [
+        "containsParticipantDerivedSummary",
+        "containsParticipantRecords",
+        "containsDirectIdentifiers",
+        "containsRawJudgments",
+        "containsSessionIds",
+        "containsCredentials",
+        "storedByDelib",
+        "storage",
+        "externalWriteStatus",
+        "expiresWithinMinutes"
+      ],
+      "properties": {
+        "containsParticipantDerivedSummary": { "const": true },
+        "containsParticipantRecords": { "const": false },
+        "containsDirectIdentifiers": { "const": false },
+        "containsRawJudgments": { "const": false },
+        "containsSessionIds": { "const": false },
+        "containsCredentials": { "const": false },
+        "storedByDelib": { "const": false },
+        "storage": { "const": "same-tab-session" },
+        "externalWriteStatus": { "const": "not-started" },
+        "expiresWithinMinutes": { "const": 120 }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "callInDraft": {
+      "type": "object",
+      "required": ["title", "description", "needsDeckUrl"],
+      "properties": {
+        "title": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "description": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "needsDeckUrl": { "const": true }
+      },
+      "additionalProperties": false
+    },
+    "harmonicaDraft": {
+      "type": "object",
+      "required": ["topic", "goal", "context", "critical", "questions"],
+      "properties": {
+        "topic": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "goal": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "context": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "critical": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "questions": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": { "type": "string", "minLength": 1, "maxLength": 240 }
+        }
+      },
+      "additionalProperties": false
+    },
+    "tttcDraft": {
+      "type": "object",
+      "required": ["title", "description"],
+      "properties": {
+        "title": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "description": { "type": "string", "minLength": 1, "maxLength": 500 }
+      },
+      "additionalProperties": false
+    },
+    "polisDraft": {
+      "type": "object",
+      "required": ["mode", "title"],
+      "properties": {
+        "mode": { "const": "site" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 120 }
+      },
+      "additionalProperties": false
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "target": { "const": "call-in" } } },
+      "then": { "properties": { "draft": { "$ref": "#/$defs/callInDraft" } } }
+    },
+    {
+      "if": { "properties": { "target": { "const": "harmonica" } } },
+      "then": { "properties": { "draft": { "$ref": "#/$defs/harmonicaDraft" } } }
+    },
+    {
+      "if": { "properties": { "target": { "const": "talk-to-the-city" } } },
+      "then": { "properties": { "draft": { "$ref": "#/$defs/tttcDraft" } } }
+    },
+    {
+      "if": { "properties": { "target": { "const": "polis" } } },
+      "then": { "properties": { "draft": { "$ref": "#/$defs/polisDraft" } } }
+    }
+  ],
+  "additionalProperties": false
+}

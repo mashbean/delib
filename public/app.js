@@ -8,6 +8,11 @@ import {
   stateToSearch,
 } from "./core.js";
 import { normalizeRankingConfig, rankingConfigToHash } from "./power-ranker-core.js";
+import {
+  RECEIPT_HANDOFF_STORAGE_KEY,
+  RECEIPT_HANDOFF_TARGETS,
+  normalizeReceiptHandoff,
+} from "./receipt-handoff-core.js";
 
 const STAGE_LABELS = {
   evaluating: "現況評估",
@@ -98,6 +103,7 @@ async function init() {
   apiKeyInput.value = sessionStorage.getItem("delib:openai-key") || "";
   harmonicaKeyInput.value = sessionStorage.getItem("delib:harmonica-key") || "";
   restoreCallInInstance();
+  restoreReceiptHandoff();
   const state = stateFromSearch(location.search);
   if (state) renderResult(state, false);
 }
@@ -576,6 +582,72 @@ function restoreCallInInstance() {
   } catch {
     sessionStorage.removeItem("delib:call-in-instance");
   }
+}
+
+function restoreReceiptHandoff() {
+  const raw = sessionStorage.getItem(RECEIPT_HANDOFF_STORAGE_KEY);
+  if (!raw) return;
+  sessionStorage.removeItem(RECEIPT_HANDOFF_STORAGE_KEY);
+  try {
+    const handoff = normalizeReceiptHandoff(JSON.parse(raw));
+    if (!handoff) return;
+    applyReceiptHandoff(handoff);
+  } catch {
+    // Invalid or expired drafts are consumed without touching any form.
+  }
+}
+
+function applyReceiptHandoff(handoff) {
+  const draft = handoff.draft;
+  let focusTarget = null;
+  if (handoff.target === "call-in") {
+    document.querySelector("#call-in-title").value = draft.title;
+    document.querySelector("#call-in-description").value = draft.description;
+    document.querySelector("#call-in-form .advanced-fields").open = true;
+    document.querySelector("#call-in-confirm").checked = false;
+    document.querySelector("#call-in-result").hidden = true;
+    focusTarget = document.querySelector("#call-in-deck");
+  } else if (handoff.target === "harmonica") {
+    document.querySelector("#harmonica-topic").value = draft.topic;
+    document.querySelector("#harmonica-goal").value = draft.goal;
+    document.querySelector("#harmonica-context").value = draft.context;
+    document.querySelector("#harmonica-critical").value = draft.critical;
+    document.querySelector("#harmonica-questions").value = draft.questions.join("\n");
+    document.querySelector("#harmonica-form .advanced-fields").open = true;
+    document.querySelector("#harmonica-confirm").checked = false;
+    document.querySelector("#harmonica-result").hidden = true;
+    focusTarget = document.querySelector("#harmonica-topic");
+  } else if (handoff.target === "talk-to-the-city") {
+    document.querySelector("#tttc-title").value = draft.title;
+    document.querySelector("#tttc-description").value = draft.description;
+    document.querySelector("#tttc-confirm").checked = false;
+    document.querySelector("#tttc-result").hidden = true;
+    focusTarget = document.querySelector("#tttc-title");
+  } else {
+    const siteMode = document.querySelector('input[name="polis-mode"][value="site"]');
+    siteMode.checked = true;
+    document.querySelector("#polis-title").value = draft.title;
+    document.querySelector("#polis-confirm").checked = false;
+    document.querySelector("#polis-result").hidden = true;
+    updatePolisMode();
+    focusTarget = document.querySelector("#polis-title");
+  }
+
+  const card = document.querySelector(`#${RECEIPT_HANDOFF_TARGETS[handoff.target].hash}`);
+  const form = card.querySelector(".launch-form");
+  const toast = document.createElement("section");
+  toast.className = "handoff-toast";
+  toast.setAttribute("role", "status");
+  const heading = document.createElement("strong");
+  heading.textContent = "已從成果收據帶入草稿";
+  const summary = document.createElement("p");
+  summary.textContent = `${handoff.source.title} → ${RECEIPT_HANDOFF_TARGETS[handoff.target].label}`;
+  const boundary = document.createElement("p");
+  boundary.textContent = "尚未建立任何外部活動，也沒有上傳參與資料。草稿暫存已刪除；請逐欄檢查後再勾選確認。";
+  toast.append(heading, summary, boundary);
+  form.prepend(toast);
+  card.scrollIntoView({ block: "start" });
+  queueMicrotask(() => focusTarget?.focus({ preventScroll: true }));
 }
 
 function renderCallInInstance(data) {

@@ -236,6 +236,20 @@ not secrecy: anyone with the complete link can read, copy and reshare it. Get
 explicit human confirmation before preparing the link, and export JSON or
 Markdown when a more durable handoff is needed.
 
+To continue from a valid receipt, a human may choose Call-in, Harmonica, Talk
+to the City or Pol.is. Delib creates a `delib-handoff/v1` draft that contains
+only bounded organizer-authored summaries needed by that destination. It must
+exclude pair counts, raw judgments, session IDs, the receipt URL, admin
+capabilities and credentials. Store it only in same-tab `sessionStorage`, expire
+it within two hours and remove it on first read. Pre-fill the destination form,
+leave every confirmation checkbox unchecked and do not trigger an API call.
+
+Do not treat this draft as a generic data conversion. TTTC still requires a
+separate, de-identified `id,interview,comment` CSV; the ranking receipt is not
+qualitative source data. Pol.is receives a title but no seed statements.
+Harmonica receives a follow-up brief but no API key. Call-in receives a title
+and summary but still requires a separately verified public deck URL.
+
 ## Build both gears
 
 Every recommendation must include:
@@ -288,6 +302,8 @@ no participant data. `delib-ranking/v1` explicitly marks pairwise judgments or
 pair-count aggregates as participant data and records that Delib did not store
 them. `delib-ranking-receipt/v1` accepts de-linked aggregates only, preserves
 that participant-data warning, and separately labels organizer-authored text.
+`delib-handoff/v1` is a one-destination, one-time browser draft; it carries no
+aggregate records and never bypasses the destination tool's human gate.
 
 Never silently delete withdrawn, rejected or unclassified rows. Keep their
 status for provenance and exclude them from publication only through an
