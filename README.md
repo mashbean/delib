@@ -30,7 +30,8 @@
 9. 在站內嵌入既有 Pol.is 對話，或用 Site ID 準備自動建立工作區；
 10. 在站內嵌入已發布的 HeyForm 表單；
 11. 在站內開啟 Talk to the City 官方建立流程，登入與 CSV 不經 Delib；
-12. `delib-integrations/v1` 盤點，明確區分可用、需連接與純目錄。
+12. 使用 tab-only Harmonica API key 直接建立 AI 對話 session，或複製 MCP 啟動提示；
+13. `delib-integrations/v1` 與 `delib-hosting/v1` 盤點，明確區分可用、共用託管、元件、研究與阻擋項目。
 
 目前不保存參與資料、API key 或使用者建立的流程。分享狀態只包含固定
 選項並留在 URL；後續才會加入經明確同意的資料匯入、轉換與公開成果保存。
@@ -97,13 +98,18 @@ OpenAI 官方目前建議文字生成使用
 - **Talk to the City**：Delib 預填分析名稱與說明，再嵌入現行官方建立頁。
   登入、上傳、模型處理與提交都留在 TTTC；第三方登入被 iframe 阻擋時可
   用同一個預填網址在新分頁繼續。
+- **Harmonica**：使用者在 Harmonica settings 產生 `hm_live_` API key，
+  Delib 只在建立 session 的單次請求中轉送。建立後回傳站內參與頁與官方管理頁；
+  也可改用 `harmonica-mcp` 讓自己的 Agent 在人工確認後建立。
 
 舊 MetaGov HeyForm／TTTC adaptor 仍保留為互通設計參考，但現行 hosted
 登入與 API 契約已不同；本站不把未驗證的舊端點標示為可直接建立。細節與
 HeyForm 目前的安全公告都列在 audit。
 
 盤點見 [`docs/integration-audit.md`](docs/integration-audit.md)，機器可讀版本在
-[`public/data/integrations.json`](public/data/integrations.json)。
+[`public/data/integrations.json`](public/data/integrations.json) 與
+[`public/data/hosting.json`](public/data/hosting.json)。Pol.is 共用託管的架構、
+帳號所有權與 release gates 見 [`docs/polis-hosting.md`](docs/polis-hosting.md)。
 
 ## Skill
 

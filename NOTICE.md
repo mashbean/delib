@@ -34,6 +34,13 @@ projects, but does not imply endorsement by their maintainers.
   Apache-2.0 licensed
   [tttc-light-js](https://github.com/AIObjectives/tttc-light-js) project;
   authentication, uploads and model processing remain upstream.
+- The Harmonica creator calls the public REST API of the independent AGPL-3.0
+  [Harmonica web app](https://github.com/harmonicabot/harmonica-web-app) and
+  frames only the returned participant URL. No Harmonica source, API key or
+  participant response is bundled or persisted by Delib.
+- The source/hosting registry cites upstream repositories and their declared
+  licenses. “Reusable” means a current repository exposes a recognized open
+  license; it does not mean Delib has copied or redistributed that code.
 
 Tool names and trademarks belong to their respective owners. The tool registry
 stores links and factual interoperability metadata; no third-party source code

@@ -14,7 +14,8 @@ share URL / JSON / Markdown       direct activation adapters
                                   ├─ Call-in managed creator
                                   ├─ Pol.is connected workspace
                                   ├─ HeyForm published-form workspace
-                                  └─ Talk to the City official create workspace
+                                  ├─ Talk to the City official create workspace
+                                  └─ Harmonica credentialed creator + workspace
         ↓ optional
 BYOK OpenAI request OR locally installed Delib skill
 ```
@@ -41,6 +42,10 @@ human gate is mandatory.
   returns a same-site participant workspace. Answers go directly to HeyForm.
 - `POST /api/integrations/tttc` prepares a same-site wrapper around the current
   official create page. Authentication, CSV and report creation stay in TTTC.
+- `POST /api/integrations/harmonica` validates a tab-only `hm_live_` key and a
+  bounded, confirmed session brief; it forwards one create request to the
+  official REST API and returns only the session ID, participant workspace and
+  management URL. Neither the key nor upstream response body is stored.
 - Private Call-in links stay in tab-scoped `sessionStorage` and never enter a
   plan URL or exported public receipt.
 

@@ -1,6 +1,6 @@
 {
   "schema": "delib-integrations/v1",
-  "updatedAt": "2026-08-30",
+  "updatedAt": "2026-08-31",
   "principles": [
     "A tool is marked available only when the in-app path was implemented and tested.",
     "Credentials remain in the browser tab unless the upstream API requires a single pass-through request.",
@@ -52,7 +52,8 @@
         "supported": true,
         "platform": "Docker services + PostgreSQL",
         "cloudflareNative": false,
-        "note": "Cloudflare Containers 只有 Workers Paid，且不提供 PostgreSQL；完整 Polis 不標示為免費 Cloudflare 一鍵部署。Delib 自己的一鍵部署可以提示輸入既有 Site ID。"
+        "recommendedArchitecture": "以最新 compdemocracy/polis edge 在一般 VM／container host 共用託管；Cloudflare 位於前方提供 DNS、TLS、WAF，資料庫使用有備份的 PostgreSQL。",
+        "note": "polis.tw 是 PDIS 自架 fork 的先例，但目前回傳 Cloudflare 523，且 fork 已大幅落後主線；不作為新部署基底。Cloudflare Containers 只有 Workers Paid，且不提供 PostgreSQL。"
       },
       "agent": {
         "canCreate": "連接 Site ID 後可以產生工作區；第一次開啟前仍需人確認。",
@@ -60,9 +61,40 @@
       },
       "evidence": [
         "https://github.com/compdemocracy/polis",
+        "https://github.com/PDIS/polis2023",
+        "https://polis.tw/",
         "https://github.com/compdemocracy/polis/blob/edge/client-admin/src/components/conversations-and-account/Integrate.js",
         "https://developers.cloudflare.com/containers/",
         "https://developers.cloudflare.com/workers/platform/pricing/"
+      ]
+    },
+    {
+      "toolId": "harmonica",
+      "readiness": "available-with-api-key",
+      "activation": "credentialed-create",
+      "label": "API／MCP 可直接建立",
+      "summary": "在 Delib 填入對話目標與選填問題，使用 Harmonica 的 tab-only API key 建立 session，再站內開啟參與頁。",
+      "accountRequired": true,
+      "credentialRequired": "需要 Harmonica settings 產生的 hm_live_ API key；只保存在目前分頁並單次轉送。",
+      "freePath": "官方提供 Start for free；可用額度與模型限制仍由 Harmonica 帳號方案決定。",
+      "writesExternalState": "按下確認後，Delib Worker 會呼叫官方 REST API，立即建立 Harmonica session。",
+      "retention": "由 Harmonica 帳號與部署政策決定；Delib 不保存 API key、對話或 session metadata。",
+      "inAppEndpoint": "/api/integrations/harmonica",
+      "selfHost": {
+        "supported": true,
+        "platform": "Next.js + PostgreSQL + Auth0 + LLM/embeddings + vector/file services",
+        "cloudflareNative": false,
+        "note": "原始碼為 AGPL，但完整自架不是 Cloudflare Workers 免費一鍵部署。"
+      },
+      "agent": {
+        "canCreate": true,
+        "mcp": "npx harmonica-mcp",
+        "humanGate": "建立前確認目標、資料邊界與外部寫入；發布摘要前人工複核。"
+      },
+      "evidence": [
+        "https://github.com/harmonicabot/harmonica-web-app",
+        "https://help.harmonica.chat/api-reference/introduction",
+        "https://github.com/harmonicabot/harmonica-mcp"
       ]
     },
     {
@@ -73,7 +105,7 @@
       "summary": "不建立專案；直接使用公開預算與來源頁，作為審議的證據齒輪。",
       "accountRequired": false,
       "credentialRequired": false,
-      "freePath": "公開網站與開放原始碼。",
+      "freePath": "公開網站可直接使用；repo 目前未標明授權，因此不把原始碼列為可重用部署。",
       "writesExternalState": false,
       "agent": {
         "canCreate": false,
@@ -178,7 +210,6 @@
     "evocracy",
     "global-brain-algorithm",
     "go-vocal",
-    "harmonica",
     "interoperable-cooperative-governance",
     "iswe-foundation",
     "ize",

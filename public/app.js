@@ -37,6 +37,7 @@ const RESULT_TITLES = {
 
 let tools = [];
 let integrations = new Map();
+let hosting = new Map();
 let currentPlan = null;
 let currentStep = 0;
 let activeFilter = "all";
@@ -55,6 +56,7 @@ const actionStatus = document.querySelector("#action-status");
 const agentStatus = document.querySelector("#agent-status");
 const agentOutput = document.querySelector("#agent-output");
 const apiKeyInput = document.querySelector("#openai-key");
+const harmonicaKeyInput = document.querySelector("#harmonica-key");
 
 init().catch((error) => {
   console.error(error);
@@ -65,19 +67,26 @@ init().catch((error) => {
 });
 
 async function init() {
-  const [response, integrationResponse] = await Promise.all([
+  const [response, integrationResponse, hostingResponse] = await Promise.all([
     fetch("/data/tools.json", { cache: "no-cache" }),
     fetch("/data/integrations.json", { cache: "no-cache" }),
+    fetch("/data/hosting.json", { cache: "no-cache" }),
   ]);
-  if (!response.ok || !integrationResponse.ok) throw new Error("tool registry unavailable");
+  if (!response.ok || !integrationResponse.ok || !hostingResponse.ok) {
+    throw new Error("tool registry unavailable");
+  }
   const registry = await response.json();
   const integrationRegistry = await integrationResponse.json();
+  const hostingRegistry = await hostingResponse.json();
   tools = Array.isArray(registry.tools) ? registry.tools : [];
   integrations = new Map(
     (Array.isArray(integrationRegistry.integrations) ? integrationRegistry.integrations : []).map((item) => [
       item.toolId,
       item,
     ]),
+  );
+  hosting = new Map(
+    (Array.isArray(hostingRegistry.tools) ? hostingRegistry.tools : []).map((item) => [item.toolId, item]),
   );
   document.querySelector("#tool-count").textContent = String(tools.length);
   renderToolLibrary();
@@ -86,6 +95,7 @@ async function init() {
   loadPolisStatus();
 
   apiKeyInput.value = sessionStorage.getItem("delib:openai-key") || "";
+  harmonicaKeyInput.value = sessionStorage.getItem("delib:harmonica-key") || "";
   restoreCallInInstance();
   const state = stateFromSearch(location.search);
   if (state) renderResult(state, false);
@@ -157,6 +167,25 @@ function bindEvents() {
   document.querySelector("#polis-form").addEventListener("submit", preparePolis);
   document.querySelector("#heyform-form").addEventListener("submit", prepareHeyForm);
   document.querySelector("#tttc-form").addEventListener("submit", prepareTttc);
+  document.querySelector("#harmonica-form").addEventListener("submit", createHarmonica);
+  harmonicaKeyInput.addEventListener("input", () => {
+    const key = harmonicaKeyInput.value.trim();
+    if (key) sessionStorage.setItem("delib:harmonica-key", key);
+    else sessionStorage.removeItem("delib:harmonica-key");
+  });
+  document.querySelector("#clear-harmonica-key").addEventListener("click", () => {
+    sessionStorage.removeItem("delib:harmonica-key");
+    harmonicaKeyInput.value = "";
+    harmonicaKeyInput.focus();
+    document.querySelector("#harmonica-status").textContent = "這個分頁裡的 Harmonica key 已清除。";
+  });
+  document.querySelector("#copy-harmonica-agent").addEventListener("click", () =>
+    copyText(
+      "請使用 Harmonica MCP 幫我設計並建立一個審議 session。先問清楚主題、目標、參與者、資料邊界、人工複核與結束條件；建立外部 session 前讓我確認。可用 npx harmonica-mcp 啟動，API key 只放在本機環境，不要貼進對話或網址。",
+      document.querySelector("#harmonica-status"),
+      "Harmonica MCP 啟動提示已複製。",
+    ),
+  );
   document.querySelector("#copy-polis-agent").addEventListener("click", () =>
     copyText(
       "請幫我連接 Delib 與 Pol.is：先開啟 Pol.is 的帳號整合頁；若需要登入就停下來讓我操作。登入後找出帳號自動產生的 Site ID，再讓我選擇貼進 Delib，或設成 Cloudflare Worker 的 POLIS_SITE_ID。不要讀取、保存或回傳我的密碼與 session cookie。",
@@ -269,11 +298,24 @@ function renderRecommendation(tool) {
   const article = createElement("article", "recommendation");
   const head = createElement("div", "recommendation-head");
   const integration = launchableIntegration(tool.id);
+  const hostingPath = hosting.get(tool.id);
   head.append(
     createElement("h4", "", tool.name),
-    createElement("span", "status-chip", integration?.label || STATUS_LABELS[tool.status] || "工具目錄"),
+    createElement(
+      "span",
+      "status-chip",
+      integration?.label || hostingPath?.label || STATUS_LABELS[tool.status] || "工具目錄",
+    ),
   );
   article.append(head, createElement("p", "", tool.summary));
+  if (hostingPath) {
+    const hostingNote = createElement("p", "hosting-note");
+    hostingNote.append(
+      createElement("strong", "", hostingPath.label),
+      document.createTextNode(` ${hostingPath.summary}`),
+    );
+    article.append(hostingNote);
+  }
 
   const reasons = createElement("div", "match-reasons");
   for (const reason of tool.match.reasons.slice(0, 3)) reasons.append(createElement("span", "reason-chip", reason));
@@ -283,7 +325,8 @@ function renderRecommendation(tool) {
   if (integration) links.append(launchButton(tool.id, integration));
   links.append(externalLink("查看工具 ↗", tool.url));
   if (tool.deploy) links.append(externalLink("部署到 Cloudflare ↗", tool.deploy));
-  if (tool.source && tool.source !== tool.url) links.append(externalLink("來源", tool.source));
+  const sourceUrl = hostingPath?.source?.url || tool.source;
+  if (sourceUrl && sourceUrl !== tool.url) links.append(externalLink("原始碼", sourceUrl));
   article.append(links);
   return article;
 }
@@ -292,8 +335,17 @@ function renderToolLibrary() {
   if (!tools.length) return;
   const term = document.querySelector("#tool-search")?.value.trim().toLocaleLowerCase("zh-Hant") || "";
   const matches = tools.filter((tool) => {
+    const hostingPath = hosting.get(tool.id);
     if (activeFilter === "direct" && !launchableIntegration(tool.id)) return false;
-    if (activeFilter !== "all" && activeFilter !== "direct" && tool.status !== activeFilter) return false;
+    if (activeFilter === "source" && hostingPath?.source?.reusable !== true) return false;
+    if (activeFilter === "shared-host" && hostingPath?.route !== "shared-host") return false;
+    if (activeFilter === "component" && hostingPath?.route !== "component") return false;
+    if (
+      activeFilter === "unverified" &&
+      !["research", "blocked", "unverified"].includes(hostingPath?.route)
+    ) {
+      return false;
+    }
     if (!term) return true;
     const haystack = [tool.name, tool.summary, tool.handoff, ...(tool.stages || []).map((stage) => STAGE_LABELS[stage] || stage)]
       .filter(Boolean)
@@ -309,23 +361,32 @@ function renderToolCard(tool) {
   const article = createElement("article", "tool-card");
   const top = createElement("div", "tool-card-top");
   const integration = launchableIntegration(tool.id);
+  const hostingPath = hosting.get(tool.id);
   top.append(
     createElement("h3", "", tool.name),
-    createElement("span", "status-chip", integration?.label || STATUS_LABELS[tool.status] || "工具目錄"),
+    createElement("span", "status-chip", integration?.label || hostingPath?.label || STATUS_LABELS[tool.status] || "工具目錄"),
   );
   const stages = createElement("div", "stage-list");
   for (const stage of tool.stages || []) stages.append(createElement("span", "", STAGE_LABELS[stage] || stage));
   const links = createElement("div", "tool-card-links");
   if (integration) links.append(launchButton(tool.id, integration));
   links.append(externalLink("查看 ↗", tool.url));
-  if (tool.source && tool.source !== tool.url) links.append(externalLink("來源", tool.source));
-  article.append(top, createElement("p", "", tool.summary), stages, links);
+  const sourceUrl = hostingPath?.source?.url || tool.source;
+  if (sourceUrl && sourceUrl !== tool.url) links.append(externalLink("原始碼", sourceUrl));
+  const hostingNote = createElement("p", "hosting-note");
+  if (hostingPath) {
+    hostingNote.append(
+      createElement("strong", "", hostingPath.label),
+      document.createTextNode(` ${hostingPath.summary}`),
+    );
+  }
+  article.append(top, createElement("p", "", tool.summary), hostingNote, stages, links);
   return article;
 }
 
 function launchableIntegration(toolId) {
   const integration = integrations.get(toolId);
-  return integration && ["managed-create", "embedded-workspace"].includes(integration.activation)
+  return integration && ["managed-create", "credentialed-create", "embedded-workspace"].includes(integration.activation)
     ? integration
     : null;
 }
@@ -334,7 +395,7 @@ function launchButton(toolId, integration) {
   const button = createElement(
     "button",
     "direct-launch",
-    integration.activation === "managed-create" ? "在這裡建立" : "在這裡開啟",
+    ["managed-create", "credentialed-create"].includes(integration.activation) ? "在這裡建立" : "在這裡開啟",
   );
   button.type = "button";
   button.addEventListener("click", () => launchTool(toolId));
@@ -354,6 +415,14 @@ function launchTool(toolId) {
     }
     if (toolId === "talk-to-the-city" && !document.querySelector("#tttc-title").value) {
       document.querySelector("#tttc-title").value = suggestedTitle;
+    }
+    if (toolId === "harmonica" && !document.querySelector("#harmonica-topic").value) {
+      document.querySelector("#harmonica-topic").value = suggestedTitle;
+      document.querySelector("#harmonica-goal").value = currentPlan.tools
+        .map((tool) => tool.summary)
+        .filter(Boolean)
+        .slice(0, 2)
+        .join(" ");
     }
   }
   target.scrollIntoView({ block: "start" });
@@ -539,10 +608,62 @@ async function prepareTttc(event) {
   }
 }
 
-async function postJson(url, body) {
+async function createHarmonica(event) {
+  event.preventDefault();
+  const status = document.querySelector("#harmonica-status");
+  const confirm = document.querySelector("#harmonica-confirm");
+  const key = harmonicaKeyInput.value.trim();
+  if (!key) {
+    status.textContent = "請先貼上 Harmonica API key；也可以改用 MCP 讓自己的 Agent 建立。";
+    harmonicaKeyInput.focus();
+    return;
+  }
+  if (!confirm.checked) {
+    status.textContent = "先確認資料邊界與人工複核責任，再建立外部 session。";
+    confirm.focus();
+    return;
+  }
+
+  const button = document.querySelector("#create-harmonica");
+  button.disabled = true;
+  button.textContent = "正在建立，大概幾秒鐘…";
+  status.textContent = "主題、目標與選填情境將送到 Harmonica；key 不會被 Delib 保存。";
+  try {
+    const questions = document
+      .querySelector("#harmonica-questions")
+      .value.split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .slice(0, 8);
+    const data = await postJson(
+      "/api/integrations/harmonica",
+      {
+        topic: document.querySelector("#harmonica-topic").value.trim(),
+        goal: document.querySelector("#harmonica-goal").value.trim(),
+        context: document.querySelector("#harmonica-context").value.trim(),
+        critical: document.querySelector("#harmonica-critical").value.trim(),
+        questions,
+        crossPollination: false,
+        confirmed: true,
+      },
+      { "X-Harmonica-Key": key },
+    );
+    document.querySelector("#harmonica-workspace").href = data.workspaceUrl;
+    document.querySelector("#harmonica-manage").href = data.manageUrl;
+    document.querySelector("#harmonica-result").hidden = false;
+    status.textContent = "Session 已建立；先自己走一次參與流程，再分享公開連結。";
+  } catch (error) {
+    status.textContent = error instanceof Error ? error.message : "Harmonica 暫時沒有完成建立。";
+  } finally {
+    button.disabled = false;
+    button.textContent = "建立 Harmonica session";
+  }
+}
+
+async function postJson(url, body, extraHeaders = {}) {
   const response = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...extraHeaders },
     body: JSON.stringify(body),
   });
   let data;

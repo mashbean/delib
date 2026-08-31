@@ -86,6 +86,10 @@ export default {
       return handleTttcRequest(request);
     }
 
+    if (url.pathname === "/api/integrations/harmonica" && request.method === "POST") {
+      return handleHarmonicaRequest(request);
+    }
+
     if (url.pathname.startsWith("/api/")) {
       return json({ error: "not found" }, 404);
     }
@@ -120,6 +124,16 @@ type HeyFormRequest = {
 type TttcRequest = {
   title?: unknown;
   description?: unknown;
+  confirmed?: unknown;
+};
+
+type HarmonicaRequest = {
+  topic?: unknown;
+  goal?: unknown;
+  context?: unknown;
+  critical?: unknown;
+  questions?: unknown;
+  crossPollination?: unknown;
   confirmed?: unknown;
 };
 
@@ -315,6 +329,106 @@ export async function handleTttcRequest(request: Request): Promise<Response> {
     writesWhenSubmitted: true,
     warning: "登入、上傳、模型處理與發布都發生在 Talk to the City；Delib 不會收到資料。",
   }, 200);
+}
+
+export async function handleHarmonicaRequest(
+  request: Request,
+  upstreamFetch: typeof fetch = fetch,
+): Promise<Response> {
+  if (!isSameOriginRequest(request)) return json({ error: "origin not allowed" }, 403);
+  const apiKey = request.headers.get("X-Harmonica-Key")?.trim();
+  if (!apiKey || !/^hm_live_[a-f0-9]{32}$/i.test(apiKey)) {
+    return json({ error: "請貼上有效的 Harmonica API key" }, 401);
+  }
+
+  const body = await readJsonRequest<HarmonicaRequest>(request, MAX_INTEGRATION_BODY_BYTES);
+  if (body instanceof Response) return body;
+  if (body.confirmed !== true) {
+    return json({ error: "建立前請先確認資料會送到 Harmonica" }, 400);
+  }
+
+  const topic = cleanRequiredString(body.topic, 120);
+  const goal = cleanRequiredString(body.goal, 500);
+  const context = cleanOptionalString(body.context, 1_000);
+  const critical = cleanOptionalString(body.critical, 500);
+  if (!topic) return json({ error: "先幫這輪對話取一個名字" }, 400);
+  if (!goal) return json({ error: "請說明希望這輪對話理解什麼" }, 400);
+
+  const questions = Array.isArray(body.questions)
+    ? body.questions
+        .slice(0, 8)
+        .map((question) => cleanRequiredString(question, 240))
+        .filter((question): question is string => Boolean(question))
+        .map((text) => ({ text }))
+    : [];
+
+  let upstream: Response;
+  try {
+    upstream = await upstreamFetch("https://app.harmonica.chat/api/v1/sessions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        topic,
+        goal,
+        ...(context ? { context } : {}),
+        ...(critical ? { critical } : {}),
+        ...(questions.length ? { questions } : {}),
+        cross_pollination: body.crossPollination === true,
+      }),
+    });
+  } catch {
+    return json({ error: "暫時連不上 Harmonica，請稍後再試" }, 502);
+  }
+
+  if (!upstream.ok) {
+    return json(
+      {
+        error:
+          upstream.status === 401 || upstream.status === 403
+            ? "Harmonica 沒有接受這把 key；請檢查是否已撤銷"
+            : upstream.status === 429
+              ? "Harmonica 目前已達速率或方案上限，請稍後再試"
+              : "Harmonica 沒有完成建立；請到原站檢查帳號與方案狀態",
+      },
+      upstream.status === 401 || upstream.status === 403 || upstream.status === 429
+        ? upstream.status
+        : 502,
+    );
+  }
+
+  let payload: unknown;
+  try {
+    payload = await upstream.json();
+  } catch {
+    return json({ error: "Harmonica 回應格式不完整" }, 502);
+  }
+  if (!isRecord(payload)) return json({ error: "Harmonica 回應格式不完整" }, 502);
+  const sessionId = cleanMatchingString(payload.id, /^[A-Za-z0-9_-]{8,128}$/, 128);
+  if (!sessionId) return json({ error: "Harmonica 回應缺少 session ID" }, 502);
+
+  const participantUrl = `https://app.harmonica.chat/chat?s=${encodeURIComponent(sessionId)}`;
+  const workspaceUrl = new URL("/integrations/harmonica.html", request.url);
+  workspaceUrl.searchParams.set("session", sessionId);
+  workspaceUrl.searchParams.set("title", topic);
+
+  return json(
+    {
+      integration: "harmonica",
+      status: "ready",
+      sessionId,
+      topic,
+      participantUrl,
+      workspaceUrl: workspaceUrl.toString(),
+      manageUrl: `https://app.harmonica.chat/sessions/${encodeURIComponent(sessionId)}`,
+      storedByDelib: false,
+      credentialStoredByDelib: false,
+      writesExternalState: true,
+    },
+    201,
+  );
 }
 
 export async function handleAgentRequest(
@@ -587,12 +701,16 @@ function withSecurityHeaders(response: Response, pathname: string): Response {
   const polisWorkspace = pathname === "/integrations/polis.html" || pathname === "/integrations/polis";
   const heyFormWorkspace = pathname === "/integrations/heyform.html" || pathname === "/integrations/heyform";
   const tttcWorkspace = pathname === "/integrations/tttc.html" || pathname === "/integrations/tttc";
+  const harmonicaWorkspace =
+    pathname === "/integrations/harmonica.html" || pathname === "/integrations/harmonica";
   const frameSource = polisWorkspace
     ? "https://pol.is"
     : heyFormWorkspace
       ? "https://heyform.net"
       : tttcWorkspace
         ? "https://talktothe.city"
+        : harmonicaWorkspace
+          ? "https://app.harmonica.chat"
         : "'none'";
   next.headers.set(
     "Content-Security-Policy",

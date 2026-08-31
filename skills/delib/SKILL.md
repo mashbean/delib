@@ -52,6 +52,12 @@ The public registry is at
 `updatedAt` as evidence boundaries. “Catalog” means discovered, not integrated
 or security-reviewed.
 
+Before recommending source reuse or self-hosting, also read
+<https://delib.mashbean.net/data/hosting.json>. Distinguish a complete app, a
+shared-host candidate, a reusable component, a research artifact, and a source
+tree without a reusable license. A public GitHub repository alone is not a
+one-click deployment.
+
 ## Direct tool activation
 
 Read <https://delib.mashbean.net/data/integrations.json> before claiming that a
@@ -111,8 +117,13 @@ request, save or repeat the account password or session cookie.
 
 Do not call full Pol.is self-hosting a Cloudflare one-click deployment. Upstream
 currently documents multiple Docker services and PostgreSQL. Cloudflare
-Containers require Workers Paid and do not provide PostgreSQL. Use the
-hosted/embed path or explain the real infrastructure requirement.
+Containers require Workers Paid and do not provide PostgreSQL. `polis.tw` is
+evidence that PDIS operated a Docker fork behind Cloudflare, not a current
+Cloudflare-native template: the site currently returns 523 and the fork is far
+behind upstream. For a new shared service, use current `compdemocracy/polis`
+and keep an organizer account per steward. Implicit creation sends private
+moderation and seed links to the Site ID owner, so do not make all organizers
+depend on one operator-owned Site ID.
 
 ### HeyForm
 
@@ -152,6 +163,32 @@ before upload and human verification of clusters, summaries and quotations
 before publication. The old MetaGov adaptor endpoint is not the current public
 API, so do not ask a non-engineer to extract a Firebase token. If iframe login
 is blocked, use the returned direct create URL in a new tab.
+
+### Harmonica
+
+Harmonica exposes a current REST API and an MCP server. After the human reviews
+the external-write preview, Delib can create a session:
+
+```http
+POST https://delib.mashbean.net/api/integrations/harmonica
+Content-Type: application/json
+X-Harmonica-Key: hm_live_...
+
+{
+  "topic": "Community park conversation",
+  "goal": "Understand trade-offs residents care about",
+  "context": "Optional, de-identified context",
+  "questions": ["What matters most to you?"],
+  "confirmed": true
+}
+```
+
+Never ask the user to paste the key into chat or put it in a URL. Direct them to
+the password field on the Delib page, or let their own environment run
+`npx harmonica-mcp`. The key remains in tab-scoped `sessionStorage`; the Worker
+forwards it only for the confirmed create request and filters the response.
+Harmonica remains responsible for participant data, AI processing, retention
+and export. Require human review of facilitator prompts, summaries and claims.
 
 ## Build both gears
 

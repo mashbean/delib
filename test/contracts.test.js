@@ -53,6 +53,27 @@ describe("public contracts", () => {
     expect(audit.integrations.find((item) => item.toolId === "talk-to-the-city").readiness).toBe(
       "available-with-upstream-login",
     );
+    expect(audit.integrations.find((item) => item.toolId === "harmonica").readiness).toBe(
+      "available-with-api-key",
+    );
     expect(audit.integrations.filter((item) => item.activation === "embedded-workspace")).toHaveLength(3);
+    expect(audit.integrations.filter((item) => item.activation === "credentialed-create")).toHaveLength(1);
+  });
+
+  it("publishes one source and hosting decision for every tool", async () => {
+    const tools = JSON.parse(await readFile(new URL("public/data/tools.json", root), "utf8"));
+    const hosting = JSON.parse(await readFile(new URL("public/data/hosting.json", root), "utf8"));
+    expect(hosting.schema).toBe("delib-hosting/v1");
+    expect(hosting.tools).toHaveLength(25);
+    expect(new Set(hosting.tools.map((item) => item.toolId))).toEqual(
+      new Set(tools.tools.map((tool) => tool.id)),
+    );
+    for (const item of hosting.tools) {
+      expect(["direct", "connected", "shared-host", "component", "research", "blocked", "unverified"]).toContain(
+        item.route,
+      );
+      expect(typeof item.source.reusable).toBe("boolean");
+      if (item.source.reusable) expect(item.source.url).toMatch(/^https:\/\//);
+    }
   });
 });

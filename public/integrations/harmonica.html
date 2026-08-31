@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta name="description" content="在 Delib 內參與 Harmonica 對話訪談。" />
+    <title>Harmonica 工作區 · Delib 審議拼圖</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/styles.css" />
+    <script type="module" src="/integrations/harmonica.js"></script>
+  </head>
+  <body class="workspace-body">
+    <a class="skip-link" href="#workspace-main">跳到 Harmonica 對話</a>
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <a class="brand" href="/" aria-label="回 Delib 審議拼圖">
+          <span class="brand-mark" aria-hidden="true">⿻</span>
+          <span><strong>Delib</strong><span class="brand-divider">·</span>Harmonica 工作區</span>
+        </a>
+        <a class="button button-small button-ghost" href="/#launch-harmonica">回到工具設定</a>
+      </div>
+    </header>
+
+    <main id="workspace-main" class="workspace-main">
+      <div class="wrap workspace-wrap">
+        <div class="workspace-heading">
+          <div>
+            <p class="section-kicker">Conversational survey workspace</p>
+            <h1 id="harmonica-workspace-title">Harmonica</h1>
+            <p id="harmonica-workspace-status" class="section-lede" role="status">正在載入對話。</p>
+          </div>
+          <a id="harmonica-direct-link" class="button button-ghost" href="https://app.harmonica.chat" target="_blank" rel="noreferrer">改在 Harmonica 開啟 ↗</a>
+        </div>
+
+        <div class="workspace-trust">
+          <strong>資料邊界</strong>
+          <span>回答與 AI 對話直接交給 Harmonica，Delib 不會收到或保存內容。</span>
+          <span>AI facilitator 不是主持人或決策者；參與前應說明用途、保存、撤回與人工聯絡方式。</span>
+        </div>
+
+        <section id="harmonica-embed-root" class="external-embed-shell external-embed-tall" aria-label="Harmonica 對話訪談">
+          <div class="workspace-loading" aria-hidden="true"></div>
+        </section>
+
+        <p class="source-note">
+          若瀏覽器阻擋第三方內容，使用上方按鈕在新分頁繼續。
+          <a href="https://github.com/harmonicabot/harmonica-web-app" target="_blank" rel="noreferrer">查看 Harmonica 原始碼 ↗</a>
+        </p>
+      </div>
+    </main>
+  </body>
+</html>

@@ -4,6 +4,7 @@ import {
   handleAgentRequest,
   handleCallInRequest,
   handleHeyFormRequest,
+  handleHarmonicaRequest,
   handlePolisRequest,
   handleTttcRequest,
   parseHeyFormId,
@@ -190,6 +191,73 @@ describe("direct integrations", () => {
     );
     expect(body.writesWhenOpened).toBe(false);
     expect(body.storedByDelib).toBe(false);
+  });
+
+  it("creates a Harmonica session without echoing or storing the API key", async () => {
+    const upstream = vi.fn(async (_url: string, init?: RequestInit) => {
+      expect(init?.headers).toMatchObject({
+        Authorization: `Bearer hm_live_${"a".repeat(32)}`,
+      });
+      expect(JSON.parse(String(init?.body))).toEqual({
+        topic: "公園深度對話",
+        goal: "理解居民在意的取捨",
+        context: "資料已去識別",
+        questions: [{ text: "你最在意什麼？" }],
+        cross_pollination: false,
+      });
+      return Response.json(
+        {
+          id: "session_12345678",
+          topic: "公園深度對話",
+          goal: "理解居民在意的取捨",
+          join_url: "https://app.harmonica.chat/chat?s=session_12345678",
+          internal: "must not leak",
+        },
+        { status: 201 },
+      );
+    });
+    const response = await handleHarmonicaRequest(
+      new Request("https://delib.example/api/integrations/harmonica", {
+        method: "POST",
+        headers: {
+          Origin: "https://delib.example",
+          "Content-Type": "application/json",
+          "X-Harmonica-Key": `hm_live_${"a".repeat(32)}`,
+        },
+        body: JSON.stringify({
+          topic: "公園深度對話",
+          goal: "理解居民在意的取捨",
+          context: "資料已去識別",
+          questions: ["你最在意什麼？"],
+          confirmed: true,
+        }),
+      }),
+      upstream as typeof fetch,
+    );
+    expect(response.status).toBe(201);
+    const body = (await response.json()) as Record<string, unknown>;
+    expect(body).toMatchObject({
+      participantUrl: "https://app.harmonica.chat/chat?s=session_12345678",
+      workspaceUrl:
+        "https://delib.example/integrations/harmonica.html?session=session_12345678&title=%E5%85%AC%E5%9C%92%E6%B7%B1%E5%BA%A6%E5%B0%8D%E8%A9%B1",
+      storedByDelib: false,
+      credentialStoredByDelib: false,
+    });
+    expect(body).not.toHaveProperty("internal");
+  });
+
+  it("rejects malformed Harmonica keys before calling upstream", async () => {
+    const upstream = vi.fn();
+    const response = await handleHarmonicaRequest(
+      new Request("https://delib.example/api/integrations/harmonica", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Harmonica-Key": "not-a-key" },
+        body: JSON.stringify({ topic: "公園", goal: "理解需求", confirmed: true }),
+      }),
+      upstream,
+    );
+    expect(response.status).toBe(401);
+    expect(upstream).not.toHaveBeenCalled();
   });
 
   it("creates a filtered ephemeral Call-in instance", async () => {

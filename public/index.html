@@ -375,12 +375,78 @@
               </section>
               <p class="boundary-note">TTTC 現行版本使用 Firebase、Google Cloud Storage、Redis、Pub/Sub 與模型服務；舊 MetaGov adaptor 的 API 網域已不是現行公開入口，因此這版採官方 UI 連接，不要求使用者擷取 Firebase token。</p>
             </article>
+
+            <article id="launch-harmonica" class="launch-card">
+              <div class="launch-card-heading">
+                <span class="launch-icon" aria-hidden="true">🎼</span>
+                <div>
+                  <span class="flow-tag">現在可用 · API／Agent 建立</span>
+                  <h3>建立 Harmonica 對話訪談</h3>
+                </div>
+              </div>
+              <p>把審議目標與幾個起始問題交給 Harmonica 的 AI facilitator，建立可分享的深度對話連結。</p>
+
+              <form id="harmonica-form" class="launch-form">
+                <label for="harmonica-key">Harmonica API key</label>
+                <div class="key-row">
+                  <input id="harmonica-key" type="password" autocomplete="off" placeholder="hm_live_…" aria-describedby="harmonica-key-note" />
+                  <button class="button button-small button-ghost" id="clear-harmonica-key" type="button">清除</button>
+                </div>
+                <p id="harmonica-key-note" class="field-note">key 只存在這個分頁；建立時單次經 Delib Worker 傳給 Harmonica，不寫入本站。</p>
+                <div class="inline-actions">
+                  <a href="https://app.harmonica.chat/settings?tab=api-keys" target="_blank" rel="noreferrer">登入 Harmonica 取得 API key ↗</a>
+                  <button id="copy-harmonica-agent" class="text-button" type="button">讓 Agent 用 MCP 建立</button>
+                </div>
+                <label for="harmonica-topic">對話名稱</label>
+                <input id="harmonica-topic" maxlength="120" required placeholder="例如：我們想要怎樣的社區公園？" />
+                <label for="harmonica-goal">這輪想理解什麼？</label>
+                <textarea id="harmonica-goal" rows="3" maxlength="500" required placeholder="例如：理解不同使用者對安全、安靜與活動空間的取捨。"></textarea>
+                <details class="advanced-fields">
+                  <summary>加入情境與起始問題（選填）</summary>
+                  <label for="harmonica-context">背景情境</label>
+                  <textarea id="harmonica-context" rows="3" maxlength="1000" placeholder="只放可交給外部 AI 服務的內容；不要放姓名或聯絡方式。"></textarea>
+                  <label for="harmonica-critical">特別要追問的觀點</label>
+                  <textarea id="harmonica-critical" rows="2" maxlength="500"></textarea>
+                  <label for="harmonica-questions">起始問題（一行一題，最多八題）</label>
+                  <textarea id="harmonica-questions" rows="4" maxlength="2000" placeholder="你最在意什麼？&#10;哪一種取捨最難接受？"></textarea>
+                </details>
+                <div class="write-preview">
+                  <strong>按下建立後會發生：</strong>
+                  <ul>
+                    <li>Harmonica 會立即建立一個 session；</li>
+                    <li>你會收到公開參與頁與需登入的管理頁；</li>
+                    <li>對話、AI 處理與匯出由 Harmonica 的政策與方案負責。</li>
+                  </ul>
+                </div>
+                <label class="consent-row">
+                  <input id="harmonica-confirm" type="checkbox" />
+                  <span>我確認沒有放入未經同意的個資，並會人工檢查 AI 追問、摘要與成果。</span>
+                </label>
+                <button class="button button-primary" id="create-harmonica" type="submit">建立 Harmonica session</button>
+                <p id="harmonica-status" class="action-status" role="status"></p>
+              </form>
+              <section id="harmonica-result" class="instance-result" hidden aria-live="polite">
+                <span class="success-mark" aria-hidden="true">✓</span>
+                <h4>對話 session 已經開好了</h4>
+                <p>先測試參與流程，再把公開連結分享給參與者。</p>
+                <div class="public-links">
+                  <strong>可以分享</strong>
+                  <a id="harmonica-workspace" class="button button-primary" target="_blank" rel="noreferrer">留在 Delib 開啟 ↗</a>
+                </div>
+                <details class="private-links">
+                  <summary>管理與成果頁</summary>
+                  <p>管理頁需要你的 Harmonica 登入狀態；不要把它當成公開參與連結。</p>
+                  <a id="harmonica-manage" target="_blank" rel="noreferrer">到 Harmonica 管理 ↗</a>
+                </details>
+              </section>
+              <p class="boundary-note">Harmonica 有正式 REST API、MCP 與 AGPL 原始碼；官方自架仍需要 PostgreSQL、Auth0、模型與向量服務。這裡先連 hosted API，讓建立動作可驗證且不代收帳密。</p>
+            </article>
           </div>
 
           <div class="next-integrations">
-            <div><span>已串接</span><strong>四個站內入口</strong><p>Call-in 可代建；Pol.is 可用 Site ID 建立；HeyForm 與 TTTC 保留上游登入和資料邊界。</p></div>
-            <div><span>誠實邊界</span><strong>連接不是重寫</strong><p>若上游需要 PostgreSQL、MongoDB、Redis 或 Firebase，就不標示為 Cloudflare 免費一鍵自架。</p></div>
-            <a href="/data/integrations.json">查看機器可讀盤點 JSON →</a>
+            <div><span>已串接</span><strong>五個站內入口</strong><p>Call-in 可代建；Pol.is 可用 Site ID；Harmonica 可用 API／MCP 建立；HeyForm 與 TTTC 保留上游邊界。</p></div>
+            <div><span>原始碼盤點</span><strong>直接用、共用主機、元件三條路</strong><p>每張工具卡會直接說明是否能內嵌、取原始碼，以及為何不能只靠 Cloudflare 免費完成。</p></div>
+            <a href="/data/hosting.json">查看 25 項機器可讀盤點 →</a>
           </div>
         </div>
       </section>
@@ -478,7 +544,7 @@
 
       <section id="tools" class="section tools-section">
         <div class="wrap">
-          <p class="section-kicker">工具目錄 · 最後查核 2026-08-30</p>
+          <p class="section-kicker">工具目錄 · 最後查核 2026-08-31</p>
           <div class="tools-heading">
             <div>
               <h2><span id="tool-count">25</span> 個工具，不是一張排名榜</h2>
@@ -489,12 +555,13 @@
               <input id="tool-search" type="search" placeholder="例如：投票、提問、證據" />
             </label>
           </div>
-          <div class="tool-filters" aria-label="依整合狀態篩選">
+          <div class="tool-filters" aria-label="依可用方式篩選">
             <button class="filter-chip active" data-filter="all">全部</button>
             <button class="filter-chip" data-filter="direct">站內啟用</button>
-            <button class="filter-chip" data-filter="integrated">可直接試</button>
-            <button class="filter-chip" data-filter="adapter">已有 adaptor</button>
-            <button class="filter-chip" data-filter="catalog">待接入</button>
+            <button class="filter-chip" data-filter="source">可取原始碼</button>
+            <button class="filter-chip" data-filter="shared-host">需要共用主機</button>
+            <button class="filter-chip" data-filter="component">元件／原型</button>
+            <button class="filter-chip" data-filter="unverified">尚未可用</button>
           </div>
           <div id="tool-library" class="tool-grid"></div>
           <p id="no-tools" class="empty-state" hidden>找不到符合的工具。換一個比較白話的關鍵字試試？</p>

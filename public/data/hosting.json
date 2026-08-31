@@ -1,0 +1,275 @@
+{
+  "schema": "delib-hosting/v1",
+  "updatedAt": "2026-08-31",
+  "routeLabels": {
+    "direct": "可直接使用",
+    "connected": "可用 API／內嵌連接",
+    "shared-host": "需共用主機",
+    "component": "可取元件／原型",
+    "research": "研究方法，不是成品",
+    "blocked": "授權或服務阻擋",
+    "unverified": "未找到可驗證部署路徑"
+  },
+  "principles": [
+    "有公開原始碼不等於完整產品，也不等於可以合法重用。",
+    "可 iframe 不等於可以建立專案；必須同時確認建立、參與、匯出與資料保存路徑。",
+    "需要 PostgreSQL、MongoDB、Redis、Firebase 或長時間背景運算的工具，不標成 Cloudflare Workers 免費一鍵部署。",
+    "大型工具優先由 Delib 營運一個共用服務，再讓非工程師一鍵建立活動空間。"
+  ],
+  "tools": [
+    {
+      "toolId": "call-in",
+      "route": "direct",
+      "label": "免費一鍵部署",
+      "summary": "完整 Cloudflare Workers + Durable Objects 服務，現在也能由 Delib 免帳號代建七天活動。",
+      "source": { "url": "https://github.com/mashbean/call-in", "license": "Apache-2.0", "reusable": true },
+      "embed": "implemented",
+      "cloudflareNative": true,
+      "nextAction": "維持 managed creator 與獨立 Deploy Button 兩條路。"
+    },
+    {
+      "toolId": "openbook",
+      "route": "direct",
+      "label": "公開資料直接用",
+      "summary": "靜態公開證據頁可直接作為審議資料入口；GitHub repo 未偵測到明確授權，不自動複製部署。",
+      "source": { "url": "https://github.com/mashbean/Open-Book", "license": "未標示", "reusable": false },
+      "embed": "public-viewer",
+      "cloudflareNative": true,
+      "nextAction": "補上授權後，可做成可選資料包與靜態部署模板。"
+    },
+    {
+      "toolId": "uncommon-ground",
+      "route": "component",
+      "label": "Agent 工作流",
+      "summary": "CC0 的資料交接與分析流程，不是參與者網站；適合做成 Delib skill 的下一段。",
+      "source": { "url": "https://github.com/audreyt/uncommon-ground", "license": "CC0-1.0", "reusable": true },
+      "embed": "not-applicable",
+      "cloudflareNative": false,
+      "nextAction": "把 Delib bundle 轉成可驗證的分析 job，發布前保留人工關卡。"
+    },
+    {
+      "toolId": "polis",
+      "route": "shared-host",
+      "label": "共用託管最實際",
+      "summary": "完整 AGPL app；需要 Node、Clojure math、PostgreSQL 等服務。polis.tw 證明可自架，但目前站點 523、fork 也已落後主線。",
+      "source": { "url": "https://github.com/compdemocracy/polis", "license": "AGPL-3.0", "reusable": true },
+      "embed": "implemented",
+      "cloudflareNative": false,
+      "nextAction": "以最新 upstream edge 架設 polis.mashbean.net，共用一套服務；Cloudflare 只負責 DNS、TLS 與防護。",
+      "evidence": ["https://github.com/PDIS/polis2023", "https://polis.tw/"]
+    },
+    {
+      "toolId": "talk-to-the-city",
+      "route": "shared-host",
+      "label": "官方 UI 已連接",
+      "summary": "Apache-2.0 完整 app，但需要 Firebase、Google Cloud Storage、Redis／PubSub 與模型服務；目前先站內開官方建立頁。",
+      "source": { "url": "https://github.com/AIObjectives/tttc-light-js", "license": "Apache-2.0", "reusable": true },
+      "embed": "implemented-upstream-ui",
+      "cloudflareNative": false,
+      "nextAction": "等正式 create API 或可維護的 auth contract，再升級成 Delib 代建。"
+    },
+    {
+      "toolId": "heyform",
+      "route": "shared-host",
+      "label": "公開表單已內嵌",
+      "summary": "AGPL 完整 app；自架需要 MongoDB 與 Redis／KeyDB。Delib 現在只內嵌已發布表單，不代收帳密。",
+      "source": { "url": "https://github.com/heyform/heyform", "license": "AGPL-3.0", "reusable": true },
+      "embed": "implemented-existing-only",
+      "cloudflareNative": false,
+      "nextAction": "安全公告修補且 create API 穩定後，再做 API 代建。"
+    },
+    {
+      "toolId": "harmonica",
+      "route": "connected",
+      "label": "API／MCP 可代建",
+      "summary": "正式 REST API 會回傳參與網址，另有 harmonica-mcp；Delib 現在可用 tab-only key 直接建立 session。",
+      "source": { "url": "https://github.com/harmonicabot/harmonica-web-app", "license": "AGPL-3.0", "reusable": true },
+      "embed": "implemented-after-create",
+      "cloudflareNative": false,
+      "nextAction": "驗證真實帳號的建立、參與與匯出，再把結果接進 delib-bundle。",
+      "evidence": ["https://help.harmonica.chat/api-reference/introduction", "https://github.com/harmonicabot/harmonica-mcp"]
+    },
+    {
+      "toolId": "decidim",
+      "route": "shared-host",
+      "label": "成熟但不是小工具",
+      "summary": "活躍的 AGPL Ruby on Rails 平台，適合城市級共用 instance；不適合每場活動各自免費部署。",
+      "source": { "url": "https://github.com/decidim/decidim", "license": "AGPL-3.0", "reusable": true },
+      "embed": "not-generic",
+      "cloudflareNative": false,
+      "nextAction": "先評估共用租戶、管理責任與匯出 API，再提供建立流程。"
+    },
+    {
+      "toolId": "deliberative-canvas",
+      "route": "component",
+      "label": "可取原型",
+      "summary": "Angular + Earthstar 的 AGPL alpha；前端可靜態部署，但多人同步還需要 Deno server，尚非一般使用者成品。",
+      "source": { "url": "https://github.com/uppy01/deliberative-canvas-app", "license": "AGPL-3.0", "reusable": true },
+      "embed": "prototype",
+      "cloudflareNative": "frontend-only",
+      "nextAction": "先做資料格式與多人同步壓力測試，再考慮做成 Delib 內建 canvas。",
+      "evidence": ["https://github.com/uppy01/deliberative-canvas-server"]
+    },
+    {
+      "toolId": "ethelo",
+      "route": "component",
+      "label": "只有核心引擎",
+      "summary": "已找到 AGPL 的 Ethelo OS engine／API，但不是一套可直接給主辦者使用的完整前後台。",
+      "source": { "url": "https://github.com/Ethelo/ethelo-os-engine", "license": "AGPL-3.0", "reusable": true },
+      "embed": "none",
+      "cloudflareNative": false,
+      "nextAction": "若要使用，需另做題目建構、參與 UI、身份與匯出層。"
+    },
+    {
+      "toolId": "evocracy",
+      "route": "unverified",
+      "label": "未找到官方完整原始碼",
+      "summary": "MetaGov 頁沒有可驗證的官方 source、建立 API 或通用 embed contract。",
+      "source": { "url": null, "license": "未確認", "reusable": false },
+      "embed": "unverified",
+      "cloudflareNative": false,
+      "nextAction": "需要專案方提供官方 repo 與現行 demo。"
+    },
+    {
+      "toolId": "global-brain-algorithm",
+      "route": "component",
+      "label": "演算法元件",
+      "summary": "MIT Julia library，可做排序／集體智慧分析；沒有參與者 UI、帳號或活動管理。",
+      "source": { "url": "https://github.com/social-protocols/GlobalBrain.jl", "license": "MIT", "reusable": true },
+      "embed": "not-applicable",
+      "cloudflareNative": false,
+      "nextAction": "包成資料轉換 worker 或分析 job，而不是 iframe。"
+    },
+    {
+      "toolId": "go-vocal",
+      "route": "shared-host",
+      "label": "可自架完整平台",
+      "summary": "CitizenLab OSS 是 AGPL 的 Rails／React 平台；需要完整應用與資料庫維運，官方商業 hosted 站也禁止跨站 iframe。",
+      "source": { "url": "https://github.com/CitizenLabDotCo/citizenlab-oss", "license": "AGPL-3.0", "reusable": true },
+      "embed": "blocked-by-upstream",
+      "cloudflareNative": false,
+      "nextAction": "把它視為共用 civic participation instance，不做每案 fork。"
+    },
+    {
+      "toolId": "interoperable-cooperative-governance",
+      "route": "research",
+      "label": "互通設計參考",
+      "summary": "目前盤點到的是方法與互通概念，不是可部署的通用 participant app。",
+      "source": { "url": null, "license": "未確認", "reusable": false },
+      "embed": "not-applicable",
+      "cloudflareNative": false,
+      "nextAction": "抽取資料模型與 handoff contract，放進 delib-bundle。"
+    },
+    {
+      "toolId": "iswe-foundation",
+      "route": "unverified",
+      "label": "沒有可驗證建立路徑",
+      "summary": "公開網站可讀，但沒有找到現行官方 app repo、建立 API 或活動 embed contract。",
+      "source": { "url": "https://github.com/iswe", "license": "未確認", "reusable": false },
+      "embed": "unverified",
+      "cloudflareNative": false,
+      "nextAction": "需由專案方指出現行平台與 source。"
+    },
+    {
+      "toolId": "ize",
+      "route": "blocked",
+      "label": "現行網站不可達",
+      "summary": "MetaGov 指向的 ize.space 目前 DNS 無法解析，亦未找到可驗證的官方完整 repo。",
+      "source": { "url": null, "license": "未確認", "reusable": false },
+      "embed": "unavailable",
+      "cloudflareNative": false,
+      "nextAction": "等待專案方提供新的網址或 repository。"
+    },
+    {
+      "toolId": "maple",
+      "route": "shared-host",
+      "label": "可自架完整專案",
+      "summary": "MIT 原始碼活躍，但依賴 Firebase／Cloud Functions，且流程針對美國立法證詞，不是通用問卷。",
+      "source": { "url": "https://github.com/codeforboston/maple", "license": "MIT", "reusable": true },
+      "embed": "not-generic",
+      "cloudflareNative": false,
+      "nextAction": "先把 testimony 資料格式做成可匯入／匯出齒輪。"
+    },
+    {
+      "toolId": "micropublishing",
+      "route": "component",
+      "label": "CC0 研究原型",
+      "summary": "原始碼可取用，但目前不是含主辦後台、參與管理與穩定匯出的完整服務。",
+      "source": { "url": "https://github.com/oasisresearchlab/dg-social-media", "license": "CC0-1.0", "reusable": true },
+      "embed": "prototype",
+      "cloudflareNative": "to-evaluate",
+      "nextAction": "先驗證可重現 build 與資料模型，再決定是否內建。"
+    },
+    {
+      "toolId": "moral-graph-elicitation",
+      "route": "blocked",
+      "label": "有原始碼但缺授權",
+      "summary": "現行 Remix／PostgreSQL app 有 JSON 資料出口，但 repo 未偵測到 LICENSE；不可先 fork 成一鍵部署。",
+      "source": { "url": "https://github.com/meaningalignment/moral-graph-elicitation", "license": "未標示", "reusable": false },
+      "embed": "existing-data-only",
+      "cloudflareNative": false,
+      "nextAction": "先取得授權；現在只能把公開 graph JSON 當資料來源。",
+      "evidence": ["https://dft.meaningalignment.org/data/edges"]
+    },
+    {
+      "toolId": "pairwise",
+      "route": "component",
+      "label": "可取專案原型",
+      "summary": "GPL Next.js 原始碼可取，但現行 app 綁定已結束的 Optimism RF6、wallet 與專用 backend，不是通用活動建構器。",
+      "source": { "url": "https://github.com/GeneralMagicio/pairwise-rf4", "license": "GPL-3.0", "reusable": true },
+      "embed": "non-generic-campaign",
+      "cloudflareNative": false,
+      "nextAction": "抽出 pairwise comparison UI，改接 Delib 的題目與可攜 JSON。"
+    },
+    {
+      "toolId": "policycraft",
+      "route": "blocked",
+      "label": "研究原型缺授權",
+      "summary": "找到 Svelte／functions 原型，但 repo 未偵測到 LICENSE；論文可以參考，程式不能先包成服務。",
+      "source": { "url": "https://github.com/tskuo/PolicyCraft", "license": "未標示", "reusable": false },
+      "embed": "prototype",
+      "cloudflareNative": false,
+      "nextAction": "聯絡作者確認授權與可重現部署。"
+    },
+    {
+      "toolId": "power-ranker",
+      "route": "component",
+      "label": "最適合內建的演算法",
+      "summary": "MIT 的 TypeScript 排序 library，沒有 server 或 participant UI；適合直接做成 Delib 內建優先序齒輪。",
+      "source": { "url": "https://github.com/zaratanDotWorld/powerRanker", "license": "MIT", "reusable": true },
+      "embed": "not-applicable",
+      "cloudflareNative": true,
+      "nextAction": "下一輪做無帳號 pairwise ranking，輸出 delib-bundle JSON。"
+    },
+    {
+      "toolId": "stanford-participatory-budgeting",
+      "route": "shared-host",
+      "label": "可自架專門平台",
+      "summary": "GPL Ruby on Rails 平台持續維護；需要資料庫、郵件與管理設定，且預設管理帳密必須在上線前更換。",
+      "source": { "url": "https://github.com/StanfordCDT/pb", "license": "GPL-3.0", "reusable": true },
+      "embed": "not-generic",
+      "cloudflareNative": false,
+      "nextAction": "只在真的要做參與式預算時部署共用 instance。"
+    },
+    {
+      "toolId": "swarmcheck",
+      "route": "unverified",
+      "label": "未找到官方原始碼",
+      "summary": "公開產品頁可達，但未找到可驗證的官方 repository、create API 或通用 embed contract。",
+      "source": { "url": null, "license": "未確認", "reusable": false },
+      "embed": "unverified",
+      "cloudflareNative": false,
+      "nextAction": "聯絡產品方確認 API、資料匯出、保存與授權。"
+    },
+    {
+      "toolId": "voice-to-vision",
+      "route": "research",
+      "label": "研究成果頁",
+      "summary": "目前是 MIT Media Lab 專案說明，不是可由主辦者建立活動的公開產品或 source package。",
+      "source": { "url": null, "license": "未確認", "reusable": false },
+      "embed": "not-applicable",
+      "cloudflareNative": false,
+      "nextAction": "參考方法，不列為一鍵工具。"
+    }
+  ]
+}

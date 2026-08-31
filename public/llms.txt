@@ -7,6 +7,7 @@ select open-source tools, and leave an inspectable receipt for the next round.
 - Agent skill: https://delib.mashbean.net/.well-known/delib/SKILL.md
 - Tool registry: https://delib.mashbean.net/data/tools.json
 - Integration audit: https://delib.mashbean.net/data/integrations.json
+- Source and hosting audit: https://delib.mashbean.net/data/hosting.json
 - Integration API: https://delib.mashbean.net/api/integrations
 - Source: https://github.com/mashbean/delib
 
@@ -21,6 +22,8 @@ Direct actions currently implemented:
 - GET /api/integrations/polis/status — report whether this deployment has a connected Site ID.
 - POST /api/integrations/heyform — validate and prepare an existing public HeyForm workspace.
 - POST /api/integrations/tttc — prepare the current official Talk to the City create workspace.
+- POST /api/integrations/harmonica — create a confirmed Harmonica session with a tab-only API key.
 
 Every preparation or external-write path requires an explicit `confirmed: true`
-human gate. HeyForm and TTTC credentials and participant data remain upstream.
+human gate. HeyForm, TTTC and Harmonica participant data remain upstream;
+Harmonica credentials are forwarded once and never stored by Delib.

@@ -1,6 +1,6 @@
 # Direct integration audit
 
-Last checked: 2026-08-30
+Last checked: 2026-08-31
 
 This audit separates discovery from a usable integration. A tool is not called
 “one click” merely because it has source code, an adaptor, an iframe, or a deploy
@@ -29,12 +29,40 @@ button.
 | Uncommon Ground | Hand a complete question pool to a bounded agent; preserve withdrawn rows and verify the final receipt. | No service account. The execution environment supplies any model credential. | CC0 workflow; not a hosted participation service. | Agent pipeline. |
 | HeyForm | Validate an existing public form URL and embed the published participant form in Delib. | No Delib credential. Creating and administering a form stays in HeyForm. Delib never asks for a password or cookie. | Self-hosting needs the application, MongoDB and Redis/KeyDB; official docs point to hosted/container platforms, not Cloudflare Workers. | Available: existing only. |
 | Talk to the City | Pre-fill title and description, then embed the current official `/create` UI. Login, CSV upload, model processing and submission all remain inside TTTC. | The user logs in to TTTC in its own frame; Delib never receives the Firebase token. | Current source uses Next/Express, Firebase, Google Cloud Storage, Redis/PubSub and model services, not a Cloudflare-only stack. | Available with upstream login. |
+| Harmonica | Create a conversational session through the official REST API, then return the participant workspace and official management page. The same task can be handed to `harmonica-mcp`. | A `hm_live_` key remains in the browser tab and is sent through the Worker only for the confirmed request. | Official hosted accounts offer a free starting path. Full AGPL self-hosting still needs PostgreSQL, Auth0, model/embedding and vector/file services. | Available with API key. |
 
-The remaining nineteen gallery tools stay `catalog-only` until we have verified
+The remaining eighteen gallery tools stay `catalog-only` until we have verified
 their creation API, embed policy, export contract, authentication, retention,
 free-tier and deploy target. Their identifiers are listed in
 `public/data/integrations.json` so the UI and agents can state this boundary
 deterministically.
+
+## Source and hosting paths
+
+`public/data/hosting.json` now records one decision for every one of the 25
+tools. The useful groups are deliberately different:
+
+- Direct or connected: Call-in, OpenBook, Pol.is, HeyForm, Talk to the City and
+  Harmonica already have an in-app path; Uncommon Ground is a data handoff.
+- Shared host: Pol.is, Decidim, Go Vocal, MAPLE and Stanford PB are complete
+  enough to operate, but require a maintained application/database service.
+- Components and prototypes: Deliberative Canvas, Ethelo OS engine, Global
+  Brain, Open Micropublishing, Pairwise and Power Ranker have reusable code but
+  still need a generic organizer and data layer.
+- Blocked or unverified: a missing license, unavailable site, research-only
+  artifact or missing official repository is shown as such instead of becoming
+  an iframe guess.
+
+Pairwise is a good example of why this distinction matters: the GPL source is
+available, but the current public app is an ended Optimism RF6 flow with wallet
+and campaign-specific services. Power Ranker is a better candidate for a small
+Cloudflare-native Delib feature because it is an MIT TypeScript algorithm rather
+than a whole external platform.
+
+Pol.is requires an additional ownership gate. Its implicit creation flow sends
+moderation and seed links to the Site ID owner. A shared operator Site ID would
+therefore make every organizer depend on the operator. The proposed host keeps
+one organizer account per steward and is documented in `docs/polis-hosting.md`.
 
 ## UX contract adapted from Matters Lifeboat
 
@@ -73,6 +101,9 @@ deterministically.
 - [HeyForm authentication documentation](https://docs.heyform.net/open-source/configuration/authentication)
 - [HeyForm security advisory GHSA-chmm-jqpm-3pwx](https://github.com/heyform/heyform/security/advisories/GHSA-chmm-jqpm-3pwx)
 - [Current Talk to the City source](https://github.com/AIObjectives/tttc-light-js)
+- [Harmonica REST API and application source](https://github.com/harmonicabot/harmonica-web-app)
+- [Harmonica MCP source](https://github.com/harmonicabot/harmonica-mcp)
+- [PDIS polis.tw fork](https://github.com/PDIS/polis2023)
 - [MetaGov ontology and adaptors](https://github.com/metagov/ontology)
 - [Matters Lifeboat UX flow](https://github.com/thematters/matters-lifeboat/blob/main/docs/ux-flow.md)
 - [Call-in hosted creator and self-host path](https://github.com/mashbean/call-in)
