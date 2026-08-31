@@ -31,12 +31,14 @@
 10. 在站內嵌入已發布的 HeyForm 表單；
 11. 在站內開啟 Talk to the City 官方建立流程，登入與 CSV 不經 Delib；
 12. 使用 tab-only Harmonica API key 直接建立 AI 對話 session，或複製 MCP 啟動提示；
-13. 使用內建 Power Ranker 完成本機成對排序，下載個人 JSON／CSV，並離線彙整多人結果；
+13. 使用內建 Power Ranker 完成本機成對排序，或建立 24 小時／7 天自動清除的多人結果收件室；
 14. `delib-integrations/v1` 與 `delib-hosting/v1` 盤點，明確區分可用、共用託管、元件、研究與阻擋項目。
 
-Delib 伺服器目前不保存參與資料、API key 或使用者建立的流程。Power Ranker
-的選擇與多人匯入只在瀏覽器記憶體處理；下載的排序檔明確標示為化名參與資料，
-不沿用「不含參與資料」的流程規劃 schema。
+Delib 伺服器不保存 API key 或使用者建立的流程。Power Ranker 預設仍可完全
+在瀏覽器處理；只有主辦者明確選擇短期收件室時，才會保存公開題目、去連結化
+pair counts 與隨機 session ID 的 SHA-256 雜湊。逐份原始判斷不落庫，資料在
+24 小時或 7 天後以 Durable Object alarm 全部清除，也可由私人管理連結提前刪除。
+所有排序檔仍明確標示為參與資料，不沿用「不含參與資料」的流程規劃 schema。
 
 ## 本機開發
 
@@ -63,11 +65,13 @@ npm run deploy:production
 
 `production` environment 才會綁定 `delib.mashbean.net`，因此 Deploy Button
 不會嘗試搶用官方網域。Cloudflare 的 Deploy button 會複製 public repo、設定
-Workers Builds 並部署所需資源；Delib 本體可在 Workers Free 的額度內運作。
-免費方案目前有每日 Worker request 上限，超過上限時請求會失敗，不會被本站
-自動升級成付費方案。詳見 Cloudflare 官方的
+Workers Builds 並部署靜態資產與 SQLite Durable Object namespace；Delib 本體
+可在 Workers Free 的額度內運作。免費方案有 Worker 與 Durable Objects 每日
+限額，超過任一限額時相關操作會失敗，不會被本站自動升級成付費方案。詳見
+Cloudflare 官方的
 [Deploy button](https://developers.cloudflare.com/workers/platform/deploy-buttons/) 與
-[Workers limits](https://developers.cloudflare.com/workers/platform/limits/)。
+[Workers limits](https://developers.cloudflare.com/workers/platform/limits/) 與
+[Durable Objects pricing](https://developers.cloudflare.com/durable-objects/platform/pricing/)。
 
 Deploy button 會依 `.dev.vars.example` 提示選填 `POLIS_SITE_ID`。這是
 Pol.is 帳號自動產生的公開識別碼，不是密碼。填入後，自己的 Delib 部署
@@ -103,9 +107,11 @@ OpenAI 官方目前建議文字生成使用
 - **Harmonica**：使用者在 Harmonica settings 產生 `hm_live_` API key，
   Delib 只在建立 session 的單次請求中轉送。建立後回傳站內參與頁與官方管理頁；
   也可改用 `harmonica-mcp` 讓自己的 Agent 在人工確認後建立。
-- **Power Ranker**：輸入 3–10 個選項後產生站內參與連結。題目位於 URL fragment，
-  選擇只留在參與者分頁；個人結果依 `delib-ranking/v1` 下載，主辦者可在瀏覽器
-  排除重複 session、彙整 pair counts，再下載 JSON／CSV。模型分數不是支持率或共識證明。
+- **Power Ranker**：輸入 3–10 個選項後可選兩條路。本機模式把題目放在 URL
+  fragment，判斷與匯入檔都不送給 Worker；短期收件室則以一房一 Durable Object
+  保存題目、pair counts 與 session 雜湊，不保存逐份判斷。公開群體結果至少要
+  三份，24 小時或 7 天後自動清除，管理者亦可提前刪除。兩種模式都可下載
+  `delib-ranking/v1` JSON／CSV；模型分數不是支持率或共識證明。
 
 舊 MetaGov HeyForm／TTTC adaptor 仍保留為互通設計參考，但現行 hosted
 登入與 API 契約已不同；本站不把未驗證的舊端點標示為可直接建立。細節與

@@ -205,6 +205,57 @@ export function aggregateRankingBundles(bundles, sourceUrl, exportedAt) {
   return { bundle, accepted: acceptedBundles.length, rejected, duplicates };
 }
 
+export function buildAggregateRankingBundleFromPairs({
+  config,
+  aggregate,
+  sourceUrl,
+  exportedAt,
+  expiresAt,
+}) {
+  const normalized = normalizeRankingConfig(config);
+  if (!normalized || !aggregate || typeof aggregate !== "object") return null;
+  const pairwise = normalizePairwise(normalized.items, aggregate.pairwise);
+  const sessions = boundedInteger(aggregate.sessions, 0, 300);
+  if (sessions === null) return null;
+  const judgments = [];
+  for (const pair of pairwise) {
+    for (let index = 0; index < pair.alphaWins; index += 1) {
+      judgments.push({ alpha: pair.alpha, beta: pair.beta, choice: "alpha" });
+    }
+    for (let index = 0; index < pair.betaWins; index += 1) {
+      judgments.push({ alpha: pair.alpha, beta: pair.beta, choice: "beta" });
+    }
+    for (let index = 0; index < pair.equal; index += 1) {
+      judgments.push({ alpha: pair.alpha, beta: pair.beta, choice: "equal" });
+    }
+  }
+  return {
+    schema: RANKING_SCHEMA,
+    kind: "aggregate",
+    exportedAt: exportedAt || new Date().toISOString(),
+    source: { ...sourceRecord(sourceUrl), persisted: true },
+    question: normalized,
+    method: methodRecord(),
+    aggregate: {
+      sessions,
+      judgments: judgments.length,
+      pairwise: pairwise.map((pair) => ({ ...pair, total: pair.alphaWins + pair.betaWins + pair.equal })),
+    },
+    result: rankJudgments(normalized.items, judgments),
+    coverage: coverageRecord(normalized.items.length, pairwise.filter((pair) => pair.alphaWins + pair.betaWins + pair.equal > 0).length),
+    dataCard: {
+      containsParticipantData: true,
+      containsDirectIdentifiers: false,
+      containsFreeText: false,
+      aggregation: "pair-counts-without-session-links",
+      publicationStatus: "ephemeral-room-aggregate",
+      storedByDelib: true,
+      expiresAt: typeof expiresAt === "number" ? new Date(expiresAt).toISOString() : null,
+      limitations: rankingLimitations(),
+    },
+  };
+}
+
 export function rankingResultToCsv(bundle) {
   const rows = [["rank", "item_id", "item", "model_score", "observations"]];
   for (const item of bundle?.result || []) {
@@ -312,6 +363,32 @@ function normalizeIndividualBundle(value) {
   return { question, session: { id: sessionId }, judgments };
 }
 
+function normalizePairwise(items, value) {
+  if (!Array.isArray(value)) return [];
+  const positions = new Map(normalizeItems(items).map((item, index) => [item.id, index]));
+  const seen = new Set();
+  const result = [];
+  for (const raw of value.slice(0, 45)) {
+    if (!raw || typeof raw !== "object") continue;
+    let alpha = cleanId(raw.alpha);
+    let beta = cleanId(raw.beta);
+    let alphaWins = boundedInteger(raw.alphaWins, 0, 300);
+    let betaWins = boundedInteger(raw.betaWins, 0, 300);
+    const equal = boundedInteger(raw.equal, 0, 300);
+    if (!alpha || !beta || alpha === beta || !positions.has(alpha) || !positions.has(beta)) continue;
+    if (alphaWins === null || betaWins === null || equal === null) continue;
+    if (positions.get(alpha) > positions.get(beta)) {
+      [alpha, beta] = [beta, alpha];
+      [alphaWins, betaWins] = [betaWins, alphaWins];
+    }
+    const key = pairKey(alpha, beta);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    result.push({ alpha, beta, alphaWins, betaWins, equal });
+  }
+  return result;
+}
+
 function summarizePairs(items, judgments) {
   const labels = Object.fromEntries(normalizeItems(items).map((item) => [item.id, item.label]));
   const pairs = new Map();
@@ -390,6 +467,10 @@ function cleanId(value) {
 
 function cleanSessionId(value) {
   return typeof value === "string" && /^[A-Za-z0-9_-]{8,80}$/.test(value) ? value : "";
+}
+
+function boundedInteger(value, minimum, maximum) {
+  return Number.isInteger(value) && value >= minimum && value <= maximum ? value : null;
 }
 
 function csvCell(value) {

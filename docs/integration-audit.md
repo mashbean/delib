@@ -15,6 +15,7 @@ button.
 | Available: existing only | A published participation surface can be embedded; project creation stays upstream. |
 | Available with upstream login | Delib opens the current official flow in-app, while authentication and data remain upstream. |
 | Available locally | The full interaction and export run in the browser without an account, API or server-side storage. |
+| Available with ephemeral room | A deliberate write creates a bounded room with declared fields, disclosure threshold and verified deletion path. |
 | Direct viewer | Useful inside the workflow but has no per-project instance. |
 | Agent pipeline | Runs against a data handoff rather than as a hosted participation surface. |
 | Next: credentialed | The upstream adaptor can perform the operation, but Delib still needs a tab-only credential flow and end-to-end test. |
@@ -31,7 +32,7 @@ button.
 | HeyForm | Validate an existing public form URL and embed the published participant form in Delib. | No Delib credential. Creating and administering a form stays in HeyForm. Delib never asks for a password or cookie. | Self-hosting needs the application, MongoDB and Redis/KeyDB; official docs point to hosted/container platforms, not Cloudflare Workers. | Available: existing only. |
 | Talk to the City | Pre-fill title and description, then embed the current official `/create` UI. Login, CSV upload, model processing and submission all remain inside TTTC. | The user logs in to TTTC in its own frame; Delib never receives the Firebase token. | Current source uses Next/Express, Firebase, Google Cloud Storage, Redis/PubSub and model services, not a Cloudflare-only stack. | Available with upstream login. |
 | Harmonica | Create a conversational session through the official REST API, then return the participant workspace and official management page. The same task can be handed to `harmonica-mcp`. | A `hm_live_` key remains in the browser tab and is sent through the Worker only for the confirmed request. | Official hosted accounts offer a free starting path. Full AGPL self-hosting still needs PostgreSQL, Auth0, model/embedding and vector/file services. | Available with API key. |
-| Power Ranker | Create a shareable 3–10 item pairwise question, rank each browser session, download individual JSON／CSV, then combine up to 100 returned files locally with duplicate-session removal. | None. A random session ID is pseudonymous participant data and appears only in the downloaded individual file. | Static HTML／JavaScript on the existing Delib Worker. Question parameters are after `#`; judgments and imports never reach the Worker. | Available locally. |
+| Power Ranker | Choose a fully local share link or a 24-hour／seven-day room. Room submissions are immediately reduced to pair counts; public aggregates appear at three sessions, and organizers can delete early. | None. Local exports contain a random pseudonymous session ID. Rooms keep only its SHA-256 hash for deduplication; the private admin token stays after `#`. | Static mode needs no storage. Room mode uses one SQLite Durable Object per room and works within Workers Free limits; excess operations fail. | Available locally or with ephemeral room. |
 
 The remaining seventeen gallery tools stay `catalog-only` until we have verified
 their creation API, embed policy, export contract, authentication, retention,
@@ -59,8 +60,8 @@ Pairwise is a good example of why this distinction matters: the GPL source is
 available, but the current public app is an ended Optimism RF6 flow with wallet
 and campaign-specific services. Power Ranker was small enough to integrate: Delib
 ports the MIT `rankCentrality` path to native browser arrays, adds a participant
-UI and exports a separate participant-aware schema. It does not treat spectral
-weights as vote percentages or proof of consensus.
+UI, optional expiring rooms, and a separate participant-aware schema. It does
+not treat spectral weights as vote percentages or proof of consensus.
 
 Pol.is requires an additional ownership gate. Its implicit creation flow sends
 moderation and seed links to the Site ID owner. A shared operator Site ID would
@@ -115,3 +116,5 @@ one organizer account per steward and is documented in `docs/polis-hosting.md`.
 - [Cloudflare Deploy buttons](https://developers.cloudflare.com/workers/platform/deploy-buttons/)
 - [Cloudflare Workers Free limits](https://developers.cloudflare.com/workers/platform/limits/)
 - [Cloudflare Durable Objects pricing and Free limits](https://developers.cloudflare.com/durable-objects/platform/pricing/)
+- [Cloudflare Rules of Durable Objects](https://developers.cloudflare.com/durable-objects/best-practices/rules-of-durable-objects/)
+- [Cloudflare SQLite storage and atomic deleteAll](https://developers.cloudflare.com/durable-objects/api/sqlite-storage-api/)

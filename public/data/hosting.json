@@ -235,12 +235,15 @@
       "toolId": "power-ranker",
       "route": "direct",
       "label": "站內直接用",
-      "summary": "MIT TypeScript library 的 rankCentrality 路徑已移植成瀏覽器原生工具；可分享題目、在本機完成成對排序，再離線彙整 JSON／CSV。",
+      "summary": "MIT TypeScript library 的 rankCentrality 路徑已移植成瀏覽器原生工具；可完全本機下載，或用短期 SQLite Durable Object 收件室自動彙整。",
       "source": { "url": "https://github.com/zaratanDotWorld/powerRanker", "license": "MIT", "reusable": true },
       "embed": "implemented-native",
       "cloudflareNative": true,
-      "nextAction": "用真實審議題目驗證題目措辭、完成率與多人彙整流程，再評估是否需要有保存期限的共享房間。",
-      "evidence": ["https://github.com/zaratanDotWorld/powerRanker/tree/4cc4f604022d0188bde1619fc47f05678c0bc0ad"]
+      "nextAction": "以真實但不含敏感資料的審議題目測試完成率、三份揭露門檻、到期清除與群體解讀。",
+      "evidence": [
+        "https://github.com/zaratanDotWorld/powerRanker/tree/4cc4f604022d0188bde1619fc47f05678c0bc0ad",
+        "https://developers.cloudflare.com/durable-objects/platform/pricing/"
+      ]
     },
     {
       "toolId": "stanford-participatory-budgeting",

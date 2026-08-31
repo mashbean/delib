@@ -23,10 +23,14 @@ Direct actions currently implemented:
 - POST /api/integrations/heyform — validate and prepare an existing public HeyForm workspace.
 - POST /api/integrations/tttc — prepare the current official Talk to the City create workspace.
 - POST /api/integrations/harmonica — create a confirmed Harmonica session with a tab-only API key.
-- /integrations/power-ranker.html — run local pairwise ranking and export or aggregate delib-ranking/v1 files; no API key or server storage.
+- /integrations/power-ranker.html — run local pairwise ranking or join a short-lived aggregate room; no account or API key.
+- POST /api/integrations/power-ranker/rooms — after human confirmation, create a 24-hour or seven-day SQLite Durable Object room.
+- GET/DELETE /api/integrations/power-ranker/rooms/:id — read thresholded aggregates or delete with a fragment-held admin token.
+- POST /api/integrations/power-ranker/rooms/:id/submissions — immediately reduce one browser session to pair counts; raw judgments are not stored.
 
 Every preparation or external-write path requires an explicit human gate.
 HeyForm, TTTC and Harmonica participant data remain upstream; Harmonica
-credentials are forwarded once and never stored by Delib. Power Ranker
-judgments and imported files stay in browser memory, and downloaded ranking
-files explicitly declare that they contain participant data.
+credentials are forwarded once and never stored by Delib. Power Ranker local
+judgments and imported files stay in browser memory. Optional rooms store only
+the public question, pair counts and hashed random session IDs until expiry or
+organizer deletion. Downloaded ranking files explicitly declare participant data.

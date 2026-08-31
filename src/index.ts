@@ -1,8 +1,19 @@
-interface Env {
+import {
+  RankingRoom,
+  sha256,
+  type RankingItem,
+  type RankingJudgment,
+  type RankingRoomRpcResult,
+} from "./ranking-room";
+
+export { RankingRoom };
+
+type WorkerEnv = Omit<Env, "RANKING_ROOMS"> & {
   ASSETS: Fetcher;
+  RANKING_ROOMS: DurableObjectNamespace<RankingRoom>;
   CALL_IN_ORIGIN?: string;
   POLIS_SITE_ID?: string;
-}
+};
 
 type AgentPlan = {
   goal?: string;
@@ -23,6 +34,7 @@ type AgentRequest = {
 const MAX_BODY_BYTES = 32 * 1024;
 const MAX_CONTEXT_LENGTH = 4_000;
 const MAX_INTEGRATION_BODY_BYTES = 12 * 1024;
+const RANKING_ROOM_RETENTION_HOURS = new Set([24, 168]);
 const DEFAULT_MODEL = "gpt-5.6";
 const DEFAULT_CALL_IN_ORIGIN = "https://call-in.mashbean.net";
 
@@ -47,7 +59,7 @@ export default {
           ok: true,
           service: "delib",
           ai: "bring-your-own-key",
-          storage: "none",
+          storage: "optional-ephemeral-ranking-rooms",
         },
         200,
       );
@@ -60,6 +72,10 @@ export default {
     if (url.pathname === "/api/integrations" && request.method === "GET") {
       const registryUrl = new URL("/data/integrations.json", url);
       return withSecurityHeaders(await env.ASSETS.fetch(new Request(registryUrl, request)), url.pathname);
+    }
+
+    if (url.pathname.startsWith("/api/integrations/power-ranker/rooms")) {
+      return handleRankingRoomRequest(request, env);
     }
 
     if (url.pathname === "/api/integrations/call-in" && request.method === "POST") {
@@ -97,7 +113,7 @@ export default {
     const assetResponse = await env.ASSETS.fetch(request);
     return withSecurityHeaders(assetResponse, url.pathname);
   },
-} satisfies ExportedHandler<Env>;
+} satisfies ExportedHandler<WorkerEnv>;
 
 type CallInRequest = {
   title?: unknown;
@@ -136,6 +152,119 @@ type HarmonicaRequest = {
   crossPollination?: unknown;
   confirmed?: unknown;
 };
+
+type RankingRoomCreateRequest = {
+  title?: unknown;
+  items?: unknown;
+  retentionHours?: unknown;
+  confirmed?: unknown;
+};
+
+type RankingRoomSubmissionRequest = {
+  sessionId?: unknown;
+  judgments?: unknown;
+};
+
+export async function handleRankingRoomRequest(
+  request: Request,
+  env: Pick<WorkerEnv, "RANKING_ROOMS">,
+): Promise<Response> {
+  const url = new URL(request.url);
+  const basePath = "/api/integrations/power-ranker/rooms";
+
+  if (url.pathname === basePath && request.method === "POST") {
+    if (!isSameOriginRequest(request)) return json({ error: "origin not allowed" }, 403);
+    const body = await readJsonRequest<RankingRoomCreateRequest>(request, MAX_INTEGRATION_BODY_BYTES);
+    if (body instanceof Response) return body;
+    if (body.confirmed !== true) return json({ error: "建立前請先確認短期保存範圍" }, 400);
+
+    const question = normalizeRankingQuestion(body.title, body.items);
+    if (!question) return json({ error: "請填入問題與 3–10 個不重複項目" }, 400);
+    const retentionHours =
+      typeof body.retentionHours === "number" && RANKING_ROOM_RETENTION_HOURS.has(body.retentionHours)
+        ? body.retentionHours
+        : null;
+    if (!retentionHours) return json({ error: "保存期限只能選 24 小時或 7 天" }, 400);
+
+    const durableId = env.RANKING_ROOMS.newUniqueId();
+    const roomId = durableId.toString();
+    const adminToken = randomHex(32);
+    const createdAt = Date.now();
+    const expiresAt = createdAt + retentionHours * 60 * 60 * 1_000;
+    const initialized = await env.RANKING_ROOMS.get(durableId).init({
+      ...question,
+      createdAt,
+      expiresAt,
+      adminTokenHash: await sha256(adminToken),
+    });
+    if (!initialized.created) return json({ error: "房間識別碼衝突，請再試一次" }, 503);
+
+    const participantUrl = new URL("/integrations/power-ranker.html", url);
+    participantUrl.searchParams.set("room", roomId);
+    const manageUrl = new URL(participantUrl);
+    manageUrl.hash = `admin=${adminToken}`;
+    return json(
+      {
+        integration: "power-ranker",
+        mode: "ephemeral-room",
+        status: "ready",
+        roomId,
+        participantUrl: participantUrl.toString(),
+        manageUrl: manageUrl.toString(),
+        createdAt,
+        expiresAt,
+        retentionHours,
+        resultThreshold: 3,
+        sessionLimit: 300,
+        storedByDelib: true,
+        storedFields: ["question", "aggregate pair counts", "hashed random session IDs"],
+        rawJudgmentsStored: false,
+      },
+      201,
+    );
+  }
+
+  const match = url.pathname.match(
+    /^\/api\/integrations\/power-ranker\/rooms\/([a-f0-9]{64})(?:\/(submissions))?$/,
+  );
+  if (!match) return json({ error: "not found" }, 404);
+  const [, roomId, child] = match;
+  let durableId: DurableObjectId;
+  try {
+    durableId = env.RANKING_ROOMS.idFromString(roomId);
+  } catch {
+    return json({ error: "not found" }, 404);
+  }
+  const stub = env.RANKING_ROOMS.get(durableId);
+
+  if (!child && request.method === "GET") {
+    const result = await stub.getRoom(request.headers.get("X-Ranking-Admin")?.trim() || undefined);
+    return rankingRoomResult(result);
+  }
+
+  if (child === "submissions" && request.method === "POST") {
+    if (!isSameOriginRequest(request)) return json({ error: "origin not allowed" }, 403);
+    const body = await readJsonRequest<RankingRoomSubmissionRequest>(request, MAX_INTEGRATION_BODY_BYTES);
+    if (body instanceof Response) return body;
+    const sessionId = cleanMatchingString(body.sessionId, /^[A-Za-z0-9_-]{8,80}$/, 80);
+    if (!sessionId || !Array.isArray(body.judgments)) return json({ error: "排序資料不完整" }, 400);
+    const result = await stub.submit(sessionId, body.judgments as RankingJudgment[]);
+    if (result.status === "invalid") return json({ error: "至少要完成基本比較，且每組配對只能出現一次" }, 400);
+    if (result.status === "full") return json({ error: "這個收件室已達 300 份上限" }, 429);
+    const response = rankingRoomResult(result, result.duplicate === true ? 200 : 201);
+    return response;
+  }
+
+  if (!child && request.method === "DELETE") {
+    if (!isSameOriginRequest(request)) return json({ error: "origin not allowed" }, 403);
+    const adminToken = request.headers.get("X-Ranking-Admin")?.trim();
+    if (!adminToken) return json({ error: "缺少管理權杖" }, 401);
+    const result = await stub.deleteRoom(adminToken);
+    return rankingRoomResult(result);
+  }
+
+  return json({ error: "method not allowed" }, 405);
+}
 
 export async function handleCallInRequest(
   request: Request,
@@ -683,6 +812,47 @@ function cleanString(value: unknown, max: number): string | undefined {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function normalizeRankingQuestion(titleValue: unknown, itemsValue: unknown): {
+  title: string;
+  items: RankingItem[];
+} | null {
+  const title = cleanRequiredString(titleValue, 120);
+  if (!title || !Array.isArray(itemsValue)) return null;
+  const labels = itemsValue
+    .slice(0, 11)
+    .map((item) => cleanRequiredString(isRecord(item) ? item.label : item, 80))
+    .filter((item): item is string => Boolean(item));
+  if (labels.length < 3 || labels.length > 10) return null;
+  const normalized = labels.map((label) => label.toLocaleLowerCase("zh-Hant"));
+  if (new Set(normalized).size !== labels.length) return null;
+  return {
+    title,
+    items: labels.map((label, index) => ({ id: `item-${index + 1}`, label })),
+  };
+}
+
+function randomHex(byteLength: number): string {
+  const bytes = crypto.getRandomValues(new Uint8Array(byteLength));
+  return [...bytes].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+function rankingRoomResult(result: RankingRoomRpcResult, readyStatus = 200): Response {
+  switch (result.status) {
+    case "ready":
+      return json(result, readyStatus);
+    case "deleted":
+      return json(result, 200);
+    case "expired":
+      return json({ error: "這個收件室已到期並清除" }, 410);
+    case "forbidden":
+      return json({ error: "管理權杖不正確" }, 403);
+    case "not_found":
+      return json({ error: "找不到這個收件室" }, 404);
+    default:
+      return json({ error: "收件室暫時無法回應" }, 503);
+  }
 }
 
 function json(data: unknown, status: number): Response {

@@ -171,6 +171,10 @@ function bindEvents() {
   document.querySelector("#harmonica-form").addEventListener("submit", createHarmonica);
   document.querySelector("#power-ranker-form").addEventListener("submit", preparePowerRanker);
   document.querySelector("#copy-power-ranker-link").addEventListener("click", copyPowerRankerLink);
+  document.querySelector("#copy-power-ranker-manage").addEventListener("click", copyPowerRankerManageLink);
+  document.querySelectorAll('input[name="power-ranker-mode"]').forEach((input) => {
+    input.addEventListener("change", updatePowerRankerMode);
+  });
   harmonicaKeyInput.addEventListener("input", () => {
     const key = harmonicaKeyInput.value.trim();
     if (key) sessionStorage.setItem("delib:harmonica-key", key);
@@ -440,7 +444,15 @@ function launchTool(toolId) {
   queueMicrotask(() => firstInput?.focus());
 }
 
-function preparePowerRanker(event) {
+function updatePowerRankerMode() {
+  const roomMode = document.querySelector('input[name="power-ranker-mode"]:checked')?.value === "room";
+  document.querySelector("#power-ranker-room-fields").hidden = !roomMode;
+  document.querySelector("#power-ranker-local-preview").hidden = roomMode;
+  document.querySelector("#power-ranker-room-preview").hidden = !roomMode;
+  document.querySelector("#prepare-power-ranker").textContent = roomMode ? "建立短期收件室" : "準備排序頁";
+}
+
+async function preparePowerRanker(event) {
   event.preventDefault();
   const status = document.querySelector("#power-ranker-status");
   const confirm = document.querySelector("#power-ranker-confirm");
@@ -460,18 +472,65 @@ function preparePowerRanker(event) {
     return;
   }
 
-  const workspace = new URL("/integrations/power-ranker.html", location.origin);
-  workspace.hash = rankingConfigToHash(config);
-  const link = document.querySelector("#power-ranker-workspace");
-  link.href = workspace.href;
+  const mode = document.querySelector('input[name="power-ranker-mode"]:checked')?.value || "local";
+  const button = document.querySelector("#prepare-power-ranker");
+  button.disabled = true;
+  try {
+    if (mode === "room") {
+      status.textContent = "正在建立短期收件室；只會送出題目、選項與清除期限。";
+      const data = await postJson("/api/integrations/power-ranker/rooms", {
+        title: config.title,
+        items: config.items,
+        retentionHours: Number(document.querySelector("#power-ranker-retention").value),
+        confirmed: true,
+      });
+      renderPowerRankerInstance(data);
+      status.textContent = "收件室已建立。先保存私人管理連結，再分享公開參與連結。";
+    } else {
+      const workspace = new URL("/integrations/power-ranker.html", location.origin);
+      workspace.hash = rankingConfigToHash(config);
+      renderPowerRankerInstance({ participantUrl: workspace.href, storedByDelib: false });
+      status.textContent = "排序頁已在本機準備好；尚未建立帳號、專案或外部資料。";
+    }
+  } catch (error) {
+    status.textContent = error instanceof Error ? error.message : "排序頁暫時沒有完成，請稍後再試。";
+  } finally {
+    button.disabled = false;
+    updatePowerRankerMode();
+  }
+}
+
+function renderPowerRankerInstance(data) {
+  const roomMode = data.storedByDelib === true;
+  document.querySelector("#power-ranker-workspace").href = data.participantUrl;
+  document.querySelector("#power-ranker-result-heading").textContent = roomMode
+    ? "短期收件室準備好了"
+    : "排序頁準備好了";
+  document.querySelector("#power-ranker-result-copy").textContent = roomMode
+    ? "先自己測試，再把公開連結分享給參與者；私人管理連結可以看彙整與提前刪除。"
+    : "先自己試排一次，再分享給參與者；主辦者可在排序頁匯入多人結果。";
+  const privateLinks = document.querySelector("#power-ranker-private-links");
+  privateLinks.hidden = !roomMode;
+  if (roomMode) {
+    document.querySelector("#power-ranker-manage").href = data.manageUrl;
+    const expires = new Intl.DateTimeFormat("zh-Hant-TW", { dateStyle: "long", timeStyle: "short" }).format(
+      new Date(data.expiresAt),
+    );
+    document.querySelector("#power-ranker-expiry").textContent = `資料預計保留到 ${expires}，也可以提前刪除。`;
+  }
   document.querySelector("#power-ranker-result").hidden = false;
-  status.textContent = "排序頁已在本機準備好；尚未建立帳號、專案或外部資料。";
 }
 
 function copyPowerRankerLink() {
   const link = document.querySelector("#power-ranker-workspace");
   if (!link.href) return;
   copyText(link.href, document.querySelector("#power-ranker-status"), "參與連結已複製。");
+}
+
+function copyPowerRankerManageLink() {
+  const link = document.querySelector("#power-ranker-manage");
+  if (!link.href) return;
+  copyText(link.href, document.querySelector("#power-ranker-status"), "私人管理連結已複製，請放在安全的地方。 ");
 }
 
 async function createCallIn(event) {

@@ -61,7 +61,7 @@ describe("public contracts", () => {
     );
     expect(audit.integrations.filter((item) => item.activation === "embedded-workspace")).toHaveLength(3);
     expect(audit.integrations.filter((item) => item.activation === "credentialed-create")).toHaveLength(1);
-    expect(audit.integrations.filter((item) => item.activation === "local-tool")).toHaveLength(1);
+    expect(audit.integrations.filter((item) => item.activation === "local-or-ephemeral-room")).toHaveLength(1);
   });
 
   it("publishes one source and hosting decision for every tool", async () => {
@@ -87,6 +87,7 @@ describe("public contracts", () => {
     );
     expect(schema.$id).toBe("https://delib.mashbean.net/schemas/delib-ranking/v1.json");
     expect(schema.properties.dataCard.properties.containsParticipantData.const).toBe(true);
-    expect(schema.properties.dataCard.properties.storedByDelib.const).toBe(false);
+    expect(schema.properties.dataCard.properties.storedByDelib.type).toBe("boolean");
+    expect(schema.allOf[0].then.properties.dataCard.properties.storedByDelib.const).toBe(false);
   });
 });

@@ -1,21 +1,27 @@
 import {
   aggregateRankingBundles,
+  buildAggregateRankingBundleFromPairs,
   buildIndividualRankingBundle,
+  normalizeRankingConfig,
   rankingConfigFromHash,
   rankingResultToCsv,
   recommendedComparisonCount,
   selectNextPair,
 } from "/power-ranker-core.js";
 
-const config = rankingConfigFromHash(location.hash);
-const itemMap = new Map((config?.items || []).map((item) => [item.id, item]));
-const targetComparisons = config ? recommendedComparisonCount(config.items.length) : 0;
+const roomId = new URLSearchParams(location.search).get("room") || "";
+const adminToken = roomId ? new URLSearchParams(location.hash.replace(/^#/, "")).get("admin") || "" : "";
+let config = roomId ? null : rankingConfigFromHash(location.hash);
+let itemMap = new Map();
+let targetComparisons = 0;
 let judgments = [];
 let currentPair = null;
 let finished = false;
-let sessionId = crypto.randomUUID();
+let submitted = false;
+let sessionId = getSessionId();
 let currentBundle = null;
 let aggregateBundle = null;
+let roomAggregateBundle = null;
 
 const title = document.querySelector("#ranking-title");
 const status = document.querySelector("#ranking-status");
@@ -33,15 +39,13 @@ const result = document.querySelector("#ranking-result");
 const resultList = document.querySelector("#ranking-result-list");
 const actionStatus = document.querySelector("#ranking-action-status");
 
-if (!config) {
-  error.hidden = false;
-  status.textContent = "無法讀取排序題目。";
+bindEvents();
+if (roomId) {
+  loadRoom();
+} else if (config) {
+  startRanking();
 } else {
-  title.textContent = config.title;
-  document.title = `${config.title} · Power Ranker · Delib`;
-  panel.hidden = false;
-  bindEvents();
-  renderQuestion();
+  showLoadError("無法讀取排序題目。", "這個連結沒有有效題目。請回到 Delib，填入 3–10 個不重複選項。");
 }
 
 function bindEvents() {
@@ -52,6 +56,12 @@ function bindEvents() {
   undoButton.addEventListener("click", undoJudgment);
   document.querySelector("#ranking-continue").addEventListener("click", continueRanking);
   document.querySelector("#ranking-restart").addEventListener("click", restartRanking);
+  document.querySelector("#ranking-submit-room").addEventListener("click", submitRoom);
+  document.querySelector("#ranking-room-refresh").addEventListener("click", loadRoomSnapshot);
+  document.querySelector("#ranking-delete-confirm").addEventListener("change", (event) => {
+    document.querySelector("#ranking-delete-room").disabled = !event.target.checked;
+  });
+  document.querySelector("#ranking-delete-room").addEventListener("click", deleteRoom);
   document.querySelector("#ranking-download-json").addEventListener("click", () =>
     downloadFile(currentBundle, "delib-power-ranker-result.json", "application/json"),
   );
@@ -66,6 +76,64 @@ function bindEvents() {
   document.querySelector("#aggregate-download-csv").addEventListener("click", () =>
     downloadFile(rankingResultToCsv(aggregateBundle), "delib-power-ranker-aggregate.csv", "text/csv"),
   );
+  document.querySelector("#room-aggregate-download-json").addEventListener("click", () =>
+    downloadFile(roomAggregateBundle, "delib-power-ranker-room-aggregate.json", "application/json"),
+  );
+  document.querySelector("#room-aggregate-download-csv").addEventListener("click", () =>
+    downloadFile(rankingResultToCsv(roomAggregateBundle), "delib-power-ranker-room-aggregate.csv", "text/csv"),
+  );
+}
+
+function startRanking() {
+  itemMap = new Map(config.items.map((item) => [item.id, item]));
+  targetComparisons = recommendedComparisonCount(config.items.length);
+  title.textContent = config.title;
+  document.title = `${config.title} · Power Ranker · Delib`;
+  panel.hidden = false;
+  renderQuestion();
+}
+
+async function loadRoom() {
+  if (!/^[a-f0-9]{64}$/.test(roomId)) {
+    showLoadError("找不到這個收件室。", "公開連結不完整，請向主辦者索取新的參與連結。");
+    return;
+  }
+  try {
+    const snapshot = await roomRequest();
+    config = normalizeRankingConfig(snapshot.question);
+    if (!config) throw new Error("收件室的題目格式不完整");
+    document.querySelector("#ranking-kicker").textContent = adminToken
+      ? "Ephemeral room · organizer"
+      : "Ephemeral room · participant";
+    document.querySelector("#ranking-trust-heading").textContent = "短期彙整";
+    document.querySelector("#ranking-trust-copy").textContent =
+      "送出時，逐題判斷只用來立即增加成對計數；Delib 不保存可逐份還原的原始判斷。";
+    document.querySelector("#ranking-trust-detail").textContent =
+      "伺服器保存公開題目、彙整計數與隨機 session ID 的 SHA-256 雜湊；到期或主辦者提前刪除時一併清除。";
+    document.querySelector("#ranking-room-summary").hidden = false;
+    document.querySelector("#room-aggregate-panel").hidden = false;
+    document.querySelector("#local-aggregate-panel").hidden = true;
+    document.querySelector("#ranking-room-consent-row").hidden = false;
+    document.querySelector("#ranking-admin-controls").hidden = !snapshot.admin;
+    startRanking();
+    renderRoomSnapshot(snapshot);
+  } catch (reason) {
+    const message = reason instanceof Error ? reason.message : "收件室暫時無法讀取";
+    showLoadError(message, adminToken ? "私人管理連結可能不正確或已經到期。" : "這個收件室可能已到期或由主辦者提前刪除。");
+  }
+}
+
+async function loadRoomSnapshot() {
+  const button = document.querySelector("#ranking-room-refresh");
+  button.disabled = true;
+  try {
+    renderRoomSnapshot(await roomRequest());
+  } catch (reason) {
+    document.querySelector("#room-aggregate-status").textContent =
+      reason instanceof Error ? reason.message : "暫時無法更新群體結果。";
+  } finally {
+    button.disabled = false;
+  }
 }
 
 function renderQuestion() {
@@ -94,15 +162,14 @@ function renderQuestion() {
 }
 
 function choose(selected) {
-  if (!currentPair || finished) return;
-  const choice =
-    selected === "equal" ? "equal" : selected === currentPair.alpha ? "alpha" : "beta";
+  if (!currentPair || finished || submitted) return;
+  const choice = selected === "equal" ? "equal" : selected === currentPair.alpha ? "alpha" : "beta";
   judgments.push({ ...currentPair, choice, order: judgments.length + 1 });
   renderQuestion();
 }
 
 function undoJudgment() {
-  if (!judgments.length) return;
+  if (!judgments.length || submitted) return;
   judgments.pop();
   actionStatus.textContent = "已回到上一組比較。";
   renderQuestion();
@@ -118,28 +185,140 @@ function finishRanking() {
     config,
     judgments,
     sessionId,
-    sourceUrl: location.href,
+    sourceUrl: publicSourceUrl(),
   });
   renderRankingList(resultList, currentBundle.result);
-  document.querySelector("#ranking-continue").hidden = !selectNextPair(config.items, judgments);
+  document.querySelector("#ranking-continue").hidden = submitted || !selectNextPair(config.items, judgments);
+  document.querySelector("#ranking-restart").hidden = submitted;
+  document.querySelector("#ranking-submit-room").hidden = !roomId || submitted;
   progressText.textContent = `已用 ${judgments.length} 組比較產生結果；完整配對共有 ${currentBundle.coverage.totalPairs} 組。`;
   progressBar.style.width = `${Math.min(100, (judgments.length / targetComparisons) * 100)}%`;
-  status.textContent = "結果只留在這個分頁；下載後才會形成可交接檔案。";
+  status.textContent = roomId
+    ? "這份個人結果仍只在目前分頁；勾選說明並送出後，伺服器才會立即合併成計數。"
+    : "結果只留在這個分頁；下載後才會形成可交接檔案。";
   result.scrollIntoView({ block: "start" });
 }
 
 function continueRanking() {
+  if (submitted) return;
   finished = false;
   result.hidden = true;
   renderQuestion();
 }
 
 function restartRanking() {
+  if (submitted) return;
   judgments = [];
   currentBundle = null;
-  sessionId = crypto.randomUUID();
+  sessionId = getSessionId(true);
   actionStatus.textContent = "已清除目前分頁裡的選擇。";
+  document.querySelector("#ranking-room-consent").checked = false;
   renderQuestion();
+}
+
+async function submitRoom() {
+  const consent = document.querySelector("#ranking-room-consent");
+  if (!consent.checked) {
+    actionStatus.textContent = "送出前請先確認短期保存方式。";
+    consent.focus();
+    return;
+  }
+  const button = document.querySelector("#ranking-submit-room");
+  button.disabled = true;
+  actionStatus.textContent = "正在送出並合併成對計數。";
+  try {
+    const snapshot = await jsonRequest(
+      `/api/integrations/power-ranker/rooms/${roomId}/submissions`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId, judgments }),
+      },
+    );
+    submitted = true;
+    renderRoomSnapshot(snapshot);
+    finishRanking();
+    actionStatus.textContent = snapshot.duplicate
+      ? "這個瀏覽器 session 已經送過，沒有重複計入。"
+      : "已合併成去連結化計數；伺服器沒有保存這份逐題判斷。";
+  } catch (reason) {
+    actionStatus.textContent = reason instanceof Error ? reason.message : "這輪選擇暫時沒有送出。";
+    button.disabled = false;
+  }
+}
+
+async function deleteRoom() {
+  const button = document.querySelector("#ranking-delete-room");
+  if (!document.querySelector("#ranking-delete-confirm").checked || !adminToken) return;
+  button.disabled = true;
+  document.querySelector("#room-aggregate-status").textContent = "正在清除收件室。";
+  try {
+    await jsonRequest(`/api/integrations/power-ranker/rooms/${roomId}`, {
+      method: "DELETE",
+      headers: { "X-Ranking-Admin": adminToken },
+    });
+    panel.hidden = true;
+    result.hidden = true;
+    document.querySelector("#ranking-room-summary").hidden = true;
+    document.querySelector("#room-aggregate-result").hidden = true;
+    document.querySelector("#ranking-admin-controls").hidden = true;
+    document.querySelector("#room-aggregate-status").textContent = "收件室已刪除；題目、session 雜湊與彙整計數都已清除。";
+  } catch (reason) {
+    document.querySelector("#room-aggregate-status").textContent =
+      reason instanceof Error ? reason.message : "收件室沒有完成刪除。";
+    button.disabled = false;
+  }
+}
+
+function renderRoomSnapshot(snapshot) {
+  const sessions = Number(snapshot.sessionsReceived) || 0;
+  document.querySelector("#ranking-room-count").textContent = `已收到 ${sessions} 份不重複 session`;
+  document.querySelector("#ranking-room-expiry").textContent = `預計於 ${formatDate(snapshot.expiresAt)} 自動清除。`;
+  const aggregateStatus = document.querySelector("#room-aggregate-status");
+  const aggregateResult = document.querySelector("#room-aggregate-result");
+  roomAggregateBundle = null;
+  aggregateResult.hidden = true;
+
+  if (!snapshot.aggregate || sessions === 0) {
+    aggregateStatus.textContent = snapshot.admin
+      ? "尚未收到結果；管理頁會在第一份送達後顯示彙整。"
+      : `至少收到 ${snapshot.resultThreshold || 3} 份才會顯示群體排序。`;
+    return;
+  }
+
+  roomAggregateBundle = buildAggregateRankingBundleFromPairs({
+    config,
+    aggregate: snapshot.aggregate,
+    sourceUrl: publicSourceUrl(),
+    expiresAt: snapshot.expiresAt,
+  });
+  if (!roomAggregateBundle) {
+    aggregateStatus.textContent = "群體計數格式不完整，請稍後再更新。";
+    return;
+  }
+  renderRankingList(document.querySelector("#room-aggregate-result-list"), roomAggregateBundle.result);
+  aggregateResult.hidden = false;
+  aggregateStatus.textContent = snapshot.admin && sessions < (snapshot.resultThreshold || 3)
+    ? `管理者預覽：目前 ${sessions} 份；參與者仍看不到群體排序。`
+    : `目前合併 ${sessions} 份、${roomAggregateBundle.aggregate.judgments} 組成對計數。`;
+}
+
+async function roomRequest() {
+  return jsonRequest(`/api/integrations/power-ranker/rooms/${roomId}`, {
+    headers: adminToken ? { "X-Ranking-Admin": adminToken } : {},
+  });
+}
+
+async function jsonRequest(url, options = {}) {
+  const response = await fetch(url, { cache: "no-store", ...options });
+  let data;
+  try {
+    data = await response.json();
+  } catch {
+    throw new Error("服務回應格式不完整");
+  }
+  if (!response.ok) throw new Error(data.error || "服務暫時無法回應");
+  return data;
 }
 
 async function copySummary() {
@@ -232,4 +411,33 @@ function downloadFile(value, filename, type) {
   anchor.click();
   URL.revokeObjectURL(url);
   actionStatus.textContent = `已下載 ${filename}。`;
+}
+
+function publicSourceUrl() {
+  if (!roomId) return location.href;
+  const url = new URL(location.href);
+  url.hash = "";
+  return url.toString();
+}
+
+function getSessionId(reset = false) {
+  if (!roomId) return crypto.randomUUID();
+  const key = `delib:power-ranker-room:${roomId}`;
+  const existing = reset ? "" : sessionStorage.getItem(key) || "";
+  if (/^[A-Za-z0-9_-]{8,80}$/.test(existing)) return existing;
+  const next = crypto.randomUUID();
+  sessionStorage.setItem(key, next);
+  return next;
+}
+
+function formatDate(value) {
+  return new Intl.DateTimeFormat("zh-Hant-TW", { dateStyle: "long", timeStyle: "short" }).format(
+    new Date(value),
+  );
+}
+
+function showLoadError(statusText, detail) {
+  error.hidden = false;
+  error.textContent = detail;
+  status.textContent = statusText;
 }

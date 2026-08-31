@@ -100,20 +100,21 @@
     {
       "toolId": "power-ranker",
       "readiness": "available",
-      "activation": "local-tool",
-      "label": "免帳號本機排序",
-      "summary": "輸入 3–10 個項目後產生可分享的站內排序頁；每位參與者在自己的瀏覽器完成，下載個人 JSON，再由主辦者離線彙整與匯出 CSV。",
+      "activation": "local-or-ephemeral-room",
+      "label": "本機或短期多人收件室",
+      "summary": "輸入 3–10 個項目後，可選完全本機下載，或建立 24 小時／7 天的站內收件室，自動彙整成對計數。",
       "accountRequired": false,
       "credentialRequired": false,
-      "freePath": "純靜態 HTML／JavaScript，使用現有 Delib Cloudflare 免費部署，不需要資料庫或外部 API。",
-      "writesExternalState": false,
-      "retention": "Delib 不保存題目、選擇或匯入檔案；重新整理分頁會清除尚未下載的選擇。",
+      "freePath": "本機模式純靜態；短期收件室使用 SQLite Durable Objects，可在 Workers Free 額度內運作，超額時操作會失敗。",
+      "writesExternalState": "只有選擇短期收件室並確認後才建立；本機模式不寫入伺服器。",
+      "retention": "本機模式不保存。短期收件室保存公開題目、pair counts 與隨機 session ID 雜湊，24 小時或 7 天後以 alarm 全部清除；主辦者可提前刪除。",
       "inAppEndpoint": "/integrations/power-ranker.html",
+      "roomEndpoint": "/api/integrations/power-ranker/rooms",
       "selfHost": {
         "supported": true,
-        "platform": "Static assets on Cloudflare Workers",
+        "platform": "Cloudflare Workers + static assets + optional SQLite Durable Objects",
         "cloudflareNative": true,
-        "note": "題目位於網址 fragment；答案與多人彙整都只在瀏覽器記憶體處理。"
+        "note": "每個收件室是一個獨立 Durable Object；不建中央參與資料庫，也不保存逐份原始判斷。"
       },
       "agent": {
         "canCreate": true,
@@ -121,7 +122,9 @@
       },
       "evidence": [
         "https://github.com/zaratanDotWorld/powerRanker/tree/4cc4f604022d0188bde1619fc47f05678c0bc0ad",
-        "https://delib.mashbean.net/schemas/delib-ranking/v1.json"
+        "https://delib.mashbean.net/schemas/delib-ranking/v1.json",
+        "https://developers.cloudflare.com/durable-objects/best-practices/rules-of-durable-objects/",
+        "https://developers.cloudflare.com/durable-objects/platform/pricing/"
       ]
     },
     {

@@ -26,7 +26,7 @@
       <div class="wrap workspace-wrap ranking-workspace">
         <div class="workspace-heading">
           <div>
-            <p class="section-kicker">Local pairwise ranking</p>
+            <p id="ranking-kicker" class="section-kicker">Local pairwise ranking</p>
             <h1 id="ranking-title">成對排序</h1>
             <p id="ranking-status" class="section-lede" role="status">正在讀取題目。</p>
           </div>
@@ -34,10 +34,19 @@
         </div>
 
         <div class="workspace-trust">
-          <strong>只在本機</strong>
-          <span>題目放在網址的 # 後方，選擇只留在目前分頁；Delib 不會收到或保存答案。</span>
-          <span>匯出的隨機 session ID 可協助排除重複檔，但仍應視為化名參與資料。</span>
+          <strong id="ranking-trust-heading">只在本機</strong>
+          <span id="ranking-trust-copy">題目放在網址的 # 後方，選擇只留在目前分頁；Delib 不會收到或保存答案。</span>
+          <span id="ranking-trust-detail">匯出的隨機 session ID 可協助排除重複檔，但仍應視為化名參與資料。</span>
         </div>
+
+        <section id="ranking-room-summary" class="room-summary" hidden aria-live="polite">
+          <div>
+            <span class="flow-tag">短期多人收件室</span>
+            <strong id="ranking-room-count">尚未收到結果</strong>
+            <p id="ranking-room-expiry"></p>
+          </div>
+          <button id="ranking-room-refresh" class="button button-small button-ghost" type="button">更新群體結果</button>
+        </section>
 
         <section id="ranking-error" class="empty-state" hidden>
           這個連結沒有有效題目。請回到 Delib，填入 3–10 個不重複選項。
@@ -76,7 +85,12 @@
           </div>
           <ol id="ranking-result-list" class="ranking-list"></ol>
           <p class="boundary-note">模型分數是這批成對選擇形成的相對權重，不是支持率、預算比例，也不能單獨證明群體共識。</p>
+          <label id="ranking-room-consent-row" class="consent-row" hidden>
+            <input id="ranking-room-consent" type="checkbox" />
+            <span>我知道送出後，Delib 會立即把這輪判斷合併成計數，只保存隨機 session ID 的雜湊，不保存我的逐題判斷。</span>
+          </label>
           <div class="result-actions">
+            <button id="ranking-submit-room" class="button button-primary" type="button" hidden>送出這輪選擇</button>
             <button id="ranking-download-json" class="button button-primary" type="button">下載個人結果 JSON</button>
             <button id="ranking-download-csv" class="button button-ghost" type="button">下載排序 CSV</button>
             <button id="ranking-copy-summary" class="button button-ghost" type="button">複製成果摘要</button>
@@ -86,7 +100,32 @@
           <p id="ranking-action-status" class="action-status" role="status"></p>
         </section>
 
-        <section class="aggregate-panel" aria-labelledby="aggregate-heading">
+        <section id="room-aggregate-panel" class="aggregate-panel" hidden aria-labelledby="room-aggregate-heading">
+          <div>
+            <p class="section-kicker">Shared aggregate</p>
+            <h2 id="room-aggregate-heading">這個收件室的群體排序</h2>
+            <p id="room-aggregate-status" class="action-status" role="status"></p>
+          </div>
+          <div id="room-aggregate-result" hidden>
+            <ol id="room-aggregate-result-list" class="ranking-list"></ol>
+            <p class="boundary-note">只呈現去連結化的成對計數；這不是代表性樣本、支持率或正式共識。</p>
+            <div class="result-actions">
+              <button id="room-aggregate-download-json" class="button button-primary" type="button">下載群體 JSON</button>
+              <button id="room-aggregate-download-csv" class="button button-ghost" type="button">下載群體 CSV</button>
+            </div>
+          </div>
+          <div id="ranking-admin-controls" class="danger-zone" hidden>
+            <strong>主辦者管理</strong>
+            <p>提前刪除會立即清除題目、session 雜湊與全部彙整計數，無法復原。</p>
+            <label class="consent-row">
+              <input id="ranking-delete-confirm" type="checkbox" />
+              <span>我確認已下載需要保留的彙整結果。</span>
+            </label>
+            <button id="ranking-delete-room" class="button button-ghost" type="button" disabled>提前刪除收件室</button>
+          </div>
+        </section>
+
+        <section id="local-aggregate-panel" class="aggregate-panel" aria-labelledby="aggregate-heading">
           <div>
             <p class="section-kicker">Organizer handoff</p>
             <h2 id="aggregate-heading">把多人下載的結果合在一起</h2>

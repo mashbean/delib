@@ -2,7 +2,21 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "delib",
   "main": "src/index.ts",
-  "compatibility_date": "2026-08-30",
+  "compatibility_date": "2026-08-31",
+  "exports": {
+    "RankingRoom": {
+      "type": "durable-object",
+      "storage": "sqlite"
+    }
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "RANKING_ROOMS",
+        "class_name": "RankingRoom"
+      }
+    ]
+  },
   "assets": {
     "directory": "./public",
     "binding": "ASSETS",
@@ -17,6 +31,14 @@
   "env": {
     "production": {
       "name": "delib",
+      "durable_objects": {
+        "bindings": [
+          {
+            "name": "RANKING_ROOMS",
+            "class_name": "RankingRoom"
+          }
+        ]
+      },
       "vars": {
         "CALL_IN_ORIGIN": "https://call-in.mashbean.net"
       },

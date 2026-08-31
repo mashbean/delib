@@ -9,11 +9,13 @@
   },
   "scripts": {
     "dev": "wrangler dev",
+    "types": "wrangler types --env production",
+    "check:types": "wrangler types --check --env production",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
+    "test": "vitest run --config vitest.config.ts && vitest run --config vitest.worker.config.ts",
     "deploy:dry": "wrangler deploy --dry-run --env production",
     "check:scripts": "node --check public/app.js && node --check public/core.js && node --check public/power-ranker-core.js && node --check public/integrations/polis.js && node --check public/integrations/heyform.js && node --check public/integrations/tttc.js && node --check public/integrations/harmonica.js && node --check public/integrations/power-ranker.js && node --check scripts/install-skill.mjs",
-    "check": "npm run check:scripts && npm run typecheck && npm test && npm run deploy:dry",
+    "check": "npm run check:scripts && npm run check:types && npm run typecheck && npm test && npm run deploy:dry",
     "deploy": "wrangler deploy",
     "deploy:production": "wrangler deploy --env production",
     "install-skill": "node scripts/install-skill.mjs install-skill"
@@ -29,7 +31,8 @@
     }
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^5.20260830.1",
+    "@cloudflare/vitest-plugin": "^1.1.2",
+    "@types/node": "^26.4.0",
     "typescript": "^5.9.3",
     "vitest": "^4.1.11",
     "wrangler": "^4.127.1"

@@ -14,7 +14,7 @@
       "properties": {
         "generator": { "type": "string" },
         "url": { "type": "string", "format": "uri" },
-        "persisted": { "const": false }
+        "persisted": { "type": "boolean" }
       }
     },
     "question": {
@@ -63,8 +63,9 @@
         "containsDirectIdentifiers": { "const": false },
         "containsFreeText": { "const": false },
         "aggregation": { "enum": ["one-browser-session", "pair-counts-without-session-links"] },
-        "publicationStatus": { "enum": ["local-export-only", "local-aggregate-only"] },
-        "storedByDelib": { "const": false },
+        "publicationStatus": { "enum": ["local-export-only", "local-aggregate-only", "ephemeral-room-aggregate"] },
+        "storedByDelib": { "type": "boolean" },
+        "expiresAt": { "type": ["string", "null"], "format": "date-time" },
         "limitations": { "type": "array", "items": { "type": "string" } }
       }
     }
@@ -72,7 +73,13 @@
   "allOf": [
     {
       "if": { "properties": { "kind": { "const": "individual" } } },
-      "then": { "required": ["session", "judgments"] }
+      "then": {
+        "required": ["session", "judgments"],
+        "properties": {
+          "source": { "properties": { "persisted": { "const": false } } },
+          "dataCard": { "properties": { "storedByDelib": { "const": false } } }
+        }
+      }
     },
     {
       "if": { "properties": { "kind": { "const": "aggregate" } } },

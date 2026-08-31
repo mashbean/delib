@@ -192,10 +192,11 @@ and export. Require human review of facilitator prompts, summaries and claims.
 
 ### Power Ranker
 
-Delib includes a browser-only pairwise ranking workspace. Create the public
-question from `https://delib.mashbean.net/#launch-power-ranker` with 3–10
-distinct options. Confirm the decision boundary and make sure the title and
-options contain no sensitive context before producing the share link.
+Delib includes a pairwise ranking workspace with two explicit modes. Create the
+public question from `https://delib.mashbean.net/#launch-power-ranker` with 3–10
+distinct options. Confirm the decision boundary, choose local download or an
+expiring room, and make sure the title and options contain no sensitive context
+before producing the share link.
 
 The question is encoded in the URL fragment after `#`, so it is not sent to the
 Worker. Judgments stay only in page memory. Each participant can download an
@@ -209,6 +210,17 @@ produces aggregate JSON／CSV without individual-session linkage. Do not call th
 result a vote share, budget allocation or consensus: PowerRanker emits relative
 spectral weights from the comparisons supplied. Publish comparison coverage,
 recruitment gaps, ties, authority and the human adoption decision with it.
+
+If the organizer chooses a short-lived room, Delib stores the public question,
+aggregate pair counts and SHA-256 hashes of random session IDs in one SQLite
+Durable Object per room. It does not store a raw-judgment table. The organizer
+must choose 24 hours or seven days, retain the private management link, and tell
+participants about the storage before submission. Public group results require
+three sessions; the private management page may preview earlier. The expiry
+alarm and the management delete action both clear the complete object storage.
+Do not put names, contact details, sensitive situations or an admin token in a
+question, option or participant link. Free operation is limited by Cloudflare's
+Workers Free and SQLite Durable Objects quotas; do not promise unlimited use.
 
 ## Build both gears
 

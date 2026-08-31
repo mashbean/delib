@@ -1,4 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
+import { env } from "cloudflare:workers";
+import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import {
   collectOutputText,
   handleAgentRequest,
@@ -6,10 +8,41 @@ import {
   handleHeyFormRequest,
   handleHarmonicaRequest,
   handlePolisRequest,
+  handleRankingRoomRequest,
   handleTttcRequest,
   parseHeyFormId,
   parsePolisConversationId,
 } from "./index";
+
+const rankingEnv = env as unknown as Parameters<typeof handleRankingRoomRequest>[1];
+
+const roomJudgments = [
+  { alpha: "item-1", beta: "item-2", choice: "alpha" },
+  { alpha: "item-2", beta: "item-3", choice: "alpha" },
+];
+
+async function createRankingRoom() {
+  const response = await handleRankingRoomRequest(
+    new Request("https://delib.example/api/integrations/power-ranker/rooms", {
+      method: "POST",
+      headers: { Origin: "https://delib.example", "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: "公園下一步",
+        items: ["照明", "草地", "遊具"],
+        retentionHours: 24,
+        confirmed: true,
+      }),
+    }),
+    rankingEnv,
+  );
+  expect(response.status).toBe(201);
+  return (await response.json()) as {
+    roomId: string;
+    participantUrl: string;
+    manageUrl: string;
+    expiresAt: number;
+  };
+}
 
 const plan = {
   goal: "listen",
@@ -294,5 +327,113 @@ describe("direct integrations", () => {
     expect(body.status).toBe("ready");
     expect(body).not.toHaveProperty("internal");
     expect(upstream).toHaveBeenCalledOnce();
+  });
+});
+
+describe("Power Ranker ephemeral rooms", () => {
+  it("aggregates three sessions, deduplicates hashes, and supports verified deletion", async () => {
+    const room = await createRankingRoom();
+    const roomPath = `https://delib.example/api/integrations/power-ranker/rooms/${room.roomId}`;
+    const adminToken = new URL(room.manageUrl).hash.replace(/^#admin=/, "");
+    expect(new URL(room.participantUrl).hash).toBe("");
+    expect(adminToken).toMatch(/^[a-f0-9]{64}$/);
+
+    const adminResponse = await handleRankingRoomRequest(
+      new Request(roomPath, { headers: { "X-Ranking-Admin": adminToken } }),
+      rankingEnv,
+    );
+    await expect(adminResponse.json()).resolves.toMatchObject({
+      admin: true,
+      sessionsReceived: 0,
+      aggregate: { sessions: 0, pairwise: [] },
+    });
+
+    for (const sessionId of ["session-one", "session-two"]) {
+      const response = await handleRankingRoomRequest(
+        new Request(`${roomPath}/submissions`, {
+          method: "POST",
+          headers: { Origin: "https://delib.example", "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionId, judgments: roomJudgments }),
+        }),
+        rankingEnv,
+      );
+      expect(response.status).toBe(201);
+    }
+
+    const beforeThreshold = await handleRankingRoomRequest(new Request(roomPath), rankingEnv);
+    await expect(beforeThreshold.json()).resolves.toMatchObject({
+      sessionsReceived: 2,
+      aggregate: null,
+      resultThreshold: 3,
+    });
+
+    const duplicate = await handleRankingRoomRequest(
+      new Request(`${roomPath}/submissions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId: "session-one", judgments: roomJudgments }),
+      }),
+      rankingEnv,
+    );
+    expect(duplicate.status).toBe(200);
+    await expect(duplicate.json()).resolves.toMatchObject({ duplicate: true, sessionsReceived: 2 });
+
+    const third = await handleRankingRoomRequest(
+      new Request(`${roomPath}/submissions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId: "session-three", judgments: roomJudgments }),
+      }),
+      rankingEnv,
+    );
+    expect(third.status).toBe(201);
+    await expect(third.json()).resolves.toMatchObject({
+      duplicate: false,
+      aggregate: {
+        sessions: 3,
+        judgments: 6,
+        pairwise: [
+          { alpha: "item-1", beta: "item-2", alphaWins: 3 },
+          { alpha: "item-2", beta: "item-3", alphaWins: 3 },
+        ],
+      },
+    });
+
+    const stub = env.RANKING_ROOMS.get(env.RANKING_ROOMS.idFromString(room.roomId));
+    await runInDurableObject(stub, async (_instance, state) => {
+      const hashes = state.storage.sql
+        .exec<{ session_hash: string }>("SELECT session_hash FROM sessions ORDER BY session_hash")
+        .toArray();
+      expect(hashes).toHaveLength(3);
+      expect(hashes.every((row) => /^[a-f0-9]{64}$/.test(row.session_hash))).toBe(true);
+      expect(JSON.stringify(hashes)).not.toContain("session-one");
+      const tables = state.storage.sql
+        .exec<{ name: string }>("SELECT name FROM sqlite_master WHERE type = 'table'")
+        .toArray()
+        .map((row) => row.name);
+      expect(tables).not.toContain("judgments");
+    });
+
+    const deleted = await handleRankingRoomRequest(
+      new Request(roomPath, {
+        method: "DELETE",
+        headers: { Origin: "https://delib.example", "X-Ranking-Admin": adminToken },
+      }),
+      rankingEnv,
+    );
+    expect(deleted.status).toBe(200);
+    const afterDelete = await handleRankingRoomRequest(new Request(roomPath), rankingEnv);
+    expect(afterDelete.status).toBe(404);
+  });
+
+  it("clears every stored field when its alarm fires", async () => {
+    const room = await createRankingRoom();
+    const stub = env.RANKING_ROOMS.get(env.RANKING_ROOMS.idFromString(room.roomId));
+    expect(await runDurableObjectAlarm(stub)).toBe(true);
+    const response = await handleRankingRoomRequest(
+      new Request(`https://delib.example/api/integrations/power-ranker/rooms/${room.roomId}`),
+      rankingEnv,
+    );
+    expect(response.status).toBe(404);
   });
 });

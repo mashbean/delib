@@ -52,7 +52,7 @@
               <button class="button button-primary button-large" data-start="listen">🧩 開始拼一輪</button>
               <a class="button button-ghost button-large" href="#how">先看看怎麼運作</a>
             </div>
-            <p class="microcopy">不用註冊 · 推薦規則公開 · 伺服器不保存參與資料</p>
+            <p class="microcopy">不用註冊 · 推薦規則公開 · 參與資料預設留在原工具或本機</p>
           </div>
 
           <aside class="hero-receipt" aria-label="成果收據預覽">
@@ -176,7 +176,7 @@
           <h2>不用離開這裡，先把工具開起來。</h2>
           <p class="section-lede">
             先預覽會建立什麼，再由你按下確認。公開參與連結和私人管理連結會分開顯示，
-            Delib 不保存你的活動或對話內容。
+            Delib 不保存你的流程規劃；只有主辦者明確建立的短期 Power Ranker 收件室會保存去連結化計數並自動清除。
           </p>
 
           <div class="launch-grid">
@@ -450,15 +450,34 @@
                   <h3>用 Power Ranker 排出優先序</h3>
                 </div>
               </div>
-              <p>輸入 3–10 個選項，產生一個可分享的成對排序頁。每位參與者在自己的瀏覽器完成，Delib 不收答案。</p>
+              <p>輸入 3–10 個選項，選擇完全本機，或建立會自動到期的多人結果收件室。</p>
 
               <form id="power-ranker-form" class="launch-form">
+                <fieldset class="mode-picker">
+                  <legend>結果怎麼收回來？</legend>
+                  <label>
+                    <input type="radio" name="power-ranker-mode" value="local" checked />
+                    <span><strong>各自下載</strong><small>不送回 Delib，主辦者離線匯入</small></span>
+                  </label>
+                  <label>
+                    <input type="radio" name="power-ranker-mode" value="room" />
+                    <span><strong>短期收件室</strong><small>只留彙整計數，24 小時或 7 天後清除</small></span>
+                  </label>
+                </fieldset>
                 <label for="power-ranker-title">要排序的問題</label>
                 <input id="power-ranker-title" maxlength="120" required placeholder="例如：社區公園下一步應優先做什麼？" />
                 <label for="power-ranker-items">候選項目（一行一項）</label>
                 <textarea id="power-ranker-items" rows="7" maxlength="810" required placeholder="增加夜間照明&#10;保留安靜草地&#10;增設兒童遊具"></textarea>
                 <p class="field-note">需要 3–10 個不重複項目，每項最多 80 字。請先確認這些題目適合出現在分享網址。</p>
-                <div class="write-preview">
+                <div id="power-ranker-room-fields" hidden>
+                  <label for="power-ranker-retention">自動清除期限</label>
+                  <select id="power-ranker-retention">
+                    <option value="24">24 小時</option>
+                    <option value="168">7 天</option>
+                  </select>
+                  <p class="field-note">最多接收 300 份；到期後題目、session 雜湊與彙整計數會一起刪除。</p>
+                </div>
+                <div id="power-ranker-local-preview" class="write-preview">
                   <strong>準備後會發生：</strong>
                   <ul>
                     <li>題目只放在網址的 # 後方，不會送進 Worker request；</li>
@@ -466,29 +485,44 @@
                     <li>個人 JSON 可交回主辦者，在同一頁離線彙整並匯出 CSV。</li>
                   </ul>
                 </div>
+                <div id="power-ranker-room-preview" class="write-preview" hidden>
+                  <strong>建立後會發生：</strong>
+                  <ul>
+                    <li>Delib 保存公開題目、去連結化的成對計數與隨機 session ID 的雜湊；</li>
+                    <li>不保存逐份原始判斷、姓名、聯絡方式，也不向參與者收自由文字；</li>
+                    <li>至少收到 3 份才向參與者顯示群體結果；主辦者可提前刪除。</li>
+                  </ul>
+                </div>
                 <label class="consent-row">
                   <input id="power-ranker-confirm" type="checkbox" />
-                  <span>我已說明這是諮詢、排序或正式決定，也確認題目不含姓名、聯絡方式或敏感情境。</span>
+                  <span>我已說明這是諮詢、排序或正式決定，也確認題目不含姓名、聯絡方式或敏感情境，並會告知所選保存方式。</span>
                 </label>
-                <button class="button button-primary" type="submit">準備排序頁</button>
+                <button id="prepare-power-ranker" class="button button-primary" type="submit">準備排序頁</button>
                 <p id="power-ranker-status" class="action-status" role="status"></p>
               </form>
               <section id="power-ranker-result" class="instance-result compact-result" hidden aria-live="polite">
                 <span class="success-mark" aria-hidden="true">✓</span>
-                <h4>排序頁準備好了</h4>
-                <p>先自己試排一次，再分享給參與者；主辦者可在排序頁匯入多人結果。</p>
+                <h4 id="power-ranker-result-heading">排序頁準備好了</h4>
+                <p id="power-ranker-result-copy">先自己試排一次，再分享給參與者；主辦者可在排序頁匯入多人結果。</p>
                 <div class="public-links">
                   <strong>可以分享</strong>
                   <a id="power-ranker-workspace" class="button button-primary" target="_blank" rel="noreferrer">打開排序頁 ↗</a>
                   <button id="copy-power-ranker-link" class="button button-ghost" type="button">複製參與連結</button>
                 </div>
+                <details id="power-ranker-private-links" class="private-links" hidden>
+                  <summary>私人管理連結</summary>
+                  <p id="power-ranker-expiry"></p>
+                  <p>權杖只放在網址 # 後方；持有者可查看未滿三份的彙整並提前刪除，請勿分享給參與者。</p>
+                  <a id="power-ranker-manage" target="_blank" rel="noreferrer">開啟管理頁 ↗</a>
+                  <button id="copy-power-ranker-manage" class="text-button" type="button">複製私人管理連結</button>
+                </details>
               </section>
-              <p class="boundary-note">這是 MIT 授權 PowerRanker `rankCentrality` 演算法的瀏覽器原生移植。模型分數不是支持率或共識證明；招募、代表性與採納權限仍需由主辦者說清楚。</p>
+              <p class="boundary-note">這是 MIT 授權 PowerRanker `rankCentrality` 演算法的瀏覽器原生移植。短期收件室使用 Cloudflare SQLite Durable Objects，在 Free 額度內可免費運作；超額時會停止接受操作。模型分數不是支持率或共識證明。</p>
             </article>
           </div>
 
           <div class="next-integrations">
-            <div><span>已串接</span><strong>六個站內入口</strong><p>Call-in 可代建；Power Ranker 可本機排序與彙整；Pol.is、Harmonica、HeyForm、TTTC 各自保留上游邊界。</p></div>
+            <div><span>已串接</span><strong>六個站內入口</strong><p>Call-in 可代建；Power Ranker 可本機排序或短期自動彙整；Pol.is、Harmonica、HeyForm、TTTC 各自保留上游邊界。</p></div>
             <div><span>原始碼盤點</span><strong>直接用、共用主機、元件三條路</strong><p>每張工具卡會直接說明是否能內嵌、取原始碼，以及為何不能只靠 Cloudflare 免費完成。</p></div>
             <a href="/data/hosting.json">查看 25 項機器可讀盤點 →</a>
           </div>
@@ -643,7 +677,7 @@
         </div>
         <div>
           <strong>資料承諾</strong>
-          <p>伺服器不保存流程、API key 或參與資料；本機下載檔由使用者自行保管。AI 輸出必須由人複核。</p>
+          <p>伺服器不保存流程或 API key；短期排序收件室只留去連結化計數與 session 雜湊並自動清除。本機下載檔由使用者自行保管。AI 輸出必須由人複核。</p>
         </div>
       </div>
     </footer>

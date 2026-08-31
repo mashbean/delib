@@ -16,13 +16,15 @@ share URL / JSON / Markdown       direct activation adapters
                                   ├─ HeyForm published-form workspace
                                   ├─ Talk to the City official create workspace
                                   ├─ Harmonica credentialed creator + workspace
-                                  └─ Power Ranker local pairwise workspace
+                                  └─ Power Ranker local or ephemeral-room workspace
         ↓ optional
 BYOK OpenAI request OR locally installed Delib skill
 ```
 
-The first release deliberately has no participant-data database. It proves the
-recommendation, handoff and receipt UX before introducing persistent civic data.
+The planning plane has no participant-data database. Power Ranker adds one
+bounded exception: an organizer can explicitly create a short-lived room whose
+per-room SQLite Durable Object stores only the public question, pair counts and
+hashed random session IDs. It is not a general civic-data warehouse.
 
 ## Direct activation plane
 
@@ -47,10 +49,16 @@ human gate is mandatory.
   bounded, confirmed session brief; it forwards one create request to the
   official REST API and returns only the session ID, participant workspace and
   management URL. Neither the key nor upstream response body is stored.
-- `/integrations/power-ranker.html` is a static, browser-only workspace. The
-  question is encoded after `#`, judgments stay in page memory, and individual
-  or aggregate `delib-ranking/v1` files are created only when the user downloads
-  them. Aggregate exports retain pair counts but remove session linkage.
+- `/integrations/power-ranker.html` has two modes. Local mode encodes the
+  question after `#`; judgments and imported files stay in page memory. Room
+  mode creates one SQLite Durable Object per room. A submission is immediately
+  reduced to pair counts; only the SHA-256 hash of its random session ID remains
+  for duplicate suppression, and there is no raw-judgment table.
+- `POST /api/integrations/power-ranker/rooms` creates a confirmed 24-hour or
+  seven-day room and returns a public participant URL plus a private management
+  URL whose token stays after `#`. GET returns public aggregates only at three
+  sessions; DELETE requires that token. The Durable Object alarm calls atomic
+  `deleteAll()` at expiry, and the management page can invoke the same cleanup.
 - Private Call-in links stay in tab-scoped `sessionStorage` and never enter a
   plan URL or exported public receipt.
 
@@ -86,7 +94,7 @@ project, phase, permission and handoff metadata. Cloudflare Workflows or Queues
 can perform explicit, restartable adapter handoffs. Public release must remain a
 separate, human-approved step.
 
-The local ranking bundle is intentionally separate from `delib-bundle/v1`.
+The ranking bundle is intentionally separate from `delib-bundle/v1`.
 Planning bundles contain no participant data; `delib-ranking/v1` explicitly
 marks pairwise judgments as participant data even when they contain no names.
 

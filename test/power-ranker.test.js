@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   RANKING_SCHEMA,
   aggregateRankingBundles,
+  buildAggregateRankingBundleFromPairs,
   buildIndividualRankingBundle,
   normalizeRankingConfig,
   rankJudgments,
@@ -93,5 +94,27 @@ describe("Power Ranker browser port", () => {
     expect(outcome.bundle.aggregate.sessions).toBe(2);
     expect(outcome.bundle).not.toHaveProperty("judgments");
     expect(outcome.bundle.dataCard.aggregation).toBe("pair-counts-without-session-links");
+  });
+
+  it("rebuilds a portable aggregate from stored pair counts", () => {
+    const bundle = buildAggregateRankingBundleFromPairs({
+      config,
+      aggregate: {
+        sessions: 3,
+        pairwise: [
+          { alpha: "item-1", beta: "item-2", alphaWins: 2, betaWins: 1, equal: 0 },
+          { alpha: "item-2", beta: "item-3", alphaWins: 3, betaWins: 0, equal: 0 },
+        ],
+      },
+      sourceUrl: "https://delib.example/integrations/power-ranker.html?room=public",
+      expiresAt: Date.parse("2026-09-01T00:00:00.000Z"),
+    });
+    expect(bundle.aggregate.sessions).toBe(3);
+    expect(bundle.aggregate.judgments).toBe(6);
+    expect(bundle.result.map((item) => item.id)).toEqual(["item-1", "item-2", "item-3"]);
+    expect(bundle.dataCard).toMatchObject({
+      storedByDelib: true,
+      publicationStatus: "ephemeral-room-aggregate",
+    });
   });
 });
