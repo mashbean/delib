@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta name="description" content="Power Ranker 群體排序的可檢查成果收據、主辦者解讀與下一步責任。" />
+    <title>Power Ranker 成果收據 · Delib</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/styles.css" />
+    <script type="module" src="/results/power-ranker.js"></script>
+  </head>
+  <body class="receipt-page-body">
+    <a class="skip-link" href="#receipt-main">跳到成果內容</a>
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <a class="brand" href="/" aria-label="回 Delib 審議拼圖">
+          <span class="brand-mark" aria-hidden="true">⿻</span>
+          <span><strong>Delib</strong><span class="brand-divider">·</span>成果收據</span>
+        </a>
+        <a class="button button-small button-ghost" href="/#launch-power-ranker">開啟新一輪</a>
+      </div>
+    </header>
+
+    <main id="receipt-main" class="receipt-page-main">
+      <div class="wrap receipt-page-wrap">
+        <section id="receipt-page-error" class="empty-state" hidden>
+          <h1>這份成果收據無法讀取</h1>
+          <p>連結可能不完整、被通訊軟體截斷，或不是目前支援的格式。請向主辦者索取新的成果連結或 JSON 檔。</p>
+          <a class="button button-primary" href="/">回到 Delib</a>
+        </section>
+
+        <article id="receipt-page-content" class="public-receipt" hidden>
+          <header class="public-receipt-hero">
+            <div>
+              <p class="section-kicker">Power Ranker · Result receipt</p>
+              <span id="receipt-decision-chip" class="receipt-decision-chip"></span>
+              <h1 id="receipt-page-title"></h1>
+              <p class="section-lede">
+                這不是投票結果。以下把工具計算、主辦者解讀、決策狀態與下一步分開呈現，讓參與者知道意見後來去了哪裡。
+              </p>
+            </div>
+            <div class="receipt-stamp" aria-label="成果收據資料狀態">
+              <strong>可攜成果</strong>
+              <span id="receipt-prepared-at"></span>
+              <span>收據未另存於 Delib</span>
+            </div>
+          </header>
+
+          <section class="receipt-metrics" aria-label="彙整範圍">
+            <div><strong id="receipt-session-count"></strong><span>不重複 session</span></div>
+            <div><strong id="receipt-judgment-count"></strong><span>成對判斷</span></div>
+            <div><strong id="receipt-coverage-count"></strong><span id="receipt-coverage-label">比較涵蓋</span></div>
+          </section>
+
+          <section class="receipt-section receipt-computation" aria-labelledby="receipt-ranking-heading">
+            <div class="receipt-section-heading">
+              <div><span class="receipt-layer-label">工具計算</span><h2 id="receipt-ranking-heading">群體相對排序</h2></div>
+              <a id="receipt-aggregate-source" target="_blank" rel="noreferrer">查看原始排序頁 ↗</a>
+            </div>
+            <ol id="receipt-ranking-list" class="ranking-list"></ol>
+            <p class="boundary-note">模型權重是這批成對判斷形成的相對排序，不是支持率、預算比例，也不能單獨證明群體共識。</p>
+          </section>
+
+          <div class="receipt-layer-grid">
+            <section class="receipt-section" aria-labelledby="receipt-interpretation-heading">
+              <span class="receipt-layer-label receipt-layer-human">主辦者解讀</span>
+              <h2 id="receipt-interpretation-heading">這份排序怎麼被理解</h2>
+              <p id="receipt-interpretation" class="receipt-long-copy"></p>
+            </section>
+
+            <section class="receipt-section" aria-labelledby="receipt-missing-heading">
+              <span class="receipt-layer-label receipt-layer-limits">未納入／限制</span>
+              <h2 id="receipt-missing-heading">還缺少哪些聲音</h2>
+              <p id="receipt-missing-voices" class="receipt-long-copy"></p>
+            </section>
+          </div>
+
+          <section class="receipt-section receipt-decision" aria-labelledby="receipt-decision-heading">
+            <div>
+              <span class="receipt-layer-label receipt-layer-decision">人工聲明</span>
+              <h2 id="receipt-decision-heading">決策狀態與確認者</h2>
+              <p><strong id="receipt-decision-status"></strong> · 由 <span id="receipt-authority"></span> 確認</p>
+              <a id="receipt-evidence-link" target="_blank" rel="noreferrer" hidden>查看公開依據 ↗</a>
+            </div>
+            <div class="receipt-next-action">
+              <span class="receipt-layer-label receipt-layer-next">下一步</span>
+              <h2 id="receipt-next-heading">誰要在何時做什麼</h2>
+              <dl>
+                <div><dt>負責回應</dt><dd id="receipt-responsible-actor"></dd></div>
+                <div><dt>預計回應</dt><dd id="receipt-response-by"></dd></div>
+                <div><dt>具體行動</dt><dd id="receipt-next-action-copy"></dd></div>
+              </dl>
+            </div>
+          </section>
+
+          <section class="receipt-data-card" aria-labelledby="receipt-data-heading">
+            <div>
+              <span class="receipt-layer-label">資料邊界</span>
+              <h2 id="receipt-data-heading">這張成果頁帶了什麼</h2>
+            </div>
+            <ul>
+              <li>包含去連結化的群體成對計數，也就是參與資料的彙整；</li>
+              <li>不含個別 session ID、逐題判斷、姓名、聯絡方式或參與者自由文字；</li>
+              <li>包含主辦者主動填寫的解讀與責任聲明；網址可以被複製與再次分享。</li>
+            </ul>
+            <p id="receipt-source-expiry"></p>
+          </section>
+
+          <footer class="receipt-actions">
+            <div>
+              <strong>讓成果回到下一輪</strong>
+              <p>可以沿用同一組選項再做一次本機排序，也可以回到 Delib 重新選擇工具與收件方式。</p>
+            </div>
+            <div class="result-actions">
+              <a id="receipt-next-round" class="button button-primary">同一組選項再跑一輪</a>
+              <a class="button button-ghost" href="/#start">重新規劃流程</a>
+              <button id="receipt-copy-summary" class="button button-ghost" type="button">複製成果摘要</button>
+              <button id="receipt-download-json" class="button button-ghost" type="button">下載 JSON</button>
+              <button id="receipt-download-md" class="button button-ghost" type="button">下載 Markdown</button>
+            </div>
+            <p id="receipt-action-status" class="action-status" role="status"></p>
+          </footer>
+        </article>
+      </div>
+    </main>
+  </body>
+</html>

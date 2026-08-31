@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://delib.mashbean.net/schemas/delib-ranking-receipt/v1.json",
+  "title": "Delib Power Ranker result receipt v1",
+  "description": "A public, de-linked aggregate ranking with organizer-authored interpretation, decision status, missing voices and next responsibility.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "preparedAt",
+    "source",
+    "question",
+    "method",
+    "aggregate",
+    "result",
+    "coverage",
+    "organizer",
+    "dataCard"
+  ],
+  "properties": {
+    "schema": {
+      "const": "https://delib.mashbean.net/schemas/delib-ranking-receipt/v1.json"
+    },
+    "kind": { "const": "ranking-receipt" },
+    "preparedAt": { "type": "string", "format": "date-time" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["generator", "aggregateStorage", "aggregateUrl", "aggregateExpiresAt"],
+      "properties": {
+        "generator": { "const": "Delib · Power Ranker" },
+        "aggregateStorage": { "enum": ["local", "ephemeral-room"] },
+        "aggregateUrl": { "type": "string", "format": "uri", "maxLength": 2000 },
+        "aggregateExpiresAt": { "type": ["string", "null"], "format": "date-time" }
+      }
+    },
+    "question": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "items"],
+      "properties": {
+        "title": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "items": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 10,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "label"],
+            "properties": {
+              "id": { "type": "string", "pattern": "^[A-Za-z0-9_-]{1,80}$" },
+              "label": { "type": "string", "minLength": 1, "maxLength": 80 }
+            }
+          }
+        }
+      }
+    },
+    "method": {
+      "type": "object",
+      "required": ["name", "normalization", "flow", "source", "implementation"]
+    },
+    "aggregate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sessions", "judgments", "pairwise"],
+      "properties": {
+        "sessions": { "type": "integer", "minimum": 3, "maximum": 300 },
+        "judgments": { "type": "integer", "minimum": 1, "maximum": 13500 },
+        "pairwise": {
+          "type": "array",
+          "maxItems": 45,
+          "items": {
+            "type": "object",
+            "required": ["alpha", "beta", "alphaWins", "betaWins", "equal", "total"]
+          }
+        }
+      }
+    },
+    "result": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "score", "observations", "rank"]
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["comparedPairs", "totalPairs", "ratio"],
+      "properties": {
+        "comparedPairs": { "type": "integer", "minimum": 1, "maximum": 45 },
+        "totalPairs": { "type": "integer", "minimum": 3, "maximum": 45 },
+        "ratio": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "organizer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "interpretation",
+        "missingVoices",
+        "decisionStatus",
+        "authority",
+        "responsibleActor",
+        "responseBy",
+        "nextAction",
+        "evidenceUrl"
+      ],
+      "properties": {
+        "interpretation": { "type": "string", "minLength": 1, "maxLength": 1200 },
+        "missingVoices": { "type": "string", "minLength": 1, "maxLength": 800 },
+        "decisionStatus": {
+          "enum": ["listening", "under-review", "adopted", "partially-adopted", "not-adopted"]
+        },
+        "authority": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "responsibleActor": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "responseBy": {
+          "oneOf": [{ "const": "" }, { "type": "string", "format": "date" }]
+        },
+        "nextAction": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "evidenceUrl": {
+          "oneOf": [{ "const": "" }, { "type": "string", "format": "uri", "maxLength": 2000 }]
+        }
+      }
+    },
+    "dataCard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "containsParticipantData",
+        "containsDirectIdentifiers",
+        "containsParticipantFreeText",
+        "containsOrganizerFreeText",
+        "aggregation",
+        "publicationStatus",
+        "storedByDelib",
+        "transport",
+        "limitations"
+      ],
+      "properties": {
+        "containsParticipantData": { "const": true },
+        "containsDirectIdentifiers": { "const": false },
+        "containsParticipantFreeText": { "const": false },
+        "containsOrganizerFreeText": { "const": true },
+        "aggregation": { "const": "pair-counts-without-session-links" },
+        "publicationStatus": { "const": "share-link-prepared" },
+        "storedByDelib": { "const": false },
+        "transport": { "const": "url-fragment" },
+        "limitations": { "type": "array", "minItems": 3, "items": { "type": "string" } }
+      }
+    }
+  }
+}

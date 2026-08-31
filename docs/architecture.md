@@ -17,6 +17,8 @@ share URL / JSON / Markdown       direct activation adapters
                                   ├─ Talk to the City official create workspace
                                   ├─ Harmonica credentialed creator + workspace
                                   └─ Power Ranker local or ephemeral-room workspace
+                                             ↓ organizer review
+                                      fragment-only result receipt
         ↓ optional
 BYOK OpenAI request OR locally installed Delib skill
 ```
@@ -59,6 +61,12 @@ human gate is mandatory.
   URL whose token stays after `#`. GET returns public aggregates only at three
   sessions; DELETE requires that token. The Durable Object alarm calls atomic
   `deleteAll()` at expiry, and the management page can invoke the same cleanup.
+- Once a local or room aggregate exists, the organizer can prepare a
+  `delib-ranking-receipt/v1` result. The browser rebuilds the ranking from the
+  pair counts, strips fragment-held admin capabilities, and requires separate
+  fields for interpretation, missing voices, decision authority, response
+  owner and next action. The public `/results/power-ranker.html` page reads the
+  receipt after `#`; the fragment is not sent to or stored by the Worker.
 - Private Call-in links stay in tab-scoped `sessionStorage` and never enter a
   plan URL or exported public receipt.
 
@@ -97,6 +105,9 @@ separate, human-approved step.
 The ranking bundle is intentionally separate from `delib-bundle/v1`.
 Planning bundles contain no participant data; `delib-ranking/v1` explicitly
 marks pairwise judgments as participant data even when they contain no names.
+`delib-ranking-receipt/v1` accepts aggregates only, preserves that participant-
+data warning, excludes individual linkage, and adds explicitly human-authored
+interpretation and responsibility fields.
 
 ## Adapter contract
 

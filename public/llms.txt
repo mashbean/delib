@@ -24,6 +24,8 @@ Direct actions currently implemented:
 - POST /api/integrations/tttc — prepare the current official Talk to the City create workspace.
 - POST /api/integrations/harmonica — create a confirmed Harmonica session with a tab-only API key.
 - /integrations/power-ranker.html — run local pairwise ranking or join a short-lived aggregate room; no account or API key.
+- /results/power-ranker.html#receipt=… — render a de-linked aggregate result receipt with organizer interpretation, missing voices, decision status and next responsibility. Receipt data stays in the URL fragment and is not stored by Delib.
+- /schemas/delib-ranking-receipt/v1.json — machine-readable contract for a layered Power Ranker result receipt.
 - POST /api/integrations/power-ranker/rooms — after human confirmation, create a 24-hour or seven-day SQLite Durable Object room.
 - GET/DELETE /api/integrations/power-ranker/rooms/:id — read thresholded aggregates or delete with a fragment-held admin token.
 - POST /api/integrations/power-ranker/rooms/:id/submissions — immediately reduce one browser session to pair counts; raw judgments are not stored.
@@ -34,3 +36,6 @@ credentials are forwarded once and never stored by Delib. Power Ranker local
 judgments and imported files stay in browser memory. Optional rooms store only
 the public question, pair counts and hashed random session IDs until expiry or
 organizer deletion. Downloaded ranking files explicitly declare participant data.
+Only an aggregate can become a public result receipt. Individual session IDs,
+raw judgments and room admin tokens are excluded; publication requires a human
+statement of authority, limitations and next action.

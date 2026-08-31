@@ -1,6 +1,6 @@
 {
   "schema": "delib-integrations/v1",
-  "updatedAt": "2026-08-31",
+  "updatedAt": "2026-09-01",
   "principles": [
     "A tool is marked available only when the in-app path was implemented and tested.",
     "Credentials remain in the browser tab unless the upstream API requires a single pass-through request.",
@@ -102,7 +102,7 @@
       "readiness": "available",
       "activation": "local-or-ephemeral-room",
       "label": "本機或短期多人收件室",
-      "summary": "輸入 3–10 個項目後，可選完全本機下載，或建立 24 小時／7 天的站內收件室，自動彙整成對計數。",
+      "summary": "輸入 3–10 個項目後，可選完全本機下載，或建立 24 小時／7 天的站內收件室，自動彙整成對計數；群體彙整可接成有人工責任聲明的成果收據。",
       "accountRequired": false,
       "credentialRequired": false,
       "freePath": "本機模式純靜態；短期收件室使用 SQLite Durable Objects，可在 Workers Free 額度內運作，超額時操作會失敗。",
@@ -110,6 +110,8 @@
       "retention": "本機模式不保存。短期收件室保存公開題目、pair counts 與隨機 session ID 雜湊，24 小時或 7 天後以 alarm 全部清除；主辦者可提前刪除。",
       "inAppEndpoint": "/integrations/power-ranker.html",
       "roomEndpoint": "/api/integrations/power-ranker/rooms",
+      "receiptEndpoint": "/results/power-ranker.html",
+      "receiptSchema": "/schemas/delib-ranking-receipt/v1.json",
       "selfHost": {
         "supported": true,
         "platform": "Cloudflare Workers + static assets + optional SQLite Durable Objects",

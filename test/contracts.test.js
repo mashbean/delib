@@ -90,4 +90,21 @@ describe("public contracts", () => {
     expect(schema.properties.dataCard.properties.storedByDelib.type).toBe("boolean");
     expect(schema.allOf[0].then.properties.dataCard.properties.storedByDelib.const).toBe(false);
   });
+
+  it("publishes a layered, fragment-only schema for ranking result receipts", async () => {
+    const schema = JSON.parse(
+      await readFile(new URL("public/schemas/delib-ranking-receipt/v1.json", root), "utf8"),
+    );
+    expect(schema.$id).toBe(
+      "https://delib.mashbean.net/schemas/delib-ranking-receipt/v1.json",
+    );
+    expect(schema.properties.dataCard.properties.containsParticipantData.const).toBe(true);
+    expect(schema.properties.dataCard.properties.containsParticipantFreeText.const).toBe(false);
+    expect(schema.properties.dataCard.properties.containsOrganizerFreeText.const).toBe(true);
+    expect(schema.properties.dataCard.properties.storedByDelib.const).toBe(false);
+    expect(schema.properties.dataCard.properties.transport.const).toBe("url-fragment");
+    expect(schema.properties.organizer.required).toEqual(
+      expect.arrayContaining(["interpretation", "missingVoices", "authority", "responsibleActor", "nextAction"]),
+    );
+  });
 });

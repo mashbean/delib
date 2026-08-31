@@ -32,13 +32,17 @@
 11. 在站內開啟 Talk to the City 官方建立流程，登入與 CSV 不經 Delib；
 12. 使用 tab-only Harmonica API key 直接建立 AI 對話 session，或複製 MCP 啟動提示；
 13. 使用內建 Power Ranker 完成本機成對排序，或建立 24 小時／7 天自動清除的多人結果收件室；
-14. `delib-integrations/v1` 與 `delib-hosting/v1` 盤點，明確區分可用、共用託管、元件、研究與阻擋項目。
+14. 把群體彙整接成 `delib-ranking-receipt/v1` 成果頁，分開呈現工具計算、主辦者解讀、未納入聲音、決策狀態與下一步責任；
+15. `delib-integrations/v1` 與 `delib-hosting/v1` 盤點，明確區分可用、共用託管、元件、研究與阻擋項目。
 
 Delib 伺服器不保存 API key 或使用者建立的流程。Power Ranker 預設仍可完全
 在瀏覽器處理；只有主辦者明確選擇短期收件室時，才會保存公開題目、去連結化
 pair counts 與隨機 session ID 的 SHA-256 雜湊。逐份原始判斷不落庫，資料在
 24 小時或 7 天後以 Durable Object alarm 全部清除，也可由私人管理連結提前刪除。
 所有排序檔仍明確標示為參與資料，不沿用「不含參與資料」的流程規劃 schema。
+成果收據只接受至少三份不重複 session 的去連結化群體彙整；公開資料編碼在網址 fragment，瀏覽器載入
+頁面時不會把它送給 Worker。Delib 不另存收據，但拿到完整連結的人可以閱讀與
+再次分享，因此產生前仍需人工確認。
 
 ## 本機開發
 
@@ -111,7 +115,9 @@ OpenAI 官方目前建議文字生成使用
   fragment，判斷與匯入檔都不送給 Worker；短期收件室則以一房一 Durable Object
   保存題目、pair counts 與 session 雜湊，不保存逐份判斷。公開群體結果至少要
   三份，24 小時或 7 天後自動清除，管理者亦可提前刪除。兩種模式都可下載
-  `delib-ranking/v1` JSON／CSV；模型分數不是支持率或共識證明。
+  `delib-ranking/v1` JSON／CSV；有群體彙整後，主辦者可補上解讀、缺席聲音、
+  決策狀態與下一責任者，產生 fragment-only 成果頁、JSON 與 Markdown。
+  成果頁不含個別 session 或逐題判斷，模型分數也不會被標成支持率或共識證明。
 
 舊 MetaGov HeyForm／TTTC adaptor 仍保留為互通設計參考，但現行 hosted
 登入與 API 契約已不同；本站不把未驗證的舊端點標示為可直接建立。細節與

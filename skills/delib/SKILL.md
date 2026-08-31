@@ -222,6 +222,20 @@ Do not put names, contact details, sensitive situations or an admin token in a
 question, option or participant link. Free operation is limited by Cloudflare's
 Workers Free and SQLite Durable Objects quotas; do not promise unlimited use.
 
+After an aggregate reaches at least three unique sessions, an organizer can use the same workspace to prepare
+a `delib-ranking-receipt/v1` public result. Require them to state, in separate
+fields: their interpretation, missing people or perspectives, current decision
+status, who confirms that status, who must respond, an optional response date,
+and the concrete next action. The result page must keep those human statements
+visually separate from the computed ranking.
+
+The receipt includes aggregate pair counts but excludes individual session IDs,
+raw judgments and admin capabilities. Its payload is encoded after `#` in the
+result URL, so Delib does not receive or store it when the page loads. This is
+not secrecy: anyone with the complete link can read, copy and reshare it. Get
+explicit human confirmation before preparing the link, and export JSON or
+Markdown when a more durable handoff is needed.
+
 ## Build both gears
 
 Every recommendation must include:
@@ -272,7 +286,8 @@ then create a separate normalised layer with:
 Keep planning and participant-data schemas separate. `delib-bundle/v1` contains
 no participant data. `delib-ranking/v1` explicitly marks pairwise judgments or
 pair-count aggregates as participant data and records that Delib did not store
-them.
+them. `delib-ranking-receipt/v1` accepts de-linked aggregates only, preserves
+that participant-data warning, and separately labels organizer-authored text.
 
 Never silently delete withdrawn, rejected or unclassified rows. Keep their
 status for provenance and exclude them from publication only through an
@@ -296,6 +311,11 @@ For question pools or large listening exercises, consider the
 
 Label machine clustering, editorial synthesis, organiser judgement and formal
 decisions separately.
+
+For Power Ranker, the built-in receipt path enforces the same separation:
+computed ranking, organizer interpretation, missing voices, decision status and
+next responsibility. A generated link is only a prepared artifact; verify the
+public page before claiming that participants received it.
 
 ## AI API boundary
 

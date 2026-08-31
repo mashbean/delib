@@ -146,6 +146,88 @@
           </div>
         </section>
 
+        <section id="ranking-receipt-builder" class="aggregate-panel receipt-builder" hidden aria-labelledby="receipt-builder-heading">
+          <div class="panel-heading">
+            <span class="panel-number">↻</span>
+            <div>
+              <p>RESULT RECEIPT</p>
+              <h2 id="receipt-builder-heading">把排序接成下一輪行動</h2>
+            </div>
+          </div>
+          <p>
+            至少三份不重複 session 的彙整才可公開。請補上主辦者的解讀、未被代表的聲音、真正的決策狀態與回覆責任，再產生可以檢查的成果頁。
+          </p>
+          <div id="receipt-source-summary" class="receipt-source-summary" aria-live="polite"></div>
+          <form id="ranking-receipt-form" class="receipt-form">
+            <div class="receipt-form-grid">
+              <div>
+                <label for="receipt-decision-status">目前決策狀態</label>
+                <select id="receipt-decision-status" required>
+                  <option value="listening">尚在聆聽</option>
+                  <option value="under-review" selected>正在評估</option>
+                  <option value="adopted">已採納</option>
+                  <option value="partially-adopted">部分採納</option>
+                  <option value="not-adopted">未採納</option>
+                </select>
+              </div>
+              <div>
+                <label for="receipt-authority">誰確認這個狀態？</label>
+                <input id="receipt-authority" maxlength="120" required placeholder="例如：公園改善工作小組" />
+              </div>
+            </div>
+
+            <label for="receipt-interpretation">主辦者怎麼解讀這份排序？</label>
+            <textarea id="receipt-interpretation" rows="5" maxlength="1200" required placeholder="說明看見的優先序、接近的取捨與仍有爭議之處；不要把模型權重寫成支持率。"></textarea>
+
+            <label for="receipt-missing-voices">哪些人或觀點還沒有被充分納入？</label>
+            <textarea id="receipt-missing-voices" rows="4" maxlength="800" required placeholder="例如：夜間較少使用公園的人、兒童與行動不便者尚未被充分邀請。"></textarea>
+
+            <div class="receipt-form-grid">
+              <div>
+                <label for="receipt-responsible-actor">下一步由誰負責？</label>
+                <input id="receipt-responsible-actor" maxlength="120" required placeholder="例如：社區發展協會" />
+              </div>
+              <div>
+                <label for="receipt-response-by">預計何時回應？（選填）</label>
+                <input id="receipt-response-by" type="date" />
+              </div>
+            </div>
+
+            <label for="receipt-next-action">具體下一步</label>
+            <textarea id="receipt-next-action" rows="4" maxlength="500" required placeholder="例如：補訪尚未納入的使用者，並在下次公開會議逐項回覆。"></textarea>
+
+            <label for="receipt-evidence-url">公開依據或會議紀錄（選填）</label>
+            <input id="receipt-evidence-url" type="url" inputmode="url" maxlength="2000" placeholder="https://…" />
+
+            <div class="write-preview">
+              <strong>產生後會發生：</strong>
+              <ul>
+                <li>只帶入去連結化的彙整計數，不含個別 session、逐題判斷或管理權杖；</li>
+                <li>成果資料編碼在網址 # 後方，不會隨頁面請求送進 Delib Worker；</li>
+                <li>任何拿到連結的人都能閱讀、複製與再次分享，請把它視為公開成果。</li>
+              </ul>
+            </div>
+            <label class="consent-row">
+              <input id="receipt-confirm" type="checkbox" />
+              <span>我已區分「工具計算」與「主辦者解讀」，確認沒有放入未經同意的個資，並願意公開承擔上面寫的回覆責任。</span>
+            </label>
+            <button class="button button-primary" type="submit">產生成果收據</button>
+            <p id="receipt-builder-status" class="action-status" role="status"></p>
+          </form>
+
+          <section id="ranking-receipt-result" class="instance-result" hidden aria-live="polite">
+            <span class="success-mark" aria-hidden="true">✓</span>
+            <h3>成果收據準備好了</h3>
+            <p>先打開預覽逐項校對；確定無誤後再把公開連結交給參與者。</p>
+            <div class="result-actions">
+              <a id="ranking-receipt-preview" class="button button-primary" target="_blank" rel="noreferrer">預覽成果頁 ↗</a>
+              <button id="ranking-receipt-copy-link" class="button button-ghost" type="button">複製公開連結</button>
+              <button id="ranking-receipt-download-json" class="button button-ghost" type="button">下載收據 JSON</button>
+              <button id="ranking-receipt-download-md" class="button button-ghost" type="button">下載 Markdown</button>
+            </div>
+          </section>
+        </section>
+
         <p class="source-note">
           排序核心是 MIT 授權 PowerRanker `rankCentrality` 路徑的瀏覽器原生移植；完整來源與修改說明見
           <a href="https://github.com/mashbean/delib/blob/main/NOTICE.md" target="_blank" rel="noreferrer">Delib NOTICE ↗</a>。

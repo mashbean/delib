@@ -8,6 +8,11 @@ import {
   recommendedComparisonCount,
   selectNextPair,
 } from "/power-ranker-core.js";
+import {
+  createRankingReceipt,
+  rankingReceiptToMarkdown,
+  rankingReceiptUrl,
+} from "/ranking-receipt-core.js";
 
 const roomId = new URLSearchParams(location.search).get("room") || "";
 const adminToken = roomId ? new URLSearchParams(location.hash.replace(/^#/, "")).get("admin") || "" : "";
@@ -22,6 +27,9 @@ let sessionId = getSessionId();
 let currentBundle = null;
 let aggregateBundle = null;
 let roomAggregateBundle = null;
+let receiptSourceBundle = null;
+let currentReceipt = null;
+let currentReceiptUrl = "";
 
 const title = document.querySelector("#ranking-title");
 const status = document.querySelector("#ranking-status");
@@ -82,6 +90,26 @@ function bindEvents() {
   document.querySelector("#room-aggregate-download-csv").addEventListener("click", () =>
     downloadFile(rankingResultToCsv(roomAggregateBundle), "delib-power-ranker-room-aggregate.csv", "text/csv"),
   );
+  document.querySelector("#ranking-receipt-form").addEventListener("submit", prepareReceipt);
+  document.querySelector("#ranking-receipt-form").addEventListener("input", invalidatePreparedReceipt);
+  document.querySelector("#ranking-receipt-form").addEventListener("change", invalidatePreparedReceipt);
+  document.querySelector("#ranking-receipt-copy-link").addEventListener("click", copyReceiptLink);
+  document.querySelector("#ranking-receipt-download-json").addEventListener("click", () =>
+    downloadFile(
+      currentReceipt,
+      "delib-power-ranker-receipt.json",
+      "application/json",
+      document.querySelector("#receipt-builder-status"),
+    ),
+  );
+  document.querySelector("#ranking-receipt-download-md").addEventListener("click", () =>
+    downloadFile(
+      currentReceipt ? rankingReceiptToMarkdown(currentReceipt) : null,
+      "delib-power-ranker-receipt.md",
+      "text/markdown",
+      document.querySelector("#receipt-builder-status"),
+    ),
+  );
 }
 
 function startRanking() {
@@ -116,7 +144,8 @@ async function loadRoom() {
     document.querySelector("#ranking-room-consent-row").hidden = false;
     document.querySelector("#ranking-admin-controls").hidden = !snapshot.admin;
     startRanking();
-    renderRoomSnapshot(snapshot);
+    if (adminToken) await loadRoomSnapshot();
+    else renderRoomSnapshot(snapshot);
   } catch (reason) {
     const message = reason instanceof Error ? reason.message : "收件室暫時無法讀取";
     showLoadError(message, adminToken ? "私人管理連結可能不正確或已經到期。" : "這個收件室可能已到期或由主辦者提前刪除。");
@@ -263,6 +292,7 @@ async function deleteRoom() {
     document.querySelector("#room-aggregate-result").hidden = true;
     document.querySelector("#ranking-admin-controls").hidden = true;
     document.querySelector("#room-aggregate-status").textContent = "收件室已刪除；題目、session 雜湊與彙整計數都已清除。";
+    clearReceiptBuilder();
   } catch (reason) {
     document.querySelector("#room-aggregate-status").textContent =
       reason instanceof Error ? reason.message : "收件室沒有完成刪除。";
@@ -278,6 +308,7 @@ function renderRoomSnapshot(snapshot) {
   const aggregateResult = document.querySelector("#room-aggregate-result");
   roomAggregateBundle = null;
   aggregateResult.hidden = true;
+  clearReceiptBuilder();
 
   if (!snapshot.aggregate || sessions === 0) {
     aggregateStatus.textContent = snapshot.admin
@@ -301,6 +332,9 @@ function renderRoomSnapshot(snapshot) {
   aggregateStatus.textContent = snapshot.admin && sessions < (snapshot.resultThreshold || 3)
     ? `管理者預覽：目前 ${sessions} 份；參與者仍看不到群體排序。`
     : `目前合併 ${sessions} 份、${roomAggregateBundle.aggregate.judgments} 組成對計數。`;
+  if (snapshot.admin && sessions >= (snapshot.resultThreshold || 3)) {
+    setReceiptSource(roomAggregateBundle, "短期收件室彙整");
+  }
 }
 
 async function roomRequest() {
@@ -340,6 +374,7 @@ async function aggregateFiles(event) {
   const aggregateResult = document.querySelector("#aggregate-result");
   aggregateResult.hidden = true;
   aggregateBundle = null;
+  clearReceiptBuilder();
   if (!files.length) {
     aggregateStatus.textContent = "尚未選取檔案。";
     return;
@@ -377,6 +412,106 @@ async function aggregateFiles(event) {
   renderRankingList(document.querySelector("#aggregate-result-list"), aggregateBundle.result);
   aggregateResult.hidden = false;
   aggregateStatus.textContent = `已在本機彙整 ${outcome.accepted} 份；排除 ${outcome.duplicates} 份重複 session、${rejected} 份無效或不同題檔案。`;
+  if (aggregateBundle.aggregate.sessions >= 3) {
+    setReceiptSource(aggregateBundle, "瀏覽器本機彙整");
+  } else {
+    aggregateStatus.textContent += " 至少需要 3 份不重複 session，才能準備公開成果收據。";
+  }
+}
+
+function setReceiptSource(bundle, label) {
+  receiptSourceBundle = bundle;
+  currentReceipt = null;
+  currentReceiptUrl = "";
+  const builder = document.querySelector("#ranking-receipt-builder");
+  const summary = document.querySelector("#receipt-source-summary");
+  const resultPanel = document.querySelector("#ranking-receipt-result");
+  const sessions = bundle.aggregate.sessions;
+  const judgments = bundle.aggregate.judgments;
+  const coverage = bundle.coverage;
+  const heading = document.createElement("strong");
+  const copy = document.createElement("span");
+  heading.textContent = `${label} · ${bundle.question.title}`;
+  copy.textContent = `${sessions} 份不重複 session、${judgments} 組成對判斷；比較涵蓋 ${coverage.comparedPairs}/${coverage.totalPairs} 組。`;
+  summary.replaceChildren(heading, copy);
+  resultPanel.hidden = true;
+  document.querySelector("#receipt-confirm").checked = false;
+  document.querySelector("#receipt-builder-status").textContent = "";
+  builder.hidden = false;
+}
+
+function clearReceiptBuilder() {
+  receiptSourceBundle = null;
+  currentReceipt = null;
+  currentReceiptUrl = "";
+  document.querySelector("#ranking-receipt-builder").hidden = true;
+  document.querySelector("#ranking-receipt-result").hidden = true;
+}
+
+function prepareReceipt(event) {
+  event.preventDefault();
+  const status = document.querySelector("#receipt-builder-status");
+  const consent = document.querySelector("#receipt-confirm");
+  if (!receiptSourceBundle) {
+    status.textContent = "請先產生一份群體彙整結果。";
+    return;
+  }
+  if (!consent.checked) {
+    status.textContent = "公開前請先確認資料邊界與回覆責任。";
+    consent.focus();
+    return;
+  }
+
+  try {
+    currentReceipt = createRankingReceipt({
+      aggregateBundle: receiptSourceBundle,
+      aggregateUrl: publicSourceUrl(),
+      organizer: {
+        interpretation: document.querySelector("#receipt-interpretation").value,
+        missingVoices: document.querySelector("#receipt-missing-voices").value,
+        decisionStatus: document.querySelector("#receipt-decision-status").value,
+        authority: document.querySelector("#receipt-authority").value,
+        responsibleActor: document.querySelector("#receipt-responsible-actor").value,
+        responseBy: document.querySelector("#receipt-response-by").value,
+        nextAction: document.querySelector("#receipt-next-action").value,
+        evidenceUrl: document.querySelector("#receipt-evidence-url").value,
+      },
+    });
+    currentReceiptUrl = rankingReceiptUrl(currentReceipt, location.origin);
+    document.querySelector("#ranking-receipt-preview").href = currentReceiptUrl;
+    document.querySelector("#ranking-receipt-result").hidden = false;
+    status.textContent =
+      currentReceiptUrl.length > 12_000
+        ? "成果已產生。這份連結較長，請同時下載 JSON，避免通訊軟體截斷網址。"
+        : "成果已在瀏覽器中產生；先預覽校對，再決定是否分享。";
+    document.querySelector("#ranking-receipt-result").scrollIntoView({ block: "start" });
+  } catch (reason) {
+    currentReceipt = null;
+    currentReceiptUrl = "";
+    document.querySelector("#ranking-receipt-result").hidden = true;
+    status.textContent = reason instanceof Error ? reason.message : "成果收據暫時無法產生。";
+  }
+}
+
+async function copyReceiptLink() {
+  const status = document.querySelector("#receipt-builder-status");
+  if (!currentReceiptUrl) return;
+  try {
+    await navigator.clipboard.writeText(currentReceiptUrl);
+    status.textContent = "公開成果連結已複製；連結內含彙整資料與主辦者說明，請視為公開內容。";
+  } catch {
+    status.textContent = "瀏覽器沒有允許複製；請打開預覽後從網址列複製。";
+  }
+}
+
+function invalidatePreparedReceipt(event) {
+  if (!currentReceipt || event.target?.id === "receipt-confirm") return;
+  currentReceipt = null;
+  currentReceiptUrl = "";
+  document.querySelector("#ranking-receipt-result").hidden = true;
+  document.querySelector("#receipt-confirm").checked = false;
+  document.querySelector("#receipt-builder-status").textContent =
+    "內容已變更；請重新確認後再產生新的成果連結。";
 }
 
 function renderRankingList(root, ranking) {
@@ -400,7 +535,7 @@ function renderRankingList(root, ranking) {
   );
 }
 
-function downloadFile(value, filename, type) {
+function downloadFile(value, filename, type, statusRoot = actionStatus) {
   if (!value) return;
   const content = typeof value === "string" ? value : JSON.stringify(value, null, 2);
   const blob = new Blob([content], { type: `${type};charset=utf-8` });
@@ -410,7 +545,7 @@ function downloadFile(value, filename, type) {
   anchor.download = filename;
   anchor.click();
   URL.revokeObjectURL(url);
-  actionStatus.textContent = `已下載 ${filename}。`;
+  statusRoot.textContent = `已下載 ${filename}。`;
 }
 
 function publicSourceUrl() {
