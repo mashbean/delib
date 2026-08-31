@@ -31,10 +31,12 @@
 10. 在站內嵌入已發布的 HeyForm 表單；
 11. 在站內開啟 Talk to the City 官方建立流程，登入與 CSV 不經 Delib；
 12. 使用 tab-only Harmonica API key 直接建立 AI 對話 session，或複製 MCP 啟動提示；
-13. `delib-integrations/v1` 與 `delib-hosting/v1` 盤點，明確區分可用、共用託管、元件、研究與阻擋項目。
+13. 使用內建 Power Ranker 完成本機成對排序，下載個人 JSON／CSV，並離線彙整多人結果；
+14. `delib-integrations/v1` 與 `delib-hosting/v1` 盤點，明確區分可用、共用託管、元件、研究與阻擋項目。
 
-目前不保存參與資料、API key 或使用者建立的流程。分享狀態只包含固定
-選項並留在 URL；後續才會加入經明確同意的資料匯入、轉換與公開成果保存。
+Delib 伺服器目前不保存參與資料、API key 或使用者建立的流程。Power Ranker
+的選擇與多人匯入只在瀏覽器記憶體處理；下載的排序檔明確標示為化名參與資料，
+不沿用「不含參與資料」的流程規劃 schema。
 
 ## 本機開發
 
@@ -101,6 +103,9 @@ OpenAI 官方目前建議文字生成使用
 - **Harmonica**：使用者在 Harmonica settings 產生 `hm_live_` API key，
   Delib 只在建立 session 的單次請求中轉送。建立後回傳站內參與頁與官方管理頁；
   也可改用 `harmonica-mcp` 讓自己的 Agent 在人工確認後建立。
+- **Power Ranker**：輸入 3–10 個選項後產生站內參與連結。題目位於 URL fragment，
+  選擇只留在參與者分頁；個人結果依 `delib-ranking/v1` 下載，主辦者可在瀏覽器
+  排除重複 session、彙整 pair counts，再下載 JSON／CSV。模型分數不是支持率或共識證明。
 
 舊 MetaGov HeyForm／TTTC adaptor 仍保留為互通設計參考，但現行 hosted
 登入與 API 契約已不同；本站不把未驗證的舊端點標示為可直接建立。細節與

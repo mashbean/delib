@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://delib.mashbean.net/schemas/delib-ranking/v1.json",
+  "title": "Delib pairwise ranking bundle v1",
+  "type": "object",
+  "required": ["schema", "kind", "exportedAt", "source", "question", "method", "result", "coverage", "dataCard"],
+  "properties": {
+    "schema": { "const": "https://delib.mashbean.net/schemas/delib-ranking/v1.json" },
+    "kind": { "enum": ["individual", "aggregate"] },
+    "exportedAt": { "type": "string", "format": "date-time" },
+    "source": {
+      "type": "object",
+      "required": ["generator", "url", "persisted"],
+      "properties": {
+        "generator": { "type": "string" },
+        "url": { "type": "string", "format": "uri" },
+        "persisted": { "const": false }
+      }
+    },
+    "question": {
+      "type": "object",
+      "required": ["title", "items"],
+      "properties": {
+        "title": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "items": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 10,
+          "items": {
+            "type": "object",
+            "required": ["id", "label"],
+            "properties": {
+              "id": { "type": "string" },
+              "label": { "type": "string", "minLength": 1, "maxLength": 80 }
+            }
+          }
+        }
+      }
+    },
+    "session": { "type": "object" },
+    "judgments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["alpha", "beta", "choice", "order"],
+        "properties": {
+          "alpha": { "type": "string" },
+          "beta": { "type": "string" },
+          "choice": { "enum": ["alpha", "beta", "equal"] },
+          "order": { "type": "integer", "minimum": 1 }
+        }
+      }
+    },
+    "aggregate": { "type": "object" },
+    "method": { "type": "object" },
+    "result": { "type": "array", "items": { "type": "object" } },
+    "coverage": { "type": "object" },
+    "dataCard": {
+      "type": "object",
+      "required": ["containsParticipantData", "containsDirectIdentifiers", "containsFreeText", "aggregation", "publicationStatus", "storedByDelib", "limitations"],
+      "properties": {
+        "containsParticipantData": { "const": true },
+        "containsDirectIdentifiers": { "const": false },
+        "containsFreeText": { "const": false },
+        "aggregation": { "enum": ["one-browser-session", "pair-counts-without-session-links"] },
+        "publicationStatus": { "enum": ["local-export-only", "local-aggregate-only"] },
+        "storedByDelib": { "const": false },
+        "limitations": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "kind": { "const": "individual" } } },
+      "then": { "required": ["session", "judgments"] }
+    },
+    {
+      "if": { "properties": { "kind": { "const": "aggregate" } } },
+      "then": { "required": ["aggregate"] }
+    }
+  ]
+}

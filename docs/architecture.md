@@ -15,7 +15,8 @@ share URL / JSON / Markdown       direct activation adapters
                                   ├─ Pol.is connected workspace
                                   ├─ HeyForm published-form workspace
                                   ├─ Talk to the City official create workspace
-                                  └─ Harmonica credentialed creator + workspace
+                                  ├─ Harmonica credentialed creator + workspace
+                                  └─ Power Ranker local pairwise workspace
         ↓ optional
 BYOK OpenAI request OR locally installed Delib skill
 ```
@@ -46,6 +47,10 @@ human gate is mandatory.
   bounded, confirmed session brief; it forwards one create request to the
   official REST API and returns only the session ID, participant workspace and
   management URL. Neither the key nor upstream response body is stored.
+- `/integrations/power-ranker.html` is a static, browser-only workspace. The
+  question is encoded after `#`, judgments stay in page memory, and individual
+  or aggregate `delib-ranking/v1` files are created only when the user downloads
+  them. Aggregate exports retain pair counts but remove session linkage.
 - Private Call-in links stay in tab-scoped `sessionStorage` and never enter a
   plan URL or exported public receipt.
 
@@ -80,6 +85,10 @@ R2 is the likely home for immutable originals and artifacts. D1 can store
 project, phase, permission and handoff metadata. Cloudflare Workflows or Queues
 can perform explicit, restartable adapter handoffs. Public release must remain a
 separate, human-approved step.
+
+The local ranking bundle is intentionally separate from `delib-bundle/v1`.
+Planning bundles contain no participant data; `delib-ranking/v1` explicitly
+marks pairwise judgments as participant data even when they contain no names.
 
 ## Adapter contract
 

@@ -23,7 +23,10 @@ Direct actions currently implemented:
 - POST /api/integrations/heyform — validate and prepare an existing public HeyForm workspace.
 - POST /api/integrations/tttc — prepare the current official Talk to the City create workspace.
 - POST /api/integrations/harmonica — create a confirmed Harmonica session with a tab-only API key.
+- /integrations/power-ranker.html — run local pairwise ranking and export or aggregate delib-ranking/v1 files; no API key or server storage.
 
-Every preparation or external-write path requires an explicit `confirmed: true`
-human gate. HeyForm, TTTC and Harmonica participant data remain upstream;
-Harmonica credentials are forwarded once and never stored by Delib.
+Every preparation or external-write path requires an explicit human gate.
+HeyForm, TTTC and Harmonica participant data remain upstream; Harmonica
+credentials are forwarded once and never stored by Delib. Power Ranker
+judgments and imported files stay in browser memory, and downloaded ranking
+files explicitly declare that they contain participant data.

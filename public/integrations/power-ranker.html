@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta name="description" content="在瀏覽器內完成成對優先序排序，並匯出可攜的 Delib 資料包。" />
+    <title>Power Ranker · Delib 審議拼圖</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/styles.css" />
+    <script type="module" src="/integrations/power-ranker.js"></script>
+  </head>
+  <body class="workspace-body">
+    <a class="skip-link" href="#workspace-main">跳到排序題目</a>
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <a class="brand" href="/" aria-label="回 Delib 審議拼圖">
+          <span class="brand-mark" aria-hidden="true">⿻</span>
+          <span><strong>Delib</strong><span class="brand-divider">·</span>Power Ranker</span>
+        </a>
+        <a class="button button-small button-ghost" href="/#launch-power-ranker">回到工具設定</a>
+      </div>
+    </header>
+
+    <main id="workspace-main" class="workspace-main">
+      <div class="wrap workspace-wrap ranking-workspace">
+        <div class="workspace-heading">
+          <div>
+            <p class="section-kicker">Local pairwise ranking</p>
+            <h1 id="ranking-title">成對排序</h1>
+            <p id="ranking-status" class="section-lede" role="status">正在讀取題目。</p>
+          </div>
+          <a href="https://github.com/zaratanDotWorld/powerRanker" class="button button-ghost" target="_blank" rel="noreferrer">查看演算法原始碼 ↗</a>
+        </div>
+
+        <div class="workspace-trust">
+          <strong>只在本機</strong>
+          <span>題目放在網址的 # 後方，選擇只留在目前分頁；Delib 不會收到或保存答案。</span>
+          <span>匯出的隨機 session ID 可協助排除重複檔，但仍應視為化名參與資料。</span>
+        </div>
+
+        <section id="ranking-error" class="empty-state" hidden>
+          這個連結沒有有效題目。請回到 Delib，填入 3–10 個不重複選項。
+        </section>
+
+        <section id="ranking-panel" class="ranking-panel" hidden aria-labelledby="ranking-question-heading">
+          <div class="ranking-progress-row">
+            <div>
+              <span class="flow-tag">目前分頁的一輪選擇</span>
+              <p id="ranking-progress-text">準備第一組比較。</p>
+            </div>
+            <button id="ranking-undo" class="button button-small button-ghost" type="button" disabled>上一步</button>
+          </div>
+          <div class="ranking-progress" aria-hidden="true"><span id="ranking-progress-bar"></span></div>
+
+          <div id="ranking-question" class="pairwise-question">
+            <p id="ranking-question-heading">如果現在只能優先做一項，你會選哪個？</p>
+            <div class="pairwise-options">
+              <button id="ranking-left" class="pairwise-option" type="button"></button>
+              <span aria-hidden="true">或</span>
+              <button id="ranking-right" class="pairwise-option" type="button"></button>
+            </div>
+            <button id="ranking-equal" class="text-button" type="button">兩項一樣重要</button>
+          </div>
+
+          <div class="ranking-controls">
+            <button id="ranking-finish" class="button button-ghost" type="button" hidden>先看目前結果</button>
+            <p>基本比較完成後可以先停，也可以繼續增加排序證據。</p>
+          </div>
+        </section>
+
+        <section id="ranking-result" class="ranking-result" hidden aria-labelledby="ranking-result-heading">
+          <div class="panel-heading">
+            <span class="panel-number">✓</span>
+            <div><p>LOCAL RESULT</p><h2 id="ranking-result-heading">目前這一輪的排序</h2></div>
+          </div>
+          <ol id="ranking-result-list" class="ranking-list"></ol>
+          <p class="boundary-note">模型分數是這批成對選擇形成的相對權重，不是支持率、預算比例，也不能單獨證明群體共識。</p>
+          <div class="result-actions">
+            <button id="ranking-download-json" class="button button-primary" type="button">下載個人結果 JSON</button>
+            <button id="ranking-download-csv" class="button button-ghost" type="button">下載排序 CSV</button>
+            <button id="ranking-copy-summary" class="button button-ghost" type="button">複製成果摘要</button>
+            <button id="ranking-continue" class="button button-ghost" type="button">再比較一組</button>
+            <button id="ranking-restart" class="text-button" type="button">清除並重來</button>
+          </div>
+          <p id="ranking-action-status" class="action-status" role="status"></p>
+        </section>
+
+        <section class="aggregate-panel" aria-labelledby="aggregate-heading">
+          <div>
+            <p class="section-kicker">Organizer handoff</p>
+            <h2 id="aggregate-heading">把多人下載的結果合在一起</h2>
+            <p>選取參與者交回的 JSON；瀏覽器會在本機排除重複 session，合併成對計數，再產生一份不保留個別連結的彙整資料包。</p>
+          </div>
+          <label class="file-drop" for="aggregate-files">
+            <strong>選取個人結果 JSON</strong>
+            <span>最多 100 份；檔案不會上傳到 Delib。</span>
+            <input id="aggregate-files" type="file" accept="application/json,.json" multiple />
+          </label>
+          <p id="aggregate-status" class="action-status" role="status"></p>
+          <div id="aggregate-result" hidden>
+            <ol id="aggregate-result-list" class="ranking-list"></ol>
+            <div class="result-actions">
+              <button id="aggregate-download-json" class="button button-primary" type="button">下載彙整 JSON</button>
+              <button id="aggregate-download-csv" class="button button-ghost" type="button">下載彙整 CSV</button>
+            </div>
+          </div>
+        </section>
+
+        <p class="source-note">
+          排序核心是 MIT 授權 PowerRanker `rankCentrality` 路徑的瀏覽器原生移植；完整來源與修改說明見
+          <a href="https://github.com/mashbean/delib/blob/main/NOTICE.md" target="_blank" rel="noreferrer">Delib NOTICE ↗</a>。
+        </p>
+      </div>
+    </main>
+  </body>
+</html>

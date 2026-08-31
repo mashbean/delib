@@ -1,0 +1,57 @@
+{
+  "schema": "https://delib.mashbean.net/schemas/delib-ranking/v1.json",
+  "kind": "individual",
+  "exportedAt": "2026-08-31T00:00:00.000Z",
+  "source": {
+    "generator": "Delib · Power Ranker",
+    "url": "https://delib.mashbean.net/integrations/power-ranker.html",
+    "persisted": false
+  },
+  "question": {
+    "title": "社區公園下一步應優先做什麼？",
+    "items": [
+      { "id": "item-1", "label": "增加夜間照明" },
+      { "id": "item-2", "label": "保留安靜草地" },
+      { "id": "item-3", "label": "增設兒童遊具" }
+    ]
+  },
+  "session": {
+    "id": "session-browser-fixture",
+    "judgments": 3
+  },
+  "method": {
+    "name": "PowerRanker rankCentrality",
+    "normalization": "rankCentrality",
+    "flow": "bidirectional",
+    "source": "https://github.com/zaratanDotWorld/powerRanker/tree/4cc4f604022d0188bde1619fc47f05678c0bc0ad",
+    "implementation": "Delib browser-native port"
+  },
+  "judgments": [
+    { "alpha": "item-1", "beta": "item-2", "choice": "alpha", "order": 1 },
+    { "alpha": "item-2", "beta": "item-3", "choice": "alpha", "order": 2 },
+    { "alpha": "item-1", "beta": "item-3", "choice": "alpha", "order": 3 }
+  ],
+  "result": [
+    { "id": "item-1", "label": "增加夜間照明", "score": 0.9993489583333334, "observations": 2, "rank": 1 },
+    { "id": "item-2", "label": "保留安靜草地", "score": 0.0006510416666666667, "observations": 2, "rank": 2 },
+    { "id": "item-3", "label": "增設兒童遊具", "score": 0, "observations": 2, "rank": 3 }
+  ],
+  "coverage": {
+    "comparedPairs": 3,
+    "totalPairs": 3,
+    "ratio": 1
+  },
+  "dataCard": {
+    "containsParticipantData": true,
+    "containsDirectIdentifiers": false,
+    "containsFreeText": false,
+    "aggregation": "one-browser-session",
+    "publicationStatus": "local-export-only",
+    "storedByDelib": false,
+    "limitations": [
+      "模型分數是相對排序權重，不是支持率、預算比例或共識證明。",
+      "結果只反映已匯入的成對判斷；招募缺口與未比較配對仍需揭露。",
+      "發佈前應由主辦者檢查題目措辭、代表性、平手處理與決策權限。"
+    ]
+  }
+}

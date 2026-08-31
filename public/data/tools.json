@@ -322,7 +322,7 @@
       "summary": "以成對偏好產生項目機率分布，可用於群體預算或資源配置。",
       "url": "https://metagov.org/delib-tools/power-ranker",
       "source": "https://github.com/zaratanDotWorld/powerRanker",
-      "status": "catalog",
+      "status": "integrated",
       "stages": ["eliciting", "reflecting", "deciding"],
       "goals": ["propose", "decide"],
       "formats": ["hybrid", "online"],

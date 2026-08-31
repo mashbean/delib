@@ -7,6 +7,7 @@ import {
   stateFromSearch,
   stateToSearch,
 } from "./core.js";
+import { normalizeRankingConfig, rankingConfigToHash } from "./power-ranker-core.js";
 
 const STAGE_LABELS = {
   evaluating: "現況評估",
@@ -168,6 +169,8 @@ function bindEvents() {
   document.querySelector("#heyform-form").addEventListener("submit", prepareHeyForm);
   document.querySelector("#tttc-form").addEventListener("submit", prepareTttc);
   document.querySelector("#harmonica-form").addEventListener("submit", createHarmonica);
+  document.querySelector("#power-ranker-form").addEventListener("submit", preparePowerRanker);
+  document.querySelector("#copy-power-ranker-link").addEventListener("click", copyPowerRankerLink);
   harmonicaKeyInput.addEventListener("input", () => {
     const key = harmonicaKeyInput.value.trim();
     if (key) sessionStorage.setItem("delib:harmonica-key", key);
@@ -386,7 +389,7 @@ function renderToolCard(tool) {
 
 function launchableIntegration(toolId) {
   const integration = integrations.get(toolId);
-  return integration && ["managed-create", "credentialed-create", "embedded-workspace"].includes(integration.activation)
+  return integration && ["managed-create", "credentialed-create", "embedded-workspace", "local-tool"].includes(integration.activation)
     ? integration
     : null;
 }
@@ -395,7 +398,11 @@ function launchButton(toolId, integration) {
   const button = createElement(
     "button",
     "direct-launch",
-    ["managed-create", "credentialed-create"].includes(integration.activation) ? "在這裡建立" : "在這裡開啟",
+    ["managed-create", "credentialed-create"].includes(integration.activation)
+      ? "在這裡建立"
+      : integration.activation === "local-tool"
+        ? "在這裡使用"
+        : "在這裡開啟",
   );
   button.type = "button";
   button.addEventListener("click", () => launchTool(toolId));
@@ -424,10 +431,47 @@ function launchTool(toolId) {
         .slice(0, 2)
         .join(" ");
     }
+    if (toolId === "power-ranker" && !document.querySelector("#power-ranker-title").value) {
+      document.querySelector("#power-ranker-title").value = suggestedTitle;
+    }
   }
   target.scrollIntoView({ block: "start" });
   const firstInput = target.querySelector("input:not([type=checkbox]):not([type=radio])");
   queueMicrotask(() => firstInput?.focus());
+}
+
+function preparePowerRanker(event) {
+  event.preventDefault();
+  const status = document.querySelector("#power-ranker-status");
+  const confirm = document.querySelector("#power-ranker-confirm");
+  if (!confirm.checked) {
+    status.textContent = "先確認決策權限與題目資料邊界，再準備分享連結。";
+    confirm.focus();
+    return;
+  }
+
+  const config = normalizeRankingConfig({
+    title: document.querySelector("#power-ranker-title").value,
+    items: document.querySelector("#power-ranker-items").value.split(/\r?\n/),
+  });
+  if (!config) {
+    status.textContent = "請填入問題與 3–10 個不重複項目；每個項目都要獨立一行。";
+    document.querySelector("#power-ranker-items").focus();
+    return;
+  }
+
+  const workspace = new URL("/integrations/power-ranker.html", location.origin);
+  workspace.hash = rankingConfigToHash(config);
+  const link = document.querySelector("#power-ranker-workspace");
+  link.href = workspace.href;
+  document.querySelector("#power-ranker-result").hidden = false;
+  status.textContent = "排序頁已在本機準備好；尚未建立帳號、專案或外部資料。";
+}
+
+function copyPowerRankerLink() {
+  const link = document.querySelector("#power-ranker-workspace");
+  if (!link.href) return;
+  copyText(link.href, document.querySelector("#power-ranker-status"), "參與連結已複製。");
 }
 
 async function createCallIn(event) {

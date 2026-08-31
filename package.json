@@ -12,7 +12,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "deploy:dry": "wrangler deploy --dry-run --env production",
-    "check:scripts": "node --check public/app.js && node --check public/core.js && node --check public/integrations/polis.js && node --check public/integrations/heyform.js && node --check public/integrations/tttc.js && node --check public/integrations/harmonica.js && node --check scripts/install-skill.mjs",
+    "check:scripts": "node --check public/app.js && node --check public/core.js && node --check public/power-ranker-core.js && node --check public/integrations/polis.js && node --check public/integrations/heyform.js && node --check public/integrations/tttc.js && node --check public/integrations/harmonica.js && node --check public/integrations/power-ranker.js && node --check scripts/install-skill.mjs",
     "check": "npm run check:scripts && npm run typecheck && npm test && npm run deploy:dry",
     "deploy": "wrangler deploy",
     "deploy:production": "wrangler deploy --env production",

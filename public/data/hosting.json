@@ -233,13 +233,14 @@
     },
     {
       "toolId": "power-ranker",
-      "route": "component",
-      "label": "最適合內建的演算法",
-      "summary": "MIT 的 TypeScript 排序 library，沒有 server 或 participant UI；適合直接做成 Delib 內建優先序齒輪。",
+      "route": "direct",
+      "label": "站內直接用",
+      "summary": "MIT TypeScript library 的 rankCentrality 路徑已移植成瀏覽器原生工具；可分享題目、在本機完成成對排序，再離線彙整 JSON／CSV。",
       "source": { "url": "https://github.com/zaratanDotWorld/powerRanker", "license": "MIT", "reusable": true },
-      "embed": "not-applicable",
+      "embed": "implemented-native",
       "cloudflareNative": true,
-      "nextAction": "下一輪做無帳號 pairwise ranking，輸出 delib-bundle JSON。"
+      "nextAction": "用真實審議題目驗證題目措辭、完成率與多人彙整流程，再評估是否需要有保存期限的共享房間。",
+      "evidence": ["https://github.com/zaratanDotWorld/powerRanker/tree/4cc4f604022d0188bde1619fc47f05678c0bc0ad"]
     },
     {
       "toolId": "stanford-participatory-budgeting",

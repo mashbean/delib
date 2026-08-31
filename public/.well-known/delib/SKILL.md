@@ -190,6 +190,26 @@ forwards it only for the confirmed create request and filters the response.
 Harmonica remains responsible for participant data, AI processing, retention
 and export. Require human review of facilitator prompts, summaries and claims.
 
+### Power Ranker
+
+Delib includes a browser-only pairwise ranking workspace. Create the public
+question from `https://delib.mashbean.net/#launch-power-ranker` with 3–10
+distinct options. Confirm the decision boundary and make sure the title and
+options contain no sensitive context before producing the share link.
+
+The question is encoded in the URL fragment after `#`, so it is not sent to the
+Worker. Judgments stay only in page memory. Each participant can download an
+individual `delib-ranking/v1` JSON and CSV. Individual JSON includes a random
+pseudonymous session ID for duplicate removal; treat the file as participant
+data even though it has no name or contact field.
+
+The same page can import up to 100 individual JSON files. Aggregation happens
+in the browser, removes duplicate session IDs, retains only pair counts and
+produces aggregate JSON／CSV without individual-session linkage. Do not call the
+result a vote share, budget allocation or consensus: PowerRanker emits relative
+spectral weights from the comparisons supplied. Publish comparison coverage,
+recruitment gaps, ties, authority and the human adoption decision with it.
+
 ## Build both gears
 
 Every recommendation must include:
@@ -236,6 +256,11 @@ then create a separate normalised layer with:
 - consent, access and retention notes;
 - transformation log and checksums;
 - a data card that says what is missing.
+
+Keep planning and participant-data schemas separate. `delib-bundle/v1` contains
+no participant data. `delib-ranking/v1` explicitly marks pairwise judgments or
+pair-count aggregates as participant data and records that Delib did not store
+them.
 
 Never silently delete withdrawn, rejected or unclassified rows. Keep their
 status for provenance and exclude them from publication only through an

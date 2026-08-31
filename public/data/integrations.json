@@ -98,6 +98,33 @@
       ]
     },
     {
+      "toolId": "power-ranker",
+      "readiness": "available",
+      "activation": "local-tool",
+      "label": "免帳號本機排序",
+      "summary": "輸入 3–10 個項目後產生可分享的站內排序頁；每位參與者在自己的瀏覽器完成，下載個人 JSON，再由主辦者離線彙整與匯出 CSV。",
+      "accountRequired": false,
+      "credentialRequired": false,
+      "freePath": "純靜態 HTML／JavaScript，使用現有 Delib Cloudflare 免費部署，不需要資料庫或外部 API。",
+      "writesExternalState": false,
+      "retention": "Delib 不保存題目、選擇或匯入檔案；重新整理分頁會清除尚未下載的選擇。",
+      "inAppEndpoint": "/integrations/power-ranker.html",
+      "selfHost": {
+        "supported": true,
+        "platform": "Static assets on Cloudflare Workers",
+        "cloudflareNative": true,
+        "note": "題目位於網址 fragment；答案與多人彙整都只在瀏覽器記憶體處理。"
+      },
+      "agent": {
+        "canCreate": true,
+        "humanGate": "建立前確認題目措辭、決策權限與敏感資料；發布前揭露比較涵蓋率、招募缺口與模型限制。"
+      },
+      "evidence": [
+        "https://github.com/zaratanDotWorld/powerRanker/tree/4cc4f604022d0188bde1619fc47f05678c0bc0ad",
+        "https://delib.mashbean.net/schemas/delib-ranking/v1.json"
+      ]
+    },
+    {
       "toolId": "openbook",
       "readiness": "direct-viewer",
       "activation": "evidence-reference",
@@ -218,7 +245,6 @@
     "moral-graph-elicitation",
     "pairwise",
     "policycraft",
-    "power-ranker",
     "stanford-participatory-budgeting",
     "swarmcheck",
     "voice-to-vision"

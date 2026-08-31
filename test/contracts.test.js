@@ -56,8 +56,12 @@ describe("public contracts", () => {
     expect(audit.integrations.find((item) => item.toolId === "harmonica").readiness).toBe(
       "available-with-api-key",
     );
+    expect(audit.integrations.find((item) => item.toolId === "power-ranker").readiness).toBe(
+      "available",
+    );
     expect(audit.integrations.filter((item) => item.activation === "embedded-workspace")).toHaveLength(3);
     expect(audit.integrations.filter((item) => item.activation === "credentialed-create")).toHaveLength(1);
+    expect(audit.integrations.filter((item) => item.activation === "local-tool")).toHaveLength(1);
   });
 
   it("publishes one source and hosting decision for every tool", async () => {
@@ -75,5 +79,14 @@ describe("public contracts", () => {
       expect(typeof item.source.reusable).toBe("boolean");
       if (item.source.reusable) expect(item.source.url).toMatch(/^https:\/\//);
     }
+  });
+
+  it("publishes a participant-aware schema for local ranking handoff", async () => {
+    const schema = JSON.parse(
+      await readFile(new URL("public/schemas/delib-ranking/v1.json", root), "utf8"),
+    );
+    expect(schema.$id).toBe("https://delib.mashbean.net/schemas/delib-ranking/v1.json");
+    expect(schema.properties.dataCard.properties.containsParticipantData.const).toBe(true);
+    expect(schema.properties.dataCard.properties.storedByDelib.const).toBe(false);
   });
 });

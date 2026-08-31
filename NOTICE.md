@@ -38,10 +38,17 @@ projects, but does not imply endorsement by their maintainers.
   [Harmonica web app](https://github.com/harmonicabot/harmonica-web-app) and
   frames only the returned participant URL. No Harmonica source, API key or
   participant response is bundled or persisted by Delib.
+- `public/power-ranker-core.js` is a browser-native adaptation of the
+  `rankCentrality` path from
+  [PowerRanker revision 4cc4f60](https://github.com/zaratanDotWorld/powerRanker/tree/4cc4f604022d0188bde1619fc47f05678c0bc0ad),
+  Copyright (c) 2024 Kronosapiens Labs and used under the MIT License. Delib
+  replaces the matrix dependency with native arrays and adds question,
+  participant export and aggregate handoff UI; it does not change the upstream
+  project or imply endorsement.
 - The source/hosting registry cites upstream repositories and their declared
   licenses. “Reusable” means a current repository exposes a recognized open
   license; it does not mean Delib has copied or redistributed that code.
 
 Tool names and trademarks belong to their respective owners. The tool registry
 stores links and factual interoperability metadata; no third-party source code
-is bundled unless explicitly noted.
+is bundled unless explicitly noted above.
