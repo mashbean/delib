@@ -6,6 +6,7 @@
     {
       "id": "frame",
       "number": "01",
+      "icon": "target",
       "title": "定義問題與權限",
       "humanFlow": "主辦者＋受影響社群",
       "dataFlow": "問題、權限、同意、風險",
@@ -17,6 +18,7 @@
     {
       "id": "recruit",
       "number": "02",
+      "icon": "megaphone",
       "title": "招募與接觸",
       "humanFlow": "母體 → 受邀者／自願者",
       "dataFlow": "招募條件、聯絡名單、可近用需求",
@@ -28,6 +30,7 @@
     {
       "id": "sortition",
       "number": "03",
+      "icon": "shuffle",
       "title": "分層抽樣 Sortition",
       "humanFlow": "志願者池 → 正選＋候補",
       "dataFlow": "配額、亂數／演算法、確認與替補紀錄",
@@ -39,6 +42,7 @@
     {
       "id": "learn",
       "number": "04",
+      "icon": "book-open-check",
       "title": "共同學習與議程",
       "humanFlow": "參與者 ↔ 專家／利害關係人",
       "dataFlow": "證據包、問題池、來源、更正紀錄",
@@ -50,6 +54,7 @@
     {
       "id": "listen",
       "number": "05",
+      "icon": "messages-square",
       "title": "蒐集陳述與經驗",
       "humanFlow": "參與者 → 彼此可見的聲音池",
       "dataFlow": "陳述、問卷、訪談與逐筆回應",
@@ -61,6 +66,7 @@
     {
       "id": "deliberate",
       "number": "06",
+      "icon": "scale",
       "title": "審議、比較與排序",
       "humanFlow": "小組 ↔ 全體；少數聲音 ↔ 多數方向",
       "dataFlow": "比較、投票、分群、理由與涵蓋率",
@@ -72,6 +78,7 @@
     {
       "id": "respond",
       "number": "07",
+      "icon": "clipboard-check",
       "title": "解讀、決定與回覆",
       "humanFlow": "主持者 → 有權回應者 → 參與者",
       "dataFlow": "工具彙整＋人工解讀＋採納狀態",
@@ -83,6 +90,7 @@
     {
       "id": "feedback",
       "number": "08",
+      "icon": "refresh-cw",
       "title": "公開、回饋、下一輪",
       "humanFlow": "成果 → 參與者／公眾／開發者 → 下一輪",
       "dataFlow": "公開摘要、修正、流程故障；不含逐筆參與資料",

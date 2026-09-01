@@ -54,10 +54,19 @@ describe("public contracts", () => {
     expect(schema.$id).toBe("https://delib.mashbean.net/schemas/delib-process/v1.json");
     expect(process.steps).toHaveLength(8);
     expect(new Set(process.steps.map((step) => step.id)).size).toBe(8);
+    expect(new Set(process.steps.map((step) => step.icon)).size).toBe(8);
     expect(process.steps.find((step) => step.id === "recruit").humanFlow).toContain("受邀者");
     expect(process.steps.find((step) => step.id === "sortition").tools).toContain("OpenDLP");
     expect(process.steps.find((step) => step.id === "feedback").dataFlow).toContain("不含逐筆參與資料");
     expect(process.feedbackLoops.map((loop) => loop.audience)).toEqual(["參與者", "主辦者", "工具開發者"]);
+  });
+
+  it("keeps the homepage dense sections progressively disclosed", async () => {
+    const homepage = await readFile(new URL("public/index.html", root), "utf8");
+    expect(homepage).toContain('id="comparison-more"');
+    expect(homepage).toContain('class="tool-catalog-details"');
+    expect(homepage.match(/<details id="launch-/g)).toHaveLength(8);
+    expect(homepage).toContain('/assets/lucide-LICENSE.txt');
   });
 
   it("publishes a source-linked deployment and interoperability comparison", async () => {

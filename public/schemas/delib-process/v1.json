@@ -16,10 +16,14 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "number", "title", "humanFlow", "dataFlow", "tools", "detail", "gate", "output"],
+        "required": ["id", "number", "icon", "title", "humanFlow", "dataFlow", "tools", "detail", "gate", "output"],
         "properties": {
           "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]+$" },
           "number": { "type": "string", "pattern": "^0[1-8]$" },
+          "icon": {
+            "type": "string",
+            "enum": ["target", "megaphone", "shuffle", "book-open-check", "messages-square", "scale", "clipboard-check", "refresh-cw"]
+          },
           "title": { "type": "string" },
           "humanFlow": { "type": "string" },
           "dataFlow": { "type": "string" },

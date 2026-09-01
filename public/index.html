@@ -30,8 +30,8 @@
         </a>
         <nav aria-label="主要選單">
           <a href="#journey">流程地圖</a>
-          <a href="#launch">直接啟用</a>
           <a href="#compare">工具比較</a>
+          <a href="#launch">直接啟用</a>
           <a href="/deploy.html">一鍵部署</a>
           <a href="#care">Care check</a>
           <button class="button button-small button-primary" data-start="listen">開始拼一輪 →</button>
@@ -74,13 +74,12 @@
           <p class="section-kicker">People flow × data flow × feedback loop</p>
           <h2>一輪審議，不只是一場活動。</h2>
           <p class="section-lede">
-            點一個步驟，看參與者怎麼進來、資料怎麼交接、哪裡必須由人確認，以及成果如何回到下一輪。
+            紫色看參與者怎麼走，綠色看資料怎麼交接。點選任一步驟，再看工具、人工關卡與交付成果。
           </p>
 
           <div class="process-legend" aria-label="流程圖圖例">
-            <span><i class="legend-mark legend-people" aria-hidden="true"></i>人流</span>
-            <span><i class="legend-mark legend-data" aria-hidden="true"></i>資料流</span>
-            <span><i class="legend-mark legend-loop" aria-hidden="true"></i>回饋與責任</span>
+            <span class="process-guide process-guide-people"><i aria-hidden="true">人</i><strong>人流</strong><small>誰被邀請、加入、退出或收到回覆</small></span>
+            <span class="process-guide process-guide-data"><i aria-hidden="true">資料</i><strong>資料流</strong><small>什麼被蒐集、轉接、公開或留在受限空間</small></span>
           </div>
 
           <div id="process-track" class="process-track" aria-label="審議流程八個步驟"></div>
@@ -92,6 +91,7 @@
               <p id="process-detail-description"></p>
             </div>
             <dl>
+              <div><dt>可用工具</dt><dd id="process-detail-tools"></dd></div>
               <div><dt>人工關卡</dt><dd id="process-detail-gate"></dd></div>
               <div><dt>交給下一步</dt><dd id="process-detail-output"></dd></div>
             </dl>
@@ -102,6 +102,7 @@
           <p class="process-boundary">
             <strong>資料分流：</strong>招募名冊、聯絡方式與可近用需求應留在受限空間；公開成果只帶彙整、解讀、限制與責任，不帶逐筆參與紀錄。
           </p>
+          <p class="process-icon-credit">流程圖示採用 <a href="https://lucide.dev/" target="_blank" rel="noreferrer">Lucide</a> 同系列開源 SVG；<a href="/assets/lucide-LICENSE.txt">查看授權</a>。</p>
         </div>
       </section>
 
@@ -207,24 +208,66 @@
         </div>
       </section>
 
+      <section id="compare" class="section comparison-section">
+        <div class="wrap comparison-wrap">
+          <p class="section-kicker">Deployment and interoperability · 最後查核 2026-09-01</p>
+          <div class="comparison-heading">
+            <div>
+              <h2>先比較「怎麼用」，再比較功能。</h2>
+              <p class="section-lede">
+                第一眼只回答：能不能從 Delib 開始、要用誰的服務、資料能不能帶走。部署與授權細節需要時再展開。
+              </p>
+            </div>
+            <a class="button button-ghost" href="/deploy.html">查看一鍵部署中心 →</a>
+          </div>
+
+          <div class="comparison-filters" aria-label="依部署方式篩選工具">
+            <button class="comparison-filter active" type="button" aria-pressed="true" data-comparison-filter="all">全部</button>
+            <button class="comparison-filter" type="button" aria-pressed="false" data-comparison-filter="direct">在 Delib 開始</button>
+            <button class="comparison-filter" type="button" aria-pressed="false" data-comparison-filter="one-click">部署自己的</button>
+            <button class="comparison-filter" type="button" aria-pressed="false" data-comparison-filter="upstream">用現成服務</button>
+            <button class="comparison-filter" type="button" aria-pressed="false" data-comparison-filter="data">資料可轉接</button>
+            <button class="comparison-filter" type="button" aria-pressed="false" data-comparison-filter="shared-host">要找人維運</button>
+            <button class="comparison-filter" type="button" aria-pressed="false" data-comparison-filter="early">仍在早期</button>
+          </div>
+
+          <div class="comparison-table-wrap" role="region" aria-label="審議工具使用方式與資料互通比較表">
+            <table class="comparison-table">
+              <thead>
+                <tr>
+                  <th scope="col">工具與用途</th>
+                  <th scope="col">怎麼開始</th>
+                  <th scope="col">資料能帶去哪裡</th>
+                </tr>
+              </thead>
+              <tbody id="comparison-body"></tbody>
+            </table>
+          </div>
+          <p id="comparison-empty" class="empty-state" hidden>這個分類目前沒有工具。</p>
+          <button id="comparison-more" class="button button-ghost comparison-more" type="button" hidden>顯示更多工具</button>
+          <p class="source-note">
+            每列連到官方服務或原始碼；「可互通」只列已實作或明確標為待驗證的路徑。OpenDLP、Panelot 補上招募與 sortition 的缺口，但目前都還沒有 Delib adapter。
+          </p>
+        </div>
+      </section>
+
       <section id="launch" class="section launch-section">
         <div class="wrap">
           <p class="section-kicker">From recommendation to a working room</p>
           <h2>不用離開這裡，先把工具開起來。</h2>
           <p class="section-lede">
-            先預覽會建立什麼，再由你按下確認。公開參與連結和私人管理連結會分開顯示，
-            Delib 不保存你的流程規劃；只有主辦者明確建立的短期 Power Ranker 收件室會保存去連結化計數並自動清除。
+            選一個工具再展開設定。公開參與連結和私人管理連結會分開顯示；未展開的工具不會要求你先讀完所有技術細節。
           </p>
 
           <div class="launch-grid">
-            <article id="launch-call-in" class="launch-card">
-              <div class="launch-card-heading">
+            <details id="launch-call-in" class="launch-card">
+              <summary class="launch-card-heading">
                 <span class="launch-icon" aria-hidden="true">🎙️</span>
                 <div>
                   <span class="flow-tag">現在可用 · 約 1 分鐘</span>
                   <h3>建立 Call-in 現場互動</h3>
                 </div>
-              </div>
+              </summary>
               <p>貼一個大家都能開啟的簡報網址，建立提問、反應、投票與主持畫面。免帳號，七天後自動到期。</p>
 
               <form id="call-in-form" class="launch-form">
@@ -272,16 +315,16 @@
               </section>
 
               <a class="self-host-link" href="https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/call-in" target="_blank" rel="noreferrer">需要自己的保存政策？免費部署獨立 Call-in ↗</a>
-            </article>
+            </details>
 
-            <article id="launch-pocket-polis" class="launch-card">
-              <div class="launch-card-heading">
+            <details id="launch-pocket-polis" class="launch-card">
+              <summary class="launch-card-heading">
                 <span class="launch-icon" aria-hidden="true">🫧</span>
                 <div>
                   <span class="flow-tag">現在可用 · 免登入直接建立</span>
                   <h3>建立 Pocket Polis 口袋審議</h3>
                 </div>
-              </div>
+              </summary>
               <p>直接在 <strong>polis.mashbean.net</strong> 建立一輪陳述、投票與群組分析；不必先申請帳號或 Site ID。</p>
 
               <form id="pocket-polis-form" class="launch-form">
@@ -349,16 +392,16 @@
                 <a href="https://github.com/mashbean/pocket-polis" target="_blank" rel="noreferrer">查看 MIT 原始碼 ↗</a>
               </div>
               <p class="boundary-note">Pocket Polis 是為 Cloudflare Workers／Durable Objects 重做的輕量 MIT 工具，不是官方 Pol.is。適合社群、課堂與工作坊；防分身能力較弱，不應單獨用於高對抗或具法定效力的投票。</p>
-            </article>
+            </details>
 
-            <article id="launch-polis" class="launch-card">
-              <div class="launch-card-heading">
+            <details id="launch-polis" class="launch-card">
+              <summary class="launch-card-heading">
                 <span class="launch-icon" aria-hidden="true">🧭</span>
                 <div>
                   <span class="flow-tag">現在可用 · 已有對話零設定</span>
                   <h3>在 Delib 開啟 Pol.is</h3>
                 </div>
-              </div>
+              </summary>
               <p>已有官方 Pol.is 對話就貼網址；要建立官方對話，第一次需要 Pol.is 帳號裡的 Site ID。</p>
 
               <form id="polis-form" class="launch-form">
@@ -407,16 +450,16 @@
               </section>
               <a class="self-host-link" href="#launch-pocket-polis">想免登入直接建立？改用 Pocket Polis ↑</a>
               <p class="boundary-note">Pol.is 完整自架需要多個 Docker 服務與 PostgreSQL；Cloudflare Containers 只有付費方案，也不會供應 PostgreSQL。本站的一鍵部署會連接既有 Site ID，而不是假裝重寫整套 Pol.is。</p>
-            </article>
+            </details>
 
-            <article id="launch-agora-citizen-network" class="launch-card">
-              <div class="launch-card-heading">
+            <details id="launch-agora-citizen-network" class="launch-card">
+              <summary class="launch-card-heading">
                 <span class="launch-icon" aria-hidden="true">🌉</span>
                 <div>
                   <span class="flow-tag">現在可用 · 已有公開對話</span>
                   <h3>在 Delib 開啟 Agora</h3>
                 </div>
-              </div>
+              </summary>
               <p>貼上 ZKorum Agora Citizen Network 的公開對話網址，參與者就能留在 Delib 看見觀點、比較並投票。</p>
 
               <form id="agora-form" class="launch-form">
@@ -449,16 +492,16 @@
                 <a href="https://github.com/zkorum/agora/blob/main/doc/embed.md" target="_blank" rel="noreferrer">查看官方嵌入說明 ↗</a>
               </div>
               <p class="boundary-note">Agora 是活躍的 AGPL 完整應用，另有 Pol.is／CSV 匯入 worker；完整自架需要 PostgreSQL、Valkey 與多個 TypeScript／Python 服務，不是 Cloudflare 免費一鍵部署。本站目前只連接既有公開對話，沒有宣稱能代建。</p>
-            </article>
+            </details>
 
-            <article id="launch-heyform" class="launch-card">
-              <div class="launch-card-heading">
+            <details id="launch-heyform" class="launch-card">
+              <summary class="launch-card-heading">
                 <span class="launch-icon" aria-hidden="true">📝</span>
                 <div>
                   <span class="flow-tag">現在可用 · 已發布表單</span>
                   <h3>在 Delib 填寫 HeyForm</h3>
                 </div>
-              </div>
+              </summary>
               <p>貼上已發布的 HeyForm 公開網址，參與者就能留在這個工作區填寫；回答不會經過 Delib。</p>
 
               <form id="heyform-form" class="launch-form">
@@ -491,16 +534,16 @@
                 <a href="https://docs.heyform.net/open-source/self-hosting" target="_blank" rel="noreferrer">查看官方自架方式 ↗</a>
               </div>
               <p class="boundary-note">HeyForm 自架需要 MongoDB 與 Redis／KeyDB，不是 Cloudflare-native。官方目前另有未修補的表單建構器安全公告；本站不代收登入憑證，也不自動代建表單。</p>
-            </article>
+            </details>
 
-            <article id="launch-talk-to-the-city" class="launch-card">
-              <div class="launch-card-heading">
+            <details id="launch-talk-to-the-city" class="launch-card">
+              <summary class="launch-card-heading">
                 <span class="launch-icon" aria-hidden="true">🧩</span>
                 <div>
                   <span class="flow-tag">現在可用 · 官方建立流程</span>
                   <h3>用 Talk to the City 整理意見</h3>
                 </div>
-              </div>
+              </summary>
               <p>先在 Delib 說清楚分析名稱與資料邊界，再於站內開啟 TTTC 官方頁登入、上傳 CSV、檢查並建立報告。</p>
 
               <form id="tttc-form" class="launch-form">
@@ -531,16 +574,16 @@
                 <a id="tttc-workspace" class="button button-primary" target="_blank" rel="noreferrer">留在 Delib 開啟 ↗</a>
               </section>
               <p class="boundary-note">TTTC 現行版本使用 Firebase、Google Cloud Storage、Redis、Pub/Sub 與模型服務；舊 MetaGov adaptor 的 API 網域已不是現行公開入口，因此這版採官方 UI 連接，不要求使用者擷取 Firebase token。</p>
-            </article>
+            </details>
 
-            <article id="launch-harmonica" class="launch-card">
-              <div class="launch-card-heading">
+            <details id="launch-harmonica" class="launch-card">
+              <summary class="launch-card-heading">
                 <span class="launch-icon" aria-hidden="true">🎼</span>
                 <div>
                   <span class="flow-tag">現在可用 · API／Agent 建立</span>
                   <h3>建立 Harmonica 對話訪談</h3>
                 </div>
-              </div>
+              </summary>
               <p>把審議目標與幾個起始問題交給 Harmonica 的 AI facilitator，建立可分享的深度對話連結。</p>
 
               <form id="harmonica-form" class="launch-form">
@@ -597,16 +640,16 @@
                 </details>
               </section>
               <p class="boundary-note">Harmonica 有正式 REST API、MCP 與 AGPL 原始碼；官方自架仍需要 PostgreSQL、Auth0、模型與向量服務。這裡先連 hosted API，讓建立動作可驗證且不代收帳密。</p>
-            </article>
+            </details>
 
-            <article id="launch-power-ranker" class="launch-card">
-              <div class="launch-card-heading">
+            <details id="launch-power-ranker" class="launch-card">
+              <summary class="launch-card-heading">
                 <span class="launch-icon" aria-hidden="true">⚖️</span>
                 <div>
                   <span class="flow-tag">現在可用 · 免費、免帳號</span>
                   <h3>用 Power Ranker 排出優先序</h3>
                 </div>
-              </div>
+              </summary>
               <p>輸入 3–10 個選項，選擇完全本機，或建立會自動到期的多人結果收件室。</p>
 
               <form id="power-ranker-form" class="launch-form">
@@ -675,7 +718,7 @@
                 </details>
               </section>
               <p class="boundary-note">這是 MIT 授權 PowerRanker `rankCentrality` 演算法的瀏覽器原生移植。短期收件室使用 Cloudflare SQLite Durable Objects，在 Free 額度內可免費運作；超額時會停止接受操作。模型分數不是支持率或共識證明。</p>
-            </article>
+            </details>
           </div>
 
           <div class="next-integrations">
@@ -777,77 +820,40 @@
         </div>
       </section>
 
-      <section id="compare" class="section comparison-section">
-        <div class="wrap comparison-wrap">
-          <p class="section-kicker">Deployment and interoperability · 最後查核 2026-09-01</p>
-          <div class="comparison-heading">
-            <div>
-              <h2>先比較「怎麼用」，再比較功能。</h2>
-              <p class="section-lede">
-                開源不等於一鍵部署；能內嵌也不等於資料能帶走。這張表把 Delib 串接、資料格式、主機責任與服務邊界放在一起。
-              </p>
-            </div>
-            <a class="button button-ghost" href="/deploy.html">查看一鍵部署中心 →</a>
-          </div>
-
-          <div class="comparison-filters" aria-label="依部署方式篩選工具">
-            <button class="comparison-filter active" type="button" aria-pressed="true" data-comparison-filter="all">全部</button>
-            <button class="comparison-filter" type="button" aria-pressed="false" data-comparison-filter="one-click">Cloudflare 一鍵</button>
-            <button class="comparison-filter" type="button" aria-pressed="false" data-comparison-filter="direct">Delib 可直接用</button>
-            <button class="comparison-filter" type="button" aria-pressed="false" data-comparison-filter="data">已有資料轉接</button>
-            <button class="comparison-filter" type="button" aria-pressed="false" data-comparison-filter="shared-host">需共用主機</button>
-            <button class="comparison-filter" type="button" aria-pressed="false" data-comparison-filter="upstream">使用對方服務</button>
-            <button class="comparison-filter" type="button" aria-pressed="false" data-comparison-filter="early">尚在早期／待整修</button>
-          </div>
-
-          <div class="comparison-table-wrap" tabindex="0" role="region" aria-label="審議工具部署與資料互通比較表">
-            <table class="comparison-table">
-              <thead>
-                <tr>
-                  <th scope="col">工具與用途</th>
-                  <th scope="col">在 Delib 怎麼用</th>
-                  <th scope="col">資料能否互通</th>
-                  <th scope="col">部署／主機責任</th>
-                  <th scope="col">開源</th>
-                </tr>
-              </thead>
-              <tbody id="comparison-body"></tbody>
-            </table>
-          </div>
-          <p id="comparison-empty" class="empty-state" hidden>這個分類目前沒有工具。</p>
-          <p class="source-note">
-            每列連到官方服務或原始碼；「可互通」只列已實作或明確標為待驗證的路徑。OpenDLP、Panelot 補上招募與 sortition 的缺口，但目前都還沒有 Delib adapter。
-          </p>
-        </div>
-      </section>
-
       <section id="tools" class="section tools-section">
         <div class="wrap">
-          <p class="section-kicker">工具目錄 · 最後查核 2026-09-01</p>
-          <div class="tools-heading">
-            <div>
-              <h2><span id="tool-count">28</span> 個工具，不是一張排名榜</h2>
-              <p class="section-lede">先看它能接哪一段、輸出什麼、資料去哪裡，再決定要不要用。</p>
+          <details class="tool-catalog-details">
+            <summary>
+              <span>
+                <small>上面沒有適合的？</small>
+                <strong>展開完整 <span id="tool-count">28</span> 項工具目錄</strong>
+              </span>
+              <b aria-hidden="true">＋</b>
+            </summary>
+            <div class="tool-catalog-content">
+              <div class="tools-heading">
+                <p class="section-lede">這裡才放完整盤點；先看工具能接哪一段、輸出什麼、資料去哪裡，再決定要不要用。</p>
+                <label class="search-field">
+                  <span>搜尋工具</span>
+                  <input id="tool-search" type="search" placeholder="例如：投票、提問、證據" />
+                </label>
+              </div>
+              <div class="tool-filters" aria-label="依可用方式篩選">
+                <button class="filter-chip active" data-filter="all">全部</button>
+                <button class="filter-chip" data-filter="direct">站內啟用</button>
+                <button class="filter-chip" data-filter="source">可取原始碼</button>
+                <button class="filter-chip" data-filter="shared-host">需要共用主機</button>
+                <button class="filter-chip" data-filter="component">元件／原型</button>
+                <button class="filter-chip" data-filter="unverified">尚未可用</button>
+              </div>
+              <div id="tool-library" class="tool-grid"></div>
+              <p id="no-tools" class="empty-state" hidden>找不到符合的工具。換一個比較白話的關鍵字試試？</p>
+              <p class="source-note">
+                目錄以 <a href="https://metagov.org/delib-tools" target="_blank" rel="noreferrer">MetaGov Deliberative Tools Gallery</a>
+                為底，加入 Call-in、Pocket Polis、OpenBook、Uncommon Ground、HeyForm、Agora Citizen Network 與 Parti DemosX。列入目錄不代表通過安全或採購審查。
+              </p>
             </div>
-            <label class="search-field">
-              <span>搜尋工具</span>
-              <input id="tool-search" type="search" placeholder="例如：投票、提問、證據" />
-            </label>
-          </div>
-          <div class="tool-filters" aria-label="依可用方式篩選">
-            <button class="filter-chip active" data-filter="all">全部</button>
-            <button class="filter-chip" data-filter="direct">站內啟用</button>
-            <button class="filter-chip" data-filter="source">可取原始碼</button>
-            <button class="filter-chip" data-filter="shared-host">需要共用主機</button>
-            <button class="filter-chip" data-filter="component">元件／原型</button>
-            <button class="filter-chip" data-filter="unverified">尚未可用</button>
-          </div>
-          <div id="tool-library" class="tool-grid"></div>
-          <p id="no-tools" class="empty-state" hidden>找不到符合的工具。換一個比較白話的關鍵字試試？</p>
-          <p class="source-note">
-            目錄以 <a href="https://metagov.org/delib-tools" target="_blank" rel="noreferrer">MetaGov Deliberative Tools Gallery</a>
-            為底，加入 Call-in、Pocket Polis、OpenBook、Uncommon Ground、HeyForm、Agora Citizen Network 與 Parti DemosX。列入目錄不代表通過安全或採購審查。
-          </p>
+          </details>
         </div>
       </section>
 

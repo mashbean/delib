@@ -54,7 +54,10 @@ let currentPlan = null;
 let currentStep = 0;
 let activeFilter = "all";
 let activeComparisonFilter = "all";
+let comparisonExpanded = false;
 let polisDeploymentConnected = false;
+
+const COMPARISON_PAGE_SIZE = 8;
 
 const plannerDialog = document.querySelector("#planner-dialog");
 const plannerForm = document.querySelector("#planner-form");
@@ -119,6 +122,7 @@ async function init() {
   renderComparisonTable();
   renderToolLibrary();
   bindEvents();
+  openLaunchCardFromHash();
   updatePolisMode();
   loadPolisStatus();
 
@@ -183,6 +187,7 @@ function bindEvents() {
   document.querySelectorAll("[data-comparison-filter]").forEach((button) => {
     button.addEventListener("click", () => {
       activeComparisonFilter = button.dataset.comparisonFilter;
+      comparisonExpanded = false;
       document.querySelectorAll("[data-comparison-filter]").forEach((candidate) => {
         candidate.classList.toggle("active", candidate === button);
         candidate.setAttribute("aria-pressed", candidate === button ? "true" : "false");
@@ -190,6 +195,19 @@ function bindEvents() {
       renderComparisonTable();
     });
   });
+  document.querySelector("#comparison-more").addEventListener("click", () => {
+    comparisonExpanded = !comparisonExpanded;
+    renderComparisonTable();
+  });
+  document.querySelectorAll(".launch-card").forEach((card) => {
+    card.addEventListener("toggle", () => {
+      if (!card.open) return;
+      document.querySelectorAll(".launch-card[open]").forEach((candidate) => {
+        if (candidate !== card) candidate.open = false;
+      });
+    });
+  });
+  window.addEventListener("hashchange", openLaunchCardFromHash);
 
   apiKeyInput.addEventListener("input", () => {
     const key = apiKeyInput.value.trim();
@@ -400,18 +418,28 @@ function renderProcessMap() {
       `${step.number} ${step.title}。人流：${step.humanFlow}。資料流：${step.dataFlow}。工具：${(step.tools || []).join("、")}`,
     );
     button.setAttribute("aria-pressed", index === 0 ? "true" : "false");
-    button.append(
+    const heading = createElement("span", "process-step-heading");
+    heading.append(
+      createProcessIcon(step.icon),
       createElement("span", "process-step-number", step.number),
       createElement("strong", "process-step-title", step.title),
     );
+    button.append(heading);
 
     const humanLine = createElement("span", "process-flow-line process-flow-people");
-    humanLine.append(createElement("b", "", "人"), document.createTextNode(step.humanFlow));
+    humanLine.append(createElement("b", "", "人流"), document.createTextNode(step.humanFlow));
     const dataLine = createElement("span", "process-flow-line process-flow-data");
-    dataLine.append(createElement("b", "", "資料"), document.createTextNode(step.dataFlow));
+    dataLine.append(createElement("b", "", "資料流"), document.createTextNode(step.dataFlow));
     const toolList = createElement("span", "process-tool-list");
     for (const tool of step.tools || []) toolList.append(createElement("span", "", tool));
-    button.append(humanLine, dataLine, toolList);
+    const connector = createElement("span", "process-connector");
+    connector.setAttribute("aria-hidden", "true");
+    const arrow = index < 3 ? "→" : index === 3 ? "↓" : index < 7 ? "←" : "↑";
+    connector.append(
+      createElement("i", "process-connector-people", arrow),
+      createElement("i", "process-connector-data", arrow),
+    );
+    button.append(humanLine, dataLine, toolList, connector);
     button.addEventListener("click", () => selectProcessStep(step.id));
     return button;
   });
@@ -431,6 +459,22 @@ function renderProcessMap() {
   selectProcessStep(processSteps[0].id);
 }
 
+function createProcessIcon(iconName) {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("class", "process-step-icon");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("fill", "none");
+  svg.setAttribute("stroke", "currentColor");
+  svg.setAttribute("stroke-width", "2");
+  svg.setAttribute("stroke-linecap", "round");
+  svg.setAttribute("stroke-linejoin", "round");
+  svg.setAttribute("aria-hidden", "true");
+  const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+  use.setAttribute("href", `/assets/process-icons.svg#${iconName}`);
+  svg.append(use);
+  return svg;
+}
+
 function selectProcessStep(stepId) {
   const step = processSteps.find((item) => item.id === stepId);
   if (!step) return;
@@ -439,6 +483,7 @@ function selectProcessStep(stepId) {
   });
   document.querySelector("#process-detail-title").textContent = `${step.number} · ${step.title}`;
   document.querySelector("#process-detail-description").textContent = step.detail;
+  document.querySelector("#process-detail-tools").textContent = (step.tools || []).join("、");
   document.querySelector("#process-detail-gate").textContent = step.gate;
   document.querySelector("#process-detail-output").textContent = step.output;
 }
@@ -448,8 +493,15 @@ function renderComparisonTable() {
   const empty = document.querySelector("#comparison-empty");
   if (!body || !empty) return;
   const matches = comparisonTools.filter(matchesComparisonFilter);
-  body.replaceChildren(...matches.map(renderComparisonRow));
+  const visible = comparisonExpanded ? matches : matches.slice(0, COMPARISON_PAGE_SIZE);
+  body.replaceChildren(...visible.map(renderComparisonRow));
   empty.hidden = matches.length > 0;
+  const more = document.querySelector("#comparison-more");
+  more.hidden = matches.length <= COMPARISON_PAGE_SIZE;
+  more.textContent = comparisonExpanded
+    ? "收起工具列表"
+    : `顯示另外 ${matches.length - COMPARISON_PAGE_SIZE} 個工具`;
+  more.setAttribute("aria-expanded", comparisonExpanded ? "true" : "false");
 }
 
 function matchesComparisonFilter(tool) {
@@ -476,6 +528,7 @@ function renderComparisonRow(tool) {
 
   const identity = document.createElement("th");
   identity.scope = "row";
+  identity.dataset.label = "工具與用途";
   const name = externalLink(tool.name, tool.url);
   name.className = "comparison-tool-name";
   const steps = createElement("span", "comparison-step-list");
@@ -483,37 +536,59 @@ function renderComparisonRow(tool) {
   identity.append(name, createElement("span", "comparison-summary", tool.summary), steps);
 
   const delib = document.createElement("td");
+  delib.dataset.label = "怎麼開始";
   delib.append(
-    createElement("span", `comparison-status comparison-status-${tool.delibMode}`, comparisonDelibLabel(tool.delibMode)),
-    createElement("p", "", tool.delibPath),
+    createElement("span", `comparison-use comparison-use-${comparisonUseMode(tool)}`, comparisonUseLabel(tool)),
+    createElement("p", "comparison-use-detail", comparisonUseDetail(tool)),
   );
+  const technical = document.createElement("details");
+  technical.className = "comparison-technical";
+  technical.append(createElement("summary", "", "部署與開源細節"));
+  const technicalList = document.createElement("dl");
+  technicalList.append(
+    comparisonDetail("部署", `${tool.deploymentLabel}。${tool.deploymentDetail}`),
+    comparisonDetail("主機責任", tool.serviceBoundary),
+    comparisonDetail("原始碼", `${comparisonSourceLabel(tool.openSource)} · ${tool.license}`),
+  );
+  technical.append(technicalList, externalLink("查看官方依據 ↗", tool.source));
+  delib.append(technical);
 
   const interop = document.createElement("td");
+  interop.dataset.label = "資料能帶去哪裡";
   interop.append(createElement("span", `interop-state interop-state-${tool.interopLevel}`, comparisonInteropLabel(tool.interopLevel)));
   const formats = createElement("ul", "comparison-list");
   for (const item of tool.interop || []) formats.append(createElement("li", "", item));
   interop.append(formats);
 
-  const deployment = document.createElement("td");
-  deployment.append(
-    createElement("span", `deployment-badge deployment-${tool.deploymentRoute}`, tool.deploymentLabel),
-    createElement("p", "", tool.deploymentDetail),
-    createElement("small", "comparison-boundary", tool.serviceBoundary),
-  );
-
-  const source = document.createElement("td");
-  source.append(
-    createElement("strong", `source-status source-${tool.openSource}`, comparisonSourceLabel(tool.openSource)),
-    createElement("span", "comparison-license", tool.license),
-    externalLink("原始碼／依據 ↗", tool.source),
-  );
-
-  row.append(identity, delib, interop, deployment, source);
+  row.append(identity, delib, interop);
   return row;
 }
 
-function comparisonDelibLabel(mode) {
-  return mode === "direct" ? "Delib 直接用" : mode === "connected" ? "Delib 已連接" : "尚未接入";
+function comparisonDetail(term, description) {
+  const group = document.createElement("div");
+  group.append(createElement("dt", "", term), createElement("dd", "", description));
+  return group;
+}
+
+function comparisonUseMode(tool) {
+  if (tool.delibMode === "direct") return "direct";
+  if (tool.delibMode === "connected") return "connected";
+  if (["upstream-service", "upstream-or-self-host"].includes(tool.deploymentRoute)) return "service";
+  if (tool.deploymentRoute === "shared-host") return "shared-host";
+  return "technical";
+}
+
+function comparisonUseLabel(tool) {
+  const mode = comparisonUseMode(tool);
+  if (mode === "direct") return "在 Delib 直接用";
+  if (mode === "connected") return "從 Delib 開啟";
+  if (mode === "service") return "使用官方服務";
+  if (mode === "shared-host") return "使用共用主機";
+  return "需要技術團隊";
+}
+
+function comparisonUseDetail(tool) {
+  return ["direct", "connected"].includes(tool.delibMode) ? tool.delibPath : tool.deploymentDetail;
 }
 
 function comparisonInteropLabel(level) {
@@ -604,6 +679,7 @@ function launchButton(toolId, integration) {
 function launchTool(toolId) {
   const target = document.querySelector(`#launch-${CSS.escape(toolId)}`);
   if (!target) return;
+  openLaunchCard(target);
   if (currentPlan) {
     const suggestedTitle = RESULT_TITLES[currentPlan.goal];
     if (toolId === "call-in" && !document.querySelector("#call-in-title").value) {
@@ -633,6 +709,17 @@ function launchTool(toolId) {
   target.scrollIntoView({ block: "start" });
   const firstInput = target.querySelector("input:not([type=checkbox]):not([type=radio])");
   queueMicrotask(() => firstInput?.focus());
+}
+
+function openLaunchCard(card) {
+  if (!(card instanceof HTMLDetailsElement)) return;
+  card.open = true;
+}
+
+function openLaunchCardFromHash() {
+  if (!location.hash.startsWith("#launch-")) return;
+  const card = document.getElementById(location.hash.slice(1));
+  if (card?.classList.contains("launch-card")) openLaunchCard(card);
 }
 
 function updatePowerRankerMode() {
@@ -819,6 +906,7 @@ function applyReceiptHandoff(handoff) {
   }
 
   const card = document.querySelector(`#${RECEIPT_HANDOFF_TARGETS[handoff.target].hash}`);
+  openLaunchCard(card);
   const form = card.querySelector(".launch-form");
   const toast = document.createElement("section");
   toast.className = "handoff-toast";
