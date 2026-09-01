@@ -19,7 +19,7 @@
 這是第一個可操作版本：
 
 1. 四步需求精靈；
-2. 27 個工具的可搜尋目錄與 deterministic recommendation；
+2. 28 個工具的可搜尋目錄與 deterministic recommendation；
 3. 線下／線上流程配方；
 4. 不含自由文字與個資的分享連結；
 5. `delib-bundle/v1` JSON 與 Markdown runbook 下載；
@@ -27,15 +27,16 @@
 7. `skills/delib/SKILL.md` 與機器可讀的
    `/.well-known/delib/SKILL.md`。
 8. 直接在站內建立七天的 Call-in 活動，不需帳號；
-9. 在站內嵌入既有 Pol.is 對話，或用 Site ID 準備自動建立工作區；
-10. 在站內嵌入既有 Agora Citizen Network 公開對話；
-11. 在站內嵌入已發布的 HeyForm 表單；
-12. 在站內開啟 Talk to the City 官方建立流程，登入與 CSV 不經 Delib；
-13. 使用 tab-only Harmonica API key 直接建立 AI 對話 session，或複製 MCP 啟動提示；
-14. 使用內建 Power Ranker 完成本機成對排序，或建立 24 小時／7 天自動清除的多人結果收件室；
-15. 把群體彙整接成 `delib-ranking-receipt/v1` 成果頁，分開呈現工具計算、主辦者解讀、未納入聲音、決策狀態與下一步責任；
-16. 從成果頁預覽並帶入 `delib-handoff/v1` 草稿，接續 Call-in 成果回報、Harmonica 補訪、TTTC 文字整理或 Pol.is 新一輪；
-17. `delib-integrations/v1` 與 `delib-hosting/v1` 盤點，加入 Agora 與 Parti DemosX，明確區分可用、共用託管、元件、研究與阻擋項目。
+9. 免登入在 `polis.mashbean.net` 代建 Pocket Polis，交回參與、成果與私人管理連結，並提供 Agent 準備提示；
+10. 在站內嵌入既有官方 Pol.is 對話，或用 Site ID 準備自動建立工作區；
+11. 在站內嵌入既有 Agora Citizen Network 公開對話；
+12. 在站內嵌入已發布的 HeyForm 表單；
+13. 在站內開啟 Talk to the City 官方建立流程，登入與 CSV 不經 Delib；
+14. 使用 tab-only Harmonica API key 直接建立 AI 對話 session，或複製 MCP 啟動提示；
+15. 使用內建 Power Ranker 完成本機成對排序，或建立 24 小時／7 天自動清除的多人結果收件室；
+16. 把群體彙整接成 `delib-ranking-receipt/v1` 成果頁，分開呈現工具計算、主辦者解讀、未納入聲音、決策狀態與下一步責任；
+17. 從成果頁預覽並帶入 `delib-handoff/v1` 草稿，接續 Call-in 成果回報、Harmonica 補訪、TTTC 文字整理或 Pol.is 新一輪；
+18. `delib-integrations/v1` 與 `delib-hosting/v1` 盤點，加入 Pocket Polis、Agora 與 Parti DemosX，明確區分可用、共用託管、元件、研究與阻擋項目。
 
 Delib 伺服器不保存 API key 或使用者建立的流程。Power Ranker 預設仍可完全
 在瀏覽器處理；只有主辦者明確選擇短期收件室時，才會保存公開題目、去連結化
@@ -104,6 +105,11 @@ OpenAI 官方目前建議文字生成使用
 - **Call-in**：使用者預覽七天保存與私人連結邊界後，Delib Worker
   代為呼叫 hosted creator。活動資料留在 Call-in；Delib 只把回傳連結
   放在該分頁的 `sessionStorage`。
+- **Pocket Polis／口袋審議**：輸入標題、說明與 5–15 句起始陳述後，
+  Delib 會呼叫 `polis.mashbean.net` 的公開建立 API，免登入交回參與、成果與
+  私人管理連結。管理 token 只存在建立者的分頁，Delib 不保存活動內容或參與資料。
+  主辦者亦可匯出去識別 CSV，或把 MIT 原始碼一鍵部署到自己的 Cloudflare。
+  它是輕量重做、不是官方 Pol.is；防分身能力較弱，不適合單獨用於高對抗投票。
 - **Pol.is**：已有對話可直接嵌入。建立模式使用公開的 Site ID 與
   page ID；第一次開啟工作區時才會在 Pol.is 建立對話。完整 Pol.is 需要
   多個 Docker 服務與 PostgreSQL；Cloudflare Containers 只有付費方案且
@@ -142,8 +148,8 @@ HeyForm 目前的安全公告都列在 audit。
 
 盤點見 [`docs/integration-audit.md`](docs/integration-audit.md)，機器可讀版本在
 [`public/data/integrations.json`](public/data/integrations.json) 與
-[`public/data/hosting.json`](public/data/hosting.json)。Pol.is 共用託管的架構、
-帳號所有權與 release gates 見 [`docs/polis-hosting.md`](docs/polis-hosting.md)。
+[`public/data/hosting.json`](public/data/hosting.json)。Pocket Polis 與官方 Pol.is
+自架的差異、帳號所有權與 release gates 見 [`docs/polis-hosting.md`](docs/polis-hosting.md)。
 
 ## Skill
 

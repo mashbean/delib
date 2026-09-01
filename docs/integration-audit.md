@@ -26,6 +26,7 @@ button.
 | Tool | Current path in Delib | Account / credential | Free / deployment boundary | Decision |
 | --- | --- | --- | --- | --- |
 | Call-in | Create a seven-day hosted event from a public deck URL; return audience, presenter, setup and moderation links. | None. Private setup and moderation links remain in the tab. | Hosted path needs no account. The source also supports Cloudflare Workers + SQLite Durable Objects, available within the Workers Free limits. | Available. |
+| Pocket Polis／口袋審議 | Create a hosted conversation from a title, description and 5–15 seed statements; return separate participant, report and private admin links. An Agent prompt and installable skill can prepare the brief, but creation still waits for human confirmation. | None. The admin token stays in the URL fragment and current browser tab; Delib does not persist it. | `polis.mashbean.net` is a managed free path. The MIT source is also a Cloudflare Worker + SQLite Durable Objects deployment with a Deploy button. It is a lightweight reimplementation, not official Pol.is, and has weaker sybil resistance. | Available. |
 | Pol.is | Embed an existing conversation. A connected `site_id` plus deterministic `page_id` can create on first load. A personal Delib Deploy-button install can ask for `POLIS_SITE_ID` once. | A real Pol.is account creates and owns the Site ID. Cloudflare cannot manufacture one. Site ID is not a password. | Full self-hosting uses several containers and PostgreSQL. Cloudflare Containers are Workers Paid only and do not provide PostgreSQL, so this is not labelled a free Cloudflare-native deployment. | Available with connection. |
 | Agora Citizen Network | Validate an official public conversation URL and embed ZKorum's maintained participant surface. Old `agoracitizen.network/feed/conversation/...` links are normalized to the current `www.agoracitizen.app/conversation/...` route. | Delib needs no credential. Any login remains inside Agora, and Delib does not receive opinions, comparisons or votes. | The active AGPL monorepo uses Quasar/Vue, Fastify, PostgreSQL, Valkey and TypeScript／Python workers. Its import worker accepts Pol.is URLs or CSV archives, but the hosted creation/import/export authorization contract has not been verified. | Available: existing only. |
 | OpenBook | Use the public evidence page as an evidence gear. | None. | Public static site; there is no instance to create. | Direct viewer. |
@@ -36,7 +37,7 @@ button.
 | Power Ranker | Choose a fully local share link or a 24-hour／seven-day room. Room submissions are immediately reduced to pair counts; public aggregates appear at three sessions, and organizers can delete early. Aggregate results can become a fragment-only public receipt after the organizer states interpretation, missing voices, authority and next responsibility. The receipt can then prepare a one-time local draft for Call-in, Harmonica, TTTC or Pol.is without carrying aggregate records. | None. Local exports contain a random pseudonymous session ID. Rooms keep only its SHA-256 hash for deduplication; the private admin token stays after `#` and is stripped from receipts and next-step drafts. | Static mode, receipt rendering and same-tab handoff need no storage. Room mode uses one SQLite Durable Object per room and works within Workers Free limits; excess operations fail. | Available locally or with ephemeral room, result receipt and next-step draft. |
 | Parti DemosX | Listed as a source-available full civic-participation platform, not an iframe or managed creator. | A self-host operator would own all accounts, retention and administration. Delib does not connect to a current hosted DemosX account. | MIT source builds a Java／Maven WAR; the supplied Docker Compose runs Tomcat, MySQL and Nginx and contains development defaults that must be replaced. The repository was last pushed in 2022, so dependency, security and export review comes before deployment. | Catalog only; shared-host candidate after maintenance review. |
 
-The other seventeen gallery tools stay `catalog-only` until we have verified
+The other eighteen gallery tools stay `catalog-only` until we have verified
 their creation API, embed policy, export contract, authentication, retention,
 free-tier and deploy target. Their identifiers are listed in
 `public/data/integrations.json` so the UI and agents can state this boundary
@@ -44,10 +45,10 @@ deterministically.
 
 ## Source and hosting paths
 
-`public/data/hosting.json` now records one decision for every one of the 27
+`public/data/hosting.json` now records one decision for every one of the 28
 tools. The useful groups are deliberately different:
 
-- Direct or connected: Call-in, OpenBook, Pol.is, Agora, HeyForm, Talk to the City,
+- Direct or connected: Call-in, Pocket Polis, OpenBook, Pol.is, Agora, HeyForm, Talk to the City,
   Harmonica and Power Ranker already have an in-app path; Uncommon Ground is a data handoff.
 - Shared host: Pol.is, Agora, Parti DemosX, Decidim, Go Vocal, MAPLE and Stanford PB are complete
   enough to operate, but require a maintained application/database service.
@@ -74,10 +75,11 @@ an analysis title and de-identification reminder, not CSV or receipt data.
 Pol.is receives new-conversation mode and a title, not seed statements or a
 Site ID. The destination form remains the external-write boundary.
 
-Pol.is requires an additional ownership gate. Its implicit creation flow sends
+Official Pol.is requires an additional ownership gate. Its implicit creation flow sends
 moderation and seed links to the Site ID owner. A shared operator Site ID would
 therefore make every organizer depend on the operator. The proposed host keeps
 one organizer account per steward and is documented in `docs/polis-hosting.md`.
+This is separate from the live Pocket Polis managed host at `polis.mashbean.net`.
 
 ## UX contract adapted from Matters Lifeboat
 
@@ -107,6 +109,9 @@ one organizer account per steward and is documented in `docs/polis-hosting.md`.
 
 ## Sources
 
+- [Pocket Polis hosted service](https://polis.mashbean.net/)
+- [Pocket Polis MIT source](https://github.com/mashbean/pocket-polis)
+- [Pocket Polis Agent guide](https://github.com/mashbean/pocket-polis/blob/main/AGENT.md)
 - [Polis repository and deployment notes](https://github.com/compdemocracy/polis)
 - [Polis site integration source](https://github.com/compdemocracy/polis/blob/edge/client-admin/src/components/conversations-and-account/Integrate.js)
 - [Cloudflare Containers](https://developers.cloudflare.com/containers/)

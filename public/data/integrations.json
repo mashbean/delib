@@ -37,6 +37,42 @@
       ]
     },
     {
+      "toolId": "pocket-polis",
+      "readiness": "available",
+      "activation": "managed-create",
+      "label": "免登入直接建立",
+      "summary": "在 Delib 填入標題、說明與 5–15 句起始陳述，直接由 polis.mashbean.net 建立活動。",
+      "accountRequired": false,
+      "credentialRequired": false,
+      "freePath": "使用 mashbean 維運的 Pocket Polis 共用主機，或按 Deploy to Cloudflare 建立自己的獨立服務。",
+      "writesExternalState": "按下確認後，Delib Worker 會呼叫 Pocket Polis 公開建立 API，立即建立活動。",
+      "retention": "由 Pocket Polis 營運者與活動主辦者的政策決定；目前未驗證自動到期或刪除契約。Delib 不保存活動資料或管理 token。",
+      "inAppEndpoint": "/api/integrations/pocket-polis",
+      "selfHost": {
+        "supported": true,
+        "platform": "Cloudflare Workers + Durable Objects SQLite",
+        "cloudflareNative": true,
+        "freeTier": "可從 GitHub 一鍵部署到 Cloudflare；實際可用量受 Cloudflare 帳號方案與 Durable Objects 配額限制。",
+        "deployUrl": "https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/pocket-polis"
+      },
+      "agent": {
+        "canCreate": true,
+        "guide": "https://github.com/mashbean/pocket-polis/blob/main/AGENT.md",
+        "skillInstall": "npx --yes github:mashbean/pocket-polis install-skill",
+        "humanGate": "Agent 可協助草擬陳述與設定；建立前由人確認題目、審核、公開資料、主辦責任與後續回覆。"
+      },
+      "knownLimitations": [
+        "Pocket Polis 是 MIT 輕量重做，不是官方 Pol.is，也不宣稱分析結果完全等同官方 Pol.is。",
+        "防分身能力較弱，不適合單獨作為高對抗、具法定效力或高風險投票。",
+        "共用主機限制每個來源的建立頻率；大量活動應部署自己的 instance。"
+      ],
+      "evidence": [
+        "https://polis.mashbean.net/",
+        "https://github.com/mashbean/pocket-polis",
+        "https://github.com/mashbean/pocket-polis/blob/main/AGENT.md"
+      ]
+    },
+    {
       "toolId": "polis",
       "readiness": "available-with-connection",
       "activation": "embedded-workspace",
@@ -52,7 +88,7 @@
         "supported": true,
         "platform": "Docker services + PostgreSQL",
         "cloudflareNative": false,
-        "recommendedArchitecture": "以最新 compdemocracy/polis edge 在一般 VM／container host 共用託管；Cloudflare 位於前方提供 DNS、TLS、WAF，資料庫使用有備份的 PostgreSQL。",
+        "recommendedArchitecture": "若需要官方 Pol.is 完整行為，以最新 compdemocracy/polis edge 在一般 VM／container host 共用託管；Cloudflare 位於前方提供 DNS、TLS、WAF，資料庫使用有備份的 PostgreSQL。Pocket Polis 是另一個輕量工具，不是這套 upstream 的部署。",
         "note": "polis.tw 是 PDIS 自架 fork 的先例，但目前回傳 Cloudflare 523，且 fork 已大幅落後主線；不作為新部署基底。Cloudflare Containers 只有 Workers Paid，且不提供 PostgreSQL。"
       },
       "agent": {

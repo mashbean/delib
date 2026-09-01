@@ -9,6 +9,7 @@ import {
   handleHeyFormRequest,
   handleHarmonicaRequest,
   handlePolisRequest,
+  handlePocketPolisRequest,
   handleRankingRoomRequest,
   handleTttcRequest,
   parseAgoraConversationSlug,
@@ -138,6 +139,95 @@ describe("handleAgentRequest", () => {
 });
 
 describe("direct integrations", () => {
+  it("creates a Pocket Polis conversation without retaining the private token", async () => {
+    const upstream = vi.fn(async (url: string, init?: RequestInit) => {
+      expect(url).toBe("https://polis.mashbean.net/api/conversations");
+      expect(JSON.parse(String(init?.body))).toEqual({
+        title: "公園議題",
+        description: "找出居民能共同推進的方向",
+        seedStatements: ["增加照明", "保留草地", "改善無障礙", "增加遊具", "再辦討論"],
+        autoApprove: false,
+        allowSubmissions: true,
+        openData: false,
+      });
+      return Response.json({
+        conversationId: "abc123def4",
+        adminToken: "a".repeat(32),
+        urls: {
+          participate: "/c/abc123def4",
+          report: "/r/abc123def4",
+          admin: `/a/abc123def4#token=${"a".repeat(32)}`,
+        },
+      });
+    });
+    const response = await handlePocketPolisRequest(
+      new Request("https://delib.example/api/integrations/pocket-polis", {
+        method: "POST",
+        headers: { Origin: "https://delib.example", "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: "公園議題",
+          description: "找出居民能共同推進的方向",
+          seedStatements: ["增加照明", "保留草地", "改善無障礙", "增加遊具", "再辦討論"],
+          autoApprove: false,
+          allowSubmissions: true,
+          openData: false,
+          confirmed: true,
+        }),
+      }),
+      upstream as typeof fetch,
+    );
+    expect(response.status).toBe(201);
+    await expect(response.json()).resolves.toMatchObject({
+      integration: "pocket-polis",
+      participateUrl: "https://polis.mashbean.net/c/abc123def4",
+      reportUrl: "https://polis.mashbean.net/r/abc123def4",
+      adminUrl: `https://polis.mashbean.net/a/abc123def4#token=${"a".repeat(32)}`,
+      storedByDelib: false,
+      credentialStoredByDelib: false,
+    });
+  });
+
+  it("requires confirmation and 5–15 unique Pocket Polis seed statements", async () => {
+    const upstream = vi.fn();
+    const response = await handlePocketPolisRequest(
+      new Request("https://delib.example/api/integrations/pocket-polis", {
+        method: "POST",
+        headers: { Origin: "https://delib.example", "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: "公園議題",
+          seedStatements: ["一", "二", "三", "四"],
+          autoApprove: false,
+          allowSubmissions: true,
+          openData: false,
+          confirmed: true,
+        }),
+      }),
+      upstream as typeof fetch,
+    );
+    expect(response.status).toBe(400);
+    expect(upstream).not.toHaveBeenCalled();
+  });
+
+  it("maps Pocket Polis rate limits without echoing upstream details", async () => {
+    const response = await handlePocketPolisRequest(
+      new Request("https://delib.example/api/integrations/pocket-polis", {
+        method: "POST",
+        headers: { Origin: "https://delib.example", "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: "公園議題",
+          seedStatements: ["一", "二", "三", "四", "五"],
+          autoApprove: false,
+          allowSubmissions: true,
+          openData: false,
+          confirmed: true,
+        }),
+      }),
+      vi.fn(async () => new Response("private upstream detail", { status: 429 })) as typeof fetch,
+    );
+    expect(response.status).toBe(429);
+    expect(await response.text()).not.toContain("private upstream detail");
+  });
+
   it("parses only public Pol.is conversation identifiers", () => {
     expect(parsePolisConversationId("https://pol.is/2demo")).toBe("2demo");
     expect(parsePolisConversationId("https://pol.is/m2demo")).toBe("2demo");

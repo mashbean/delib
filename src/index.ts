@@ -12,6 +12,7 @@ type WorkerEnv = Omit<Env, "RANKING_ROOMS"> & {
   ASSETS: Fetcher;
   RANKING_ROOMS: DurableObjectNamespace<RankingRoom>;
   CALL_IN_ORIGIN?: string;
+  POCKET_POLIS_ORIGIN?: string;
   POLIS_SITE_ID?: string;
 };
 
@@ -37,6 +38,7 @@ const MAX_INTEGRATION_BODY_BYTES = 12 * 1024;
 const RANKING_ROOM_RETENTION_HOURS = new Set([24, 168]);
 const DEFAULT_MODEL = "gpt-5.6";
 const DEFAULT_CALL_IN_ORIGIN = "https://call-in.mashbean.net";
+const DEFAULT_POCKET_POLIS_ORIGIN = "https://polis.mashbean.net";
 
 const AGENT_INSTRUCTIONS = `你是審議流程的協作助理，不是決策者。請使用正體中文，根據已經由規則引擎選出的流程與工具，產生一份簡短、可執行的主持簡報。
 
@@ -80,6 +82,14 @@ export default {
 
     if (url.pathname === "/api/integrations/call-in" && request.method === "POST") {
       return handleCallInRequest(request, fetch, env.CALL_IN_ORIGIN || DEFAULT_CALL_IN_ORIGIN);
+    }
+
+    if (url.pathname === "/api/integrations/pocket-polis" && request.method === "POST") {
+      return handlePocketPolisRequest(
+        request,
+        fetch,
+        env.POCKET_POLIS_ORIGIN || DEFAULT_POCKET_POLIS_ORIGIN,
+      );
     }
 
     if (url.pathname === "/api/integrations/polis" && request.method === "POST") {
@@ -133,6 +143,16 @@ type PolisRequest = {
   siteId?: unknown;
   pageId?: unknown;
   title?: unknown;
+  confirmed?: unknown;
+};
+
+type PocketPolisRequest = {
+  title?: unknown;
+  description?: unknown;
+  seedStatements?: unknown;
+  autoApprove?: unknown;
+  allowSubmissions?: unknown;
+  openData?: unknown;
   confirmed?: unknown;
 };
 
@@ -411,6 +431,103 @@ export async function handlePolisRequest(request: Request, defaultSiteId?: strin
   }
 
   return json({ error: "請選擇已有對話或建立新對話" }, 400);
+}
+
+export async function handlePocketPolisRequest(
+  request: Request,
+  upstreamFetch: typeof fetch = fetch,
+  configuredOrigin = DEFAULT_POCKET_POLIS_ORIGIN,
+): Promise<Response> {
+  if (!isSameOriginRequest(request)) return json({ error: "origin not allowed" }, 403);
+  const body = await readJsonRequest<PocketPolisRequest>(request, MAX_INTEGRATION_BODY_BYTES);
+  if (body instanceof Response) return body;
+  if (body.confirmed !== true) return json({ error: "建立前請先確認公開範圍與私人管理連結" }, 400);
+
+  const title = cleanRequiredString(body.title, 120);
+  const description = cleanOptionalString(body.description, 2_000);
+  const seedStatements = normalizePocketPolisSeeds(body.seedStatements);
+  if (!title) return json({ error: "先幫這輪審議取一個名字" }, 400);
+  if (!seedStatements) return json({ error: "請填入 5–15 句不重複、每句只表達一個觀點的起始陳述" }, 400);
+  if (
+    typeof body.autoApprove !== "boolean" ||
+    typeof body.allowSubmissions !== "boolean" ||
+    typeof body.openData !== "boolean"
+  ) {
+    return json({ error: "請確認審核、投稿與開放資料設定" }, 400);
+  }
+
+  const pocketPolisOrigin = normalizeServiceOrigin(configuredOrigin);
+  if (!pocketPolisOrigin) return json({ error: "Pocket Polis 主機設定不完整" }, 503);
+
+  let upstream: Response;
+  try {
+    upstream = await upstreamFetch(`${pocketPolisOrigin}/api/conversations`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title,
+        description,
+        seedStatements,
+        autoApprove: body.autoApprove,
+        allowSubmissions: body.allowSubmissions,
+        openData: body.openData,
+      }),
+    });
+  } catch {
+    return json({ error: "暫時連不上 Pocket Polis，請稍後再試" }, 502);
+  }
+
+  if (!upstream.ok) {
+    return json(
+      {
+        error:
+          upstream.status === 429
+            ? "Pocket Polis 目前建立活動的次數已達上限，請稍後再試"
+            : upstream.status === 503
+              ? "Pocket Polis 的免費資源暫時忙碌，請稍後再試"
+              : "Pocket Polis 沒有完成建立，請檢查內容後再試",
+      },
+      upstream.status === 429 ? 429 : 502,
+    );
+  }
+
+  let payload: unknown;
+  try {
+    payload = await upstream.json();
+  } catch {
+    return json({ error: "Pocket Polis 回應格式不完整" }, 502);
+  }
+  if (!isRecord(payload)) return json({ error: "Pocket Polis 回應格式不完整" }, 502);
+  const conversationId = cleanMatchingString(payload.conversationId, /^[a-z0-9]{10}$/, 10);
+  const adminToken = cleanMatchingString(payload.adminToken, /^[a-f0-9]{32}$/i, 32);
+  if (!conversationId || !adminToken) {
+    return json({ error: "Pocket Polis 回應缺少必要資訊" }, 502);
+  }
+
+  const participateUrl = `${pocketPolisOrigin}/c/${conversationId}`;
+  const reportUrl = `${pocketPolisOrigin}/r/${conversationId}`;
+  const adminUrl = `${pocketPolisOrigin}/a/${conversationId}#token=${adminToken}`;
+  return json(
+    {
+      integration: "pocket-polis",
+      status: "ready",
+      serviceOrigin: pocketPolisOrigin,
+      conversationId,
+      title,
+      participateUrl,
+      reportUrl,
+      adminUrl,
+      storedByDelib: false,
+      credentialStoredByDelib: false,
+      writesExternalState: true,
+      privacy: {
+        privateUrls: ["adminUrl"],
+        participantDataOwner: pocketPolisOrigin,
+        openData: body.openData,
+      },
+    },
+    201,
+  );
 }
 
 export async function handleHeyFormRequest(request: Request): Promise<Response> {
@@ -742,6 +859,35 @@ function cleanMatchingString(value: unknown, pattern: RegExp, max: number): stri
   if (typeof value !== "string") return null;
   const cleaned = value.trim();
   return cleaned.length <= max && pattern.test(cleaned) ? cleaned : null;
+}
+
+function normalizePocketPolisSeeds(value: unknown): string[] | null {
+  if (!Array.isArray(value) || value.length < 5 || value.length > 15) return null;
+  const statements = value
+    .map((statement) => cleanRequiredString(statement, 280))
+    .filter((statement): statement is string => Boolean(statement));
+  if (statements.length !== value.length) return null;
+  const normalized = statements.map((statement) => statement.toLocaleLowerCase("zh-Hant"));
+  return new Set(normalized).size === statements.length ? statements : null;
+}
+
+function normalizeServiceOrigin(value: string): string | null {
+  try {
+    const parsed = new URL(value);
+    if (
+      parsed.protocol !== "https:" ||
+      parsed.username ||
+      parsed.password ||
+      parsed.pathname !== "/" ||
+      parsed.search ||
+      parsed.hash
+    ) {
+      return null;
+    }
+    return parsed.origin;
+  } catch {
+    return null;
+  }
 }
 
 function cleanHttpsUrl(value: unknown, max: number, allowFragment = false): string | null {

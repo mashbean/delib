@@ -5,6 +5,7 @@
     "https://metagov.org/delib-tools",
     "https://github.com/metagov/interop",
     "https://github.com/metagov/ontology",
+    "https://github.com/mashbean/pocket-polis",
     "https://github.com/zkorum/agora",
     "https://100-democracy.parti.coop/en/07-builder.html"
   ],
@@ -57,6 +58,23 @@
       "outputs": ["questions", "insights", "receipt"],
       "hosting": "local-scripts-and-agent-skill",
       "handoff": "questions/clusters/arc/takes/loopbacks/meta JSON 與 verify.py。敏感資料必須在本機或核准環境處理。"
+    },
+    {
+      "id": "pocket-polis",
+      "name": "Pocket Polis · 口袋審議",
+      "summary": "免登入建立陳述、同意／不同意投票與意見群組分析，直接由 polis.mashbean.net 託管活動。",
+      "url": "https://polis.mashbean.net/",
+      "source": "https://github.com/mashbean/pocket-polis",
+      "status": "integrated",
+      "stages": ["eliciting", "deliberating", "reflecting"],
+      "goals": ["listen", "understand", "propose", "followup"],
+      "formats": ["hybrid", "online"],
+      "scales": ["small", "medium", "large"],
+      "privacy": ["public", "pseudonymous"],
+      "outputs": ["insights", "proposals", "evidence", "receipt"],
+      "hosting": "cloudflare-worker",
+      "deploy": "https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/pocket-polis",
+      "handoff": "Delib 可免登入代建並交回參與、成果、私人管理三種連結；主辦者可匯出去識別 CSV，管理 token 只留在建立者分頁。"
     },
     {
       "id": "polis",

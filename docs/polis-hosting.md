@@ -1,28 +1,38 @@
-# Pol.is shared hosting decision
+# Pocket Polis live host and official Pol.is hosting decision
 
-Last checked: 2026-08-31
+Last checked: 2026-09-01
 
 ## Decision
 
-Self-hosting Pol.is from source is viable, but it is not a GitHub + Cloudflare
-Workers-only deployment. The practical product is one maintained shared Pol.is
-service behind Cloudflare, with one organizer account per steward, rather than a
-new Docker stack for every deliberation.
+`https://polis.mashbean.net/` is now the live host for **Pocket Polis／口袋審議**.
+It is an MIT-licensed lightweight reimplementation built for one Cloudflare
+Worker and SQLite Durable Objects. Delib can call its public create API without
+an account and return participant, report and fragment-held admin links.
+
+Pocket Polis is not a deployment of the official Pol.is source and must never
+be labelled as one. Self-hosting official Pol.is remains viable, but it is not a
+GitHub + Cloudflare Workers-only deployment. If official feature parity is
+required, the practical product is one maintained shared service behind
+Cloudflare, with one organizer account per steward, rather than a new Docker
+stack for every deliberation.
 
 Use `compdemocracy/polis` `edge` as the upstream baseline. Do not start from
 `PDIS/polis2023`: it is useful evidence that PDIS operated a customized Docker
 deployment, but its `pdis-prod` branch is far behind current upstream and
 `https://polis.tw/` currently returns Cloudflare 523.
 
-## Proposed shape
+## Two deliberately separate shapes
 
 ```text
 delib.mashbean.net (Cloudflare Worker)
-        │ prepare / open
+        │ confirmed create API
         ▼
-polis.mashbean.net (Cloudflare DNS, TLS, WAF)
-        │
-        ▼
+polis.mashbean.net (Pocket Polis Worker)
+  └─ SQLite Durable Object per conversation
+
+official Pol.is shared host (future, different hostname)
+  │ Cloudflare DNS, TLS, WAF
+  ▼
 maintained Linux/container origin
   ├─ Node API and web clients
   ├─ Clojure math service
@@ -30,11 +40,29 @@ maintained Linux/container origin
   └─ PostgreSQL with backups
 ```
 
-Cloudflare remains useful at the edge, but the stateful origin and PostgreSQL
-need a VM or managed container/database provider. Cloudflare Containers has no
-free allocation and does not replace PostgreSQL.
+Pocket Polis is Cloudflare-native and has a public one-click deploy path. The
+official stack still needs a VM or managed container/database provider;
+Cloudflare remains useful at its edge, but Containers does not replace
+PostgreSQL.
 
-## The real one-click gate
+## Pocket Polis managed-create contract
+
+The Delib form accepts a bounded title, optional description, 5–15 unique seed
+statements and explicit moderation/open-data booleans. After human confirmation
+it calls `POST https://polis.mashbean.net/api/conversations` once. Delib validates
+the returned conversation ID and admin token, constructs the three canonical
+URLs, and does not persist them server-side.
+
+- participant URL and report URL are public capabilities;
+- the admin URL contains its token after `#` and stays in tab-scoped
+  `sessionStorage`;
+- statements, votes, clustering and CSV exports remain in Pocket Polis;
+- weak sybil resistance is disclosed, so the tool is not the only ballot for a
+  high-adversarial or legally binding decision;
+- an Agent may draft seed statements and settings, but a person confirms before
+  any external conversation is created.
+
+## The official Pol.is one-click gate
 
 Running the containers is only the operator step. A non-engineer still needs:
 
@@ -51,7 +79,7 @@ the Site ID owner. This means a single operator-owned Site ID is not sufficient
 for a public self-service product: every organizer would otherwise depend on the
 operator to forward private moderation access.
 
-The first shared-host release should therefore keep upstream account ownership.
+Any future official shared-host release should therefore keep upstream account ownership.
 Delib may remove the copy-and-paste step after the organizer explicitly connects
 their account, but must not silently make every event belong to one Mashbean
 account.
@@ -70,9 +98,11 @@ account.
 
 ## Sources
 
+- <https://polis.mashbean.net/>
+- <https://github.com/mashbean/pocket-polis>
+- <https://github.com/mashbean/pocket-polis/blob/main/AGENT.md>
 - <https://github.com/compdemocracy/polis>
 - <https://github.com/compdemocracy/polis/blob/edge/docker-compose.yml>
 - <https://github.com/compdemocracy/polis/blob/edge/server/src/routes/implicitConversation.ts>
 - <https://github.com/PDIS/polis2023>
 - <https://developers.cloudflare.com/containers/>
-

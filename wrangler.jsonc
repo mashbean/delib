@@ -26,7 +26,8 @@
     "enabled": false
   },
   "vars": {
-    "CALL_IN_ORIGIN": "https://call-in.mashbean.net"
+    "CALL_IN_ORIGIN": "https://call-in.mashbean.net",
+    "POCKET_POLIS_ORIGIN": "https://polis.mashbean.net"
   },
   "env": {
     "production": {
@@ -40,7 +41,8 @@
         ]
       },
       "vars": {
-        "CALL_IN_ORIGIN": "https://call-in.mashbean.net"
+        "CALL_IN_ORIGIN": "https://call-in.mashbean.net",
+        "POCKET_POLIS_ORIGIN": "https://polis.mashbean.net"
       },
       "routes": [
         {

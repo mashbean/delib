@@ -48,6 +48,20 @@
       "nextAction": "把 Delib bundle 轉成可驗證的分析 job，發布前保留人工關卡。"
     },
     {
+      "toolId": "pocket-polis",
+      "route": "direct",
+      "label": "本站代建＋Cloudflare 一鍵部署",
+      "summary": "MIT 的單一 Cloudflare Worker + Durable Objects SQLite 服務；Delib 現在可免登入代建，也可部署自己的 instance。",
+      "source": { "url": "https://github.com/mashbean/pocket-polis", "license": "MIT", "reusable": true },
+      "embed": "direct-create-and-links",
+      "cloudflareNative": true,
+      "nextAction": "把去識別 CSV 轉成 delib-bundle，保留來源、同意範圍與人工解讀欄位。",
+      "evidence": [
+        "https://polis.mashbean.net/",
+        "https://github.com/mashbean/pocket-polis/blob/main/AGENT.md"
+      ]
+    },
+    {
       "toolId": "polis",
       "route": "shared-host",
       "label": "共用託管最實際",
@@ -55,7 +69,7 @@
       "source": { "url": "https://github.com/compdemocracy/polis", "license": "AGPL-3.0", "reusable": true },
       "embed": "implemented",
       "cloudflareNative": false,
-      "nextAction": "以最新 upstream edge 架設 polis.mashbean.net，共用一套服務；Cloudflare 只負責 DNS、TLS 與防護。",
+      "nextAction": "若仍需要官方 Pol.is 完整能力，另選 VM／container host 架設最新 upstream；不要把 Pocket Polis 誤標成官方 self-host。",
       "evidence": ["https://github.com/PDIS/polis2023", "https://polis.tw/"]
     },
     {

@@ -23,6 +23,11 @@ projects, but does not imply endorsement by their maintainers.
   surface over HTTPS. Pol.is is an independent AGPL-3.0 project; its code is
   not copied into this repository and its service policies apply inside the
   embedded frame.
+- The managed Pocket Polis activation calls
+  [polis.mashbean.net](https://polis.mashbean.net/), a separate MIT-licensed
+  Cloudflare Worker project. It is a lightweight reimplementation, not the
+  official Pol.is service or codebase. Delib does not persist its conversation
+  data or fragment-held admin token.
 - The managed Call-in activation calls the separately deployed
   [Call-in](https://github.com/mashbean/call-in) hosted creator. Call-in is
   Apache-2.0 licensed and keeps its own seven-day event lifecycle.

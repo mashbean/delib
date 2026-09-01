@@ -41,6 +41,8 @@ const RESULT_TITLES = {
   followup: "審議結束，loop 才正要開始。",
 };
 
+const POCKET_POLIS_STORAGE_KEY = "delib:pocket-polis-instance";
+
 let tools = [];
 let integrations = new Map();
 let hosting = new Map();
@@ -103,6 +105,7 @@ async function init() {
   apiKeyInput.value = sessionStorage.getItem("delib:openai-key") || "";
   harmonicaKeyInput.value = sessionStorage.getItem("delib:harmonica-key") || "";
   restoreCallInInstance();
+  restorePocketPolisInstance();
   restoreReceiptHandoff();
   const state = stateFromSearch(location.search);
   if (state) renderResult(state, false);
@@ -171,6 +174,7 @@ function bindEvents() {
   });
   document.querySelector("#run-agent").addEventListener("click", runAgent);
   document.querySelector("#call-in-form").addEventListener("submit", createCallIn);
+  document.querySelector("#pocket-polis-form").addEventListener("submit", createPocketPolis);
   document.querySelector("#polis-form").addEventListener("submit", preparePolis);
   document.querySelector("#agora-form").addEventListener("submit", prepareAgora);
   document.querySelector("#heyform-form").addEventListener("submit", prepareHeyForm);
@@ -205,6 +209,13 @@ function bindEvents() {
       "請幫我連接 Delib 與 Pol.is：先開啟 Pol.is 的帳號整合頁；若需要登入就停下來讓我操作。登入後找出帳號自動產生的 Site ID，再讓我選擇貼進 Delib，或設成 Cloudflare Worker 的 POLIS_SITE_ID。不要讀取、保存或回傳我的密碼與 session cookie。",
       document.querySelector("#polis-status"),
       "Agent 連接指令已複製；請貼到支援瀏覽器操作的 Agent。",
+    ),
+  );
+  document.querySelector("#copy-pocket-polis-agent").addEventListener("click", () =>
+    copyText(
+      "請先閱讀 https://github.com/mashbean/pocket-polis/blob/main/AGENT.md，協助我設計一輪 Pocket Polis 口袋審議。請問清楚主題、參與者、後續回覆責任與資料公開範圍，草擬 5–15 句彼此不重複、每句只有一個觀點的起始陳述；建立前列出標題、說明、陳述、投稿審核與 openData 設定讓我確認。只有我確認後，才能在我擁有的 https://polis.mashbean.net 建立；私人 admin URL 只回傳給我，不要貼到公開文件或 log。也可以用 npx --yes github:mashbean/pocket-polis install-skill 安裝 skill。",
+      document.querySelector("#pocket-polis-status"),
+      "Pocket Polis Agent 提示已複製；建立外部活動前仍會請你確認。",
     ),
   );
   document.querySelectorAll('input[name="polis-mode"]').forEach((input) => {
@@ -430,6 +441,9 @@ function launchTool(toolId) {
     }
     if (toolId === "polis" && !document.querySelector("#polis-title").value) {
       document.querySelector("#polis-title").value = suggestedTitle;
+    }
+    if (toolId === "pocket-polis" && !document.querySelector("#pocket-polis-title").value) {
+      document.querySelector("#pocket-polis-title").value = suggestedTitle;
     }
     if (toolId === "talk-to-the-city" && !document.querySelector("#tttc-title").value) {
       document.querySelector("#tttc-title").value = suggestedTitle;
@@ -661,6 +675,95 @@ function renderCallInInstance(data) {
   );
   document.querySelector("#call-in-expiry").textContent = `預計保留到 ${expires}。`;
   document.querySelector("#call-in-result").hidden = false;
+}
+
+async function createPocketPolis(event) {
+  event.preventDefault();
+  const status = document.querySelector("#pocket-polis-status");
+  const confirm = document.querySelector("#pocket-polis-confirm");
+  if (!confirm.checked) {
+    status.textContent = "先確認起始陳述、審核方式、公開範圍與主辦者責任。";
+    confirm.focus();
+    return;
+  }
+
+  const seedStatements = document
+    .querySelector("#pocket-polis-seeds")
+    .value.split(/\r?\n/)
+    .map((statement) => statement.trim())
+    .filter(Boolean);
+  const button = document.querySelector("#create-pocket-polis");
+  button.disabled = true;
+  status.textContent = "正在建立口袋審議與三種連結…";
+  try {
+    const data = await postJson("/api/integrations/pocket-polis", {
+      title: document.querySelector("#pocket-polis-title").value.trim(),
+      description: document.querySelector("#pocket-polis-description").value.trim(),
+      seedStatements,
+      autoApprove: document.querySelector("#pocket-polis-auto-approve").checked,
+      allowSubmissions: document.querySelector("#pocket-polis-allow-submissions").checked,
+      openData: document.querySelector("#pocket-polis-open-data").checked,
+      confirmed: true,
+    });
+    sessionStorage.setItem(POCKET_POLIS_STORAGE_KEY, JSON.stringify(data));
+    renderPocketPolisInstance(data);
+    status.textContent = "活動已建立；請先測試參與頁，並把私人管理連結交給真正的主辦者。";
+  } catch (error) {
+    status.textContent = error instanceof Error ? error.message : "Pocket Polis 暫時沒有完成建立。";
+  } finally {
+    button.disabled = false;
+  }
+}
+
+function restorePocketPolisInstance() {
+  const saved = sessionStorage.getItem(POCKET_POLIS_STORAGE_KEY);
+  if (!saved) return;
+  try {
+    renderPocketPolisInstance(JSON.parse(saved));
+    document.querySelector("#pocket-polis-status").textContent = "已復原這個分頁剛建立的三種連結。";
+  } catch {
+    sessionStorage.removeItem(POCKET_POLIS_STORAGE_KEY);
+  }
+}
+
+function renderPocketPolisInstance(data) {
+  const serviceOrigin = validateServiceOrigin(data.serviceOrigin);
+  const participateUrl = validatePocketPolisUrl(data.participateUrl, "c", false, serviceOrigin);
+  const reportUrl = validatePocketPolisUrl(data.reportUrl, "r", false, serviceOrigin);
+  const adminUrl = validatePocketPolisUrl(data.adminUrl, "a", true, serviceOrigin);
+  if (!participateUrl || !reportUrl || !adminUrl) throw new Error("Pocket Polis 連結格式不完整");
+  document.querySelector("#pocket-polis-participate").href = participateUrl;
+  document.querySelector("#pocket-polis-report").href = reportUrl;
+  document.querySelector("#pocket-polis-admin").href = adminUrl;
+  document.querySelector("#pocket-polis-result").hidden = false;
+}
+
+function validateServiceOrigin(value) {
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === "https:" && !parsed.username && !parsed.password && parsed.pathname === "/" && !parsed.search && !parsed.hash
+      ? parsed.origin
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+function validatePocketPolisUrl(value, route, requiresToken, serviceOrigin) {
+  if (!serviceOrigin) return null;
+  try {
+    const parsed = new URL(value);
+    if (parsed.origin !== serviceOrigin || parsed.search) return null;
+    if (!new RegExp(`^/${route}/[a-z0-9]{10}$`).test(parsed.pathname)) return null;
+    if (requiresToken) {
+      if (!/^#token=[a-f0-9]{32}$/i.test(parsed.hash)) return null;
+    } else if (parsed.hash) {
+      return null;
+    }
+    return parsed.toString();
+  } catch {
+    return null;
+  }
 }
 
 function updatePolisMode() {

@@ -12,6 +12,7 @@ human-readable result + offline gears + care checks
         ↓                              ↓ explicit preview + confirmation
 share URL / JSON / Markdown       direct activation adapters
                                   ├─ Call-in managed creator
+                                  ├─ Pocket Polis managed creator
                                   ├─ Pol.is connected workspace
                                   ├─ Agora public-conversation workspace
                                   ├─ HeyForm published-form workspace
@@ -41,6 +42,12 @@ human gate is mandatory.
 - `POST /api/integrations/call-in` validates a small public-deck request,
   forwards it to the hosted Call-in creator, filters the response and returns
   public and private capability links. Delib does not persist the event.
+- `POST /api/integrations/pocket-polis` validates a confirmed title,
+  description, 5–15 unique seed statements and moderation/data booleans before
+  forwarding one create request to `polis.mashbean.net`. It rebuilds the three
+  returned URLs from a validated conversation ID and admin token. Public
+  participation and report URLs are separated from the fragment-held private
+  admin URL; Delib stores none of them server-side.
 - `POST /api/integrations/polis` validates an existing conversation or a
   public Site ID integration and returns a same-site workspace URL. Loading the
   Site ID workspace is the external write, so it remains a separate click.
@@ -82,6 +89,9 @@ human gate is mandatory.
   its existing preview, validation and explicit-confirmation gate.
 - Private Call-in links stay in tab-scoped `sessionStorage` and never enter a
   plan URL or exported public receipt.
+- The private Pocket Polis admin URL follows the same tab-scoped rule. The
+  participant and report links are public capabilities; the admin fragment is
+  never written to Delib logs, plan URLs or exports.
 
 The remaining tools stay read-only recommendations until the credential,
 retention, export and end-to-end creation paths have been verified. An embedded

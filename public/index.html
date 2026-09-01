@@ -237,6 +237,81 @@
               <a class="self-host-link" href="https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/call-in" target="_blank" rel="noreferrer">需要自己的保存政策？免費部署獨立 Call-in ↗</a>
             </article>
 
+            <article id="launch-pocket-polis" class="launch-card">
+              <div class="launch-card-heading">
+                <span class="launch-icon" aria-hidden="true">🫧</span>
+                <div>
+                  <span class="flow-tag">現在可用 · 免登入直接建立</span>
+                  <h3>建立 Pocket Polis 口袋審議</h3>
+                </div>
+              </div>
+              <p>直接在 <strong>polis.mashbean.net</strong> 建立一輪陳述、投票與群組分析；不必先申請帳號或 Site ID。</p>
+
+              <form id="pocket-polis-form" class="launch-form">
+                <label for="pocket-polis-title">這輪審議的名稱</label>
+                <input id="pocket-polis-title" maxlength="120" required placeholder="例如：我們想要怎樣的社區公園？" />
+                <label for="pocket-polis-description">給參與者看的說明（選填）</label>
+                <textarea id="pocket-polis-description" rows="3" maxlength="2000" placeholder="這一輪要理解的問題、主辦者與後續回覆方式"></textarea>
+                <label for="pocket-polis-seeds">起始陳述（一行一句，5–15 句）</label>
+                <textarea id="pocket-polis-seeds" rows="9" maxlength="4215" required placeholder="公園應優先增加夜間照明。&#10;應保留更多安靜、不安排活動的草地。&#10;兒童遊具比新增停車位更重要。&#10;預算應先改善無障礙動線。&#10;規劃完成前應再辦一次居民討論。"></textarea>
+                <p class="field-note">每句最多 280 字、只表達一個可同意或不同意的觀點。不要放姓名、聯絡方式或未公開個資。</p>
+                <details class="advanced-fields">
+                  <summary>投稿、審核與開放資料</summary>
+                  <label class="consent-row">
+                    <input id="pocket-polis-auto-approve" type="checkbox" />
+                    <span>新陳述免審核直接公開（預設關閉，較適合先由主辦者審題）</span>
+                  </label>
+                  <label class="consent-row">
+                    <input id="pocket-polis-allow-submissions" type="checkbox" checked />
+                    <span>允許參與者提出新陳述</span>
+                  </label>
+                  <label class="consent-row">
+                    <input id="pocket-polis-open-data" type="checkbox" />
+                    <span>開放去識別 CSV 下載（只有確定可公開時才開啟）</span>
+                  </label>
+                </details>
+                <div class="inline-actions">
+                  <button id="copy-pocket-polis-agent" class="text-button" type="button">讓 Agent 幫我準備</button>
+                  <a href="https://github.com/mashbean/pocket-polis/blob/main/AGENT.md" target="_blank" rel="noreferrer">Agent 操作說明 ↗</a>
+                </div>
+                <div class="write-preview">
+                  <strong>按下建立後會發生：</strong>
+                  <ul>
+                    <li>Pocket Polis 會立即建立活動並回傳參與、成果與私人管理連結；</li>
+                    <li>Delib 不保存活動內容、投票、陳述或管理 token；</li>
+                    <li>私人管理連結只暫存在這個分頁，請交給真正的主辦者保管。</li>
+                  </ul>
+                </div>
+                <label class="consent-row">
+                  <input id="pocket-polis-confirm" type="checkbox" />
+                  <span>我已檢查起始陳述、投稿審核與資料公開範圍，也會說明主辦者和後續回覆方式。</span>
+                </label>
+                <button class="button button-primary" id="create-pocket-polis" type="submit">建立 Pocket Polis 活動</button>
+                <p id="pocket-polis-status" class="action-status" role="status"></p>
+              </form>
+              <section id="pocket-polis-result" class="instance-result" hidden aria-live="polite">
+                <span class="success-mark" aria-hidden="true">✓</span>
+                <h4>口袋審議已經開好了</h4>
+                <p>先用公開連結測試，再分享給參與者；管理連結不要公開。</p>
+                <div class="public-links">
+                  <strong>可以分享</strong>
+                  <a id="pocket-polis-participate" class="button button-primary" target="_blank" rel="noreferrer">打開參與頁 ↗</a>
+                  <a id="pocket-polis-report" class="button button-ghost" target="_blank" rel="noreferrer">打開成果頁 ↗</a>
+                </div>
+                <details class="private-links">
+                  <summary>私人管理連結</summary>
+                  <p>網址 # 後方含管理 token，只交給真正的主辦者。Delib 只暫存在目前分頁。</p>
+                  <a id="pocket-polis-admin" target="_blank" rel="noreferrer">管理活動 ↗</a>
+                </details>
+              </section>
+              <div class="resource-links">
+                <a href="https://polis.mashbean.net/" target="_blank" rel="noreferrer">直接使用 Pocket Polis ↗</a>
+                <a href="https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/pocket-polis" target="_blank" rel="noreferrer">部署自己的 Pocket Polis ↗</a>
+                <a href="https://github.com/mashbean/pocket-polis" target="_blank" rel="noreferrer">查看 MIT 原始碼 ↗</a>
+              </div>
+              <p class="boundary-note">Pocket Polis 是為 Cloudflare Workers／Durable Objects 重做的輕量 MIT 工具，不是官方 Pol.is。適合社群、課堂與工作坊；防分身能力較弱，不應單獨用於高對抗或具法定效力的投票。</p>
+            </article>
+
             <article id="launch-polis" class="launch-card">
               <div class="launch-card-heading">
                 <span class="launch-icon" aria-hidden="true">🧭</span>
@@ -245,7 +320,7 @@
                   <h3>在 Delib 開啟 Pol.is</h3>
                 </div>
               </div>
-              <p>已有對話就貼網址；要自動建立新對話，第一次需要 Pol.is 帳號裡的 Site ID。</p>
+              <p>已有官方 Pol.is 對話就貼網址；要建立官方對話，第一次需要 Pol.is 帳號裡的 Site ID。</p>
 
               <form id="polis-form" class="launch-form">
                 <fieldset class="mode-picker">
@@ -291,6 +366,7 @@
                 <p>連結只包含公開的對話代碼或 Site ID，沒有登入憑證。</p>
                 <a id="polis-workspace" class="button button-primary" target="_blank" rel="noreferrer">留在 Delib 開啟 ↗</a>
               </section>
+              <a class="self-host-link" href="#launch-pocket-polis">想免登入直接建立？改用 Pocket Polis ↑</a>
               <p class="boundary-note">Pol.is 完整自架需要多個 Docker 服務與 PostgreSQL；Cloudflare Containers 只有付費方案，也不會供應 PostgreSQL。本站的一鍵部署會連接既有 Site ID，而不是假裝重寫整套 Pol.is。</p>
             </article>
 
@@ -564,9 +640,9 @@
           </div>
 
           <div class="next-integrations">
-            <div><span>已串接</span><strong>七個站內入口</strong><p>Call-in 可代建；Power Ranker 可本機排序或短期自動彙整；Pol.is、Agora、Harmonica、HeyForm、TTTC 各自保留上游邊界。</p></div>
+            <div><span>已串接</span><strong>八個站內入口</strong><p>Call-in 與 Pocket Polis 可免登入代建；Power Ranker 可本機排序或短期自動彙整；官方 Pol.is、Agora、Harmonica、HeyForm、TTTC 各自保留上游邊界。</p></div>
             <div><span>原始碼盤點</span><strong>直接用、共用主機、元件三條路</strong><p>每張工具卡會直接說明是否能內嵌、取原始碼，以及為何不能只靠 Cloudflare 免費完成。</p></div>
-            <a href="/data/hosting.json">查看 27 項機器可讀盤點 →</a>
+            <a href="/data/hosting.json">查看 28 項機器可讀盤點 →</a>
           </div>
         </div>
       </section>
@@ -667,7 +743,7 @@
           <p class="section-kicker">工具目錄 · 最後查核 2026-09-01</p>
           <div class="tools-heading">
             <div>
-              <h2><span id="tool-count">27</span> 個工具，不是一張排名榜</h2>
+              <h2><span id="tool-count">28</span> 個工具，不是一張排名榜</h2>
               <p class="section-lede">先看它能接哪一段、輸出什麼、資料去哪裡，再決定要不要用。</p>
             </div>
             <label class="search-field">
@@ -687,7 +763,7 @@
           <p id="no-tools" class="empty-state" hidden>找不到符合的工具。換一個比較白話的關鍵字試試？</p>
           <p class="source-note">
             目錄以 <a href="https://metagov.org/delib-tools" target="_blank" rel="noreferrer">MetaGov Deliberative Tools Gallery</a>
-            為底，加入 Call-in、OpenBook、Uncommon Ground、HeyForm、Agora Citizen Network 與 Parti DemosX。列入目錄不代表通過安全或採購審查。
+            為底，加入 Call-in、Pocket Polis、OpenBook、Uncommon Ground、HeyForm、Agora Citizen Network 與 Parti DemosX。列入目錄不代表通過安全或採購審查。
           </p>
         </div>
       </section>
