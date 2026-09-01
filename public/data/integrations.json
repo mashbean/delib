@@ -54,7 +54,7 @@
         "portableSchema": "/schemas/delib-pocket-polis/v1.json",
         "outputs": ["delib-pocket-polis/v1 JSON", "Talk to the City CSV", "Agora Pol.is summary/comments/votes CSV", "delib-pocket-polis-receipt/v1 public receipt"],
         "storage": "browser-memory-only",
-        "humanGate": "下載前確認參與資料用途、權限與保存方式。公開收據另要求至少 3 位參與者、每句入選陳述至少 3 份回應，並由主辦者逐句確認自由文字與補上解讀、缺席聲音、權責和下一步。"
+        "humanGate": "下載前確認參與資料用途、權限與保存方式。公開收據另要求至少 3 位實際投票者、每句入選陳述至少 3 份回應，並由主辦者逐句確認自由文字與補上解讀、缺席聲音、權責和下一步。"
       },
       "receiptEndpoint": "/results/pocket-polis.html",
       "receiptSchema": "/schemas/delib-pocket-polis-receipt/v1.json",

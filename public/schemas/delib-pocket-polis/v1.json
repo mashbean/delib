@@ -49,7 +49,7 @@
         "approvedStatements": { "type": "integer", "minimum": 0 },
         "seedStatements": { "type": "integer", "minimum": 0 },
         "participantSubmittedStatements": { "type": "integer", "minimum": 0 },
-        "participants": { "type": "integer", "minimum": 0 },
+        "participants": { "type": "integer", "minimum": 0, "description": "Unique pseudonymous participants with at least one vote in votes.csv; this can be lower than the conversation's opened-session count." },
         "votes": { "type": "integer", "minimum": 0 },
         "coverage": { "type": "number", "minimum": 0, "maximum": 1 }
       }

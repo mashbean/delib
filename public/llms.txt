@@ -41,7 +41,7 @@ Pocket Polis CSVs remain in browser memory. Their pseudonymous participant IDs
 can still link votes within one conversation, and participant-authored text may
 contain self-disclosed identifiers, so the resulting files are declared as
 participant data and require a separate download confirmation.
-Pocket Polis public receipts require at least three participants and three
+Pocket Polis public receipts require at least three participants with a vote and three
 responses for every one of the one-to-eight organizer-selected statements.
 They contain statement text and aggregate agree/disagree/pass counts, but no
 pseudonymous participant IDs, raw vote rows, original-file hashes or admin

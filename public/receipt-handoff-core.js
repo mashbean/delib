@@ -170,12 +170,13 @@ function buildDraft(sourceReceipt, target) {
     };
   }
   if (target === "talk-to-the-city") {
+    const missingVoices = sentenceText(organizer.missingVoices);
     return {
       title: limitLine(`${title}：下一輪文字意見`, 120),
       description: limitText(
         tool === "pocket-polis"
-          ? `延續前一輪口袋審議，這次要補充理解：${organizer.missingVoices}。請回資料工作台下載已核准意見 CSV；公開成果收據不是 Talk to the City 的分析資料。`
-          : `延續前一輪排序，這次要補充理解：${organizer.missingVoices}。請只上傳已去識別的原始文字意見；排序成果收據不是 Talk to the City 的分析資料。`,
+          ? `延續前一輪口袋審議，這次要補充理解：${missingVoices}請回資料工作台下載已核准意見 CSV；公開成果收據不是 Talk to the City 的分析資料。`
+          : `延續前一輪排序，這次要補充理解：${missingVoices}請只上傳已去識別的原始文字意見；排序成果收據不是 Talk to the City 的分析資料。`,
         500,
       ),
     };
@@ -247,6 +248,11 @@ function limitText(value, max) {
     .replace(/\n{3,}/g, "\n\n")
     .slice(0, max)
     .trim();
+}
+
+function sentenceText(value) {
+  const text = String(value).trim();
+  return /[。！？.!?…]$/.test(text) ? text : `${text}。`;
 }
 
 function cleanLine(value, max) {

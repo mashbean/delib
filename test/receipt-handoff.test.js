@@ -95,6 +95,7 @@ describe("result receipt handoff", () => {
     const handoff = createReceiptHandoff({ receipt, target: "talk-to-the-city" });
     expect(handoff.draft.description).toContain("已去識別的原始文字意見");
     expect(handoff.draft.description).toContain("不是 Talk to the City 的分析資料");
+    expect(handoff.draft.description).not.toContain("。。");
     expect(handoff.draft).not.toHaveProperty("csv");
   });
 

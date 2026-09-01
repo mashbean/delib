@@ -61,7 +61,7 @@ human gate is mandatory.
   card; the TTTC adapter keeps approved statement text only; the Agora adapter
   emits summary, comments and votes CSVs while explicitly marking missing
   author linkage. No admin token is accepted or restored.
-- If both Pocket Polis exports agree, at least three participants appear, and
+- If both Pocket Polis exports agree, at least three participants with a vote appear, and
   an approved statement has at least three responses, the organizer may select
   one to eight such statements for a `delib-pocket-polis-receipt/v1` result.
   The organizer must also state interpretation, missing voices, decision

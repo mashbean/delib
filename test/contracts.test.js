@@ -103,6 +103,7 @@ describe("public contracts", () => {
       await readFile(new URL("public/schemas/delib-pocket-polis/v1.json", root), "utf8"),
     );
     expect(schema.$id).toBe("https://delib.mashbean.net/schemas/delib-pocket-polis/v1.json");
+    expect(schema.properties.summary.properties.participants.description).toContain("at least one vote");
     expect(schema.properties.source.properties.persistedByDelib.const).toBe(false);
     expect(schema.properties.dataCard.properties.containsParticipantData.const).toBe(true);
     expect(schema.properties.dataCard.properties.containsParticipantFreeText.const).toBe(true);
@@ -118,6 +119,7 @@ describe("public contracts", () => {
       "https://delib.mashbean.net/schemas/delib-pocket-polis-receipt/v1.json",
     );
     expect(schema.properties.scope.properties.participants.minimum).toBe(3);
+    expect(schema.properties.scope.properties.participants.description).toContain("at least one vote");
     expect(schema.properties.findings.maxItems).toBe(8);
     expect(schema.properties.dataCard.properties.containsParticipantRecords.const).toBe(false);
     expect(schema.properties.dataCard.properties.containsParticipantFreeText.const).toBe(true);
@@ -143,8 +145,15 @@ describe("public contracts", () => {
       "utf8",
     );
     const renderer = await readFile(new URL("public/results/pocket-polis.js", root), "utf8");
+    const builderScript = await readFile(
+      new URL("public/integrations/pocket-polis-data.js", root),
+      "utf8",
+    );
+    const receiptPage = await readFile(new URL("public/results/pocket-polis.html", root), "utf8");
     expect(builder).toContain('id="pocket-polis-receipt-form"');
     expect(builder).toContain("選 1–8 句");
+    expect(builderScript).toContain("匿名投票者");
+    expect(receiptPage).toContain("匿名投票者");
     expect(renderer).toContain("pocketPolisReceiptFromHash(location.hash)");
     expect(renderer).not.toContain("location.search");
     expect(renderer).not.toContain("adminUrl");

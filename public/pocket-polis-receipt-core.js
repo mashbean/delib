@@ -23,7 +23,7 @@ export function createPocketPolisReceipt({ bundle, selectedStatementIds, organiz
   if (!source) throw new Error("需要一份有效的 Pocket Polis 本機資料包");
   if (!source.consistency.countMatches) throw new Error("兩份 CSV 的票數不一致，請重新下載後再準備公開成果");
   if (source.summary.participants < MIN_PUBLIC_RESPONSES) {
-    throw new Error("公開成果頁至少需要 3 位匿名參與者");
+    throw new Error("公開成果頁至少需要 3 位匿名投票者");
   }
 
   const ids = normalizeSelectedIds(selectedStatementIds);
@@ -133,7 +133,7 @@ export function pocketPolisReceiptToMarkdown(value) {
   return `# ${escapeMarkdown(receipt.source.title)}\n\n` +
     `> Pocket Polis 成果收據 · ${formatDate(receipt.preparedAt)}\n\n` +
     `## 回應概況\n\n${findings}\n\n` +
-    `- 匿名參與者：${receipt.scope.participants}\n` +
+    `- 匿名投票者：${receipt.scope.participants}\n` +
     `- 逐筆投票：${receipt.scope.totalVotes}\n` +
     `- 已核准陳述：${receipt.scope.approvedStatements}\n` +
     `- 已核准陳述投票涵蓋率：${Math.round(receipt.scope.coverage * 100)}%\n\n` +

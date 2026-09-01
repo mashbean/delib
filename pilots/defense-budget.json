@@ -1,0 +1,16 @@
+{
+  "reportUrl": "https://polis.mashbean.net/r/3ovoxq5c6o",
+  "expectedTitle": "【模擬】國防軍購特別預算公投",
+  "delibOrigin": "https://delib.mashbean.net",
+  "selectedStatementIds": [11, 9, 21, 17, 22, 2, 12, 24],
+  "organizer": {
+    "interpretation": "這份全部虛構的樣本呈現兩個主要意見群；跨群較一致支持全民防衛韌性、獨立審計、公開採購清單、分期審查與役期／教召成效評估。以舉債支應軍購、兩岸對話和政黨責任的陳述則呈現明顯分歧。這只能證明模擬資料與少量訪客回應形成上述結構，不能推論台灣民意。",
+    "missingVoices": "沒有用全國代表性抽樣招募，也不代表真實選民、立委或政黨。軍人與眷屬、退伍軍人、青年役男、社福與教育工作者、原住民族與偏鄉居民、不同性別與身障者、財政／採購／國防專家及各種國際安全觀點都未被有系統納入；具體採購清單、財政排擠與機密資料也不足。",
+    "decisionStatus": "listening",
+    "authority": "Delib × Pocket Polis 合成 pilot 主辦者",
+    "responsibleActor": "Delib pilot 維護者（模擬）",
+    "responseBy": "2026-09-08",
+    "nextAction": "用這份合成資料完成資料轉換、公開收據與四種下一步交接；再邀請 3–5 位審議工作者檢查是否看得懂資料邊界、缺席聲音與回覆責任，通過後才考慮真實議題 pilot。",
+    "evidenceUrl": "https://polis.mashbean.net/r/3ovoxq5c6o"
+  }
+}

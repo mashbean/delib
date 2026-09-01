@@ -29,7 +29,7 @@
       "additionalProperties": false,
       "required": ["participants", "approvedStatements", "totalVotes", "coverage", "includedStatements"],
       "properties": {
-        "participants": { "type": "integer", "minimum": 3 },
+        "participants": { "type": "integer", "minimum": 3, "description": "Unique pseudonymous voters with at least one vote in the source CSV." },
         "approvedStatements": { "type": "integer", "minimum": 1 },
         "totalVotes": { "type": "integer", "minimum": 1 },
         "coverage": { "type": "number", "minimum": 0, "maximum": 1 },

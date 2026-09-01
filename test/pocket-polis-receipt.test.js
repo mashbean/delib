@@ -144,4 +144,11 @@ describe("Pocket Polis result receipt", () => {
       expect(serialized).not.toContain('"participant"');
     },
   );
+
+  it("keeps Pocket Polis TTTC handoff punctuation readable", () => {
+    const receipt = createPocketPolisReceipt({ bundle: bundleFixture(), selectedStatementIds: [1, 2], organizer });
+    const handoff = createReceiptHandoff({ receipt, target: "talk-to-the-city" });
+    expect(handoff.draft.description).toContain("請回資料工作台下載已核准意見 CSV");
+    expect(handoff.draft.description).not.toContain("。。");
+  });
 });

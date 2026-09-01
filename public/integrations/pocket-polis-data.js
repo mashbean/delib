@@ -121,7 +121,7 @@ function renderResult(bundle) {
   consistency.className = bundle.consistency.countMatches ? "data-check-ok" : "data-check-warning";
 
   const metrics = [
-    [bundle.summary.participants, "匿名參與者"],
+    [bundle.summary.participants, "匿名投票者"],
     [bundle.summary.approvedStatements, `已核准意見／共 ${bundle.summary.statements} 句`],
     [bundle.summary.votes, "逐筆投票"],
     [`${Math.round(bundle.summary.coverage * 100)}%`, "已核准意見投票涵蓋率"],
@@ -185,7 +185,7 @@ function setReceiptSource(bundle) {
   const heading = document.createElement("strong");
   const copy = document.createElement("span");
   heading.textContent = `Pocket Polis · ${bundle.source.title}`;
-  copy.textContent = `${bundle.summary.participants} 位匿名參與者、${bundle.summary.votes} 筆投票；${receiptCandidates.length} 句已核准陳述達到 3 份公開門檻。`;
+  copy.textContent = `${bundle.summary.participants} 位匿名投票者、${bundle.summary.votes} 筆投票；${receiptCandidates.length} 句已核准陳述達到 3 份公開門檻。`;
   summary.replaceChildren(heading, copy);
   document.querySelector("#pocket-polis-receipt-result").hidden = true;
   document.querySelector("#pocket-receipt-confirm").checked = false;
@@ -193,7 +193,7 @@ function setReceiptSource(bundle) {
   const blocker = !bundle.consistency.countMatches
     ? "兩份 CSV 的票數不一致；請重新下載後再準備公開成果。"
     : bundle.summary.participants < 3
-      ? "公開成果頁至少需要 3 位匿名參與者。你仍可下載本機資料，但不應公開逐句票數。"
+      ? "公開成果頁至少需要 3 位匿名投票者。你仍可下載本機資料，但不應公開逐句票數。"
       : receiptCandidates.length === 0
         ? "目前沒有已核准且至少有 3 份回應的陳述。"
         : "";

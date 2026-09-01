@@ -46,7 +46,7 @@ pair counts 與隨機 session ID 的 SHA-256 雜湊。逐份原始判斷不落�
 24 小時或 7 天後以 Durable Object alarm 全部清除，也可由私人管理連結提前刪除。
 所有排序檔仍明確標示為參與資料，不沿用「不含參與資料」的流程規劃 schema。
 Power Ranker 成果收據只接受至少三份不重複 session 的去連結化群體彙整。
-Pocket Polis 收據也要求至少三位參與者，每句公開陳述至少三份回應，且最多由
+Pocket Polis 收據也要求至少三位實際投票者，每句公開陳述至少三份回應，且最多由
 主辦者人工挑選八句；它不含參與者代號、逐筆投票、原始檔雜湊或管理 token。
 兩種公開資料都編碼在網址 fragment，瀏覽器載入頁面時不會把它送給 Worker。
 Delib 不另存收據，但拿到完整連結的人可以閱讀與再次分享，因此產生前仍需人工確認。
@@ -124,6 +124,10 @@ OpenAI 官方目前建議文字生成使用
   匿名代碼、逐筆投票、檔案雜湊或管理 token；主辦者還須逐句確認自由文字適合公開。
   收據可再準備同一分頁、兩小時、讀取一次的 Call-in、Harmonica、TTTC 或 Pol.is
   下一步草稿，但不會把陳述原文或統計帶入目的工具。
+  Repo 另提供可重跑的虛構軍購案例 pilot：`npm run pilot:pocket-polis` 會從
+  公開 open-data 端點取得原始 CSV，驗證後一次產生可攜 JSON、TTTC／Agora
+  匯入包、成果收據、四種 handoff 與測試報告；它不讀取私人管理 token，也不把
+  產生匯入檔誤稱為已在上游服務完成匯入。案例設定見 [`pilots/defense-budget.json`](pilots/defense-budget.json)。
   主辦者也可把 MIT 原始碼一鍵部署到自己的 Cloudflare。
   它是輕量重做、不是官方 Pol.is；防分身能力較弱，不適合單獨用於高對抗投票。
 - **Pol.is**：已有對話可直接嵌入。建立模式使用公開的 Site ID 與

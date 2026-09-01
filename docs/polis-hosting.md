@@ -89,7 +89,7 @@ succeeded; that remains a separate upstream-account and preview check.
 The same local workbench can turn a validated aggregate into a public
 `delib-pocket-polis-receipt/v1` result without uploading the two CSV files to
 Delib. Publication is blocked unless both exports agree, at least three
-participants appear, and every selected approved statement has at least three
+participants with a vote appear, and every selected approved statement has at least three
 responses. The organizer may select one to eight statements and must review
 their text, then add a separate interpretation, missing voices, decision
 status and authority, responsible actor, response date and next action.
@@ -108,6 +108,15 @@ accountability fields but no statement text or counts. It remains in the same
 tab's `sessionStorage`, expires after two hours and is deleted on first read;
 the destination still requires its normal validation and confirmation before
 any external write.
+
+The repository's `npm run pilot:pocket-polis` command makes this route
+reproducible against the fictional defense-budget demo. It reads only the
+public conversation, result and open-data CSV endpoints, then produces the
+participant-aware bundle, TTTC and Agora files, result receipt and all four
+handoff drafts. It stops rather than requesting a private token when open data
+is disabled. The pilot distinguishes opened participant sessions from unique
+people with a vote because only the latter appear in `votes.csv` and the result
+receipt.
 
 ## The official Pol.is one-click gate
 
