@@ -143,7 +143,7 @@ export default {
     }
 
     const publicReceiptMatch = url.pathname.match(/^\/r\/([a-f0-9]{16})$/);
-    if (publicReceiptMatch && request.method === "GET") {
+    if (publicReceiptMatch && (request.method === "GET" || request.method === "HEAD")) {
       const receiptStub = env.PUBLIC_RECEIPTS.getByName(publicReceiptMatch[1]);
       const record = await receiptStub.getReceipt();
       if (record.status !== "ready") return publicReceiptResult(record);
