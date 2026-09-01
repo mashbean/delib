@@ -14,6 +14,10 @@ share URL / JSON / Markdown       direct activation adapters
                                   ├─ Call-in managed creator
                                   ├─ Pocket Polis managed creator
                                   │          └─ browser-only CSV validation + TTTC / Agora / JSON handoff
+                                  │                         ↓ organizer review + privacy threshold
+                                  │                  fragment-only result receipt
+                                  │                         ↓ preview + one-time local draft
+                                  │          Call-in / Harmonica / TTTC / Pol.is next-step form
                                   ├─ Pol.is connected workspace
                                   ├─ Agora public-conversation workspace
                                   ├─ HeyForm published-form workspace
@@ -57,6 +61,16 @@ human gate is mandatory.
   card; the TTTC adapter keeps approved statement text only; the Agora adapter
   emits summary, comments and votes CSVs while explicitly marking missing
   author linkage. No admin token is accepted or restored.
+- If both Pocket Polis exports agree, at least three participants appear, and
+  an approved statement has at least three responses, the organizer may select
+  one to eight such statements for a `delib-pocket-polis-receipt/v1` result.
+  The organizer must also state interpretation, missing voices, decision
+  status and authority, response owner, response date and next action, and
+  explicitly confirm that participant-authored text is suitable for public
+  release. The receipt keeps selected statement text and aggregate
+  agree/disagree/pass counts, but strips pseudonymous participant IDs, raw
+  votes, original-file hashes and admin tokens. The public
+  `/results/pocket-polis.html` page reads it after `#`; Delib does not store it.
 - `POST /api/integrations/polis` validates an existing conversation or a
   public Site ID integration and returns a same-site workspace URL. Loading the
   Site ID workspace is the external write, so it remains a separate click.
@@ -90,9 +104,10 @@ human gate is mandatory.
   fields for interpretation, missing voices, decision authority, response
   owner and next action. The public `/results/power-ranker.html` page reads the
   receipt after `#`; the fragment is not sent to or stored by the Worker.
-- The result page can derive a `delib-handoff/v1` draft for Call-in,
+- Either result page can derive a `delib-handoff/v1` draft for Call-in,
   Harmonica, Talk to the City or Pol.is. The handoff excludes pair counts,
-  raw judgments, session IDs, receipt URLs, admin capabilities and credentials.
+  statement texts and counts, raw judgments and votes, session IDs,
+  participant pseudonyms, receipt URLs, admin capabilities and credentials.
   It is stored in same-tab `sessionStorage` for at most two hours, consumed on
   first load, and only pre-fills the destination form. Every destination keeps
   its existing preview, validation and explicit-confirmation gate.
@@ -110,7 +125,10 @@ upstream UI is labelled separately from a managed create API.
 
 The first local data adapter is now implemented for Pocket Polis. It deliberately
 keeps participant exports out of Worker storage and separate from the planning
-`delib-bundle/v1` schema. The larger cross-tool data plane remains planned:
+`delib-bundle/v1` schema. Its public receipt is a second, deliberately smaller
+contract: it publishes only thresholded, organizer-selected aggregate findings
+plus human-authored accountability fields, and uses a URL fragment rather than
+server storage. The larger cross-tool data plane remains planned:
 
 Future adapters should produce a versioned bundle:
 
@@ -144,10 +162,14 @@ marks pairwise judgments as participant data even when they contain no names.
 `delib-ranking-receipt/v1` accepts aggregates only, preserves that participant-
 data warning, excludes individual linkage, and adds explicitly human-authored
 interpretation and responsibility fields.
+`delib-pocket-polis-receipt/v1` applies the same layered result pattern to
+selected approved statements. It enforces participant and response thresholds,
+preserves the warning that public free text may self-identify, and excludes the
+pseudonymous vote linkage present in the participant-aware source bundle.
 `delib-handoff/v1` is smaller again: it carries only bounded organizer-authored
 summary fields needed for one named destination. It is not an export of the
-ranking receipt and cannot be treated as TTTC qualitative input or Pol.is seed
-statements.
+underlying receipt and cannot be treated as TTTC qualitative input or Pol.is
+seed statements.
 
 ## Adapter contract
 

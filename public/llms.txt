@@ -21,6 +21,8 @@ Direct actions currently implemented:
 - POST /api/integrations/pocket-polis — create a confirmed Pocket Polis conversation without an account and return separate public and fragment-held private links.
 - /integrations/pocket-polis-data.html — validate Pocket Polis statements.csv and votes.csv locally, then download a participant-aware JSON bundle, TTTC CSV or Agora summary/comments/votes CSVs. Files never leave browser memory.
 - /schemas/delib-pocket-polis/v1.json — machine-readable contract for the local Pocket Polis handoff.
+- /results/pocket-polis.html#receipt=… — render an organizer-reviewed Pocket Polis result receipt from selected thresholded statements and aggregate response counts. Receipt data stays in the URL fragment and is not stored by Delib.
+- /schemas/delib-pocket-polis-receipt/v1.json — machine-readable contract for the public Pocket Polis result receipt.
 - POST /api/integrations/polis — validate and prepare an embedded Pol.is workspace.
 - GET /api/integrations/polis/status — report whether this deployment has a connected Site ID.
 - POST /api/integrations/heyform — validate and prepare an existing public HeyForm workspace.
@@ -29,7 +31,7 @@ Direct actions currently implemented:
 - /integrations/power-ranker.html — run local pairwise ranking or join a short-lived aggregate room; no account or API key.
 - /results/power-ranker.html#receipt=… — render a de-linked aggregate result receipt with organizer interpretation, missing voices, decision status and next responsibility. Receipt data stays in the URL fragment and is not stored by Delib.
 - /schemas/delib-ranking-receipt/v1.json — machine-readable contract for a layered Power Ranker result receipt.
-- /schemas/delib-handoff/v1.json — machine-readable contract for a two-hour, one-time, same-tab next-step draft.
+- /schemas/delib-handoff/v1.json — machine-readable contract for a two-hour, one-time, same-tab next-step draft derived from a Power Ranker or Pocket Polis receipt.
 - POST /api/integrations/power-ranker/rooms — after human confirmation, create a 24-hour or seven-day SQLite Durable Object room.
 - GET/DELETE /api/integrations/power-ranker/rooms/:id — read thresholded aggregates or delete with a fragment-held admin token.
 - POST /api/integrations/power-ranker/rooms/:id/submissions — immediately reduce one browser session to pair counts; raw judgments are not stored.
@@ -39,6 +41,12 @@ Pocket Polis CSVs remain in browser memory. Their pseudonymous participant IDs
 can still link votes within one conversation, and participant-authored text may
 contain self-disclosed identifiers, so the resulting files are declared as
 participant data and require a separate download confirmation.
+Pocket Polis public receipts require at least three participants and three
+responses for every one of the one-to-eight organizer-selected statements.
+They contain statement text and aggregate agree/disagree/pass counts, but no
+pseudonymous participant IDs, raw vote rows, original-file hashes or admin
+token. Because participant-authored text can self-identify, publication also
+requires explicit statement-by-statement organizer review.
 HeyForm, TTTC and Harmonica participant data remain upstream; Harmonica
 credentials are forwarded once and never stored by Delib. Power Ranker local
 judgments and imported files stay in browser memory. Optional rooms store only
@@ -47,9 +55,10 @@ organizer deletion. Downloaded ranking files explicitly declare participant data
 Only an aggregate can become a public result receipt. Individual session IDs,
 raw judgments and room admin tokens are excluded; publication requires a human
 statement of authority, limitations and next action.
-From a valid receipt, the browser may prepare a minimized draft for Call-in,
+From either valid receipt, the browser may prepare a minimized draft for Call-in,
 Harmonica, TTTC or Pol.is. It carries no pair counts, raw judgments, session
-IDs, receipt URL, admin capability or credential. It is consumed once from
+IDs, selected statement text, statement counts, receipt URL, admin capability
+or credential. It is consumed once from
 same-tab sessionStorage and does not bypass the destination's normal human
 confirmation gate. TTTC still requires a separate de-identified qualitative
 CSV; Pol.is receives no seed statements.

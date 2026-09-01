@@ -1,4 +1,8 @@
 import { decisionStatusLabel, normalizeRankingReceipt } from "./ranking-receipt-core.js";
+import {
+  normalizePocketPolisReceipt,
+  pocketPolisDecisionStatusLabel,
+} from "./pocket-polis-receipt-core.js";
 
 export const RECEIPT_HANDOFF_SCHEMA =
   "https://delib.mashbean.net/schemas/delib-handoff/v1.json";
@@ -33,8 +37,8 @@ export const RECEIPT_HANDOFF_TARGETS = Object.freeze({
 });
 
 export function createReceiptHandoff({ receipt, target, createdAt }) {
-  const normalizedReceipt = normalizeRankingReceipt(receipt);
-  if (!normalizedReceipt) throw new Error("需要一份有效的成果收據");
+  const sourceReceipt = normalizeSourceReceipt(receipt);
+  if (!sourceReceipt) throw new Error("需要一份有效的成果收據");
   if (!Object.hasOwn(RECEIPT_HANDOFF_TARGETS, target)) {
     throw new Error("這個下一步工具尚未支援成果草稿");
   }
@@ -47,10 +51,10 @@ export function createReceiptHandoff({ receipt, target, createdAt }) {
     createdAt: created,
     expiresAt: new Date(Date.parse(created) + RECEIPT_HANDOFF_TTL_MS).toISOString(),
     source: {
-      tool: "power-ranker",
-      title: normalizedReceipt.question.title,
+      tool: sourceReceipt.tool,
+      title: sourceReceipt.title,
     },
-    draft: buildDraft(normalizedReceipt, target),
+    draft: buildDraft(sourceReceipt, target),
     dataCard: {
       containsParticipantDerivedSummary: true,
       containsParticipantRecords: false,
@@ -81,9 +85,12 @@ export function normalizeReceiptHandoff(value, { now = Date.now() } = {}) {
   const createdAt = validDateTime(value.createdAt);
   const expiresAt = validDateTime(value.expiresAt);
   const currentTime = validTime(now);
+  const sourceTool = value.source?.tool === "power-ranker" || value.source?.tool === "pocket-polis"
+    ? value.source.tool
+    : "";
   const sourceTitle = cleanLine(value.source?.title, 120);
   const draft = normalizeDraft(value.target, value.draft);
-  if (!createdAt || !expiresAt || currentTime === null || !sourceTitle || !draft) return null;
+  if (!createdAt || !expiresAt || currentTime === null || !sourceTool || !sourceTitle || !draft) return null;
   const lifetime = Date.parse(expiresAt) - Date.parse(createdAt);
   if (
     lifetime <= 0 ||
@@ -100,7 +107,7 @@ export function normalizeReceiptHandoff(value, { now = Date.now() } = {}) {
     target: value.target,
     createdAt,
     expiresAt,
-    source: { tool: "power-ranker", title: sourceTitle },
+    source: { tool: sourceTool, title: sourceTitle },
     draft,
     dataCard: {
       containsParticipantDerivedSummary: true,
@@ -129,10 +136,11 @@ export function receiptHandoffTargetUrl(
   return url.toString();
 }
 
-function buildDraft(receipt, target) {
-  const title = receipt.question.title;
-  const organizer = receipt.organizer;
-  const status = decisionStatusLabel(organizer.decisionStatus);
+function buildDraft(sourceReceipt, target) {
+  const { title, organizer, tool } = sourceReceipt;
+  const status = tool === "pocket-polis"
+    ? pocketPolisDecisionStatusLabel(organizer.decisionStatus)
+    : decisionStatusLabel(organizer.decisionStatus);
   if (target === "call-in") {
     return {
       title: limitLine(`${title}：成果回報`, 120),
@@ -153,8 +161,10 @@ function buildDraft(receipt, target) {
       ),
       critical: limitText(organizer.missingVoices, 500),
       questions: [
-        "你怎麼看目前被排在前面的選項？",
-        "這份結果遺漏了哪些經驗、需求或取捨？",
+        tool === "pocket-polis"
+          ? "你怎麼看成果頁挑選呈現的陳述與票數？"
+          : "你怎麼看目前被排在前面的選項？",
+        "這份成果遺漏了哪些經驗、需求或取捨？",
         "主辦者提出的下一步需要怎麼修正，才更能納入你的處境？",
       ],
     };
@@ -163,7 +173,9 @@ function buildDraft(receipt, target) {
     return {
       title: limitLine(`${title}：下一輪文字意見`, 120),
       description: limitText(
-        `延續前一輪排序，這次要補充理解：${organizer.missingVoices}。請只上傳已去識別的原始文字意見；排序成果收據不是 Talk to the City 的分析資料。`,
+        tool === "pocket-polis"
+          ? `延續前一輪口袋審議，這次要補充理解：${organizer.missingVoices}。請回資料工作台下載已核准意見 CSV；公開成果收據不是 Talk to the City 的分析資料。`
+          : `延續前一輪排序，這次要補充理解：${organizer.missingVoices}。請只上傳已去識別的原始文字意見；排序成果收據不是 Talk to the City 的分析資料。`,
         500,
       ),
     };
@@ -172,6 +184,25 @@ function buildDraft(receipt, target) {
     mode: "site",
     title: limitLine(`${title}：下一輪意見`, 120),
   };
+}
+
+function normalizeSourceReceipt(value) {
+  const ranking = normalizeRankingReceipt(value);
+  if (ranking) {
+    return {
+      tool: "power-ranker",
+      title: ranking.question.title,
+      organizer: ranking.organizer,
+    };
+  }
+  const pocketPolis = normalizePocketPolisReceipt(value);
+  return pocketPolis
+    ? {
+        tool: "pocket-polis",
+        title: pocketPolis.source.title,
+        organizer: pocketPolis.organizer,
+      }
+    : null;
 }
 
 function normalizeDraft(target, value) {

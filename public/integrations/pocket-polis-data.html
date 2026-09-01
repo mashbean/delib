@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex,nofollow" />
-    <meta name="description" content="在瀏覽器本機檢查 Pocket Polis CSV，準備可攜 JSON、Talk to the City 與 Agora 匯入檔。" />
+    <meta name="description" content="在瀏覽器本機檢查 Pocket Polis CSV，準備可攜 JSON、Talk to the City、Agora 匯入檔與分層成果收據。" />
     <title>Pocket Polis 資料工作台 · Delib 審議拼圖</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/styles.css" />
@@ -147,6 +147,96 @@
             </article>
           </div>
           <p class="source-note">為避免試算表把意見當成公式，以 =、+、- 或 @ 開頭的文字會加上單引號。轉換不代表 TTTC 或 Agora 已成功匯入，仍需在上游服務確認預覽與權限。</p>
+
+          <section id="pocket-polis-receipt-builder" class="receipt-builder data-receipt-builder" hidden>
+            <div class="receipt-section-heading">
+              <div>
+                <span class="receipt-layer-label receipt-layer-next">關閉這一輪的 loop</span>
+                <h2>把回應整理成公開成果頁</h2>
+              </div>
+              <p>公開頁不帶匿名代碼或逐筆投票，但會帶入主辦者挑選的參與者文字與逐句彙整票數。</p>
+            </div>
+            <div id="pocket-receipt-source-summary" class="receipt-source-summary" aria-live="polite"></div>
+
+            <form id="pocket-polis-receipt-form" class="receipt-form">
+              <fieldset id="pocket-receipt-fields">
+                <legend class="receipt-layer-label">先挑選公開陳述</legend>
+                <p class="field-note">只會列出已核准且至少有 3 份回應的陳述。請選 1–8 句；這是主辦者的編輯選擇，不代表工具自動判定的重要性。</p>
+                <label for="pocket-receipt-filter">陳述較多時，可以搜尋文字或 statement_id</label>
+                <input id="pocket-receipt-filter" type="search" maxlength="120" placeholder="例如：照明、草地或 12" />
+                <p id="pocket-receipt-selection-status" class="action-status" role="status"></p>
+                <div id="pocket-receipt-statement-list" class="receipt-statement-picker"></div>
+
+                <div class="receipt-form-grid">
+                  <div>
+                    <label for="pocket-receipt-decision-status">目前決策狀態</label>
+                    <select id="pocket-receipt-decision-status" required>
+                      <option value="">請選擇</option>
+                      <option value="listening">尚在聆聽</option>
+                      <option value="under-review">正在評估</option>
+                      <option value="adopted">已採納</option>
+                      <option value="partially-adopted">部分採納</option>
+                      <option value="not-adopted">未採納</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="pocket-receipt-authority">誰確認這個狀態？</label>
+                    <input id="pocket-receipt-authority" maxlength="120" required placeholder="例如：公園改善工作小組" />
+                  </div>
+                </div>
+
+                <label for="pocket-receipt-interpretation">主辦者怎麼解讀這些回應？</label>
+                <textarea id="pocket-receipt-interpretation" rows="5" maxlength="1200" required placeholder="說明看見的支持、反對、略過與取捨；不要把這批參與者的票數寫成代表性民調或共識。"></textarea>
+
+                <label for="pocket-receipt-missing-voices">哪些人、觀點或資料還沒有被充分納入？</label>
+                <textarea id="pocket-receipt-missing-voices" rows="4" maxlength="800" required placeholder="例如：夜間較少使用公園的人、兒童與行動不便者尚未被充分邀請。"></textarea>
+
+                <div class="receipt-form-grid">
+                  <div>
+                    <label for="pocket-receipt-responsible-actor">下一步由誰負責？</label>
+                    <input id="pocket-receipt-responsible-actor" maxlength="120" required placeholder="例如：社區發展協會" />
+                  </div>
+                  <div>
+                    <label for="pocket-receipt-response-by">預計何時回應？</label>
+                    <input id="pocket-receipt-response-by" type="date" required />
+                  </div>
+                </div>
+
+                <label for="pocket-receipt-next-action">具體下一步</label>
+                <textarea id="pocket-receipt-next-action" rows="4" maxlength="500" required placeholder="例如：補訪尚未納入的使用者，並在下次公開會議逐項回覆。"></textarea>
+
+                <label for="pocket-receipt-evidence-url">公開依據或會議紀錄（選填）</label>
+                <input id="pocket-receipt-evidence-url" type="url" inputmode="url" maxlength="2000" placeholder="https://…" />
+
+                <div class="write-preview">
+                  <strong>成果頁會帶入：</strong>
+                  <ul>
+                    <li>整輪參與人數、投票數、涵蓋率，以及你挑選的逐句彙整票數；</li>
+                    <li>挑選陳述的原文，可能是參與者自由文字；不帶匿名代碼與逐筆投票；</li>
+                    <li>主辦者填寫的解讀、未納入聲音、決策狀態與下一步責任。</li>
+                  </ul>
+                </div>
+                <label class="consent-row">
+                  <input id="pocket-receipt-confirm" type="checkbox" />
+                  <span>我已逐句檢查公開文字與原活動同意範圍，確認沒有未經同意的個資，也願意公開承擔上面寫的回覆責任。</span>
+                </label>
+                <button class="button button-primary" type="submit">產生成果收據</button>
+              </fieldset>
+              <p id="pocket-receipt-builder-status" class="action-status" role="status"></p>
+            </form>
+
+            <section id="pocket-polis-receipt-result" class="instance-result" hidden aria-live="polite">
+              <span class="success-mark" aria-hidden="true">✓</span>
+              <h3>成果收據準備好了</h3>
+              <p>先打開預覽逐項校對；確定無誤後，再把公開連結交給參與者。</p>
+              <div class="result-actions">
+                <a id="pocket-receipt-preview" class="button button-primary" target="_blank" rel="noreferrer">預覽成果頁 ↗</a>
+                <button id="pocket-receipt-copy-link" class="button button-ghost" type="button">複製公開連結</button>
+                <button id="pocket-receipt-download-json" class="button button-ghost" type="button">下載收據 JSON</button>
+                <button id="pocket-receipt-download-md" class="button button-ghost" type="button">下載 Markdown</button>
+              </div>
+            </section>
+          </section>
         </section>
       </div>
     </main>

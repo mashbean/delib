@@ -26,7 +26,7 @@ button.
 | Tool | Current path in Delib | Account / credential | Free / deployment boundary | Decision |
 | --- | --- | --- | --- | --- |
 | Call-in | Create a seven-day hosted event from a public deck URL; return audience, presenter, setup and moderation links. | None. Private setup and moderation links remain in the tab. | Hosted path needs no account. The source also supports Cloudflare Workers + SQLite Durable Objects, available within the Workers Free limits. | Available. |
-| Pocket Polis／口袋審議 | Create a hosted conversation from a title, description and 5–15 seed statements; return separate participant, report and private admin links. After collection, validate `statements.csv` and `votes.csv` locally and prepare a participant-aware JSON, TTTC CSV or Agora three-file import. An Agent prompt and installable skill can prepare the brief, but creation and data download still wait for human confirmation. | None. The admin token stays in the URL fragment and current browser tab; Delib does not persist it or accept it in the data workbench. CSVs remain in browser memory. | `polis.mashbean.net` is a managed free path. The MIT source is also a Cloudflare Worker + SQLite Durable Objects deployment with a Deploy button. It is a lightweight reimplementation, not official Pol.is, and has weaker sybil resistance. Local conversion does not prove a hosted TTTC or Agora import succeeded. | Available with local data handoff. |
+| Pocket Polis／口袋審議 | Create a hosted conversation from a title, description and 5–15 seed statements; return separate participant, report and private admin links. After collection, validate `statements.csv` and `votes.csv` locally and prepare a participant-aware JSON, TTTC CSV or Agora three-file import. A thresholded aggregate can become a fragment-only result receipt with organizer interpretation, missing voices and next responsibility, then prepare a one-time draft for Call-in, Harmonica, TTTC or Pol.is. An Agent prompt and installable skill can prepare the brief, but creation, data download and publication still wait for human confirmation. | None. The admin token stays in the URL fragment and current browser tab; Delib does not persist it or accept it in the data workbench. CSVs remain in browser memory. A public receipt requires at least three participants and three responses for each selected statement; it excludes pseudonyms, raw votes, file hashes and admin tokens. | `polis.mashbean.net` is a managed free path. The MIT source is also a Cloudflare Worker + SQLite Durable Objects deployment with a Deploy button. It is a lightweight reimplementation, not official Pol.is, and has weaker sybil resistance. Local conversion does not prove a hosted TTTC or Agora import succeeded. | Available with local data handoff, result receipt and next-step draft. |
 | Pol.is | Embed an existing conversation. A connected `site_id` plus deterministic `page_id` can create on first load. A personal Delib Deploy-button install can ask for `POLIS_SITE_ID` once. | A real Pol.is account creates and owns the Site ID. Cloudflare cannot manufacture one. Site ID is not a password. | Full self-hosting uses several containers and PostgreSQL. Cloudflare Containers are Workers Paid only and do not provide PostgreSQL, so this is not labelled a free Cloudflare-native deployment. | Available with connection. |
 | Agora Citizen Network | Validate an official public conversation URL and embed ZKorum's maintained participant surface. Old `agoracitizen.network/feed/conversation/...` links are normalized to the current `www.agoracitizen.app/conversation/...` route. | Delib needs no credential. Any login remains inside Agora, and Delib does not receive opinions, comparisons or votes. | The active AGPL monorepo uses Quasar/Vue, Fastify, PostgreSQL, Valkey and TypeScript／Python workers. Its import worker accepts Pol.is URLs or CSV archives, but the hosted creation/import/export authorization contract has not been verified. | Available: existing only. |
 | OpenBook | Use the public evidence page as an evidence gear. | None. | Public static site; there is no instance to create. | Direct viewer. |
@@ -68,7 +68,17 @@ aggregate-only result receipt. The receipt keeps tool calculation, organizer
 interpretation and formal status as distinct layers; it does not treat spectral
 weights as vote percentages or proof of consensus.
 
-The next-step draft is deliberately not a generic data pipe. Call-in receives
+Pocket Polis now follows the same layered-result pattern without copying its
+participant-aware bundle into the public page. The local workbench blocks a
+receipt when export totals disagree, fewer than three participants appear, or
+an included statement has fewer than three responses. It publishes only one to
+eight organizer-reviewed statement texts with aggregate response counts, plus
+separate interpretation, missing voices, decision authority, response date,
+responsible actor and next action. Pseudonymous participant IDs, raw votes,
+original-file hashes and the admin token remain outside the receipt.
+
+The next-step draft is deliberately not a generic data pipe. For both result
+types, Call-in receives
 only a title and summary and still requires a separately verified public deck
 URL. Harmonica receives a bounded follow-up brief but no API key. TTTC receives
 an analysis title and de-identification reminder, not CSV or receipt data.

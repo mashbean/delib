@@ -15,7 +15,7 @@
       "type": "object",
       "required": ["tool", "title"],
       "properties": {
-        "tool": { "const": "power-ranker" },
+        "tool": { "enum": ["power-ranker", "pocket-polis"] },
         "title": { "type": "string", "minLength": 1, "maxLength": 120 }
       },
       "additionalProperties": false

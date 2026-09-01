@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://delib.mashbean.net/schemas/delib-pocket-polis-receipt/v1.json",
+  "title": "Delib Pocket Polis result receipt v1",
+  "description": "A public, aggregate Pocket Polis result with organizer interpretation, missing voices, decision status and next responsibility.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "preparedAt", "source", "scope", "findings", "organizer", "dataCard"],
+  "properties": {
+    "schema": { "const": "https://delib.mashbean.net/schemas/delib-pocket-polis-receipt/v1.json" },
+    "kind": { "const": "pocket-polis-receipt" },
+    "preparedAt": { "type": "string", "format": "date-time" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tool", "title", "description", "conversationId", "reportUrl", "sourceExportedAt", "sourceCountMatches"],
+      "properties": {
+        "tool": { "const": "Pocket Polis" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "description": { "type": "string", "maxLength": 2000 },
+        "conversationId": { "type": "string", "pattern": "^[a-z0-9]{10}$" },
+        "reportUrl": { "type": "string", "format": "uri", "pattern": "^https://" },
+        "sourceExportedAt": { "type": "string", "format": "date-time" },
+        "sourceCountMatches": { "const": true }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["participants", "approvedStatements", "totalVotes", "coverage", "includedStatements"],
+      "properties": {
+        "participants": { "type": "integer", "minimum": 3 },
+        "approvedStatements": { "type": "integer", "minimum": 1 },
+        "totalVotes": { "type": "integer", "minimum": 1 },
+        "coverage": { "type": "number", "minimum": 0, "maximum": 1 },
+        "includedStatements": { "type": "integer", "minimum": 1, "maximum": 8 }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["statementId", "text", "isSeed", "agrees", "disagrees", "passes", "responses"],
+        "properties": {
+          "statementId": { "type": "integer", "minimum": 1 },
+          "text": { "type": "string", "minLength": 1, "maxLength": 280 },
+          "isSeed": { "type": "boolean" },
+          "agrees": { "type": "integer", "minimum": 0 },
+          "disagrees": { "type": "integer", "minimum": 0 },
+          "passes": { "type": "integer", "minimum": 0 },
+          "responses": { "type": "integer", "minimum": 3 }
+        }
+      }
+    },
+    "organizer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["interpretation", "missingVoices", "decisionStatus", "authority", "responsibleActor", "responseBy", "nextAction", "evidenceUrl"],
+      "properties": {
+        "interpretation": { "type": "string", "minLength": 1, "maxLength": 1200 },
+        "missingVoices": { "type": "string", "minLength": 1, "maxLength": 800 },
+        "decisionStatus": { "enum": ["listening", "under-review", "adopted", "partially-adopted", "not-adopted"] },
+        "authority": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "responsibleActor": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "responseBy": { "type": "string", "format": "date" },
+        "nextAction": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "evidenceUrl": {
+          "oneOf": [
+            { "type": "string", "format": "uri", "pattern": "^https://" },
+            { "const": "" }
+          ]
+        }
+      }
+    },
+    "dataCard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["containsParticipantData", "containsDirectIdentifiers", "containsParticipantRecords", "containsParticipantFreeText", "containsPseudonymousLinkage", "containsOrganizerFreeText", "aggregation", "publicationStatus", "storedByDelib", "transport", "limitations"],
+      "properties": {
+        "containsParticipantData": { "const": true },
+        "containsDirectIdentifiers": { "const": false },
+        "containsParticipantRecords": { "const": false },
+        "containsParticipantFreeText": { "const": true },
+        "containsPseudonymousLinkage": { "const": false },
+        "containsOrganizerFreeText": { "const": true },
+        "aggregation": { "const": "selected-statement-counts" },
+        "publicationStatus": { "const": "share-link-prepared" },
+        "storedByDelib": { "const": false },
+        "transport": { "const": "url-fragment" },
+        "limitations": {
+          "type": "array",
+          "minItems": 4,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

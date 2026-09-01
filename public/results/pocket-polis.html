@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta name="description" content="Pocket Polis 回應概況、主辦者解讀、未納入聲音、決策狀態與下一步責任。" />
+    <title>Pocket Polis 成果收據 · Delib</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/styles.css" />
+    <script type="module" src="/results/pocket-polis.js"></script>
+  </head>
+  <body class="receipt-page-body">
+    <a class="skip-link" href="#receipt-main">跳到成果內容</a>
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <a class="brand" href="/" aria-label="回 Delib 審議拼圖">
+          <span class="brand-mark" aria-hidden="true">⿻</span>
+          <span><strong>Delib</strong><span class="brand-divider">·</span>成果收據</span>
+        </a>
+        <a class="button button-small button-ghost" href="/integrations/pocket-polis-data.html">整理另一份資料</a>
+      </div>
+    </header>
+
+    <main id="receipt-main" class="receipt-page-main">
+      <div class="wrap receipt-page-wrap">
+        <section id="pocket-receipt-page-error" class="empty-state" hidden>
+          <h1>這份成果收據無法讀取</h1>
+          <p>連結可能不完整、被通訊軟體截斷，或不是目前支援的格式。請向主辦者索取新的成果連結或 JSON 檔。</p>
+          <a class="button button-primary" href="/">回到 Delib</a>
+        </section>
+
+        <article id="pocket-receipt-page-content" class="public-receipt" hidden>
+          <header class="public-receipt-hero">
+            <div>
+              <p class="section-kicker">Pocket Polis · Result receipt</p>
+              <span id="pocket-receipt-decision-chip" class="receipt-decision-chip"></span>
+              <h1 id="pocket-receipt-page-title"></h1>
+              <p id="pocket-receipt-page-description" class="section-lede"></p>
+            </div>
+            <div class="receipt-stamp" aria-label="成果收據資料狀態">
+              <strong>可攜成果</strong>
+              <span id="pocket-receipt-prepared-at"></span>
+              <span>收據未另存於 Delib</span>
+            </div>
+          </header>
+
+          <section class="receipt-metrics data-metrics" aria-label="彙整範圍">
+            <div><strong id="pocket-receipt-participant-count"></strong><span>匿名參與者</span></div>
+            <div><strong id="pocket-receipt-vote-count"></strong><span>逐筆投票</span></div>
+            <div><strong id="pocket-receipt-statement-count"></strong><span>成果頁呈現／已核准陳述</span></div>
+            <div><strong id="pocket-receipt-coverage"></strong><span>已核准陳述投票涵蓋率</span></div>
+          </section>
+
+          <section class="receipt-section" aria-labelledby="pocket-receipt-findings-heading">
+            <div class="receipt-section-heading">
+              <div>
+                <span class="receipt-layer-label">工具彙整＋主辦者挑選</span>
+                <h2 id="pocket-receipt-findings-heading">這一輪公開呈現的回應</h2>
+              </div>
+              <a id="pocket-receipt-source-link" target="_blank" rel="noreferrer">查看 Pocket Polis 公開成果 ↗</a>
+            </div>
+            <ol id="pocket-receipt-finding-list" class="statement-receipt-list"></ol>
+            <p class="boundary-note">票數只描述這一輪已收到的回應，不是代表性民調。公開陳述是主辦者從符合門檻的已核准文字中挑選，也不代表工具自動判定的重要性或共識。</p>
+          </section>
+
+          <div class="receipt-layer-grid">
+            <section class="receipt-section" aria-labelledby="pocket-receipt-interpretation-heading">
+              <span class="receipt-layer-label receipt-layer-human">主辦者解讀</span>
+              <h2 id="pocket-receipt-interpretation-heading">這些回應怎麼被理解</h2>
+              <p id="pocket-receipt-interpretation" class="receipt-long-copy"></p>
+            </section>
+
+            <section class="receipt-section" aria-labelledby="pocket-receipt-missing-heading">
+              <span class="receipt-layer-label receipt-layer-limits">未納入／限制</span>
+              <h2 id="pocket-receipt-missing-heading">還缺少哪些聲音</h2>
+              <p id="pocket-receipt-missing-voices" class="receipt-long-copy"></p>
+            </section>
+          </div>
+
+          <section class="receipt-section receipt-decision" aria-labelledby="pocket-receipt-decision-heading">
+            <div>
+              <span class="receipt-layer-label receipt-layer-decision">人工聲明</span>
+              <h2 id="pocket-receipt-decision-heading">決策狀態與確認者</h2>
+              <p><strong id="pocket-receipt-decision-status"></strong> · 由 <span id="pocket-receipt-authority"></span> 確認</p>
+              <a id="pocket-receipt-evidence-link" target="_blank" rel="noreferrer" hidden>查看公開依據 ↗</a>
+            </div>
+            <div class="receipt-next-action">
+              <span class="receipt-layer-label receipt-layer-next">下一步</span>
+              <h2>誰要在何時做什麼</h2>
+              <dl>
+                <div><dt>負責回應</dt><dd id="pocket-receipt-responsible-actor"></dd></div>
+                <div><dt>預計回應</dt><dd id="pocket-receipt-response-by"></dd></div>
+                <div><dt>具體行動</dt><dd id="pocket-receipt-next-action"></dd></div>
+              </dl>
+            </div>
+          </section>
+
+          <section class="receipt-data-card" aria-labelledby="pocket-receipt-data-heading">
+            <div>
+              <span class="receipt-layer-label">資料邊界</span>
+              <h2 id="pocket-receipt-data-heading">這張成果頁帶了什麼</h2>
+            </div>
+            <ul id="pocket-receipt-data-list">
+              <li>包含整輪彙整範圍、主辦者挑選的陳述原文與逐句同意／不同意／略過計數；</li>
+              <li>不含匿名參與者代碼、逐筆投票、姓名、聯絡方式、原檔雜湊或管理 token；</li>
+              <li>包含主辦者主動填寫的解讀與責任聲明；網址可以被複製與再次分享。</li>
+            </ul>
+            <p id="pocket-receipt-source-note"></p>
+          </section>
+
+          <section class="receipt-handoff" aria-labelledby="pocket-receipt-handoff-heading">
+            <div class="receipt-section-heading">
+              <div>
+                <span class="receipt-layer-label receipt-layer-next">接到下一輪</span>
+                <h2 id="pocket-receipt-handoff-heading">下一步想開哪一個齒輪？</h2>
+              </div>
+              <p>先看會帶走什麼，再回 Delib 逐欄確認。</p>
+            </div>
+            <div class="handoff-targets" aria-label="選擇下一步工具">
+              <button type="button" data-handoff-target="call-in" aria-pressed="false">
+                <span aria-hidden="true">🎙️</span><strong>成果回報場</strong><small>Call-in</small>
+              </button>
+              <button type="button" data-handoff-target="harmonica" aria-pressed="false">
+                <span aria-hidden="true">🎼</span><strong>補訪缺席聲音</strong><small>Harmonica</small>
+              </button>
+              <button type="button" data-handoff-target="talk-to-the-city" aria-pressed="false">
+                <span aria-hidden="true">🧩</span><strong>整理下一輪文字</strong><small>Talk to the City</small>
+              </button>
+              <button type="button" data-handoff-target="polis" aria-pressed="false">
+                <span aria-hidden="true">🧭</span><strong>開放新陳述</strong><small>Pol.is</small>
+              </button>
+            </div>
+            <aside id="pocket-receipt-handoff-preview" class="handoff-preview" hidden aria-live="polite">
+              <div>
+                <span class="memory-toast-mark" aria-hidden="true">✓</span>
+                <div>
+                  <strong id="pocket-receipt-handoff-target-label"></strong>
+                  <p>會帶入草稿：</p>
+                  <ul id="pocket-receipt-handoff-fields"></ul>
+                </div>
+              </div>
+              <p id="pocket-receipt-handoff-boundary" class="handoff-boundary"></p>
+              <p class="field-note">草稿只存在同一個分頁，最多兩小時；進入設定頁後即從暫存中刪除。現在不會建立外部活動或上傳資料。</p>
+              <button id="pocket-receipt-handoff-continue" class="button button-primary" type="button">帶到設定頁</button>
+            </aside>
+          </section>
+
+          <footer class="receipt-actions">
+            <div>
+              <strong>讓成果回到下一輪</strong>
+              <p>可以回到資料工作台重選公開陳述，或重新規劃下一輪的工具與收件方式。</p>
+            </div>
+            <div class="result-actions">
+              <a class="button button-primary" href="/integrations/pocket-polis-data.html">回資料工作台</a>
+              <a class="button button-ghost" href="/#start">重新規劃流程</a>
+              <button id="pocket-receipt-copy-summary" class="button button-ghost" type="button">複製成果摘要</button>
+              <button id="pocket-receipt-download-json" class="button button-ghost" type="button">下載 JSON</button>
+              <button id="pocket-receipt-download-md" class="button button-ghost" type="button">下載 Markdown</button>
+            </div>
+            <p id="pocket-receipt-action-status" class="action-status" role="status"></p>
+          </footer>
+        </article>
+      </div>
+    </main>
+  </body>
+</html>

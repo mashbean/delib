@@ -110,6 +110,21 @@ describe("public contracts", () => {
     expect(schema.properties.dataCard.properties.storedByDelib.const).toBe(false);
   });
 
+  it("publishes a de-linked Pocket Polis public receipt schema", async () => {
+    const schema = JSON.parse(
+      await readFile(new URL("public/schemas/delib-pocket-polis-receipt/v1.json", root), "utf8"),
+    );
+    expect(schema.$id).toBe(
+      "https://delib.mashbean.net/schemas/delib-pocket-polis-receipt/v1.json",
+    );
+    expect(schema.properties.scope.properties.participants.minimum).toBe(3);
+    expect(schema.properties.findings.maxItems).toBe(8);
+    expect(schema.properties.dataCard.properties.containsParticipantRecords.const).toBe(false);
+    expect(schema.properties.dataCard.properties.containsParticipantFreeText.const).toBe(true);
+    expect(schema.properties.dataCard.properties.containsPseudonymousLinkage.const).toBe(false);
+    expect(schema.properties.dataCard.properties.transport.const).toBe("url-fragment");
+  });
+
   it("keeps the Pocket Polis admin capability out of the data-workbench handoff", async () => {
     const app = await readFile(new URL("public/app.js", root), "utf8");
     const workbench = await readFile(
@@ -120,6 +135,19 @@ describe("public contracts", () => {
     expect(workbench).toContain('"delib:pocket-polis-data-source"');
     expect(workbench).not.toContain('"delib:pocket-polis-instance"');
     expect(workbench).not.toContain("adminUrl");
+  });
+
+  it("ships the Pocket Polis public receipt builder and fragment-only renderer", async () => {
+    const builder = await readFile(
+      new URL("public/integrations/pocket-polis-data.html", root),
+      "utf8",
+    );
+    const renderer = await readFile(new URL("public/results/pocket-polis.js", root), "utf8");
+    expect(builder).toContain('id="pocket-polis-receipt-form"');
+    expect(builder).toContain("選 1–8 句");
+    expect(renderer).toContain("pocketPolisReceiptFromHash(location.hash)");
+    expect(renderer).not.toContain("location.search");
+    expect(renderer).not.toContain("adminUrl");
   });
 
   it("publishes a layered, fragment-only schema for ranking result receipts", async () => {

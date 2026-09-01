@@ -41,7 +41,7 @@
       "readiness": "available",
       "activation": "managed-create",
       "label": "免登入直接建立",
-      "summary": "在 Delib 填入標題、說明與 5–15 句起始陳述，直接由 polis.mashbean.net 建立活動；收完後可在本機驗證 CSV 並轉成 TTTC、Agora 或可攜 JSON。",
+      "summary": "在 Delib 填入標題、說明與 5–15 句起始陳述，直接由 polis.mashbean.net 建立活動；收完後可在本機驗證 CSV、轉成 TTTC／Agora／可攜 JSON，或發布分層成果收據並接續下一輪。",
       "accountRequired": false,
       "credentialRequired": false,
       "freePath": "使用 mashbean 維運的 Pocket Polis 共用主機，或按 Deploy to Cloudflare 建立自己的獨立服務。",
@@ -52,10 +52,13 @@
         "endpoint": "/integrations/pocket-polis-data.html",
         "input": ["statements.csv", "votes.csv"],
         "portableSchema": "/schemas/delib-pocket-polis/v1.json",
-        "outputs": ["delib-pocket-polis/v1 JSON", "Talk to the City CSV", "Agora Pol.is summary/comments/votes CSV"],
+        "outputs": ["delib-pocket-polis/v1 JSON", "Talk to the City CSV", "Agora Pol.is summary/comments/votes CSV", "delib-pocket-polis-receipt/v1 public receipt"],
         "storage": "browser-memory-only",
-        "humanGate": "下載前確認參與資料用途、權限、保存方式，並在公開前人工檢查自由文字。"
+        "humanGate": "下載前確認參與資料用途、權限與保存方式。公開收據另要求至少 3 位參與者、每句入選陳述至少 3 份回應，並由主辦者逐句確認自由文字與補上解讀、缺席聲音、權責和下一步。"
       },
+      "receiptEndpoint": "/results/pocket-polis.html",
+      "receiptSchema": "/schemas/delib-pocket-polis-receipt/v1.json",
+      "nextStepSchema": "/schemas/delib-handoff/v1.json",
       "selfHost": {
         "supported": true,
         "platform": "Cloudflare Workers + Durable Objects SQLite",

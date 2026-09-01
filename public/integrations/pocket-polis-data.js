@@ -4,6 +4,11 @@ import {
   pocketPolisToAgoraCsv,
   pocketPolisToTttcCsv,
 } from "/pocket-polis-data-core.js";
+import {
+  createPocketPolisReceipt,
+  pocketPolisReceiptToMarkdown,
+  pocketPolisReceiptUrl,
+} from "/pocket-polis-receipt-core.js";
 
 const STORAGE_KEY = "delib:pocket-polis-data-source";
 const MAX_FILE_BYTES = 20 * 1024 * 1024;
@@ -13,6 +18,10 @@ const status = document.querySelector("#pocket-polis-data-status");
 const consent = document.querySelector("#pocket-polis-data-consent");
 const downloadButtons = [...document.querySelectorAll(".data-download")];
 let currentBundle = null;
+let receiptCandidates = [];
+let selectedReceiptStatementIds = new Set();
+let currentReceipt = null;
+let currentReceiptUrl = "";
 
 restorePublicContext();
 form.addEventListener("submit", checkExports);
@@ -20,6 +29,28 @@ form.addEventListener("input", invalidateResult);
 form.addEventListener("change", invalidateResult);
 consent.addEventListener("change", syncDownloadState);
 for (const button of downloadButtons) button.addEventListener("click", downloadOutput);
+document.querySelector("#pocket-polis-receipt-form").addEventListener("submit", prepareReceipt);
+document.querySelector("#pocket-polis-receipt-form").addEventListener("input", invalidatePreparedReceipt);
+document.querySelector("#pocket-polis-receipt-form").addEventListener("change", invalidatePreparedReceipt);
+document.querySelector("#pocket-receipt-filter").addEventListener("input", renderReceiptCandidates);
+document.querySelector("#pocket-receipt-statement-list").addEventListener("change", selectReceiptStatement);
+document.querySelector("#pocket-receipt-copy-link").addEventListener("click", copyReceiptLink);
+document.querySelector("#pocket-receipt-download-json").addEventListener("click", () => {
+  if (!currentReceipt) return;
+  downloadText(
+    `pocket-polis-${currentReceipt.source.conversationId}-receipt.json`,
+    `${JSON.stringify(currentReceipt, null, 2)}\n`,
+    "application/json;charset=utf-8",
+  );
+});
+document.querySelector("#pocket-receipt-download-md").addEventListener("click", () => {
+  if (!currentReceipt) return;
+  downloadText(
+    `pocket-polis-${currentReceipt.source.conversationId}-receipt.md`,
+    pocketPolisReceiptToMarkdown(currentReceipt),
+    "text/markdown;charset=utf-8",
+  );
+});
 
 async function checkExports(event) {
   event.preventDefault();
@@ -49,6 +80,7 @@ async function checkExports(event) {
       files: [statements.evidence, votes.evidence],
     });
     renderResult(currentBundle);
+    setReceiptSource(currentBundle);
     result.hidden = false;
     status.textContent = "兩份 CSV 已在本機通過格式檢查；尚未上傳或保存。";
     result.scrollIntoView({ behavior: reducedMotion() ? "auto" : "smooth", block: "start" });
@@ -140,6 +172,147 @@ function renderResult(bundle) {
   );
 }
 
+function setReceiptSource(bundle) {
+  receiptCandidates = bundle.statements.filter((statement) =>
+    statement.status === "approved" && statement.agrees + statement.disagrees + statement.passes >= 3,
+  );
+  selectedReceiptStatementIds = new Set();
+  currentReceipt = null;
+  currentReceiptUrl = "";
+  const builder = document.querySelector("#pocket-polis-receipt-builder");
+  const fields = document.querySelector("#pocket-receipt-fields");
+  const summary = document.querySelector("#pocket-receipt-source-summary");
+  const heading = document.createElement("strong");
+  const copy = document.createElement("span");
+  heading.textContent = `Pocket Polis · ${bundle.source.title}`;
+  copy.textContent = `${bundle.summary.participants} 位匿名參與者、${bundle.summary.votes} 筆投票；${receiptCandidates.length} 句已核准陳述達到 3 份公開門檻。`;
+  summary.replaceChildren(heading, copy);
+  document.querySelector("#pocket-polis-receipt-result").hidden = true;
+  document.querySelector("#pocket-receipt-confirm").checked = false;
+  document.querySelector("#pocket-receipt-filter").value = "";
+  const blocker = !bundle.consistency.countMatches
+    ? "兩份 CSV 的票數不一致；請重新下載後再準備公開成果。"
+    : bundle.summary.participants < 3
+      ? "公開成果頁至少需要 3 位匿名參與者。你仍可下載本機資料，但不應公開逐句票數。"
+      : receiptCandidates.length === 0
+        ? "目前沒有已核准且至少有 3 份回應的陳述。"
+        : "";
+  fields.disabled = Boolean(blocker);
+  document.querySelector("#pocket-receipt-builder-status").textContent = blocker;
+  builder.hidden = false;
+  renderReceiptCandidates();
+}
+
+function renderReceiptCandidates() {
+  const query = document.querySelector("#pocket-receipt-filter").value.trim().toLocaleLowerCase("zh-Hant-TW");
+  const matches = receiptCandidates.filter((statement) =>
+    !query || statement.text.toLocaleLowerCase("zh-Hant-TW").includes(query) || String(statement.statementId) === query,
+  );
+  const visible = matches.slice(0, 60);
+  document.querySelector("#pocket-receipt-statement-list").replaceChildren(
+    ...visible.map((statement) => {
+      const label = document.createElement("label");
+      const input = document.createElement("input");
+      const copy = document.createElement("span");
+      const text = document.createElement("strong");
+      const counts = document.createElement("small");
+      input.type = "checkbox";
+      input.value = String(statement.statementId);
+      input.checked = selectedReceiptStatementIds.has(statement.statementId);
+      text.textContent = statement.text;
+      counts.textContent = `#${statement.statementId} · ${statement.isSeed ? "種子陳述" : "參與者投稿"} · 同意 ${statement.agrees}／不同意 ${statement.disagrees}／略過 ${statement.passes}`;
+      copy.append(text, counts);
+      label.append(input, copy);
+      return label;
+    }),
+  );
+  const hiddenCount = matches.length - visible.length;
+  const selectedCount = selectedReceiptStatementIds.size;
+  document.querySelector("#pocket-receipt-selection-status").textContent =
+    `已選 ${selectedCount}/8 句${hiddenCount > 0 ? `；另有 ${hiddenCount} 句，請縮小搜尋範圍` : ""}。`;
+}
+
+function selectReceiptStatement(event) {
+  if (!(event.target instanceof HTMLInputElement) || event.target.type !== "checkbox") return;
+  const statementId = Number(event.target.value);
+  if (!Number.isSafeInteger(statementId)) return;
+  if (event.target.checked && selectedReceiptStatementIds.size >= 8) {
+    event.target.checked = false;
+    document.querySelector("#pocket-receipt-selection-status").textContent = "成果頁最多放 8 句；請先取消一個選擇。";
+    return;
+  }
+  if (event.target.checked) selectedReceiptStatementIds.add(statementId);
+  else selectedReceiptStatementIds.delete(statementId);
+  renderReceiptCandidates();
+}
+
+function prepareReceipt(event) {
+  event.preventDefault();
+  const builderStatus = document.querySelector("#pocket-receipt-builder-status");
+  const receiptConsent = document.querySelector("#pocket-receipt-confirm");
+  if (!currentBundle) {
+    builderStatus.textContent = "請先重新檢查兩份 Pocket Polis CSV。";
+    return;
+  }
+  if (!receiptConsent.checked) {
+    builderStatus.textContent = "公開前請先確認陳述文字、同意範圍與回覆責任。";
+    receiptConsent.focus();
+    return;
+  }
+  try {
+    currentReceipt = createPocketPolisReceipt({
+      bundle: currentBundle,
+      selectedStatementIds: [...selectedReceiptStatementIds],
+      organizer: {
+        interpretation: document.querySelector("#pocket-receipt-interpretation").value,
+        missingVoices: document.querySelector("#pocket-receipt-missing-voices").value,
+        decisionStatus: document.querySelector("#pocket-receipt-decision-status").value,
+        authority: document.querySelector("#pocket-receipt-authority").value,
+        responsibleActor: document.querySelector("#pocket-receipt-responsible-actor").value,
+        responseBy: document.querySelector("#pocket-receipt-response-by").value,
+        nextAction: document.querySelector("#pocket-receipt-next-action").value,
+        evidenceUrl: document.querySelector("#pocket-receipt-evidence-url").value,
+      },
+    });
+    currentReceiptUrl = pocketPolisReceiptUrl(currentReceipt, location.origin);
+    document.querySelector("#pocket-receipt-preview").href = currentReceiptUrl;
+    document.querySelector("#pocket-polis-receipt-result").hidden = false;
+    builderStatus.textContent = currentReceiptUrl.length > 12_000
+      ? "成果已產生。這份連結較長，請同時下載 JSON，避免通訊軟體截斷網址。"
+      : "成果已在瀏覽器中產生；先預覽校對，再決定是否分享。";
+    document.querySelector("#pocket-polis-receipt-result").scrollIntoView({
+      behavior: reducedMotion() ? "auto" : "smooth",
+      block: "start",
+    });
+  } catch (error) {
+    currentReceipt = null;
+    currentReceiptUrl = "";
+    document.querySelector("#pocket-polis-receipt-result").hidden = true;
+    builderStatus.textContent = error instanceof Error ? error.message : "成果收據暫時無法產生。";
+  }
+}
+
+async function copyReceiptLink() {
+  const builderStatus = document.querySelector("#pocket-receipt-builder-status");
+  if (!currentReceiptUrl) return;
+  try {
+    await navigator.clipboard.writeText(currentReceiptUrl);
+    builderStatus.textContent = "公開成果連結已複製；連結含參與者文字與彙整票數，請視為公開內容。";
+  } catch {
+    builderStatus.textContent = "瀏覽器沒有允許複製；請打開預覽後從網址列複製。";
+  }
+}
+
+function invalidatePreparedReceipt(event) {
+  if (!currentReceipt || event.target?.id === "pocket-receipt-confirm") return;
+  currentReceipt = null;
+  currentReceiptUrl = "";
+  document.querySelector("#pocket-polis-receipt-result").hidden = true;
+  document.querySelector("#pocket-receipt-confirm").checked = false;
+  document.querySelector("#pocket-receipt-builder-status").textContent =
+    "內容已變更；請重新確認後再產生新的成果連結。";
+}
+
 function downloadOutput(event) {
   if (!currentBundle || !consent.checked) return;
   const id = currentBundle.source.conversationId;
@@ -188,7 +361,17 @@ function invalidateResult() {
   result.hidden = true;
   consent.checked = false;
   syncDownloadState();
+  clearReceiptBuilder();
   status.textContent = "來源或檔案已變更，請重新檢查兩份 CSV。";
+}
+
+function clearReceiptBuilder() {
+  receiptCandidates = [];
+  selectedReceiptStatementIds = new Set();
+  currentReceipt = null;
+  currentReceiptUrl = "";
+  document.querySelector("#pocket-polis-receipt-builder").hidden = true;
+  document.querySelector("#pocket-polis-receipt-result").hidden = true;
 }
 
 function restorePublicContext() {

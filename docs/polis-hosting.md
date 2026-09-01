@@ -84,6 +84,31 @@ Potential spreadsheet formulas in free text receive a leading apostrophe. A
 successful local conversion is not evidence that the hosted TTTC or Agora import
 succeeded; that remains a separate upstream-account and preview check.
 
+## Pocket Polis result receipt
+
+The same local workbench can turn a validated aggregate into a public
+`delib-pocket-polis-receipt/v1` result without uploading the two CSV files to
+Delib. Publication is blocked unless both exports agree, at least three
+participants appear, and every selected approved statement has at least three
+responses. The organizer may select one to eight statements and must review
+their text, then add a separate interpretation, missing voices, decision
+status and authority, responsible actor, response date and next action.
+
+The receipt includes only those selected statement texts and aggregate
+agree/disagree/pass counts. It excludes participant pseudonyms, raw vote rows,
+original-file hashes and the Pocket Polis admin token. The encoded receipt stays
+after `#` in `/results/pocket-polis.html`; browsers do not send that fragment to
+the Worker and Delib does not store it. The full link is still a public
+capability, so anyone who receives it can read and reshare its participant-
+authored text.
+
+From the result page, the organizer can preview a minimized
+`delib-handoff/v1` draft for Call-in, Harmonica, TTTC or Pol.is. It contains
+accountability fields but no statement text or counts. It remains in the same
+tab's `sessionStorage`, expires after two hours and is deleted on first read;
+the destination still requires its normal validation and confirmation before
+any external write.
+
 ## The official Pol.is one-click gate
 
 Running the containers is only the operator step. A non-engineer still needs:
