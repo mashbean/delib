@@ -3,6 +3,7 @@ import { env } from "cloudflare:workers";
 import { runDurableObjectAlarm, runInDurableObject } from "cloudflare:test";
 import {
   collectOutputText,
+  handleAgoraRequest,
   handleAgentRequest,
   handleCallInRequest,
   handleHeyFormRequest,
@@ -10,6 +11,7 @@ import {
   handlePolisRequest,
   handleRankingRoomRequest,
   handleTttcRequest,
+  parseAgoraConversationSlug,
   parseHeyFormId,
   parsePolisConversationId,
 } from "./index";
@@ -207,6 +209,57 @@ describe("direct integrations", () => {
       storedByDelib: false,
       writesWhenSubmitted: true,
     });
+  });
+
+  it("accepts only official public Agora Citizen Network conversation URLs", () => {
+    expect(
+      parseAgoraConversationSlug("https://agoracitizen.network/feed/conversation/ss_4Cg/"),
+    ).toBe("ss_4Cg");
+    expect(
+      parseAgoraConversationSlug("https://www.agoracitizen.app/conversation/nRAynpw/embed"),
+    ).toBe("nRAynpw");
+    expect(parseAgoraConversationSlug("ss_4Cg")).toBeNull();
+    expect(parseAgoraConversationSlug("https://example.com/conversation/ss_4Cg")).toBeNull();
+    expect(
+      parseAgoraConversationSlug("https://www.agoracitizen.app/conversation/ss_4Cg?admin=true"),
+    ).toBeNull();
+  });
+
+  it("prepares a current Agora embed workspace without proxying participation", async () => {
+    const response = await handleAgoraRequest(
+      new Request("https://delib.example/api/integrations/agora", {
+        method: "POST",
+        headers: { Origin: "https://delib.example", "Content-Type": "application/json" },
+        body: JSON.stringify({
+          conversation: "https://agoracitizen.network/feed/conversation/ss_4Cg/embed",
+          confirmed: true,
+        }),
+      }),
+    );
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      integration: "agora-citizen-network",
+      workspaceUrl: "https://delib.example/integrations/agora.html?conversation=ss_4Cg",
+      participantUrl: "https://www.agoracitizen.app/conversation/ss_4Cg",
+      embedUrl: "https://www.agoracitizen.app/conversation/ss_4Cg/embed",
+      storedByDelib: false,
+      writesWhenOpened: false,
+      writesWhenParticipating: true,
+    });
+  });
+
+  it("requires confirmation before opening an Agora workspace", async () => {
+    const response = await handleAgoraRequest(
+      new Request("https://delib.example/api/integrations/agora", {
+        method: "POST",
+        headers: { Origin: "https://delib.example", "Content-Type": "application/json" },
+        body: JSON.stringify({
+          conversation: "https://www.agoracitizen.app/conversation/ss_4Cg",
+        }),
+      }),
+    );
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toMatchObject({ error: expect.stringContaining("確認") });
   });
 
   it("prepares the current Talk to the City create UI with bounded public context", async () => {

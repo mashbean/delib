@@ -6,8 +6,8 @@
 審議工作者的流程組裝器。回答幾個白話問題後，它會產生：
 
 - 線下齒輪：招募、知情同意、主持、人工決策與後續責任；
-- 線上齒輪：依需求推薦 Call-in、Polis、Talk to the City、OpenBook、
-  Uncommon Ground、Decidim 等開源工具；
+- 線上齒輪：依需求推薦 Call-in、Polis、Agora Citizen Network、Talk to
+  the City、OpenBook、Parti DemosX、Decidim 等開源工具；
 - 一份可分享的流程成果頁、JSON 資料包與 Markdown 執行手冊；
 - 可選的 AI 協作：使用者自備 OpenAI API key，或安裝 Delib skill。
 
@@ -19,7 +19,7 @@
 這是第一個可操作版本：
 
 1. 四步需求精靈；
-2. 25 個工具的可搜尋目錄與 deterministic recommendation；
+2. 27 個工具的可搜尋目錄與 deterministic recommendation；
 3. 線下／線上流程配方；
 4. 不含自由文字與個資的分享連結；
 5. `delib-bundle/v1` JSON 與 Markdown runbook 下載；
@@ -28,13 +28,14 @@
    `/.well-known/delib/SKILL.md`。
 8. 直接在站內建立七天的 Call-in 活動，不需帳號；
 9. 在站內嵌入既有 Pol.is 對話，或用 Site ID 準備自動建立工作區；
-10. 在站內嵌入已發布的 HeyForm 表單；
-11. 在站內開啟 Talk to the City 官方建立流程，登入與 CSV 不經 Delib；
-12. 使用 tab-only Harmonica API key 直接建立 AI 對話 session，或複製 MCP 啟動提示；
-13. 使用內建 Power Ranker 完成本機成對排序，或建立 24 小時／7 天自動清除的多人結果收件室；
-14. 把群體彙整接成 `delib-ranking-receipt/v1` 成果頁，分開呈現工具計算、主辦者解讀、未納入聲音、決策狀態與下一步責任；
-15. 從成果頁預覽並帶入 `delib-handoff/v1` 草稿，接續 Call-in 成果回報、Harmonica 補訪、TTTC 文字整理或 Pol.is 新一輪；
-16. `delib-integrations/v1` 與 `delib-hosting/v1` 盤點，明確區分可用、共用託管、元件、研究與阻擋項目。
+10. 在站內嵌入既有 Agora Citizen Network 公開對話；
+11. 在站內嵌入已發布的 HeyForm 表單；
+12. 在站內開啟 Talk to the City 官方建立流程，登入與 CSV 不經 Delib；
+13. 使用 tab-only Harmonica API key 直接建立 AI 對話 session，或複製 MCP 啟動提示；
+14. 使用內建 Power Ranker 完成本機成對排序，或建立 24 小時／7 天自動清除的多人結果收件室；
+15. 把群體彙整接成 `delib-ranking-receipt/v1` 成果頁，分開呈現工具計算、主辦者解讀、未納入聲音、決策狀態與下一步責任；
+16. 從成果頁預覽並帶入 `delib-handoff/v1` 草稿，接續 Call-in 成果回報、Harmonica 補訪、TTTC 文字整理或 Pol.is 新一輪；
+17. `delib-integrations/v1` 與 `delib-hosting/v1` 盤點，加入 Agora 與 Parti DemosX，明確區分可用、共用託管、元件、研究與阻擋項目。
 
 Delib 伺服器不保存 API key 或使用者建立的流程。Power Ranker 預設仍可完全
 在瀏覽器處理；只有主辦者明確選擇短期收件室時，才會保存公開題目、去連結化
@@ -107,6 +108,10 @@ OpenAI 官方目前建議文字生成使用
   page ID；第一次開啟工作區時才會在 Pol.is 建立對話。完整 Pol.is 需要
   多個 Docker 服務與 PostgreSQL；Cloudflare Containers 只有付費方案且
   不供應 PostgreSQL，因此沒有把它標成免費 Cloudflare 一鍵自架。
+- **Agora Citizen Network**：貼上 ZKorum Agora 的官方公開對話網址即可
+  站內嵌入。Delib 接受舊 `.network` 與現行 `.app` 分享網址，但登入、意見、
+  比較與投票都直接送往 Agora。完整自架需要 PostgreSQL、Valkey 及多個
+  TypeScript／Python workers；目前未驗證代建或 hosted 匯入權限。
 - **HeyForm**：貼上已發布的 `heyform.net/f/...` 公開網址即可站內嵌入。
   建立表單仍在 HeyForm；Delib 不收帳密、cookie 或回答。完整自架需要
   MongoDB 與 Redis／KeyDB。
@@ -126,6 +131,10 @@ OpenAI 官方目前建議文字生成使用
   成果頁另可把最小必要的主辦者摘要帶回 Delib，預填 Call-in、Harmonica、TTTC
   或 Pol.is 的下一輪草稿。TTTC 仍須另行上傳已去識別的原始文字資料；Pol.is
   不會自動新增種子陳述；Call-in 的公開簡報網址也不會因長收據連結而被假裝填好。
+- **Parti DemosX**：MIT 原始碼已列入工具與 hosting 盤點；它是 Java／Maven
+  WAR 搭配 Tomcat、MySQL、Nginx 的完整市民參與平台，repository 最後更新於
+  2022。導入前要先更新依賴、移除 compose 預設密碼、做安全與資料出口測試，
+  因此目前不標成直接啟用或 Cloudflare 一鍵部署。
 
 舊 MetaGov HeyForm／TTTC adaptor 仍保留為互通設計參考，但現行 hosted
 登入與 API 契約已不同；本站不把未驗證的舊端點標示為可直接建立。細節與

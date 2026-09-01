@@ -98,6 +98,10 @@ export default {
       return handleHeyFormRequest(request);
     }
 
+    if (url.pathname === "/api/integrations/agora" && request.method === "POST") {
+      return handleAgoraRequest(request);
+    }
+
     if (url.pathname === "/api/integrations/tttc" && request.method === "POST") {
       return handleTttcRequest(request);
     }
@@ -134,6 +138,11 @@ type PolisRequest = {
 
 type HeyFormRequest = {
   form?: unknown;
+  confirmed?: unknown;
+};
+
+type AgoraRequest = {
+  conversation?: unknown;
   confirmed?: unknown;
 };
 
@@ -426,6 +435,35 @@ export async function handleHeyFormRequest(request: Request): Promise<Response> 
     storedByDelib: false,
     writesWhenOpened: false,
     writesWhenSubmitted: true,
+  }, 200);
+}
+
+export async function handleAgoraRequest(request: Request): Promise<Response> {
+  if (!isSameOriginRequest(request)) return json({ error: "origin not allowed" }, 403);
+  const body = await readJsonRequest<AgoraRequest>(request, MAX_INTEGRATION_BODY_BYTES);
+  if (body instanceof Response) return body;
+  if (body.confirmed !== true) {
+    return json({ error: "開啟前請先確認參與資料會交給 Agora Citizen Network" }, 400);
+  }
+
+  const conversationSlug = parseAgoraConversationSlug(body.conversation);
+  if (!conversationSlug) return json({ error: "請貼上有效的 Agora 公開對話網址" }, 400);
+  const participantUrl = `https://www.agoracitizen.app/conversation/${encodeURIComponent(conversationSlug)}`;
+  const embedUrl = `${participantUrl}/embed`;
+  const workspaceUrl = new URL("/integrations/agora.html", request.url);
+  workspaceUrl.searchParams.set("conversation", conversationSlug);
+
+  return json({
+    integration: "agora-citizen-network",
+    mode: "existing-conversation",
+    status: "ready",
+    conversationSlug,
+    workspaceUrl: workspaceUrl.toString(),
+    participantUrl,
+    embedUrl,
+    storedByDelib: false,
+    writesWhenOpened: false,
+    writesWhenParticipating: true,
   }, 200);
 }
 
@@ -754,6 +792,44 @@ export function parseHeyFormId(value: unknown): string | null {
   }
 }
 
+export function parseAgoraConversationSlug(value: unknown): string | null {
+  if (typeof value !== "string" || value.length > 2_048) return null;
+  try {
+    const parsed = new URL(value.trim());
+    const allowedHosts = new Set([
+      "agoracitizen.network",
+      "www.agoracitizen.network",
+      "agoracitizen.app",
+      "www.agoracitizen.app",
+    ]);
+    if (
+      parsed.protocol !== "https:" ||
+      parsed.username ||
+      parsed.password ||
+      parsed.search ||
+      parsed.hash ||
+      !allowedHosts.has(parsed.hostname)
+    ) {
+      return null;
+    }
+    const segments = parsed.pathname.split("/").filter(Boolean);
+    const oldPath = segments.length === 3 && segments[0] === "feed" && segments[1] === "conversation";
+    const oldEmbedPath =
+      segments.length === 4 &&
+      segments[0] === "feed" &&
+      segments[1] === "conversation" &&
+      segments[3] === "embed";
+    const currentPath = segments.length === 2 && segments[0] === "conversation";
+    const currentEmbedPath =
+      segments.length === 3 && segments[0] === "conversation" && segments[2] === "embed";
+    if (!oldPath && !oldEmbedPath && !currentPath && !currentEmbedPath) return null;
+    const conversationSlug = segments[0] === "feed" ? segments[2] : segments[1];
+    return /^[A-Za-z0-9_-]{3,120}$/.test(conversationSlug) ? conversationSlug : null;
+  } catch {
+    return null;
+  }
+}
+
 function slugify(value: string): string {
   const latin = value
     .normalize("NFKD")
@@ -870,6 +946,7 @@ function withSecurityHeaders(response: Response, pathname: string): Response {
   const next = new Response(response.body, response);
   const polisWorkspace = pathname === "/integrations/polis.html" || pathname === "/integrations/polis";
   const heyFormWorkspace = pathname === "/integrations/heyform.html" || pathname === "/integrations/heyform";
+  const agoraWorkspace = pathname === "/integrations/agora.html" || pathname === "/integrations/agora";
   const tttcWorkspace = pathname === "/integrations/tttc.html" || pathname === "/integrations/tttc";
   const harmonicaWorkspace =
     pathname === "/integrations/harmonica.html" || pathname === "/integrations/harmonica";
@@ -877,11 +954,13 @@ function withSecurityHeaders(response: Response, pathname: string): Response {
     ? "https://pol.is"
     : heyFormWorkspace
       ? "https://heyform.net"
-      : tttcWorkspace
-        ? "https://talktothe.city"
-        : harmonicaWorkspace
-          ? "https://app.harmonica.chat"
-        : "'none'";
+      : agoraWorkspace
+        ? "https://agoracitizen.network https://www.agoracitizen.network https://agoracitizen.app https://www.agoracitizen.app"
+        : tttcWorkspace
+          ? "https://talktothe.city"
+          : harmonicaWorkspace
+            ? "https://app.harmonica.chat"
+            : "'none'";
   next.headers.set(
     "Content-Security-Policy",
     `default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-src ${frameSource}; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'`,

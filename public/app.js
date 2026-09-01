@@ -172,6 +172,7 @@ function bindEvents() {
   document.querySelector("#run-agent").addEventListener("click", runAgent);
   document.querySelector("#call-in-form").addEventListener("submit", createCallIn);
   document.querySelector("#polis-form").addEventListener("submit", preparePolis);
+  document.querySelector("#agora-form").addEventListener("submit", prepareAgora);
   document.querySelector("#heyform-form").addEventListener("submit", prepareHeyForm);
   document.querySelector("#tttc-form").addEventListener("submit", prepareTttc);
   document.querySelector("#harmonica-form").addEventListener("submit", createHarmonica);
@@ -750,6 +751,33 @@ async function prepareHeyForm(event) {
     status.textContent = "工作區網址已準備好；Delib 不會接收或保存表單回答。";
   } catch (error) {
     status.textContent = error instanceof Error ? error.message : "HeyForm 工作區暫時沒有準備好。";
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function prepareAgora(event) {
+  event.preventDefault();
+  const status = document.querySelector("#agora-status");
+  const confirm = document.querySelector("#agora-confirm");
+  if (!confirm.checked) {
+    status.textContent = "先確認登入、意見、比較與投票會直接交給 Agora。";
+    confirm.focus();
+    return;
+  }
+  const button = document.querySelector("#open-agora");
+  button.disabled = true;
+  status.textContent = "正在檢查官方公開對話網址…";
+  try {
+    const data = await postJson("/api/integrations/agora", {
+      conversation: document.querySelector("#agora-url").value.trim(),
+      confirmed: true,
+    });
+    document.querySelector("#agora-workspace").href = data.workspaceUrl;
+    document.querySelector("#agora-result").hidden = false;
+    status.textContent = "工作區網址已準備好；Delib 不會接收或保存 Agora 的參與資料。";
+  } catch (error) {
+    status.textContent = error instanceof Error ? error.message : "Agora 工作區暫時沒有準備好。";
   } finally {
     button.disabled = false;
   }

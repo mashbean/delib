@@ -27,14 +27,16 @@ button.
 | --- | --- | --- | --- | --- |
 | Call-in | Create a seven-day hosted event from a public deck URL; return audience, presenter, setup and moderation links. | None. Private setup and moderation links remain in the tab. | Hosted path needs no account. The source also supports Cloudflare Workers + SQLite Durable Objects, available within the Workers Free limits. | Available. |
 | Pol.is | Embed an existing conversation. A connected `site_id` plus deterministic `page_id` can create on first load. A personal Delib Deploy-button install can ask for `POLIS_SITE_ID` once. | A real Pol.is account creates and owns the Site ID. Cloudflare cannot manufacture one. Site ID is not a password. | Full self-hosting uses several containers and PostgreSQL. Cloudflare Containers are Workers Paid only and do not provide PostgreSQL, so this is not labelled a free Cloudflare-native deployment. | Available with connection. |
+| Agora Citizen Network | Validate an official public conversation URL and embed ZKorum's maintained participant surface. Old `agoracitizen.network/feed/conversation/...` links are normalized to the current `www.agoracitizen.app/conversation/...` route. | Delib needs no credential. Any login remains inside Agora, and Delib does not receive opinions, comparisons or votes. | The active AGPL monorepo uses Quasar/Vue, Fastify, PostgreSQL, Valkey and TypeScript／Python workers. Its import worker accepts Pol.is URLs or CSV archives, but the hosted creation/import/export authorization contract has not been verified. | Available: existing only. |
 | OpenBook | Use the public evidence page as an evidence gear. | None. | Public static site; there is no instance to create. | Direct viewer. |
 | Uncommon Ground | Hand a complete question pool to a bounded agent; preserve withdrawn rows and verify the final receipt. | No service account. The execution environment supplies any model credential. | CC0 workflow; not a hosted participation service. | Agent pipeline. |
 | HeyForm | Validate an existing public form URL and embed the published participant form in Delib. | No Delib credential. Creating and administering a form stays in HeyForm. Delib never asks for a password or cookie. | Self-hosting needs the application, MongoDB and Redis/KeyDB; official docs point to hosted/container platforms, not Cloudflare Workers. | Available: existing only. |
 | Talk to the City | Pre-fill title and description, then embed the current official `/create` UI. Login, CSV upload, model processing and submission all remain inside TTTC. | The user logs in to TTTC in its own frame; Delib never receives the Firebase token. | Current source uses Next/Express, Firebase, Google Cloud Storage, Redis/PubSub and model services, not a Cloudflare-only stack. | Available with upstream login. |
 | Harmonica | Create a conversational session through the official REST API, then return the participant workspace and official management page. The same task can be handed to `harmonica-mcp`. | A `hm_live_` key remains in the browser tab and is sent through the Worker only for the confirmed request. | Official hosted accounts offer a free starting path. Full AGPL self-hosting still needs PostgreSQL, Auth0, model/embedding and vector/file services. | Available with API key. |
 | Power Ranker | Choose a fully local share link or a 24-hour／seven-day room. Room submissions are immediately reduced to pair counts; public aggregates appear at three sessions, and organizers can delete early. Aggregate results can become a fragment-only public receipt after the organizer states interpretation, missing voices, authority and next responsibility. The receipt can then prepare a one-time local draft for Call-in, Harmonica, TTTC or Pol.is without carrying aggregate records. | None. Local exports contain a random pseudonymous session ID. Rooms keep only its SHA-256 hash for deduplication; the private admin token stays after `#` and is stripped from receipts and next-step drafts. | Static mode, receipt rendering and same-tab handoff need no storage. Room mode uses one SQLite Durable Object per room and works within Workers Free limits; excess operations fail. | Available locally or with ephemeral room, result receipt and next-step draft. |
+| Parti DemosX | Listed as a source-available full civic-participation platform, not an iframe or managed creator. | A self-host operator would own all accounts, retention and administration. Delib does not connect to a current hosted DemosX account. | MIT source builds a Java／Maven WAR; the supplied Docker Compose runs Tomcat, MySQL and Nginx and contains development defaults that must be replaced. The repository was last pushed in 2022, so dependency, security and export review comes before deployment. | Catalog only; shared-host candidate after maintenance review. |
 
-The remaining seventeen gallery tools stay `catalog-only` until we have verified
+The other seventeen gallery tools stay `catalog-only` until we have verified
 their creation API, embed policy, export contract, authentication, retention,
 free-tier and deploy target. Their identifiers are listed in
 `public/data/integrations.json` so the UI and agents can state this boundary
@@ -42,12 +44,12 @@ deterministically.
 
 ## Source and hosting paths
 
-`public/data/hosting.json` now records one decision for every one of the 25
+`public/data/hosting.json` now records one decision for every one of the 27
 tools. The useful groups are deliberately different:
 
-- Direct or connected: Call-in, OpenBook, Pol.is, HeyForm, Talk to the City,
+- Direct or connected: Call-in, OpenBook, Pol.is, Agora, HeyForm, Talk to the City,
   Harmonica and Power Ranker already have an in-app path; Uncommon Ground is a data handoff.
-- Shared host: Pol.is, Decidim, Go Vocal, MAPLE and Stanford PB are complete
+- Shared host: Pol.is, Agora, Parti DemosX, Decidim, Go Vocal, MAPLE and Stanford PB are complete
   enough to operate, but require a maintained application/database service.
 - Components and prototypes: Deliberative Canvas, Ethelo OS engine, Global
   Brain, Open Micropublishing and Pairwise have reusable code but
@@ -118,6 +120,11 @@ one organizer account per steward and is documented in `docs/polis-hosting.md`.
 - [Harmonica MCP source](https://github.com/harmonicabot/harmonica-mcp)
 - [PowerRanker source at the ported revision](https://github.com/zaratanDotWorld/powerRanker/tree/4cc4f604022d0188bde1619fc47f05678c0bc0ad)
 - [PDIS polis.tw fork](https://github.com/PDIS/polis2023)
+- [Agora Citizen Network source](https://github.com/zkorum/agora)
+- [Agora official embed documentation](https://github.com/zkorum/agora/blob/main/doc/embed.md)
+- [Agora Pol.is／CSV import worker](https://github.com/zkorum/agora/tree/main/services/import-worker)
+- [Parti Digital Democracy 100 builder](https://100-democracy.parti.coop/en/07-builder.html)
+- [Parti DemosX source and deployment notes](https://github.com/parti-coop/demosx)
 - [MetaGov ontology and adaptors](https://github.com/metagov/ontology)
 - [Matters Lifeboat UX flow](https://github.com/thematters/matters-lifeboat/blob/main/docs/ux-flow.md)
 - [Call-in hosted creator and self-host path](https://github.com/mashbean/call-in)

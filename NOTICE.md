@@ -29,6 +29,10 @@ projects, but does not imply endorsement by their maintainers.
 - The HeyForm workspace frames a published `https://heyform.net/f/...`
   participant surface. HeyForm is an independent AGPL-3.0 project; no HeyForm
   source or participant response is copied into this repository.
+- The Agora workspace frames an official public conversation from the
+  AGPL-3.0 [Agora Citizen Network](https://github.com/zkorum/agora) project.
+  Delib normalizes the older `agoracitizen.network` share route to the current
+  `agoracitizen.app` route; no Agora source or participant data is copied.
 - The Talk to the City workspace frames the maintained
   `https://talktothe.city/create` interface. Its current source is the
   Apache-2.0 licensed
@@ -48,6 +52,9 @@ projects, but does not imply endorsement by their maintainers.
 - The source/hosting registry cites upstream repositories and their declared
   licenses. “Reusable” means a current repository exposes a recognized open
   license; it does not mean Delib has copied or redistributed that code.
+- The registry describes Parti Co-op's MIT-licensed
+  [DemosX](https://github.com/parti-coop/demosx) source as a self-host candidate.
+  Delib does not bundle or run its Java, Tomcat, MySQL or Nginx services.
 
 Tool names and trademarks belong to their respective owners. The tool registry
 stores links and factual interoperability metadata; no third-party source code

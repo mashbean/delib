@@ -294,6 +294,48 @@
               <p class="boundary-note">Pol.is 完整自架需要多個 Docker 服務與 PostgreSQL；Cloudflare Containers 只有付費方案，也不會供應 PostgreSQL。本站的一鍵部署會連接既有 Site ID，而不是假裝重寫整套 Pol.is。</p>
             </article>
 
+            <article id="launch-agora-citizen-network" class="launch-card">
+              <div class="launch-card-heading">
+                <span class="launch-icon" aria-hidden="true">🌉</span>
+                <div>
+                  <span class="flow-tag">現在可用 · 已有公開對話</span>
+                  <h3>在 Delib 開啟 Agora</h3>
+                </div>
+              </div>
+              <p>貼上 ZKorum Agora Citizen Network 的公開對話網址，參與者就能留在 Delib 看見觀點、比較並投票。</p>
+
+              <form id="agora-form" class="launch-form">
+                <label for="agora-url">Agora 公開對話網址</label>
+                <input id="agora-url" type="url" maxlength="2048" required placeholder="https://www.agoracitizen.app/conversation/…" />
+                <p class="field-note">接受官方新網址與舊的 agoracitizen.network 分享網址；不接受後台、查詢參數或登入資料。</p>
+                <div class="write-preview">
+                  <strong>開啟後會發生：</strong>
+                  <ul>
+                    <li>官方公開對話會嵌入 Delib；</li>
+                    <li>只有登入、發表、比較或投票時才會把資料寫入 Agora；</li>
+                    <li>Delib 不取得建立、管理或匯出權限，也不保存參與資料。</li>
+                  </ul>
+                </div>
+                <label class="consent-row">
+                  <input id="agora-confirm" type="checkbox" />
+                  <span>我知道參與資料會交給 Agora，也已確認這是正確的公開對話與主辦者。</span>
+                </label>
+                <button class="button button-primary" id="open-agora" type="submit">開啟 Agora 工作區</button>
+                <p id="agora-status" class="action-status" role="status"></p>
+              </form>
+              <section id="agora-result" class="instance-result compact-result" hidden aria-live="polite">
+                <span class="success-mark" aria-hidden="true">✓</span>
+                <h4>對話工作區準備好了</h4>
+                <p>Delib 只使用公開對話代碼，不接收登入或參與資料。</p>
+                <a id="agora-workspace" class="button button-primary" target="_blank" rel="noreferrer">留在 Delib 開啟 ↗</a>
+              </section>
+              <div class="resource-links">
+                <a href="https://www.agoracitizen.app/" target="_blank" rel="noreferrer">還沒有對話？到 Agora 建立 ↗</a>
+                <a href="https://github.com/zkorum/agora/blob/main/doc/embed.md" target="_blank" rel="noreferrer">查看官方嵌入說明 ↗</a>
+              </div>
+              <p class="boundary-note">Agora 是活躍的 AGPL 完整應用，另有 Pol.is／CSV 匯入 worker；完整自架需要 PostgreSQL、Valkey 與多個 TypeScript／Python 服務，不是 Cloudflare 免費一鍵部署。本站目前只連接既有公開對話，沒有宣稱能代建。</p>
+            </article>
+
             <article id="launch-heyform" class="launch-card">
               <div class="launch-card-heading">
                 <span class="launch-icon" aria-hidden="true">📝</span>
@@ -522,9 +564,9 @@
           </div>
 
           <div class="next-integrations">
-            <div><span>已串接</span><strong>六個站內入口</strong><p>Call-in 可代建；Power Ranker 可本機排序或短期自動彙整；Pol.is、Harmonica、HeyForm、TTTC 各自保留上游邊界。</p></div>
+            <div><span>已串接</span><strong>七個站內入口</strong><p>Call-in 可代建；Power Ranker 可本機排序或短期自動彙整；Pol.is、Agora、Harmonica、HeyForm、TTTC 各自保留上游邊界。</p></div>
             <div><span>原始碼盤點</span><strong>直接用、共用主機、元件三條路</strong><p>每張工具卡會直接說明是否能內嵌、取原始碼，以及為何不能只靠 Cloudflare 免費完成。</p></div>
-            <a href="/data/hosting.json">查看 25 項機器可讀盤點 →</a>
+            <a href="/data/hosting.json">查看 27 項機器可讀盤點 →</a>
           </div>
         </div>
       </section>
@@ -622,10 +664,10 @@
 
       <section id="tools" class="section tools-section">
         <div class="wrap">
-          <p class="section-kicker">工具目錄 · 最後查核 2026-08-31</p>
+          <p class="section-kicker">工具目錄 · 最後查核 2026-09-01</p>
           <div class="tools-heading">
             <div>
-              <h2><span id="tool-count">25</span> 個工具，不是一張排名榜</h2>
+              <h2><span id="tool-count">27</span> 個工具，不是一張排名榜</h2>
               <p class="section-lede">先看它能接哪一段、輸出什麼、資料去哪裡，再決定要不要用。</p>
             </div>
             <label class="search-field">
@@ -645,7 +687,7 @@
           <p id="no-tools" class="empty-state" hidden>找不到符合的工具。換一個比較白話的關鍵字試試？</p>
           <p class="source-note">
             目錄以 <a href="https://metagov.org/delib-tools" target="_blank" rel="noreferrer">MetaGov Deliberative Tools Gallery</a>
-            為底，加入 Call-in、OpenBook、Uncommon Ground 與 HeyForm。列入目錄不代表通過安全或採購審查。
+            為底，加入 Call-in、OpenBook、Uncommon Ground、HeyForm、Agora Citizen Network 與 Parti DemosX。列入目錄不代表通過安全或採購審查。
           </p>
         </div>
       </section>

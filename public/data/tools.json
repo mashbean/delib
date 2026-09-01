@@ -1,10 +1,12 @@
 {
   "schema": "delib-tools/v1",
-  "updatedAt": "2026-08-31",
+  "updatedAt": "2026-09-01",
   "sources": [
     "https://metagov.org/delib-tools",
     "https://github.com/metagov/interop",
-    "https://github.com/metagov/ontology"
+    "https://github.com/metagov/ontology",
+    "https://github.com/zkorum/agora",
+    "https://100-democracy.parti.coop/en/07-builder.html"
   ],
   "tools": [
     {
@@ -73,6 +75,22 @@
       "handoff": "既有對話可嵌入；連接 Pol.is 帳號的 Site ID 後可第一次載入自動建立。完整自架需要 Docker 與 PostgreSQL。"
     },
     {
+      "id": "agora-citizen-network",
+      "name": "Agora Citizen Network",
+      "summary": "以 bridging-based 排序呈現跨群體較能接受的觀點，支援公開對話、比較與投票。",
+      "url": "https://www.agoracitizen.app/",
+      "source": "https://github.com/zkorum/agora",
+      "status": "integrated",
+      "stages": ["eliciting", "deliberating", "reflecting"],
+      "goals": ["listen", "understand", "propose"],
+      "formats": ["hybrid", "online"],
+      "scales": ["medium", "large"],
+      "privacy": ["public", "pseudonymous"],
+      "outputs": ["insights", "proposals"],
+      "hosting": "hosted-or-multi-service",
+      "handoff": "既有公開對話可在 Delib 內嵌入；Agora 另有 Pol.is／CSV 匯入 worker，但建立、匯入與匯出權限仍留在上游。"
+    },
+    {
       "id": "talk-to-the-city",
       "name": "Talk to the City",
       "summary": "把大量文字意見整理成主題、主張與引文，適合訪談、問卷或提問池的 sensemaking。",
@@ -103,6 +121,22 @@
       "outputs": ["proposals", "decision", "receipt"],
       "hosting": "rails-application",
       "handoff": "適合長期制度化參與；不是 Cloudflare 單一 Worker 應用。"
+    },
+    {
+      "id": "parti-demosx",
+      "name": "Parti DemosX",
+      "summary": "韓國 Parti Co-op 公開的完整市民參與平台原始碼，源自首爾市民主參與服務。",
+      "url": "https://100-democracy.parti.coop/en/07-builder.html",
+      "source": "https://github.com/parti-coop/demosx",
+      "status": "catalog",
+      "stages": ["agenda-setting", "eliciting", "deliberating", "proposing", "deciding"],
+      "goals": ["listen", "propose", "decide", "followup"],
+      "formats": ["hybrid", "online"],
+      "scales": ["medium", "large"],
+      "privacy": ["public", "pseudonymous"],
+      "outputs": ["insights", "proposals", "decision", "receipt"],
+      "hosting": "java-docker-application",
+      "handoff": "MIT 原始碼可自架，但目前是 Java／Maven WAR、Tomcat、MySQL、Nginx 的完整平台；repository 最後更新於 2022，導入前需做維護與安全評估。"
     },
     {
       "id": "deliberative-canvas",

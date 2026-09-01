@@ -59,6 +59,20 @@
       "evidence": ["https://github.com/PDIS/polis2023", "https://polis.tw/"]
     },
     {
+      "toolId": "agora-citizen-network",
+      "route": "shared-host",
+      "label": "公開對話已內嵌",
+      "summary": "活躍的 AGPL 完整平台；Delib 已連接 hosted 公開對話，但自架需要 PostgreSQL、Valkey 與多個 TypeScript／Python 服務。",
+      "source": { "url": "https://github.com/zkorum/agora", "license": "AGPL-3.0", "reusable": true },
+      "embed": "implemented-existing-only",
+      "cloudflareNative": false,
+      "nextAction": "先驗證 hosted 建立、匯入與匯出契約；若要自架，採一個有維運者的共用 instance，而不是每案部署。",
+      "evidence": [
+        "https://github.com/zkorum/agora/blob/main/doc/embed.md",
+        "https://github.com/zkorum/agora/tree/main/services/import-worker"
+      ]
+    },
+    {
       "toolId": "talk-to-the-city",
       "route": "shared-host",
       "label": "官方 UI 已連接",
@@ -98,6 +112,21 @@
       "embed": "not-generic",
       "cloudflareNative": false,
       "nextAction": "先評估共用租戶、管理責任與匯出 API，再提供建立流程。"
+    },
+    {
+      "toolId": "parti-demosx",
+      "route": "shared-host",
+      "label": "MIT 自架平台，需先整修",
+      "summary": "Parti Co-op 公開的完整市民參與平台；目前 source 是 Java／Maven WAR，Docker Compose 會啟動 Tomcat、MySQL 與 Nginx，repository 最後更新於 2022。",
+      "source": { "url": "https://github.com/parti-coop/demosx", "license": "MIT", "reusable": true },
+      "embed": "not-verified",
+      "cloudflareNative": false,
+      "nextAction": "先重現 build、更新依賴與預設密碼、做安全掃描及資料出口測試，再決定是否營運共用 instance。",
+      "evidence": [
+        "https://100-democracy.parti.coop/en/07-builder.html",
+        "https://github.com/parti-coop/demosx/blob/master/README.md",
+        "https://github.com/parti-coop/demosx/blob/master/docker/docker-compose.yml"
+      ]
     },
     {
       "toolId": "deliberative-canvas",

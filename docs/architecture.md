@@ -13,6 +13,7 @@ human-readable result + offline gears + care checks
 share URL / JSON / Markdown       direct activation adapters
                                   ├─ Call-in managed creator
                                   ├─ Pol.is connected workspace
+                                  ├─ Agora public-conversation workspace
                                   ├─ HeyForm published-form workspace
                                   ├─ Talk to the City official create workspace
                                   ├─ Harmonica credentialed creator + workspace
@@ -47,6 +48,10 @@ human gate is mandatory.
   has a `POLIS_SITE_ID` connection without revealing its value.
 - `POST /api/integrations/heyform` accepts only a canonical public form URL and
   returns a same-site participant workspace. Answers go directly to HeyForm.
+- `POST /api/integrations/agora` accepts only an official Agora Citizen Network
+  public conversation URL, normalizes the old `.network` route to the current
+  `.app` route and returns a same-site embed workspace. Delib does not proxy
+  login, opinions, comparisons or votes, and does not claim project creation.
 - `POST /api/integrations/tttc` prepares a same-site wrapper around the current
   official create page. Authentication, CSV and report creation stay in TTTC.
 - `POST /api/integrations/harmonica` validates a tab-only `hm_live_` key and a

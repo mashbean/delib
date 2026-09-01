@@ -69,6 +69,40 @@
       ]
     },
     {
+      "toolId": "agora-citizen-network",
+      "readiness": "available-existing-only",
+      "activation": "embedded-workspace",
+      "label": "已有公開對話直接嵌入",
+      "summary": "貼上 ZKorum Agora Citizen Network 的官方公開對話網址，即可在 Delib 內參與；舊 network 網址會正規化到現行 app 網址。",
+      "accountRequired": "是否需要登入取決於參與動作與上游設定；登入只發生在 Agora。",
+      "credentialRequired": false,
+      "freePath": "可使用 Agora Citizen Network 現行 hosted 公開對話；Delib 不代建帳號或專案。",
+      "writesExternalState": "開啟工作區不寫入；登入、發表、比較或投票時才由 Agora 寫入。",
+      "retention": "由 Agora 帳號與部署政策決定；Delib 不保存登入、意見、比較或投票資料。",
+      "inAppEndpoint": "/api/integrations/agora",
+      "selfHost": {
+        "supported": true,
+        "platform": "Quasar/Vue + Fastify + PostgreSQL + Valkey + TypeScript/Python workers",
+        "cloudflareNative": false,
+        "note": "AGPL monorepo 可自架，另有 Pol.is URL／CSV import worker；完整服務不是 Cloudflare Workers 免費一鍵部署。"
+      },
+      "agent": {
+        "canCreate": false,
+        "canEmbedExisting": true,
+        "humanGate": "確認公開對話、主辦者、資料政策與參與目的；Delib 尚未驗證建立 API 或管理權限。"
+      },
+      "knownLimitations": [
+        "官方 embed 文件仍使用 agoracitizen.network；該網址目前會導向 www.agoracitizen.app，Delib 同時驗證兩種官方格式。",
+        "官方 source 顯示可匯入 Pol.is URL 或 CSV，但 Delib 尚未取得或驗證 hosted 匯入、建立與匯出的授權契約。"
+      ],
+      "evidence": [
+        "https://github.com/zkorum/agora",
+        "https://github.com/zkorum/agora/blob/main/doc/embed.md",
+        "https://github.com/zkorum/agora/tree/main/services/import-worker",
+        "https://www.agoracitizen.app/"
+      ]
+    },
+    {
       "toolId": "harmonica",
       "readiness": "available-with-api-key",
       "activation": "credentialed-create",
@@ -237,6 +271,7 @@
   ],
   "catalogOnly": [
     "decidim",
+    "parti-demosx",
     "deliberative-canvas",
     "ethelo",
     "evocracy",
