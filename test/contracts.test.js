@@ -43,6 +43,52 @@ describe("public contracts", () => {
     );
   });
 
+  it("publishes an eight-step people, data and feedback-loop process map", async () => {
+    const process = JSON.parse(
+      await readFile(new URL("public/data/deliberation-process.json", root), "utf8"),
+    );
+    const schema = JSON.parse(
+      await readFile(new URL("public/schemas/delib-process/v1.json", root), "utf8"),
+    );
+    expect(process.schema).toBe("delib-process/v1");
+    expect(schema.$id).toBe("https://delib.mashbean.net/schemas/delib-process/v1.json");
+    expect(process.steps).toHaveLength(8);
+    expect(new Set(process.steps.map((step) => step.id)).size).toBe(8);
+    expect(process.steps.find((step) => step.id === "recruit").humanFlow).toContain("受邀者");
+    expect(process.steps.find((step) => step.id === "sortition").tools).toContain("OpenDLP");
+    expect(process.steps.find((step) => step.id === "feedback").dataFlow).toContain("不含逐筆參與資料");
+    expect(process.feedbackLoops.map((loop) => loop.audience)).toEqual(["參與者", "主辦者", "工具開發者"]);
+  });
+
+  it("publishes a source-linked deployment and interoperability comparison", async () => {
+    const comparison = JSON.parse(
+      await readFile(new URL("public/data/tool-comparison.json", root), "utf8"),
+    );
+    const schema = JSON.parse(
+      await readFile(new URL("public/schemas/delib-tool-comparison/v1.json", root), "utf8"),
+    );
+    expect(comparison.schema).toBe("delib-tool-comparison/v1");
+    expect(schema.$id).toBe("https://delib.mashbean.net/schemas/delib-tool-comparison/v1.json");
+    expect(comparison.tools.length).toBeGreaterThanOrEqual(15);
+    expect(new Set(comparison.tools.map((tool) => tool.id)).size).toBe(comparison.tools.length);
+    for (const tool of comparison.tools) {
+      expect(["direct", "connected", "catalog"]).toContain(tool.delibMode);
+      expect(["implemented", "partial", "planned"]).toContain(tool.interopLevel);
+      expect(tool.url).toMatch(/^https:\/\//);
+      expect(tool.source).toMatch(/^https:\/\//);
+    }
+    expect(comparison.tools.find((tool) => tool.id === "pocket-polis")).toMatchObject({
+      deploymentRoute: "one-click",
+      interopLevel: "implemented",
+      openSource: "yes",
+    });
+    expect(comparison.tools.find((tool) => tool.id === "polis").deploymentRoute).toBe("shared-host");
+    expect(comparison.tools.find((tool) => tool.id === "opendlp")).toMatchObject({
+      deploymentRoute: "early-stage",
+      license: "Apache-2.0",
+    });
+  });
+
   it("lists only reproducible Cloudflare-native paths as one-click recipes", async () => {
     const deployments = JSON.parse(
       await readFile(new URL("public/data/deployments.json", root), "utf8"),

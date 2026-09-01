@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://delib.mashbean.net/schemas/delib-process/v1.json",
+  "title": "Delib deliberation process map v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "updatedAt", "promise", "steps", "feedbackLoops"],
+  "properties": {
+    "schema": { "const": "delib-process/v1" },
+    "updatedAt": { "type": "string", "format": "date" },
+    "promise": { "type": "string" },
+    "steps": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "number", "title", "humanFlow", "dataFlow", "tools", "detail", "gate", "output"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]+$" },
+          "number": { "type": "string", "pattern": "^0[1-8]$" },
+          "title": { "type": "string" },
+          "humanFlow": { "type": "string" },
+          "dataFlow": { "type": "string" },
+          "tools": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+          "detail": { "type": "string" },
+          "gate": { "type": "string" },
+          "output": { "type": "string" }
+        }
+      }
+    },
+    "feedbackLoops": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["audience", "action"],
+        "properties": {
+          "audience": { "type": "string" },
+          "action": { "type": "string" }
+        }
+      }
+    }
+  }
+}

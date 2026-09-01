@@ -47,9 +47,13 @@ const POCKET_POLIS_DATA_STORAGE_KEY = "delib:pocket-polis-data-source";
 let tools = [];
 let integrations = new Map();
 let hosting = new Map();
+let processSteps = [];
+let feedbackLoops = [];
+let comparisonTools = [];
 let currentPlan = null;
 let currentStep = 0;
 let activeFilter = "all";
+let activeComparisonFilter = "all";
 let polisDeploymentConnected = false;
 
 const plannerDialog = document.querySelector("#planner-dialog");
@@ -76,18 +80,31 @@ init().catch((error) => {
 });
 
 async function init() {
-  const [response, integrationResponse, hostingResponse] = await Promise.all([
+  const [response, integrationResponse, hostingResponse, processResponse, comparisonResponse] = await Promise.all([
     fetch("/data/tools.json", { cache: "no-cache" }),
     fetch("/data/integrations.json", { cache: "no-cache" }),
     fetch("/data/hosting.json", { cache: "no-cache" }),
+    fetch("/data/deliberation-process.json", { cache: "no-cache" }),
+    fetch("/data/tool-comparison.json", { cache: "no-cache" }),
   ]);
-  if (!response.ok || !integrationResponse.ok || !hostingResponse.ok) {
+  if (
+    !response.ok ||
+    !integrationResponse.ok ||
+    !hostingResponse.ok ||
+    !processResponse.ok ||
+    !comparisonResponse.ok
+  ) {
     throw new Error("tool registry unavailable");
   }
   const registry = await response.json();
   const integrationRegistry = await integrationResponse.json();
   const hostingRegistry = await hostingResponse.json();
+  const processRegistry = await processResponse.json();
+  const comparisonRegistry = await comparisonResponse.json();
   tools = Array.isArray(registry.tools) ? registry.tools : [];
+  processSteps = Array.isArray(processRegistry.steps) ? processRegistry.steps : [];
+  feedbackLoops = Array.isArray(processRegistry.feedbackLoops) ? processRegistry.feedbackLoops : [];
+  comparisonTools = Array.isArray(comparisonRegistry.tools) ? comparisonRegistry.tools : [];
   integrations = new Map(
     (Array.isArray(integrationRegistry.integrations) ? integrationRegistry.integrations : []).map((item) => [
       item.toolId,
@@ -98,6 +115,8 @@ async function init() {
     (Array.isArray(hostingRegistry.tools) ? hostingRegistry.tools : []).map((item) => [item.toolId, item]),
   );
   document.querySelector("#tool-count").textContent = String(tools.length);
+  renderProcessMap();
+  renderComparisonTable();
   renderToolLibrary();
   bindEvents();
   updatePolisMode();
@@ -159,6 +178,16 @@ function bindEvents() {
         candidate.classList.toggle("active", candidate === button);
       });
       renderToolLibrary();
+    });
+  });
+  document.querySelectorAll("[data-comparison-filter]").forEach((button) => {
+    button.addEventListener("click", () => {
+      activeComparisonFilter = button.dataset.comparisonFilter;
+      document.querySelectorAll("[data-comparison-filter]").forEach((candidate) => {
+        candidate.classList.toggle("active", candidate === button);
+        candidate.setAttribute("aria-pressed", candidate === button ? "true" : "false");
+      });
+      renderComparisonTable();
     });
   });
 
@@ -355,6 +384,146 @@ function renderRecommendation(tool) {
   if (sourceUrl && sourceUrl !== tool.url) links.append(externalLink("原始碼", sourceUrl));
   article.append(links);
   return article;
+}
+
+function renderProcessMap() {
+  const track = document.querySelector("#process-track");
+  const loopContainer = document.querySelector("#feedback-loops");
+  if (!track || !loopContainer || !processSteps.length) return;
+
+  const nodes = processSteps.map((step, index) => {
+    const button = createElement("button", `process-step process-step-${index + 1}`);
+    button.type = "button";
+    button.dataset.processStep = step.id;
+    button.setAttribute(
+      "aria-label",
+      `${step.number} ${step.title}。人流：${step.humanFlow}。資料流：${step.dataFlow}。工具：${(step.tools || []).join("、")}`,
+    );
+    button.setAttribute("aria-pressed", index === 0 ? "true" : "false");
+    button.append(
+      createElement("span", "process-step-number", step.number),
+      createElement("strong", "process-step-title", step.title),
+    );
+
+    const humanLine = createElement("span", "process-flow-line process-flow-people");
+    humanLine.append(createElement("b", "", "人"), document.createTextNode(step.humanFlow));
+    const dataLine = createElement("span", "process-flow-line process-flow-data");
+    dataLine.append(createElement("b", "", "資料"), document.createTextNode(step.dataFlow));
+    const toolList = createElement("span", "process-tool-list");
+    for (const tool of step.tools || []) toolList.append(createElement("span", "", tool));
+    button.append(humanLine, dataLine, toolList);
+    button.addEventListener("click", () => selectProcessStep(step.id));
+    return button;
+  });
+  track.replaceChildren(...nodes);
+
+  loopContainer.replaceChildren(
+    ...feedbackLoops.map((loop, index) => {
+      const article = createElement("article", "feedback-loop-card");
+      article.append(
+        createElement("span", "feedback-loop-number", `LOOP ${String(index + 1).padStart(2, "0")}`),
+        createElement("strong", "", loop.audience),
+        createElement("p", "", loop.action),
+      );
+      return article;
+    }),
+  );
+  selectProcessStep(processSteps[0].id);
+}
+
+function selectProcessStep(stepId) {
+  const step = processSteps.find((item) => item.id === stepId);
+  if (!step) return;
+  document.querySelectorAll("[data-process-step]").forEach((button) => {
+    button.setAttribute("aria-pressed", button.dataset.processStep === stepId ? "true" : "false");
+  });
+  document.querySelector("#process-detail-title").textContent = `${step.number} · ${step.title}`;
+  document.querySelector("#process-detail-description").textContent = step.detail;
+  document.querySelector("#process-detail-gate").textContent = step.gate;
+  document.querySelector("#process-detail-output").textContent = step.output;
+}
+
+function renderComparisonTable() {
+  const body = document.querySelector("#comparison-body");
+  const empty = document.querySelector("#comparison-empty");
+  if (!body || !empty) return;
+  const matches = comparisonTools.filter(matchesComparisonFilter);
+  body.replaceChildren(...matches.map(renderComparisonRow));
+  empty.hidden = matches.length > 0;
+}
+
+function matchesComparisonFilter(tool) {
+  switch (activeComparisonFilter) {
+    case "one-click":
+      return ["one-click", "bundled"].includes(tool.deploymentRoute);
+    case "direct":
+      return ["direct", "connected"].includes(tool.delibMode);
+    case "data":
+      return ["implemented", "partial"].includes(tool.interopLevel);
+    case "shared-host":
+      return ["shared-host", "rehabilitation"].includes(tool.deploymentRoute);
+    case "upstream":
+      return ["upstream-service", "upstream-or-self-host"].includes(tool.deploymentRoute);
+    case "early":
+      return ["early-stage", "rehabilitation"].includes(tool.deploymentRoute);
+    default:
+      return true;
+  }
+}
+
+function renderComparisonRow(tool) {
+  const row = document.createElement("tr");
+
+  const identity = document.createElement("th");
+  identity.scope = "row";
+  const name = externalLink(tool.name, tool.url);
+  name.className = "comparison-tool-name";
+  const steps = createElement("span", "comparison-step-list");
+  for (const step of tool.steps || []) steps.append(createElement("span", "", step));
+  identity.append(name, createElement("span", "comparison-summary", tool.summary), steps);
+
+  const delib = document.createElement("td");
+  delib.append(
+    createElement("span", `comparison-status comparison-status-${tool.delibMode}`, comparisonDelibLabel(tool.delibMode)),
+    createElement("p", "", tool.delibPath),
+  );
+
+  const interop = document.createElement("td");
+  interop.append(createElement("span", `interop-state interop-state-${tool.interopLevel}`, comparisonInteropLabel(tool.interopLevel)));
+  const formats = createElement("ul", "comparison-list");
+  for (const item of tool.interop || []) formats.append(createElement("li", "", item));
+  interop.append(formats);
+
+  const deployment = document.createElement("td");
+  deployment.append(
+    createElement("span", `deployment-badge deployment-${tool.deploymentRoute}`, tool.deploymentLabel),
+    createElement("p", "", tool.deploymentDetail),
+    createElement("small", "comparison-boundary", tool.serviceBoundary),
+  );
+
+  const source = document.createElement("td");
+  source.append(
+    createElement("strong", `source-status source-${tool.openSource}`, comparisonSourceLabel(tool.openSource)),
+    createElement("span", "comparison-license", tool.license),
+    externalLink("原始碼／依據 ↗", tool.source),
+  );
+
+  row.append(identity, delib, interop, deployment, source);
+  return row;
+}
+
+function comparisonDelibLabel(mode) {
+  return mode === "direct" ? "Delib 直接用" : mode === "connected" ? "Delib 已連接" : "尚未接入";
+}
+
+function comparisonInteropLabel(level) {
+  return level === "implemented" ? "已實作" : level === "partial" ? "部分可接" : "尚待轉接";
+}
+
+function comparisonSourceLabel(status) {
+  if (status === "yes") return "開源";
+  if (status === "partial") return "部分公開";
+  return "授權未確認";
 }
 
 function renderToolLibrary() {

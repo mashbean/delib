@@ -9,6 +9,8 @@ select open-source tools, and leave an inspectable receipt for the next round.
 - Integration audit: https://delib.mashbean.net/data/integrations.json
 - Source and hosting audit: https://delib.mashbean.net/data/hosting.json
 - Verified deployment recipes: https://delib.mashbean.net/data/deployments.json
+- Deliberation people/data/feedback process: https://delib.mashbean.net/data/deliberation-process.json
+- Deployment and interoperability comparison: https://delib.mashbean.net/data/tool-comparison.json
 - One-click deployment center: https://delib.mashbean.net/deploy.html
 - Privacy-safe interoperability feedback: https://delib.mashbean.net/feedback.html
 - Integration API: https://delib.mashbean.net/api/integrations
@@ -24,6 +26,8 @@ Direct actions currently implemented:
 - POST /api/integrations/pocket-polis — create a confirmed Pocket Polis conversation without an account and return separate public and fragment-held private links.
 - /integrations/pocket-polis-data.html — validate Pocket Polis statements.csv and votes.csv locally, then download a participant-aware source bundle, delib-data/v1, TTTC CSV or Agora summary/comments/votes CSVs. Files never leave browser memory.
 - /schemas/delib-data/v1.json — common source-preserving envelope for phases, items, responses, outcomes, provenance and privacy boundaries. Pocket Polis and Power Ranker adapters are implemented.
+- /schemas/delib-process/v1.json — eight-stage recruit, sortition, learn, deliberate, respond and feedback process with explicit human and data flows.
+- /schemas/delib-tool-comparison/v1.json — source-linked comparison of Delib access, data interoperability, deployment responsibility, service boundary and license.
 - /schemas/delib-pocket-polis/v1.json — machine-readable contract for the local Pocket Polis handoff.
 - /results/pocket-polis.html#receipt=… — default no-storage organizer-reviewed Pocket Polis result receipt.
 - /schemas/delib-pocket-polis-receipt/v1.json — machine-readable contract for the public Pocket Polis result receipt.

@@ -1,0 +1,109 @@
+{
+  "schema": "delib-process/v1",
+  "updatedAt": "2026-09-01",
+  "promise": "Every round shows where people move, where data moves, who can decide, and how feedback changes the next round.",
+  "steps": [
+    {
+      "id": "frame",
+      "number": "01",
+      "title": "定義問題與權限",
+      "humanFlow": "主辦者＋受影響社群",
+      "dataFlow": "問題、權限、同意、風險",
+      "tools": ["Delib", "OpenBook", "Uncommon Ground"],
+      "detail": "先寫清楚誰能決定、參與會影響什麼、哪些資料不能收，以及沒有採納時要如何回覆。",
+      "gate": "受影響的人能否改寫問題？主辦者的真實權限是否已公開？",
+      "output": "審議 brief、資料界線與回覆承諾"
+    },
+    {
+      "id": "recruit",
+      "number": "02",
+      "title": "招募與接觸",
+      "humanFlow": "母體 → 受邀者／自願者",
+      "dataFlow": "招募條件、聯絡名單、可近用需求",
+      "tools": ["HeyForm", "OpenDLP", "電話／實體邀請"],
+      "detail": "公開招募與定向邀請可以並行；聯絡資料應與後面的意見、投票及公開成果分開保存。",
+      "gate": "哪些人因語言、時間、設備、照顧或交通條件而進不來？",
+      "output": "受邀名單、志願者池與招募缺口"
+    },
+    {
+      "id": "sortition",
+      "number": "03",
+      "title": "分層抽樣 Sortition",
+      "humanFlow": "志願者池 → 正選＋候補",
+      "dataFlow": "配額、亂數／演算法、確認與替補紀錄",
+      "tools": ["OpenDLP", "Panelot", "人工覆核"],
+      "detail": "若需要小型公民會議，用公開的分層條件與可稽核抽樣選出參與者；不要把自願報名者直接稱為代表性樣本。",
+      "gate": "配額由誰決定？抽樣過程能否重現？拒絕與替補會不會重新造成偏差？",
+      "output": "可說明限制的參與者樣本與候補名單"
+    },
+    {
+      "id": "learn",
+      "number": "04",
+      "title": "共同學習與議程",
+      "humanFlow": "參與者 ↔ 專家／利害關係人",
+      "dataFlow": "證據包、問題池、來源、更正紀錄",
+      "tools": ["OpenBook", "Call-in", "Talk to the City"],
+      "detail": "把證據、提問與不同立場放在同一輪學習裡，保留來源與更正，不讓單一簡報成為最後答案。",
+      "gate": "證據是否可查？誰有機會提問、補充或指出錯誤？",
+      "output": "可查證的議程、證據包與問題池"
+    },
+    {
+      "id": "listen",
+      "number": "05",
+      "title": "蒐集陳述與經驗",
+      "humanFlow": "參與者 → 彼此可見的聲音池",
+      "dataFlow": "陳述、問卷、訪談與逐筆回應",
+      "tools": ["Pocket Polis", "Pol.is", "HeyForm", "Harmonica"],
+      "detail": "讓參與者提出新陳述、回應他人並補充經驗；公開文字、匿名代碼與聯絡資訊要有不同保存規則。",
+      "gate": "投稿如何審核？撤回、更正與敏感經驗如何處理？",
+      "output": "原始聲音、陳述池與資料卡"
+    },
+    {
+      "id": "deliberate",
+      "number": "06",
+      "title": "審議、比較與排序",
+      "humanFlow": "小組 ↔ 全體；少數聲音 ↔ 多數方向",
+      "dataFlow": "比較、投票、分群、理由與涵蓋率",
+      "tools": ["Power Ranker", "Agora", "Decidim", "Parti DemosX"],
+      "detail": "使用討論、兩兩比較、投票或群組分析找出可推進方向，但不能把工具分數直接叫做共識或代表性民意。",
+      "gate": "誰沒有完成？哪些觀點被排序方法壓低？結果的涵蓋率是多少？",
+      "output": "共識候選、分歧、少數聲音與方法限制"
+    },
+    {
+      "id": "respond",
+      "number": "07",
+      "title": "解讀、決定與回覆",
+      "humanFlow": "主持者 → 有權回應者 → 參與者",
+      "dataFlow": "工具彙整＋人工解讀＋採納狀態",
+      "tools": ["Talk to the City", "Uncommon Ground", "Delib 成果收據"],
+      "detail": "工具整理、主持判斷與正式決定要分層呈現；每個下一步都要寫出負責者與回覆日期。",
+      "gate": "誰簽署這份解讀？未採納的建議是否有理由與申訴入口？",
+      "output": "公開成果、責任人、期限與未回答問題"
+    },
+    {
+      "id": "feedback",
+      "number": "08",
+      "title": "公開、回饋、下一輪",
+      "humanFlow": "成果 → 參與者／公眾／開發者 → 下一輪",
+      "dataFlow": "公開摘要、修正、流程故障；不含逐筆參與資料",
+      "tools": ["Delib 短網址", "Call-in", "開發者回饋"],
+      "detail": "參與者看見自己的聲音如何被使用並提出修正；主辦者調整下一輪招募與議程；開發者只收到資料結構、部署與流程卡點。",
+      "gate": "回饋會由誰處理？哪些改變會進入下一輪？公開資料能否安全分享與到期？",
+      "output": "修正紀錄、下一輪 brief 與工具改進項目"
+    }
+  ],
+  "feedbackLoops": [
+    {
+      "audience": "參與者",
+      "action": "查核原話與解讀、要求修正、申訴或加入下一輪"
+    },
+    {
+      "audience": "主辦者",
+      "action": "調整招募、抽樣、證據、問題與回覆責任"
+    },
+    {
+      "audience": "工具開發者",
+      "action": "修正 schema、轉接、部署與放棄點，不接收參與內容"
+    }
+  ]
+}

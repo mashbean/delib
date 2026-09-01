@@ -29,9 +29,9 @@
           <span><strong>Delib</strong><span class="brand-divider">·</span>審議拼圖</span>
         </a>
         <nav aria-label="主要選單">
-          <a href="#how">怎麼拼</a>
+          <a href="#journey">流程地圖</a>
           <a href="#launch">直接啟用</a>
-          <a href="#tools">工具庫</a>
+          <a href="#compare">工具比較</a>
           <a href="/deploy.html">一鍵部署</a>
           <a href="#care">Care check</a>
           <button class="button button-small button-primary" data-start="listen">開始拼一輪 →</button>
@@ -51,7 +51,7 @@
             </p>
             <div class="actions">
               <button class="button button-primary button-large" data-start="listen">🧩 開始拼一輪</button>
-              <a class="button button-ghost button-large" href="#how">先看看怎麼運作</a>
+              <a class="button button-ghost button-large" href="#journey">先看看完整流程</a>
             </div>
             <p class="microcopy">不用註冊 · 推薦規則公開 · 參與資料預設留在原工具或本機</p>
           </div>
@@ -66,6 +66,42 @@
             </ol>
             <p>一場活動不是終點。可檢查的收據，才是下一輪的起點。</p>
           </aside>
+        </div>
+      </section>
+
+      <section id="journey" class="section journey-section">
+        <div class="wrap">
+          <p class="section-kicker">People flow × data flow × feedback loop</p>
+          <h2>一輪審議，不只是一場活動。</h2>
+          <p class="section-lede">
+            點一個步驟，看參與者怎麼進來、資料怎麼交接、哪裡必須由人確認，以及成果如何回到下一輪。
+          </p>
+
+          <div class="process-legend" aria-label="流程圖圖例">
+            <span><i class="legend-mark legend-people" aria-hidden="true"></i>人流</span>
+            <span><i class="legend-mark legend-data" aria-hidden="true"></i>資料流</span>
+            <span><i class="legend-mark legend-loop" aria-hidden="true"></i>回饋與責任</span>
+          </div>
+
+          <div id="process-track" class="process-track" aria-label="審議流程八個步驟"></div>
+
+          <section id="process-detail" class="process-detail" aria-live="polite" aria-labelledby="process-detail-title">
+            <div>
+              <p class="process-detail-label">目前步驟</p>
+              <h3 id="process-detail-title">讀取流程中…</h3>
+              <p id="process-detail-description"></p>
+            </div>
+            <dl>
+              <div><dt>人工關卡</dt><dd id="process-detail-gate"></dd></div>
+              <div><dt>交給下一步</dt><dd id="process-detail-output"></dd></div>
+            </dl>
+          </section>
+
+          <p class="feedback-return-label"><span aria-hidden="true">↺</span> 成果回到招募、議程與工具設計</p>
+          <div id="feedback-loops" class="feedback-loops" aria-label="三個回饋迴路"></div>
+          <p class="process-boundary">
+            <strong>資料分流：</strong>招募名冊、聯絡方式與可近用需求應留在受限空間；公開成果只帶彙整、解讀、限制與責任，不帶逐筆參與紀錄。
+          </p>
         </div>
       </section>
 
@@ -738,6 +774,50 @@
               </div>
             </section>
           </div>
+        </div>
+      </section>
+
+      <section id="compare" class="section comparison-section">
+        <div class="wrap comparison-wrap">
+          <p class="section-kicker">Deployment and interoperability · 最後查核 2026-09-01</p>
+          <div class="comparison-heading">
+            <div>
+              <h2>先比較「怎麼用」，再比較功能。</h2>
+              <p class="section-lede">
+                開源不等於一鍵部署；能內嵌也不等於資料能帶走。這張表把 Delib 串接、資料格式、主機責任與服務邊界放在一起。
+              </p>
+            </div>
+            <a class="button button-ghost" href="/deploy.html">查看一鍵部署中心 →</a>
+          </div>
+
+          <div class="comparison-filters" aria-label="依部署方式篩選工具">
+            <button class="comparison-filter active" type="button" aria-pressed="true" data-comparison-filter="all">全部</button>
+            <button class="comparison-filter" type="button" aria-pressed="false" data-comparison-filter="one-click">Cloudflare 一鍵</button>
+            <button class="comparison-filter" type="button" aria-pressed="false" data-comparison-filter="direct">Delib 可直接用</button>
+            <button class="comparison-filter" type="button" aria-pressed="false" data-comparison-filter="data">已有資料轉接</button>
+            <button class="comparison-filter" type="button" aria-pressed="false" data-comparison-filter="shared-host">需共用主機</button>
+            <button class="comparison-filter" type="button" aria-pressed="false" data-comparison-filter="upstream">使用對方服務</button>
+            <button class="comparison-filter" type="button" aria-pressed="false" data-comparison-filter="early">尚在早期／待整修</button>
+          </div>
+
+          <div class="comparison-table-wrap" tabindex="0" role="region" aria-label="審議工具部署與資料互通比較表">
+            <table class="comparison-table">
+              <thead>
+                <tr>
+                  <th scope="col">工具與用途</th>
+                  <th scope="col">在 Delib 怎麼用</th>
+                  <th scope="col">資料能否互通</th>
+                  <th scope="col">部署／主機責任</th>
+                  <th scope="col">開源</th>
+                </tr>
+              </thead>
+              <tbody id="comparison-body"></tbody>
+            </table>
+          </div>
+          <p id="comparison-empty" class="empty-state" hidden>這個分類目前沒有工具。</p>
+          <p class="source-note">
+            每列連到官方服務或原始碼；「可互通」只列已實作或明確標為待驗證的路徑。OpenDLP、Panelot 補上招募與 sortition 的缺口，但目前都還沒有 Delib adapter。
+          </p>
         </div>
       </section>
 

@@ -42,7 +42,9 @@
 21. `delib-data/v1` 通用跨工具資料層，先提供 Pocket Polis 與 Power Ranker（個人／群體）轉接器，保留來源 schema、provenance 與匿名串連風險；
 22. 成果頁可選擇建立 16 字元公開短網址，保存 30 天、1 年或 3 年；只存已去連結化公開收據，私人刪除網址的 token 只留在 `#` 後方；
 23. [`/deploy.html`](https://delib.mashbean.net/deploy.html) 一鍵部署中心，集中 Delib、Pocket Polis、Call-in 三個可重現配方，並誠實列出 Pol.is、Agora、TTTC、HeyForm、Harmonica 與 Parti DemosX 的維運邊界；
-24. [`/feedback.html`](https://delib.mashbean.net/feedback.html) 開發者回饋迴路，以 `delib-feedback/v1` 在本機預覽 schema 缺口、轉接失敗與部署摩擦，再由使用者明確下載或開 GitHub issue；CI 會在 PR 與 main 執行完整檢查。
+24. [`/feedback.html`](https://delib.mashbean.net/feedback.html) 開發者回饋迴路，以 `delib-feedback/v1` 在本機預覽 schema 缺口、轉接失敗與部署摩擦，再由使用者明確下載或開 GitHub issue；CI 會在 PR 與 main 執行完整檢查；
+25. 首頁 `delib-process/v1` 八步流程圖，同時呈現招募、sortition、共同學習、審議、回覆與下一輪的人流、資料流、人工關卡和參與者／主辦者／開發者回饋迴路；
+26. 首頁 `delib-tool-comparison/v1` 比較表，對照 Delib 串接、資料格式、Cloudflare 一鍵、共用主機、上游服務與開源授權，並補入 OpenDLP 與 Panelot 的 sortition 路徑。
 
 Delib 伺服器不保存 API key 或使用者建立的流程。Power Ranker 預設仍可完全
 在瀏覽器處理；只有主辦者明確選擇短期收件室時，才會保存公開題目、去連結化

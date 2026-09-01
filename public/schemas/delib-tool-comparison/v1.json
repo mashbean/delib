@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://delib.mashbean.net/schemas/delib-tool-comparison/v1.json",
+  "title": "Delib tool deployment and interoperability comparison v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "updatedAt", "promise", "tools"],
+  "properties": {
+    "schema": { "const": "delib-tool-comparison/v1" },
+    "updatedAt": { "type": "string", "format": "date" },
+    "promise": { "type": "string" },
+    "tools": {
+      "type": "array",
+      "minItems": 10,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id", "name", "summary", "steps", "delibMode", "interopLevel", "delibPath", "interop",
+          "deploymentRoute", "deploymentLabel", "deploymentDetail", "serviceBoundary",
+          "openSource", "license", "url", "source"
+        ],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]+$" },
+          "name": { "type": "string" },
+          "summary": { "type": "string" },
+          "steps": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+          "delibMode": { "enum": ["direct", "connected", "catalog"] },
+          "interopLevel": { "enum": ["implemented", "partial", "planned"] },
+          "delibPath": { "type": "string" },
+          "interop": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+          "deploymentRoute": {
+            "enum": [
+              "one-click", "bundled", "shared-host", "upstream-service", "upstream-or-self-host",
+              "early-stage", "rehabilitation", "direct-view", "agent-workflow"
+            ]
+          },
+          "deploymentLabel": { "type": "string" },
+          "deploymentDetail": { "type": "string" },
+          "serviceBoundary": { "type": "string" },
+          "openSource": { "enum": ["yes", "partial", "unverified"] },
+          "license": { "type": "string" },
+          "url": { "type": "string", "format": "uri" },
+          "source": { "type": "string", "format": "uri" }
+        }
+      }
+    }
+  }
+}
