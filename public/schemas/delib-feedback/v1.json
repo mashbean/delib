@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://delib.mashbean.net/schemas/delib-feedback/v1.json",
+  "title": "Delib interoperability feedback v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "createdAt", "context", "issue", "dataCard"],
+  "properties": {
+    "schema": { "const": "https://delib.mashbean.net/schemas/delib-feedback/v1.json" },
+    "kind": { "const": "interop-feedback" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "phase", "tool", "publicUrl"],
+      "properties": {
+        "role": { "enum": ["organizer", "participant", "developer", "operator", "researcher"] },
+        "phase": { "enum": ["recommendation", "deployment", "participation", "import", "export", "analysis", "result", "handoff", "agent", "accessibility"] },
+        "tool": { "type": "string", "maxLength": 120 },
+        "publicUrl": { "type": "string", "maxLength": 2000 }
+      }
+    },
+    "issue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["category", "severity", "summary", "expected", "actual", "reproduction", "workaround", "environment"],
+      "properties": {
+        "category": { "enum": ["schema-gap", "integration-failure", "deployment-friction", "privacy-boundary", "accessibility", "usability", "outcome-loop", "other"] },
+        "severity": { "enum": ["blocked", "degraded", "confusing", "idea"] },
+        "summary": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "expected": { "type": "string", "minLength": 1, "maxLength": 1500 },
+        "actual": { "type": "string", "minLength": 1, "maxLength": 1500 },
+        "reproduction": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "workaround": { "type": "string", "maxLength": 1000 },
+        "environment": { "type": "string", "maxLength": 500 }
+      }
+    },
+    "dataCard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["containsParticipantContent", "containsDirectIdentifiers", "containsCredentials", "submittedAutomatically", "destination"],
+      "properties": {
+        "containsParticipantContent": { "const": false },
+        "containsDirectIdentifiers": { "const": false },
+        "containsCredentials": { "const": false },
+        "submittedAutomatically": { "const": false },
+        "destination": { "const": "user-selected-download-or-github-issue" }
+      }
+    }
+  }
+}

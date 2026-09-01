@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="把 Delib 的 schema 缺口、轉接失敗、部署摩擦與使用者卡點整理成不含參與內容的可行動回饋。" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>開發者回饋迴路 · Delib</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/styles.css" />
+    <script type="module" src="/feedback.js"></script>
+  </head>
+  <body class="workspace-body">
+    <a class="skip-link" href="#main">跳到主要內容</a>
+    <header class="site-header"><div class="wrap header-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true">⿻</span><span><strong>Delib</strong><span class="brand-divider">·</span>開發者回饋</span></a><a class="button button-small button-ghost" href="/">回審議拼圖</a></div></header>
+    <main id="main" class="workspace-main">
+      <div class="wrap feedback-wrap">
+        <header class="workspace-heading"><div><p class="section-kicker">A loop for maintainers</p><h1>把卡關，變成下一個可以修的問題。</h1><p class="section-lede">這裡不做隱藏分析。資料只在本機整理；你預覽後，才選擇下載或開啟 GitHub issue。</p></div></header>
+        <aside class="workspace-trust"><strong>不要貼進來</strong><span>參與者原話、投票、姓名、email、匿名代碼或敏感情境。</span><span>API key、管理 token，以及 # 後方含私人權限的網址。</span></aside>
+        <form id="feedback-form" class="data-import-card feedback-form">
+          <div class="data-step-heading"><span>1</span><div><h2>這個問題發生在哪裡？</h2><p>先把階段、工具與影響說清楚。</p></div></div>
+          <div class="feedback-grid">
+            <label>你的角色<select name="role" required><option value="">請選擇</option><option value="organizer">審議主辦者</option><option value="participant">參與者</option><option value="developer">工具開發者</option><option value="operator">服務維運者</option><option value="researcher">研究者</option></select></label>
+            <label>流程階段<select id="feedback-phase" name="phase" required><option value="recommendation">工具推薦</option><option value="deployment">部署</option><option value="participation">參與</option><option value="import">資料匯入</option><option value="export">資料匯出</option><option value="analysis">分析</option><option value="result">成果頁</option><option value="handoff">跨工具交接</option><option value="agent">AI Agent</option><option value="accessibility">無障礙</option></select></label>
+            <label>問題類型<select name="category" required><option value="schema-gap">資料 schema 缺口</option><option value="integration-failure">轉接失敗</option><option value="deployment-friction">部署摩擦</option><option value="privacy-boundary">資料／隱私邊界</option><option value="accessibility">無障礙</option><option value="usability">操作理解</option><option value="outcome-loop">成果與下一輪</option><option value="other">其他</option></select></label>
+            <label>影響程度<select name="severity" required><option value="blocked">完全無法完成</option><option value="degraded">可繞過但成果受損</option><option value="confusing">可以完成但很難理解</option><option value="idea">改善建議</option></select></label>
+          </div>
+          <label>工具或整合名稱（選填）<input name="tool" maxlength="120" placeholder="例如：Pocket Polis → TTTC" /></label>
+          <label>一句話摘要<input name="summary" maxlength="160" required placeholder="例如：TTTC 匯入後無法辨認來源活動" /></label>
+          <label>你原本預期會發生什麼？<textarea name="expected" rows="4" maxlength="1500" required></textarea></label>
+          <label>實際發生什麼？<textarea name="actual" rows="4" maxlength="1500" required></textarea></label>
+          <label>如何用不含參與內容的測試資料重現？<textarea name="reproduction" rows="5" maxlength="2000" required placeholder="請使用虛構題目、公開 demo 或欄位名稱，不要貼真實參與資料。"></textarea></label>
+          <label>目前怎麼補救？（選填）<textarea name="workaround" rows="3" maxlength="1000"></textarea></label>
+          <label>環境（選填）<textarea name="environment" rows="2" maxlength="500" placeholder="例如：Safari 20、Cloudflare Workers 免費方案"></textarea></label>
+          <label>可公開成果網址（選填）<input name="publicUrl" type="url" maxlength="2000" placeholder="https://…（不可含 #）" /></label>
+          <label class="consent-row"><input name="confirmed" type="checkbox" value="true" /><span>我已確認內容不含參與者原話、逐筆回應、個資、匿名代碼、API key、管理 token 或含私人權限的網址。</span></label>
+          <button class="button button-primary" type="submit">產生回饋預覽</button>
+          <p id="feedback-status" class="action-status" role="status"></p>
+        </form>
+        <section id="feedback-result" class="data-result" hidden>
+          <div class="data-step-heading"><span>2</span><div><h2>送出前再看一次</h2><p>以下才是會被下載或帶到 GitHub 的內容。</p></div></div>
+          <pre id="feedback-preview" class="feedback-preview"></pre>
+          <div class="result-actions"><a id="feedback-github" class="button button-primary" target="_blank" rel="noreferrer">在 GitHub 開 issue ↗</a><button id="feedback-download" class="button button-ghost" type="button">只下載 JSON</button><a class="button button-ghost" href="/schemas/delib-feedback/v1.json" target="_blank">查看資料契約 ↗</a></div>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>

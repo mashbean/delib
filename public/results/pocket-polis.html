@@ -41,7 +41,7 @@
             <div class="receipt-stamp" aria-label="成果收據資料狀態">
               <strong>可攜成果</strong>
               <span id="pocket-receipt-prepared-at"></span>
-              <span>收據未另存於 Delib</span>
+              <span id="pocket-receipt-storage-stamp">收據未另存於 Delib</span>
             </div>
           </header>
 
@@ -109,6 +109,40 @@
             <p id="pocket-receipt-source-note"></p>
           </section>
 
+          <section id="pocket-receipt-publication" class="receipt-publication" aria-labelledby="pocket-receipt-publication-heading">
+            <div class="receipt-section-heading">
+              <div>
+                <span class="receipt-layer-label receipt-layer-next">短而穩定的分享</span>
+                <h2 id="pocket-receipt-publication-heading">把 6,000 多字網址變成短網址</h2>
+              </div>
+              <p>原本的無儲存長網址仍可繼續使用。</p>
+            </div>
+            <div data-publication-create class="publication-create">
+              <p>Delib 只保存本頁看得到的彙整票數、已公開陳述、主辦者解讀與下一步；不保存參與者代碼、逐筆投票、來源 CSV 或管理憑證。</p>
+              <label>
+                保存期限
+                <select id="pocket-receipt-retention">
+                  <option value="30">30 天</option>
+                  <option value="365" selected>1 年</option>
+                  <option value="1095">3 年</option>
+                </select>
+              </label>
+              <label class="check-row">
+                <input id="pocket-receipt-publish-confirm" type="checkbox" />
+                <span>我確認本頁的陳述原文、彙整票數與主辦者說明可以公開。</span>
+              </label>
+              <button id="pocket-receipt-publish" class="button button-primary" type="button">建立公開短網址</button>
+            </div>
+            <div id="pocket-receipt-publication-result" class="publication-result" hidden>
+              <label>公開短網址<input id="pocket-receipt-public-url" type="url" readonly /></label>
+              <button id="pocket-receipt-copy-public" class="button button-ghost" type="button">複製公開網址</button>
+              <label>私人刪除網址<input id="pocket-receipt-manage-url" type="url" readonly /></label>
+              <button id="pocket-receipt-copy-manage" class="button button-ghost" type="button">複製私人網址</button>
+              <button id="pocket-receipt-delete" class="button button-ghost button-danger" type="button" hidden>立即刪除公開成果</button>
+              <p class="field-note">私人網址的刪除權杖只存在網址 # 後方；Delib 只保存雜湊，無法替你找回。</p>
+            </div>
+          </section>
+
           <section class="receipt-handoff" aria-labelledby="pocket-receipt-handoff-heading">
             <div class="receipt-section-heading">
               <div>
@@ -157,6 +191,7 @@
               <button id="pocket-receipt-copy-summary" class="button button-ghost" type="button">複製成果摘要</button>
               <button id="pocket-receipt-download-json" class="button button-ghost" type="button">下載 JSON</button>
               <button id="pocket-receipt-download-md" class="button button-ghost" type="button">下載 Markdown</button>
+              <a class="button button-ghost" href="/feedback.html?phase=result">回報成果頁問題</a>
             </div>
             <p id="pocket-receipt-action-status" class="action-status" role="status"></p>
           </footer>

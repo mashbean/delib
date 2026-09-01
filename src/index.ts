@@ -5,12 +5,19 @@ import {
   type RankingJudgment,
   type RankingRoomRpcResult,
 } from "./ranking-room";
+import {
+  PublicReceipt,
+  type JsonValue,
+  type PublicReceiptKind,
+  type PublicReceiptRecord,
+} from "./public-receipt";
 
-export { RankingRoom };
+export { PublicReceipt, RankingRoom };
 
-type WorkerEnv = Omit<Env, "RANKING_ROOMS"> & {
+type WorkerEnv = Omit<Env, "RANKING_ROOMS" | "PUBLIC_RECEIPTS"> & {
   ASSETS: Fetcher;
   RANKING_ROOMS: DurableObjectNamespace<RankingRoom>;
+  PUBLIC_RECEIPTS: { getByName(name: string): PublicReceiptRpcStub };
   CALL_IN_ORIGIN?: string;
   POCKET_POLIS_ORIGIN?: string;
   POLIS_SITE_ID?: string;
@@ -36,6 +43,11 @@ const MAX_BODY_BYTES = 32 * 1024;
 const MAX_CONTEXT_LENGTH = 4_000;
 const MAX_INTEGRATION_BODY_BYTES = 12 * 1024;
 const RANKING_ROOM_RETENTION_HOURS = new Set([24, 168]);
+const PUBLIC_RECEIPT_RETENTION_DAYS = new Set([30, 365, 1_095]);
+const PUBLIC_RECEIPT_SCHEMA = new Map<string, PublicReceiptKind>([
+  ["https://delib.mashbean.net/schemas/delib-pocket-polis-receipt/v1.json", "pocket-polis-receipt"],
+  ["https://delib.mashbean.net/schemas/delib-ranking-receipt/v1.json", "ranking-receipt"],
+]);
 const DEFAULT_MODEL = "gpt-5.6";
 const DEFAULT_CALL_IN_ORIGIN = "https://call-in.mashbean.net";
 const DEFAULT_POCKET_POLIS_ORIGIN = "https://polis.mashbean.net";
@@ -61,7 +73,9 @@ export default {
           ok: true,
           service: "delib",
           ai: "bring-your-own-key",
-          storage: "optional-ephemeral-ranking-rooms",
+          storage: "optional-ephemeral-ranking-rooms-and-public-receipts",
+          dataContract: "delib-data/v1",
+          publicReceiptRetentionDays: [...PUBLIC_RECEIPT_RETENTION_DAYS],
         },
         200,
       );
@@ -78,6 +92,10 @@ export default {
 
     if (url.pathname.startsWith("/api/integrations/power-ranker/rooms")) {
       return handleRankingRoomRequest(request, env);
+    }
+
+    if (url.pathname === "/api/receipts" || url.pathname.startsWith("/api/receipts/")) {
+      return handlePublicReceiptRequest(request, env);
     }
 
     if (url.pathname === "/api/integrations/call-in" && request.method === "POST") {
@@ -122,6 +140,19 @@ export default {
 
     if (url.pathname.startsWith("/api/")) {
       return json({ error: "not found" }, 404);
+    }
+
+    const publicReceiptMatch = url.pathname.match(/^\/r\/([a-f0-9]{16})$/);
+    if (publicReceiptMatch && request.method === "GET") {
+      const receiptStub = env.PUBLIC_RECEIPTS.getByName(publicReceiptMatch[1]);
+      const record = await receiptStub.getReceipt();
+      if (record.status !== "ready") return publicReceiptResult(record);
+      const resultPage = record.kind === "pocket-polis-receipt"
+        ? "/results/pocket-polis"
+        : "/results/power-ranker";
+      const assetUrl = new URL(resultPage, url);
+      const assetResponse = await env.ASSETS.fetch(new Request(assetUrl, request));
+      return withSecurityHeaders(assetResponse, url.pathname);
     }
 
     const assetResponse = await env.ASSETS.fetch(request);
@@ -193,6 +224,98 @@ type RankingRoomSubmissionRequest = {
   sessionId?: unknown;
   judgments?: unknown;
 };
+
+type PublicReceiptCreateRequest = {
+  receipt?: unknown;
+  retentionDays?: unknown;
+  confirmed?: unknown;
+};
+
+type PublicReceiptRpcStub = {
+  init(input: {
+    kind: PublicReceiptKind;
+    receipt: JsonValue;
+    createdAt: number;
+    expiresAt: number;
+    adminTokenHash: string;
+  }): Promise<{ created: boolean }>;
+  getReceipt(): Promise<PublicReceiptRecord>;
+  deleteReceipt(adminToken: string): Promise<PublicReceiptRecord>;
+};
+
+export async function handlePublicReceiptRequest(
+  request: Request,
+  env: Pick<WorkerEnv, "PUBLIC_RECEIPTS">,
+): Promise<Response> {
+  const url = new URL(request.url);
+  const basePath = "/api/receipts";
+
+  if (url.pathname === basePath && request.method === "POST") {
+    if (!isSameOriginRequest(request)) return json({ error: "origin not allowed" }, 403);
+    const body = await readJsonRequest<PublicReceiptCreateRequest>(request, MAX_BODY_BYTES);
+    if (body instanceof Response) return body;
+    if (body.confirmed !== true) return json({ error: "發布前請先確認公開內容與保存期限" }, 400);
+    const retentionDays = typeof body.retentionDays === "number" &&
+        PUBLIC_RECEIPT_RETENTION_DAYS.has(body.retentionDays)
+      ? body.retentionDays
+      : null;
+    if (!retentionDays) return json({ error: "保存期限只能選 30 天、1 年或 3 年" }, 400);
+    const normalized = normalizePublicReceipt(body.receipt);
+    if (!normalized) {
+      return json({ error: "只接受已去除個別紀錄、管理憑證與參與者代碼的 Delib 公開成果收據" }, 400);
+    }
+
+    const createdAt = Date.now();
+    const expiresAt = createdAt + retentionDays * 24 * 60 * 60 * 1_000;
+    const adminToken = randomHex(32);
+    const adminTokenHash = await sha256(adminToken);
+    for (let attempt = 0; attempt < 4; attempt += 1) {
+      const slug = randomHex(8);
+      const receiptStub = env.PUBLIC_RECEIPTS.getByName(slug);
+      const initialized = await receiptStub.init({
+        kind: normalized.kind,
+        receipt: normalized.receipt,
+        createdAt,
+        expiresAt,
+        adminTokenHash,
+      });
+      if (!initialized.created) continue;
+      const publicUrl = new URL(`/r/${slug}`, url);
+      const manageUrl = new URL(publicUrl);
+      manageUrl.hash = `delete=${adminToken}`;
+      return json({
+        status: "ready",
+        kind: normalized.kind,
+        publicUrl: publicUrl.toString(),
+        manageUrl: manageUrl.toString(),
+        createdAt,
+        expiresAt,
+        retentionDays,
+        storedByDelib: true,
+        storedFields: ["public aggregate receipt", "organizer interpretation", "next-step responsibility"],
+        excludedFields: ["participant identifiers", "individual responses", "source files", "admin credentials"],
+      }, 201);
+    }
+    return json({ error: "暫時無法產生短網址，請稍後再試" }, 503);
+  }
+
+  const match = url.pathname.match(/^\/api\/receipts\/([a-f0-9]{16})$/);
+  if (!match) return json({ error: "not found" }, 404);
+  const stub = env.PUBLIC_RECEIPTS.getByName(match[1]);
+
+  if (request.method === "GET") {
+    return publicReceiptResult(await stub.getReceipt());
+  }
+
+  if (request.method === "DELETE") {
+    if (!isSameOriginRequest(request)) return json({ error: "origin not allowed" }, 403);
+    const adminToken = request.headers.get("X-Receipt-Admin")?.trim();
+    if (!adminToken || !/^[a-f0-9]{64}$/.test(adminToken)) return json({ error: "缺少私人刪除權杖" }, 401);
+    return publicReceiptResult(await stub.deleteReceipt(adminToken));
+  }
+
+  return json({ error: "method not allowed" }, 405);
+}
 
 export async function handleRankingRoomRequest(
   request: Request,
@@ -1058,6 +1181,293 @@ function normalizeRankingQuestion(titleValue: unknown, itemsValue: unknown): {
 function randomHex(byteLength: number): string {
   const bytes = crypto.getRandomValues(new Uint8Array(byteLength));
   return [...bytes].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+function normalizePublicReceipt(value: unknown): {
+  kind: PublicReceiptKind;
+  receipt: JsonValue;
+} | null {
+  if (!isRecord(value)) return null;
+  const kind = typeof value.schema === "string" ? PUBLIC_RECEIPT_SCHEMA.get(value.schema) : undefined;
+  if (!kind || value.kind !== kind || !isBoundedPublicValue(value)) return null;
+  const expectedTopLevel = kind === "pocket-polis-receipt"
+    ? ["schema", "kind", "preparedAt", "source", "scope", "findings", "organizer", "dataCard"]
+    : [
+        "schema",
+        "kind",
+        "preparedAt",
+        "source",
+        "question",
+        "method",
+        "aggregate",
+        "result",
+        "coverage",
+        "organizer",
+        "dataCard",
+      ];
+  if (
+    !hasOnlyKeys(value, expectedTopLevel) ||
+    !validDateTimeValue(value.preparedAt) ||
+    !validPublicOrganizer(value.organizer)
+  ) return null;
+  if (!isRecord(value.dataCard) || value.dataCard.containsDirectIdentifiers !== false) return null;
+  if (
+    value.dataCard.containsParticipantData !== true ||
+    value.dataCard.containsOrganizerFreeText !== true ||
+    value.dataCard.publicationStatus !== "share-link-prepared" ||
+    value.dataCard.storedByDelib !== false ||
+    value.dataCard.transport !== "url-fragment" ||
+    !Array.isArray(value.dataCard.limitations)
+  ) return null;
+
+  if (kind === "pocket-polis-receipt") {
+    if (
+      !hasOnlyKeys(value.dataCard, [
+        "containsParticipantData",
+        "containsDirectIdentifiers",
+        "containsParticipantRecords",
+        "containsParticipantFreeText",
+        "containsPseudonymousLinkage",
+        "containsOrganizerFreeText",
+        "aggregation",
+        "publicationStatus",
+        "storedByDelib",
+        "transport",
+        "limitations",
+      ]) ||
+      value.dataCard.containsParticipantRecords !== false ||
+      value.dataCard.containsPseudonymousLinkage !== false ||
+      value.dataCard.aggregation !== "selected-statement-counts" ||
+      !validPocketReceipt(value)
+    ) {
+      return null;
+    }
+  } else if (
+    !hasOnlyKeys(value.dataCard, [
+      "containsParticipantData",
+      "containsDirectIdentifiers",
+      "containsParticipantFreeText",
+      "containsOrganizerFreeText",
+      "aggregation",
+      "publicationStatus",
+      "storedByDelib",
+      "transport",
+      "limitations",
+    ]) ||
+    value.dataCard.containsParticipantFreeText !== false ||
+    value.dataCard.aggregation !== "pair-counts-without-session-links" ||
+    !validRankingReceipt(value)
+  ) {
+    return null;
+  }
+
+  return { kind, receipt: JSON.parse(JSON.stringify(value)) as JsonValue };
+}
+
+function validPocketReceipt(value: Record<string, unknown>): boolean {
+  const source = value.source;
+  const scope = value.scope;
+  const findings = value.findings;
+  if (!isRecord(source) || !isRecord(scope) || !Array.isArray(findings)) return false;
+  if (
+    !hasOnlyKeys(source, [
+      "tool",
+      "title",
+      "description",
+      "conversationId",
+      "reportUrl",
+      "sourceExportedAt",
+      "sourceCountMatches",
+    ]) ||
+    source.tool !== "Pocket Polis" ||
+    source.sourceCountMatches !== true ||
+    cleanRequiredString(source.title, 120) === null ||
+    typeof source.description !== "string" ||
+    source.description.length > 2_000 ||
+    !cleanMatchingString(source.conversationId, /^[a-z0-9]{10}$/, 10) ||
+    !cleanHttpsUrl(source.reportUrl, 2_000) ||
+    !validDateTimeValue(source.sourceExportedAt)
+  ) {
+    return false;
+  }
+  if (
+    !hasOnlyKeys(scope, ["participants", "approvedStatements", "totalVotes", "coverage", "includedStatements"]) ||
+    !integerInRange(scope.participants, 3, 1_000_000) ||
+    !integerInRange(scope.approvedStatements, 1, 100_000) ||
+    !integerInRange(scope.totalVotes, 1, 100_000_000) ||
+    !numberInRange(scope.coverage, 0, 1) ||
+    !integerInRange(scope.includedStatements, 1, 8) ||
+    findings.length !== scope.includedStatements
+  ) {
+    return false;
+  }
+  return findings.length >= 1 && findings.length <= 8 && findings.every((finding) => {
+    if (!isRecord(finding) || !hasOnlyKeys(finding, [
+      "statementId",
+      "text",
+      "isSeed",
+      "agrees",
+      "disagrees",
+      "passes",
+      "responses",
+    ])) return false;
+    return integerInRange(finding.statementId, 1, 100_000) &&
+      cleanRequiredString(finding.text, 280) !== null &&
+      typeof finding.isSeed === "boolean" &&
+      integerInRange(finding.agrees, 0, 1_000_000) &&
+      integerInRange(finding.disagrees, 0, 1_000_000) &&
+      integerInRange(finding.passes, 0, 1_000_000) &&
+      integerInRange(finding.responses, 3, 1_000_000) &&
+      finding.responses === Number(finding.agrees) + Number(finding.disagrees) + Number(finding.passes);
+  });
+}
+
+function validRankingReceipt(value: Record<string, unknown>): boolean {
+  const source = value.source;
+  const question = value.question;
+  const method = value.method;
+  const aggregate = value.aggregate;
+  const result = value.result;
+  const coverage = value.coverage;
+  if (
+    !isRecord(source) ||
+    !isRecord(question) ||
+    !isRecord(method) ||
+    !isRecord(aggregate) ||
+    !Array.isArray(result) ||
+    !isRecord(coverage)
+  ) return false;
+  if (
+    !hasOnlyKeys(source, ["generator", "aggregateStorage", "aggregateUrl", "aggregateExpiresAt"]) ||
+    source.generator !== "Delib · Power Ranker" ||
+    !["local", "ephemeral-room"].includes(String(source.aggregateStorage)) ||
+    !cleanHttpsUrl(source.aggregateUrl, 2_000) ||
+    !(source.aggregateExpiresAt === null || validDateTimeValue(source.aggregateExpiresAt))
+  ) return false;
+  if (!hasOnlyKeys(method, ["name", "normalization", "flow", "source", "implementation"])) return false;
+  if (!hasOnlyKeys(question, ["title", "items"]) || !Array.isArray(question.items)) return false;
+  const questionItems = question.items;
+  if (cleanRequiredString(question.title, 120) === null || questionItems.length < 3 || questionItems.length > 10) {
+    return false;
+  }
+  const itemIds = new Set<string>();
+  for (const item of questionItems) {
+    if (!isRecord(item) || !hasOnlyKeys(item, ["id", "label"])) return false;
+    const id = cleanMatchingString(item.id, /^[A-Za-z0-9_-]{1,80}$/, 80);
+    if (!id || itemIds.has(id) || cleanRequiredString(item.label, 80) === null) return false;
+    itemIds.add(id);
+  }
+  if (!hasOnlyKeys(aggregate, ["sessions", "judgments", "pairwise"]) || !Array.isArray(aggregate.pairwise)) {
+    return false;
+  }
+  if (!integerInRange(aggregate.sessions, 3, 300) || !integerInRange(aggregate.judgments, 1, 13_500)) {
+    return false;
+  }
+  if (aggregate.pairwise.length > 45 || !aggregate.pairwise.every((pair) => {
+    if (!isRecord(pair) || !hasOnlyKeys(pair, ["alpha", "beta", "alphaWins", "betaWins", "equal", "total"])) {
+      return false;
+    }
+    return itemIds.has(String(pair.alpha)) && itemIds.has(String(pair.beta)) && pair.alpha !== pair.beta &&
+      integerInRange(pair.alphaWins, 0, 300) && integerInRange(pair.betaWins, 0, 300) &&
+      integerInRange(pair.equal, 0, 300) && integerInRange(pair.total, 0, 900);
+  })) return false;
+  if (result.length !== questionItems.length || !result.every((item) => {
+    if (!isRecord(item) || !hasOnlyKeys(item, ["id", "label", "score", "observations", "rank"])) return false;
+    return itemIds.has(String(item.id)) && cleanRequiredString(item.label, 80) !== null &&
+      numberInRange(item.score, 0, 1) && integerInRange(item.observations, 0, 13_500) &&
+      integerInRange(item.rank, 1, questionItems.length);
+  })) return false;
+  return hasOnlyKeys(coverage, ["comparedPairs", "totalPairs", "ratio"]) &&
+    integerInRange(coverage.comparedPairs, 1, 45) &&
+    integerInRange(coverage.totalPairs, 3, 45) &&
+    numberInRange(coverage.ratio, 0, 1);
+}
+
+function validPublicOrganizer(value: unknown): boolean {
+  if (!isRecord(value) || !hasOnlyKeys(value, [
+    "interpretation",
+    "missingVoices",
+    "decisionStatus",
+    "authority",
+    "responsibleActor",
+    "responseBy",
+    "nextAction",
+    "evidenceUrl",
+  ])) return false;
+  return cleanRequiredString(value.interpretation, 1_200) !== null &&
+    cleanRequiredString(value.missingVoices, 800) !== null &&
+    ["listening", "under-review", "adopted", "partially-adopted", "not-adopted"].includes(
+      String(value.decisionStatus),
+    ) &&
+    cleanRequiredString(value.authority, 120) !== null &&
+    cleanRequiredString(value.responsibleActor, 120) !== null &&
+    cleanRequiredString(value.nextAction, 500) !== null &&
+    (value.responseBy === "" || /^\d{4}-\d{2}-\d{2}$/.test(String(value.responseBy))) &&
+    (value.evidenceUrl === "" || cleanHttpsUrl(value.evidenceUrl, 2_000) !== null);
+}
+
+function isBoundedPublicValue(value: unknown, depth = 0): boolean {
+  if (depth > 8) return false;
+  if (value === null || typeof value === "boolean" || typeof value === "number") return true;
+  if (typeof value === "string") return value.length <= 2_000;
+  if (Array.isArray(value)) return value.length <= 50 && value.every((item) => isBoundedPublicValue(item, depth + 1));
+  if (!isRecord(value) || Object.keys(value).length > 20) return false;
+  const forbidden = new Set([
+    "participantid",
+    "participantids",
+    "sessionid",
+    "sessionids",
+    "votes",
+    "admintoken",
+    "managetoken",
+    "token",
+    "sourcefiles",
+    "importedfiles",
+  ]);
+  return Object.entries(value).every(([key, nested]) =>
+    !forbidden.has(key.toLowerCase()) && key.length <= 80 && isBoundedPublicValue(nested, depth + 1));
+}
+
+function hasOnlyKeys(value: Record<string, unknown>, expected: string[]): boolean {
+  const keys = Object.keys(value);
+  return keys.length === expected.length && keys.every((key) => expected.includes(key));
+}
+
+function integerInRange(value: unknown, min: number, max: number): boolean {
+  return Number.isInteger(value) && Number(value) >= min && Number(value) <= max;
+}
+
+function numberInRange(value: unknown, min: number, max: number): boolean {
+  return typeof value === "number" && Number.isFinite(value) && value >= min && value <= max;
+}
+
+function validDateTimeValue(value: unknown): boolean {
+  if (typeof value !== "string") return false;
+  const parsed = new Date(value);
+  return !Number.isNaN(parsed.valueOf());
+}
+
+function publicReceiptResult(result: PublicReceiptRecord): Response {
+  switch (result.status) {
+    case "ready":
+      return json({
+        status: "ready",
+        kind: result.kind,
+        receipt: result.receipt,
+        createdAt: result.createdAt,
+        expiresAt: result.expiresAt,
+      }, 200);
+    case "deleted":
+      return json({ status: "deleted" }, 200);
+    case "expired":
+      return json({ error: "這份公開成果已到期並清除" }, 410);
+    case "forbidden":
+      return json({ error: "私人刪除權杖不正確" }, 403);
+    case "not_found":
+      return json({ error: "找不到這份公開成果" }, 404);
+    default:
+      return json({ error: "公開成果暫時無法回應" }, 503);
+  }
 }
 
 function rankingRoomResult(result: RankingRoomRpcResult, readyStatus = 200): Response {

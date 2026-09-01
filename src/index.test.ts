@@ -10,6 +10,7 @@ import {
   handleHarmonicaRequest,
   handlePolisRequest,
   handlePocketPolisRequest,
+  handlePublicReceiptRequest,
   handleRankingRoomRequest,
   handleTttcRequest,
   parseAgoraConversationSlug,
@@ -18,6 +19,7 @@ import {
 } from "./index";
 
 const rankingEnv = env as unknown as Parameters<typeof handleRankingRoomRequest>[1];
+const publicReceiptEnv = env as unknown as Parameters<typeof handlePublicReceiptRequest>[1];
 
 const roomJudgments = [
   { alpha: "item-1", beta: "item-2", choice: "alpha" },
@@ -56,6 +58,48 @@ const plan = {
   tools: [{ id: "call-in", name: "Call-in", summary: "即時提問" }],
   offlineGears: [{ title: "審議前", description: "說明資料用途" }],
 };
+
+function pocketReceiptFixture() {
+  return {
+    schema: "https://delib.mashbean.net/schemas/delib-pocket-polis-receipt/v1.json",
+    kind: "pocket-polis-receipt",
+    preparedAt: "2026-09-01T00:00:00.000Z",
+    source: {
+      tool: "Pocket Polis",
+      title: "虛構公園測試",
+      description: "只用來驗證公開成果短網址",
+      conversationId: "abc123def4",
+      reportUrl: "https://polis.example/r/abc123def4",
+      sourceExportedAt: "2026-09-01T00:00:00.000Z",
+      sourceCountMatches: true,
+    },
+    scope: { participants: 3, approvedStatements: 1, totalVotes: 3, coverage: 1, includedStatements: 1 },
+    findings: [{ statementId: 1, text: "增加照明", isSeed: true, agrees: 2, disagrees: 1, passes: 0, responses: 3 }],
+    organizer: {
+      interpretation: "仍有取捨需要討論。",
+      missingVoices: "尚未納入夜間使用者。",
+      decisionStatus: "under-review",
+      authority: "虛構工作小組",
+      responsibleActor: "虛構主辦者",
+      responseBy: "2026-10-01",
+      nextAction: "補訪後公開回覆。",
+      evidenceUrl: "",
+    },
+    dataCard: {
+      containsParticipantData: true,
+      containsDirectIdentifiers: false,
+      containsParticipantRecords: false,
+      containsParticipantFreeText: true,
+      containsPseudonymousLinkage: false,
+      containsOrganizerFreeText: true,
+      aggregation: "selected-statement-counts",
+      publicationStatus: "share-link-prepared",
+      storedByDelib: false,
+      transport: "url-fragment",
+      limitations: ["不是代表性民調", "公開句子由主辦者挑選", "不含分群", "解讀是人工聲明"],
+    },
+  };
+}
 
 describe("collectOutputText", () => {
   it("collects every output_text item instead of assuming the first item", () => {
@@ -578,5 +622,122 @@ describe("Power Ranker ephemeral rooms", () => {
       rankingEnv,
     );
     expect(response.status).toBe(404);
+  });
+});
+
+describe("public result short links", () => {
+  it("stores only a validated public receipt, serves it by slug, and deletes it with a private token", async () => {
+    const created = await handlePublicReceiptRequest(
+      new Request("https://delib.example/api/receipts", {
+        method: "POST",
+        headers: { Origin: "https://delib.example", "Content-Type": "application/json" },
+        body: JSON.stringify({ receipt: pocketReceiptFixture(), retentionDays: 365, confirmed: true }),
+      }),
+      publicReceiptEnv,
+    );
+    expect(created.status).toBe(201);
+    const payload = (await created.json()) as {
+      publicUrl: string;
+      manageUrl: string;
+      expiresAt: number;
+      excludedFields: string[];
+    };
+    expect(payload.publicUrl).toMatch(/^https:\/\/delib\.example\/r\/[a-f0-9]{16}$/);
+    expect(payload.manageUrl).toMatch(/#delete=[a-f0-9]{64}$/);
+    expect(payload.excludedFields).toContain("individual responses");
+
+    const slug = new URL(payload.publicUrl).pathname.split("/").pop() || "";
+    const fetched = await handlePublicReceiptRequest(
+      new Request(`https://delib.example/api/receipts/${slug}`),
+      publicReceiptEnv,
+    );
+    expect(fetched.status).toBe(200);
+    await expect(fetched.json()).resolves.toMatchObject({
+      status: "ready",
+      kind: "pocket-polis-receipt",
+      receipt: { findings: [{ text: "增加照明" }] },
+    });
+
+    const stub = env.PUBLIC_RECEIPTS.getByName(slug);
+    await runInDurableObject(stub, async (_instance, state) => {
+      const row = state.storage.sql
+        .exec<{ receipt_json: string; admin_hash: string }>(
+          "SELECT receipt_json, admin_hash FROM receipt WHERE id = 1",
+        )
+        .one();
+      expect(row.receipt_json).not.toContain("participantId");
+      expect(row.receipt_json).not.toContain("adminToken");
+      expect(row.admin_hash).toMatch(/^[a-f0-9]{64}$/);
+      expect(payload.manageUrl).not.toContain(row.admin_hash);
+    });
+
+    const adminToken = new URL(payload.manageUrl).hash.replace(/^#delete=/, "");
+    const deleted = await handlePublicReceiptRequest(
+      new Request(`https://delib.example/api/receipts/${slug}`, {
+        method: "DELETE",
+        headers: { Origin: "https://delib.example", "X-Receipt-Admin": adminToken },
+      }),
+      publicReceiptEnv,
+    );
+    expect(deleted.status).toBe(200);
+    const missing = await handlePublicReceiptRequest(
+      new Request(`https://delib.example/api/receipts/${slug}`),
+      publicReceiptEnv,
+    );
+    expect(missing.status).toBe(404);
+  });
+
+  it("rejects raw participant linkage, unconfirmed publication, and cross-origin writes", async () => {
+    const linked = pocketReceiptFixture();
+    linked.dataCard.containsPseudonymousLinkage = true;
+    const rejected = await handlePublicReceiptRequest(
+      new Request("https://delib.example/api/receipts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ receipt: linked, retentionDays: 365, confirmed: true }),
+      }),
+      publicReceiptEnv,
+    );
+    expect(rejected.status).toBe(400);
+
+    const unconfirmed = await handlePublicReceiptRequest(
+      new Request("https://delib.example/api/receipts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ receipt: pocketReceiptFixture(), retentionDays: 365 }),
+      }),
+      publicReceiptEnv,
+    );
+    expect(unconfirmed.status).toBe(400);
+
+    const crossOrigin = await handlePublicReceiptRequest(
+      new Request("https://delib.example/api/receipts", {
+        method: "POST",
+        headers: { Origin: "https://attacker.example", "Content-Type": "application/json" },
+        body: JSON.stringify({ receipt: pocketReceiptFixture(), retentionDays: 365, confirmed: true }),
+      }),
+      publicReceiptEnv,
+    );
+    expect(crossOrigin.status).toBe(403);
+  });
+
+  it("clears the public receipt when its alarm fires", async () => {
+    const created = await handlePublicReceiptRequest(
+      new Request("https://delib.example/api/receipts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ receipt: pocketReceiptFixture(), retentionDays: 30, confirmed: true }),
+      }),
+      publicReceiptEnv,
+    );
+    const payload = (await created.json()) as { publicUrl: string };
+    const slug = new URL(payload.publicUrl).pathname.split("/").pop() || "";
+    const stub = env.PUBLIC_RECEIPTS.getByName(slug);
+    expect(await runDurableObjectAlarm(stub)).toBe(true);
+    const missing = await handlePublicReceiptRequest(
+      new Request(`https://delib.example/api/receipts/${slug}`),
+      publicReceiptEnv,
+    );
+    expect(missing.status).toBe(404);
   });
 });

@@ -38,7 +38,11 @@
 17. 使用內建 Power Ranker 完成本機成對排序，或建立 24 小時／7 天自動清除的多人結果收件室；
 18. 把群體彙整接成 `delib-ranking-receipt/v1` 成果頁，分開呈現工具計算、主辦者解讀、未納入聲音、決策狀態與下一步責任；
 19. 從兩種成果頁預覽並帶入 `delib-handoff/v1` 草稿，接續 Call-in 成果回報、Harmonica 補訪、TTTC 文字整理或 Pol.is 新一輪；
-20. `delib-integrations/v1` 與 `delib-hosting/v1` 盤點，加入 Pocket Polis、Agora 與 Parti DemosX，明確區分可用、共用託管、元件、研究與阻擋項目。
+20. `delib-integrations/v1` 與 `delib-hosting/v1` 盤點，加入 Pocket Polis、Agora 與 Parti DemosX，明確區分可用、共用託管、元件、研究與阻擋項目；
+21. `delib-data/v1` 通用跨工具資料層，先提供 Pocket Polis 與 Power Ranker（個人／群體）轉接器，保留來源 schema、provenance 與匿名串連風險；
+22. 成果頁可選擇建立 16 字元公開短網址，保存 30 天、1 年或 3 年；只存已去連結化公開收據，私人刪除網址的 token 只留在 `#` 後方；
+23. [`/deploy.html`](https://delib.mashbean.net/deploy.html) 一鍵部署中心，集中 Delib、Pocket Polis、Call-in 三個可重現配方，並誠實列出 Pol.is、Agora、TTTC、HeyForm、Harmonica 與 Parti DemosX 的維運邊界；
+24. [`/feedback.html`](https://delib.mashbean.net/feedback.html) 開發者回饋迴路，以 `delib-feedback/v1` 在本機預覽 schema 缺口、轉接失敗與部署摩擦，再由使用者明確下載或開 GitHub issue；CI 會在 PR 與 main 執行完整檢查。
 
 Delib 伺服器不保存 API key 或使用者建立的流程。Power Ranker 預設仍可完全
 在瀏覽器處理；只有主辦者明確選擇短期收件室時，才會保存公開題目、去連結化
@@ -48,8 +52,12 @@ pair counts 與隨機 session ID 的 SHA-256 雜湊。逐份原始判斷不落�
 Power Ranker 成果收據只接受至少三份不重複 session 的去連結化群體彙整。
 Pocket Polis 收據也要求至少三位實際投票者，每句公開陳述至少三份回應，且最多由
 主辦者人工挑選八句；它不含參與者代號、逐筆投票、原始檔雜湊或管理 token。
-兩種公開資料都編碼在網址 fragment，瀏覽器載入頁面時不會把它送給 Worker。
-Delib 不另存收據，但拿到完整連結的人可以閱讀與再次分享，因此產生前仍需人工確認。
+兩種成果收據預設都編碼在網址 fragment，瀏覽器載入頁面時不會把它送給 Worker。
+主辦者也可在成果頁另外確認公開範圍後，建立 `/r/<16 字元>` 短網址：只保存同一份
+已去除個別紀錄的公開成果、主辦者說明與下一步責任，不保存匿名代碼、逐筆回應、
+來源檔或管理憑證。公開副本到期時以 Durable Object alarm 全部清除；私人刪除 token
+只放在管理網址的 fragment，伺服器只保存 SHA-256 雜湊。拿到公開連結的人仍可閱讀與
+再次分享，因此產生前仍需人工確認。原本完全不儲存的長網址繼續作為備援。
 成果接續草稿只包含主辦者已公開的解讀、限制與下一步，不含 pair counts、
 陳述統計、陳述原文、個別判斷、session ID、管理連結或 credential。草稿只活在同一分頁的
 `sessionStorage`，兩小時內有效且讀取一次即刪除；帶入後仍須通過目的工具原本的
@@ -80,7 +88,8 @@ npm run deploy:production
 
 `production` environment 才會綁定 `delib.mashbean.net`，因此 Deploy Button
 不會嘗試搶用官方網域。Cloudflare 的 Deploy button 會複製 public repo、設定
-Workers Builds 並部署靜態資產與 SQLite Durable Object namespace；Delib 本體
+Workers Builds 並部署靜態資產與兩種 SQLite Durable Object namespace（短期排序收件室、
+公開成果短網址）；Delib 本體
 可在 Workers Free 的額度內運作。免費方案有 Worker 與 Durable Objects 每日
 限額，超過任一限額時相關操作會失敗，不會被本站自動升級成付費方案。詳見
 Cloudflare 官方的
@@ -115,19 +124,20 @@ OpenAI 官方目前建議文字生成使用
   收完後，主辦者可把 `statements.csv` 與 `votes.csv` 放入
   [`/integrations/pocket-polis-data.html`](https://delib.mashbean.net/integrations/pocket-polis-data.html)：
   欄位、匿名代碼、重複票、跨檔彙整與 SHA-256 都在瀏覽器本機處理，接著下載
-  `delib-pocket-polis/v1` JSON、TTTC CSV 或 Agora summary/comments/votes 三檔。
+  `delib-pocket-polis/v1` JSON、通用 `delib-data/v1`、TTTC CSV 或 Agora summary/comments/votes 三檔。
   匿名代碼仍可串連同一人的投票，自由文字也可能自行揭露身分，因此下載前另有人工確認。
   資料一致且至少有三位參與者時，主辦者也可挑選 1–8 句各有至少三份回應的
   已核准陳述，補上解讀、缺席聲音、決策狀態、回覆日期與責任者，產生
   [`delib-pocket-polis-receipt/v1`](https://delib.mashbean.net/schemas/delib-pocket-polis-receipt/v1.json)
-  的 fragment-only 公開成果頁。它只公開選定陳述與同意／不同意／略過合計，不含
+  的預設 fragment-only 公開成果頁。它只公開選定陳述與同意／不同意／略過合計，不含
   匿名代碼、逐筆投票、檔案雜湊或管理 token；主辦者還須逐句確認自由文字適合公開。
   收據可再準備同一分頁、兩小時、讀取一次的 Call-in、Harmonica、TTTC 或 Pol.is
   下一步草稿，但不會把陳述原文或統計帶入目的工具。
   Repo 另提供可重跑的虛構軍購案例 pilot：`npm run pilot:pocket-polis` 會從
   公開 open-data 端點取得原始 CSV，驗證後一次產生可攜 JSON、TTTC／Agora
   匯入包、成果收據、四種 handoff 與測試報告；它不讀取私人管理 token，也不把
-  產生匯入檔誤稱為已在上游服務完成匯入。案例設定見 [`pilots/defense-budget.json`](pilots/defense-budget.json)。
+  產生匯入檔誤稱為已在上游服務完成匯入。Pilot 也會輸出 `portable/delib-data.json`。
+  案例設定見 [`pilots/defense-budget.json`](pilots/defense-budget.json)。
   主辦者也可把 MIT 原始碼一鍵部署到自己的 Cloudflare。
   它是輕量重做、不是官方 Pol.is；防分身能力較弱，不適合單獨用於高對抗投票。
 - **Pol.is**：已有對話可直接嵌入。建立模式使用公開的 Site ID 與
@@ -151,7 +161,7 @@ OpenAI 官方目前建議文字生成使用
   fragment，判斷與匯入檔都不送給 Worker；短期收件室則以一房一 Durable Object
   保存題目、pair counts 與 session 雜湊，不保存逐份判斷。公開群體結果至少要
   三份，24 小時或 7 天後自動清除，管理者亦可提前刪除。兩種模式都可下載
-  `delib-ranking/v1` JSON／CSV；有群體彙整後，主辦者可補上解讀、缺席聲音、
+  `delib-ranking/v1` JSON／CSV與通用 `delib-data/v1`；有群體彙整後，主辦者可補上解讀、缺席聲音、
   決策狀態與下一責任者，產生 fragment-only 成果頁、JSON 與 Markdown。
   成果頁不含個別 session 或逐題判斷，模型分數也不會被標成支持率或共識證明。
   成果頁另可把最小必要的主辦者摘要帶回 Delib，預填 Call-in、Harmonica、TTTC
@@ -168,8 +178,10 @@ HeyForm 目前的安全公告都列在 audit。
 
 盤點見 [`docs/integration-audit.md`](docs/integration-audit.md)，機器可讀版本在
 [`public/data/integrations.json`](public/data/integrations.json) 與
-[`public/data/hosting.json`](public/data/hosting.json)。Pocket Polis 與官方 Pol.is
+[`public/data/hosting.json`](public/data/hosting.json)，可部署配方在
+[`public/data/deployments.json`](public/data/deployments.json)。Pocket Polis 與官方 Pol.is
 自架的差異、帳號所有權與 release gates 見 [`docs/polis-hosting.md`](docs/polis-hosting.md)。
+當前完成／未完成邊界見 [`docs/roadmap.md`](docs/roadmap.md)。
 
 ## Skill
 

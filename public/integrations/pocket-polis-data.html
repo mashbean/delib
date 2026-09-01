@@ -124,8 +124,12 @@
               <span class="receipt-layer-label">保留完整來源</span>
               <h3>Delib 可攜 JSON</h3>
               <p>保留陳述、匿名投票、原檔 SHA-256、來源網址、資料卡與限制，適合交給下一個 Agent 或分析服務。</p>
-              <button class="button button-ghost data-download" type="button" data-download="bundle" disabled>下載 JSON</button>
+              <div class="data-download-row">
+                <button class="button button-ghost data-download" type="button" data-download="bundle" disabled>來源格式</button>
+                <button class="button button-ghost data-download" type="button" data-download="portable" disabled>通用 delib-data/v1</button>
+              </div>
               <a href="/schemas/delib-pocket-polis/v1.json" target="_blank">查看資料契約 ↗</a>
+              <a href="/schemas/delib-data/v1.json" target="_blank">查看跨工具契約 ↗</a>
             </article>
             <article>
               <span class="receipt-layer-label receipt-layer-human">文字聚類</span>

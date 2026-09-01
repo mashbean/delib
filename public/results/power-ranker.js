@@ -1,10 +1,15 @@
 import {
   decisionStatusLabel,
   nextRoundRankingUrl,
+  normalizeRankingReceipt,
   rankingReceiptFromHash,
   rankingReceiptSummary,
   rankingReceiptToMarkdown,
 } from "/ranking-receipt-core.js";
+import {
+  bindPublicationControls,
+  loadStoredReceipt,
+} from "/public-receipt-client.js";
 import {
   RECEIPT_HANDOFF_STORAGE_KEY,
   RECEIPT_HANDOFF_TARGETS,
@@ -12,7 +17,11 @@ import {
   receiptHandoffTargetUrl,
 } from "/receipt-handoff-core.js";
 
-const receipt = rankingReceiptFromHash(location.hash);
+let receipt = rankingReceiptFromHash(location.hash);
+const storedReceipt = receipt
+  ? null
+  : await loadStoredReceipt(normalizeRankingReceipt, "ranking-receipt");
+receipt ||= storedReceipt?.receipt || null;
 const error = document.querySelector("#receipt-page-error");
 const content = document.querySelector("#receipt-page-content");
 const actionStatus = document.querySelector("#receipt-action-status");
@@ -22,6 +31,12 @@ if (!receipt) {
 } else {
   renderReceipt(receipt);
   bindReceiptActions(receipt);
+  bindPublicationControls({
+    receipt,
+    stored: storedReceipt,
+    prefix: "receipt",
+    status: actionStatus,
+  });
   content.hidden = false;
 }
 
@@ -90,7 +105,7 @@ function bindReceiptActions(value) {
   });
   document.querySelector("#receipt-copy-summary").addEventListener("click", async () => {
     try {
-      await navigator.clipboard.writeText(`${rankingReceiptSummary(value)}\n${location.href}`);
+      await navigator.clipboard.writeText(`${rankingReceiptSummary(value)}\n${publicPageUrl()}`);
       actionStatus.textContent = "成果摘要與公開連結已複製。";
     } catch {
       actionStatus.textContent = "瀏覽器沒有允許複製；請改下載 Markdown。";
@@ -102,6 +117,12 @@ function bindReceiptActions(value) {
   document.querySelector("#receipt-download-md").addEventListener("click", () =>
     downloadFile(rankingReceiptToMarkdown(value), "delib-power-ranker-receipt.md", "text/markdown"),
   );
+}
+
+function publicPageUrl() {
+  const url = new URL(location.href);
+  if (url.pathname.startsWith("/r/")) url.hash = "";
+  return url.toString();
 }
 
 function renderHandoffPreview(handoff) {

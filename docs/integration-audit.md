@@ -48,6 +48,13 @@ deterministically.
 `public/data/hosting.json` now records one decision for every one of the 28
 tools. The useful groups are deliberately different:
 
+`public/data/deployments.json` is the smaller executable subset shown at
+`/deploy.html`. It has one-click buttons only for Delib, Pocket Polis and
+Call-in, whose repositories already have reproducible Cloudflare-native
+deployments. Power Ranker ships inside Delib. A tool cannot enter this subset
+from source availability alone: the recipe also needs a build, license, storage
+model, deletion path and named operator responsibility.
+
 - Direct or connected: Call-in, Pocket Polis, OpenBook, Pol.is, Agora, HeyForm, Talk to the City,
   Harmonica and Power Ranker already have an in-app path; Uncommon Ground is a data handoff.
 - Shared host: Pol.is, Agora, Parti DemosX, Decidim, Go Vocal, MAPLE and Stanford PB are complete

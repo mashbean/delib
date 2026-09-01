@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://delib.mashbean.net/schemas/delib-deployments/v1.json",
+  "title": "Delib deployment recipes v1",
+  "type": "object",
+  "required": ["schema", "updatedAt", "promise", "recipes", "operatorPaths"],
+  "properties": {
+    "schema": { "const": "delib-deployments/v1" },
+    "updatedAt": { "type": "string", "format": "date" },
+    "promise": { "type": "string" },
+    "recipes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "status", "tools", "summary", "runtime", "account", "dataBoundary", "repositoryUrl", "deployUrl"],
+        "properties": {
+          "id": { "type": "string" }, "name": { "type": "string" }, "status": { "const": "one-click" }, "tools": { "type": "array", "items": { "type": "string" } }, "summary": { "type": "string" }, "runtime": { "type": "string" }, "account": { "type": "string" }, "dataBoundary": { "type": "string" }, "repositoryUrl": { "type": "string", "format": "uri" }, "deployUrl": { "type": "string", "format": "uri" }
+        }
+      }
+    },
+    "operatorPaths": { "type": "array", "items": { "type": "object" } }
+  }
+}

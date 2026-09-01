@@ -7,6 +7,10 @@
     "RankingRoom": {
       "type": "durable-object",
       "storage": "sqlite"
+    },
+    "PublicReceipt": {
+      "type": "durable-object",
+      "storage": "sqlite"
     }
   },
   "durable_objects": {
@@ -14,6 +18,10 @@
       {
         "name": "RANKING_ROOMS",
         "class_name": "RankingRoom"
+      },
+      {
+        "name": "PUBLIC_RECEIPTS",
+        "class_name": "PublicReceipt"
       }
     ]
   },
@@ -37,6 +45,10 @@
           {
             "name": "RANKING_ROOMS",
             "class_name": "RankingRoom"
+          },
+          {
+            "name": "PUBLIC_RECEIPTS",
+            "class_name": "PublicReceipt"
           }
         ]
       },

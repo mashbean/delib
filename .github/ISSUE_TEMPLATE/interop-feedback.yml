@@ -1,0 +1,47 @@
+name: Interoperability feedback
+description: Report a schema gap, integration failure, deployment friction, or closed-loop usability problem.
+title: "[Interop] "
+labels: ["interop-feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include participant content, personal data, pseudonymous participant IDs, API keys, admin tokens, or private URLs.
+  - type: dropdown
+    id: phase
+    attributes:
+      label: Flow phase
+      options: [Recommendation, Deployment, Participation, Import, Export, Analysis, Result, Handoff, Agent, Accessibility]
+    validations:
+      required: true
+  - type: input
+    id: tool
+    attributes:
+      label: Tool or integration
+      placeholder: Pocket Polis to TTTC
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Privacy-safe reproduction
+      description: Use fictional data, a public demo, or field names only.
+    validations:
+      required: true
+  - type: checkboxes
+    id: boundary
+    attributes:
+      label: Data boundary
+      options:
+        - label: I removed participant content, identifiers, credentials, and private URL fragments.
+          required: true

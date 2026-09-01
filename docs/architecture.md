@@ -13,9 +13,9 @@ human-readable result + offline gears + care checks
 share URL / JSON / Markdown       direct activation adapters
                                   ├─ Call-in managed creator
                                   ├─ Pocket Polis managed creator
-                                  │          └─ browser-only CSV validation + TTTC / Agora / JSON handoff
+                                  │          └─ browser-only CSV validation + delib-data / TTTC / Agora handoff
                                   │                         ↓ organizer review + privacy threshold
-                                  │                  fragment-only result receipt
+                                  │                  result receipt → optional short public URL
                                   │                         ↓ preview + one-time local draft
                                   │          Call-in / Harmonica / TTTC / Pol.is next-step form
                                   ├─ Pol.is connected workspace
@@ -25,17 +25,21 @@ share URL / JSON / Markdown       direct activation adapters
                                   ├─ Harmonica credentialed creator + workspace
                                   └─ Power Ranker local or ephemeral-room workspace
                                              ↓ organizer review
-                                      fragment-only result receipt
+                                      result receipt → optional short public URL
                                              ↓ preview + one-time local draft
                              Call-in / Harmonica / TTTC / Pol.is next-step form
         ↓ optional
 BYOK OpenAI request OR locally installed Delib skill
 ```
 
-The planning plane has no participant-data database. Power Ranker adds one
-bounded exception: an organizer can explicitly create a short-lived room whose
+The planning plane has no participant-data database. Two explicit storage
+features are separate from planning: an organizer can create a short-lived Power Ranker room whose
 per-room SQLite Durable Object stores only the public question, pair counts and
-hashed random session IDs. It is not a general civic-data warehouse.
+hashed random session IDs; an organizer can also publish a de-linked result receipt
+under a 16-character slug for 30 days, one year or three years. The second Durable
+Object stores only the same aggregate public result already visible on the page,
+plus organizer-authored interpretation and responsibility. Neither is a general
+civic-data warehouse.
 
 ## Direct activation plane
 
@@ -58,7 +62,9 @@ human gate is mandatory.
   foreign keys, pseudonymous participant codes, duplicate votes and aggregate
   count consistency, then hashes both originals. The participant-aware
   `delib-pocket-polis/v1` JSON preserves all rows plus provenance and a data
-  card; the TTTC adapter keeps approved statement text only; the Agora adapter
+  card. The `delib-data/v1` adapter maps phases, statements, responses and
+  outcomes into the shared envelope while retaining pseudonymous linkage and a
+  private-only data-card warning; the TTTC adapter keeps approved statement text only; the Agora adapter
   emits summary, comments and votes CSVs while explicitly marking missing
   author linkage. No admin token is accepted or restored.
 - If both Pocket Polis exports agree, at least three participants with a vote appear, and
@@ -70,7 +76,7 @@ human gate is mandatory.
   release. The receipt keeps selected statement text and aggregate
   agree/disagree/pass counts, but strips pseudonymous participant IDs, raw
   votes, original-file hashes and admin tokens. The public
-  `/results/pocket-polis.html` page reads it after `#`; Delib does not store it.
+  `/results/pocket-polis.html` page reads it after `#`; this default path is not stored.
 - `POST /api/integrations/polis` validates an existing conversation or a
   public Site ID integration and returns a same-site workspace URL. Loading the
   Site ID workspace is the external write, so it remains a separate click.
@@ -103,7 +109,18 @@ human gate is mandatory.
   pair counts, strips fragment-held admin capabilities, and requires separate
   fields for interpretation, missing voices, decision authority, response
   owner and next action. The public `/results/power-ranker.html` page reads the
-  receipt after `#`; the fragment is not sent to or stored by the Worker.
+  receipt after `#`; the fragment is not sent to or stored by the Worker. Both
+  local and aggregate ranking bundles can additionally be exported through the
+  same `delib-data/v1` envelope, with individual session linkage and aggregate
+  pair counts kept semantically distinct.
+- `POST /api/receipts` accepts only the two normalized public receipt kinds. It
+  rejects direct identifiers, individual records, pseudonymous linkage, raw
+  judgments, source files, credentials and unexpected fields. A new
+  `PublicReceipt` SQLite Durable Object receives one randomly named slug, the
+  public receipt, expiry, and a SHA-256 hash of a random delete token. `GET
+  /api/receipts/:slug` returns the public copy; `DELETE` requires the token in a
+  header. The private manage URL keeps that token after `#`, so it is never part
+  of the page request. The alarm and verified deletion both call `deleteAll()`.
 - Either result page can derive a `delib-handoff/v1` draft for Call-in,
   Harmonica, Talk to the City or Pol.is. The handoff excludes pair counts,
   statement texts and counts, raw judgments and votes, session IDs,
@@ -121,14 +138,18 @@ The remaining tools stay read-only recommendations until the credential,
 retention, export and end-to-end creation paths have been verified. An embedded
 upstream UI is labelled separately from a managed create API.
 
-## Data plane direction
+## Cross-tool data plane
 
-The first local data adapter is now implemented for Pocket Polis. It deliberately
-keeps participant exports out of Worker storage and separate from the planning
-`delib-bundle/v1` schema. Its public receipt is a second, deliberately smaller
-contract: it publishes only thresholded, organizer-selected aggregate findings
-plus human-authored accountability fields, and uses a URL fragment rather than
-server storage. The larger cross-tool data plane remains planned:
+`delib-data/v1` is the first shared envelope, implemented for Pocket Polis and
+Power Ranker. It contains source identity and source schema, phases, items,
+responses, outcomes, a compact summary, provenance and a machine-readable data
+card. The adapter must not erase semantic differences: Pocket Polis retains
+agree/disagree/pass and participant linkage; Power Ranker retains pair direction
+and labels an individual session differently from de-linked aggregate counts.
+All transformations run in the browser and downloads remain outside Worker
+storage. This envelope is the handoff contract, not an authorization to publish.
+
+The next larger archival package remains planned:
 
 Future adapters should produce a versioned bundle:
 
@@ -156,7 +177,7 @@ project, phase, permission and handoff metadata. Cloudflare Workflows or Queues
 can perform explicit, restartable adapter handoffs. Public release must remain a
 separate, human-approved step.
 
-The ranking bundle is intentionally separate from `delib-bundle/v1`.
+The source-specific ranking bundle is intentionally separate from `delib-bundle/v1`.
 Planning bundles contain no participant data; `delib-ranking/v1` explicitly
 marks pairwise judgments as participant data even when they contain no names.
 `delib-ranking-receipt/v1` accepts aggregates only, preserves that participant-
@@ -173,7 +194,7 @@ seed statements.
 
 ## Adapter contract
 
-Each adapter should eventually expose:
+Each adapter should expose:
 
 - `discover`: describe capabilities and deployment requirements;
 - `export`: retrieve the original flat file without changing it;

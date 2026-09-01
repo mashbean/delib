@@ -17,6 +17,7 @@ import {
   pocketPolisReceiptToMarkdown,
   pocketPolisReceiptUrl,
 } from "../public/pocket-polis-receipt-core.js";
+import { pocketPolisBundleToDelibData } from "../public/delib-data-core.js";
 import {
   RECEIPT_HANDOFF_TARGETS,
   createReceiptHandoff,
@@ -68,6 +69,7 @@ const receipt = createPocketPolisReceipt({
   preparedAt: exportedAt,
 });
 const tttcCsv = pocketPolisToTttcCsv(bundle);
+const delibData = pocketPolisBundleToDelibData(bundle, exportedAt);
 const agora = pocketPolisToAgoraCsv(bundle);
 const handoffs = Object.fromEntries(
   Object.keys(RECEIPT_HANDOFF_TARGETS).map((target) => {
@@ -79,7 +81,7 @@ const handoffs = Object.fromEntries(
   }),
 );
 
-const checks = runChecks({ bundle, receipt, tttcCsv, agora, handoffs, publicInfo, publicResults });
+const checks = runChecks({ bundle, delibData, receipt, tttcCsv, agora, handoffs, publicInfo, publicResults });
 if (checks.some((check) => !check.ok)) {
   const failures = checks.filter((check) => !check.ok).map((check) => check.label).join("、");
   throw new Error(`Pilot 驗證失敗：${failures}`);
@@ -98,6 +100,7 @@ await Promise.all([
   writeFile(resolve(outputDirectory, "source", "statements.csv"), statementsCsv),
   writeFile(resolve(outputDirectory, "source", "votes.csv"), votesCsv),
   writeFile(resolve(outputDirectory, "portable", "delib-pocket-polis.json"), jsonText(bundle)),
+  writeFile(resolve(outputDirectory, "portable", "delib-data.json"), jsonText(delibData)),
   writeFile(resolve(outputDirectory, "tttc", "statements.csv"), tttcCsv),
   writeFile(resolve(outputDirectory, "agora", "summary.csv"), agora.summaryCsv),
   writeFile(resolve(outputDirectory, "agora", "comments.csv"), agora.commentsCsv),
@@ -165,7 +168,7 @@ function fileEvidence(role, name, content) {
   };
 }
 
-function runChecks({ bundle, receipt, tttcCsv, agora, handoffs, publicInfo, publicResults }) {
+function runChecks({ bundle, delibData, receipt, tttcCsv, agora, handoffs, publicInfo, publicResults }) {
   const serializedReceipt = JSON.stringify(receipt);
   const selectedTexts = receipt.findings.map((finding) => finding.text);
   const serializedHandoffs = JSON.stringify(handoffs);
@@ -180,6 +183,8 @@ function runChecks({ bundle, receipt, tttcCsv, agora, handoffs, publicInfo, publ
   });
   return [
     check("兩份 CSV 彙整票數一致", bundle.consistency.countMatches),
+    check("通用資料層保留全部陳述與逐筆回應", delibData.items.length === bundle.summary.statements && delibData.responses.length === bundle.summary.votes),
+    check("通用資料層標記匿名串連與禁止直接公開", delibData.dataCard.containsPseudonymousLinkage && !delibData.dataCard.suitableForPublicSharing),
     check("CSV 投票者數與分析結果一致", bundle.summary.participants === result.nParticipantsTotal),
     check("CSV 票數與分析結果一致", bundle.summary.votes === result.nVotes),
     check("活動開啟 session 不少於實際投票者", publicInfo.counts.participants >= bundle.summary.participants),
@@ -230,10 +235,11 @@ function renderPilotReport({ configuration, publicInfo, publicResults, bundle, r
     `## 已完成的管線\n\n` +
     `1. 公開 open-data CSV 原檔與 SHA-256 證據；\n` +
     `2. \`delib-pocket-polis/v1\` participant-aware JSON；\n` +
-    `3. TTTC \`id,interview,comment\` CSV；\n` +
-    `4. Agora Pol.is summary/comments/votes 三檔；\n` +
-    `5. \`delib-pocket-polis-receipt/v1\` JSON、Markdown 與 fragment-only 成果網址；\n` +
-    `6. Call-in、Harmonica、TTTC、Pol.is 四份兩小時、一次性 handoff 草稿。\n\n` +
+    `3. \`delib-data/v1\` 跨工具資料包，保留來源 schema 與匿名串連風險；\n` +
+    `4. TTTC \`id,interview,comment\` CSV；\n` +
+    `5. Agora Pol.is summary/comments/votes 三檔；\n` +
+    `6. \`delib-pocket-polis-receipt/v1\` JSON、Markdown 與 fragment-only 成果網址；\n` +
+    `7. Call-in、Harmonica、TTTC、Pol.is 四份兩小時、一次性 handoff 草稿。\n\n` +
     `## 自動驗證\n\n${checks.map((item) => `- ${item.ok ? "通過" : "失敗"}：${item.label}`).join("\n")}\n\n` +
     `## 尚未越過的外部邊界\n\n` +
     `本 pilot 會驗證 TTTC／Agora 檔案格式與 Delib 內的目的工具預填，但不把「產生檔案」宣稱為「上游匯入成功」。真正建立 TTTC 或 Agora 專案仍需要登入、上傳、預覽與人工確認。\n`;

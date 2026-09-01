@@ -8,6 +8,7 @@ import {
   recommendedComparisonCount,
   selectNextPair,
 } from "/power-ranker-core.js";
+import { rankingBundleToDelibData } from "/delib-data-core.js";
 import {
   createRankingReceipt,
   rankingReceiptToMarkdown,
@@ -73,6 +74,9 @@ function bindEvents() {
   document.querySelector("#ranking-download-json").addEventListener("click", () =>
     downloadFile(currentBundle, "delib-power-ranker-result.json", "application/json"),
   );
+  document.querySelector("#ranking-download-portable").addEventListener("click", () =>
+    downloadFile(rankingBundleToDelibData(currentBundle), "delib-power-ranker-delib-data.json", "application/json"),
+  );
   document.querySelector("#ranking-download-csv").addEventListener("click", () =>
     downloadFile(rankingResultToCsv(currentBundle), "delib-power-ranker-result.csv", "text/csv"),
   );
@@ -84,11 +88,17 @@ function bindEvents() {
   document.querySelector("#aggregate-download-csv").addEventListener("click", () =>
     downloadFile(rankingResultToCsv(aggregateBundle), "delib-power-ranker-aggregate.csv", "text/csv"),
   );
+  document.querySelector("#aggregate-download-portable").addEventListener("click", () =>
+    downloadFile(rankingBundleToDelibData(aggregateBundle), "delib-power-ranker-aggregate-delib-data.json", "application/json"),
+  );
   document.querySelector("#room-aggregate-download-json").addEventListener("click", () =>
     downloadFile(roomAggregateBundle, "delib-power-ranker-room-aggregate.json", "application/json"),
   );
   document.querySelector("#room-aggregate-download-csv").addEventListener("click", () =>
     downloadFile(rankingResultToCsv(roomAggregateBundle), "delib-power-ranker-room-aggregate.csv", "text/csv"),
+  );
+  document.querySelector("#room-aggregate-download-portable").addEventListener("click", () =>
+    downloadFile(rankingBundleToDelibData(roomAggregateBundle), "delib-power-ranker-room-delib-data.json", "application/json"),
   );
   document.querySelector("#ranking-receipt-form").addEventListener("submit", prepareReceipt);
   document.querySelector("#ranking-receipt-form").addEventListener("input", invalidatePreparedReceipt);

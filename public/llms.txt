@@ -8,6 +8,9 @@ select open-source tools, and leave an inspectable receipt for the next round.
 - Tool registry: https://delib.mashbean.net/data/tools.json
 - Integration audit: https://delib.mashbean.net/data/integrations.json
 - Source and hosting audit: https://delib.mashbean.net/data/hosting.json
+- Verified deployment recipes: https://delib.mashbean.net/data/deployments.json
+- One-click deployment center: https://delib.mashbean.net/deploy.html
+- Privacy-safe interoperability feedback: https://delib.mashbean.net/feedback.html
 - Integration API: https://delib.mashbean.net/api/integrations
 - Source: https://github.com/mashbean/delib
 
@@ -19,9 +22,10 @@ Direct actions currently implemented:
 
 - POST /api/integrations/call-in — create a confirmed seven-day hosted event.
 - POST /api/integrations/pocket-polis — create a confirmed Pocket Polis conversation without an account and return separate public and fragment-held private links.
-- /integrations/pocket-polis-data.html — validate Pocket Polis statements.csv and votes.csv locally, then download a participant-aware JSON bundle, TTTC CSV or Agora summary/comments/votes CSVs. Files never leave browser memory.
+- /integrations/pocket-polis-data.html — validate Pocket Polis statements.csv and votes.csv locally, then download a participant-aware source bundle, delib-data/v1, TTTC CSV or Agora summary/comments/votes CSVs. Files never leave browser memory.
+- /schemas/delib-data/v1.json — common source-preserving envelope for phases, items, responses, outcomes, provenance and privacy boundaries. Pocket Polis and Power Ranker adapters are implemented.
 - /schemas/delib-pocket-polis/v1.json — machine-readable contract for the local Pocket Polis handoff.
-- /results/pocket-polis.html#receipt=… — render an organizer-reviewed Pocket Polis result receipt from selected thresholded statements and aggregate response counts. Receipt data stays in the URL fragment and is not stored by Delib.
+- /results/pocket-polis.html#receipt=… — default no-storage organizer-reviewed Pocket Polis result receipt.
 - /schemas/delib-pocket-polis-receipt/v1.json — machine-readable contract for the public Pocket Polis result receipt.
 - POST /api/integrations/polis — validate and prepare an embedded Pol.is workspace.
 - GET /api/integrations/polis/status — report whether this deployment has a connected Site ID.
@@ -29,7 +33,10 @@ Direct actions currently implemented:
 - POST /api/integrations/tttc — prepare the current official Talk to the City create workspace.
 - POST /api/integrations/harmonica — create a confirmed Harmonica session with a tab-only API key.
 - /integrations/power-ranker.html — run local pairwise ranking or join a short-lived aggregate room; no account or API key.
-- /results/power-ranker.html#receipt=… — render a de-linked aggregate result receipt with organizer interpretation, missing voices, decision status and next responsibility. Receipt data stays in the URL fragment and is not stored by Delib.
+- /results/power-ranker.html#receipt=… — default no-storage de-linked aggregate result receipt.
+- POST /api/receipts — after explicit public-scope confirmation, store only a de-linked public receipt for 30 days, one year or three years and return /r/:slug plus a private fragment-held delete URL.
+- GET/DELETE /api/receipts/:slug — read the public copy or delete it with the private token; expiry and deletion clear the entire Durable Object.
+- /schemas/delib-feedback/v1.json — explicit, non-automatic developer feedback contract for schema, integration, deployment and closed-loop problems.
 - /schemas/delib-ranking-receipt/v1.json — machine-readable contract for a layered Power Ranker result receipt.
 - /schemas/delib-handoff/v1.json — machine-readable contract for a two-hour, one-time, same-tab next-step draft derived from a Power Ranker or Pocket Polis receipt.
 - POST /api/integrations/power-ranker/rooms — after human confirmation, create a 24-hour or seven-day SQLite Durable Object room.

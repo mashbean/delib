@@ -4,6 +4,7 @@ import {
   pocketPolisToAgoraCsv,
   pocketPolisToTttcCsv,
 } from "/pocket-polis-data-core.js";
+import { pocketPolisBundleToDelibData } from "/delib-data-core.js";
 import {
   createPocketPolisReceipt,
   pocketPolisReceiptToMarkdown,
@@ -321,6 +322,14 @@ function downloadOutput(event) {
     downloadText(`pocket-polis-${id}-delib.json`, `${JSON.stringify(currentBundle, null, 2)}\n`, "application/json;charset=utf-8");
     return;
   }
+  if (output === "portable") {
+    downloadText(
+      `pocket-polis-${id}-delib-data.json`,
+      `${JSON.stringify(pocketPolisBundleToDelibData(currentBundle), null, 2)}\n`,
+      "application/json;charset=utf-8",
+    );
+    return;
+  }
   if (output === "tttc") {
     downloadText(`pocket-polis-${id}-tttc.csv`, pocketPolisToTttcCsv(currentBundle), "text/csv;charset=utf-8");
     return;
@@ -349,6 +358,7 @@ function syncDownloadState() {
     const output = button.dataset.download;
     const available =
       output === "bundle" ||
+      output === "portable" ||
       (output === "tttc" && currentBundle?.summary.approvedStatements > 0) ||
       (output?.startsWith("agora-") && currentBundle?.summary.votes > 0);
     button.disabled = !currentBundle || !consent.checked || !available;

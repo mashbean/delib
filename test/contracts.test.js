@@ -32,6 +32,48 @@ describe("public contracts", () => {
     expect(schema.properties.dataCard.properties.containsParticipantData.const).toBe(false);
   });
 
+  it("publishes one cross-tool data contract with source and privacy provenance", async () => {
+    const schema = JSON.parse(
+      await readFile(new URL("public/schemas/delib-data/v1.json", root), "utf8"),
+    );
+    expect(schema.$id).toBe("https://delib.mashbean.net/schemas/delib-data/v1.json");
+    expect(schema.properties.source.required).toContain("sourceSchema");
+    expect(schema.properties.dataCard.required).toEqual(
+      expect.arrayContaining(["containsPseudonymousLinkage", "suitableForPublicSharing"]),
+    );
+  });
+
+  it("lists only reproducible Cloudflare-native paths as one-click recipes", async () => {
+    const deployments = JSON.parse(
+      await readFile(new URL("public/data/deployments.json", root), "utf8"),
+    );
+    expect(deployments.schema).toBe("delib-deployments/v1");
+    expect(deployments.recipes.map((item) => item.id)).toEqual([
+      "delib-suite",
+      "pocket-polis",
+      "call-in",
+    ]);
+    for (const recipe of deployments.recipes) {
+      expect(recipe.status).toBe("one-click");
+      expect(recipe.repositoryUrl).toMatch(/^https:\/\/github\.com\//);
+      expect(recipe.deployUrl).toMatch(/^https:\/\/deploy\.workers\.cloudflare\.com\//);
+    }
+    expect(deployments.operatorPaths.find((item) => item.id === "polis").status).toBe("shared-host");
+    expect(deployments.operatorPaths.find((item) => item.id === "parti-demosx").status).toBe("needs-rehabilitation");
+  });
+
+  it("publishes a privacy-safe developer feedback contract and issue workflow", async () => {
+    const schema = JSON.parse(
+      await readFile(new URL("public/schemas/delib-feedback/v1.json", root), "utf8"),
+    );
+    const workflow = await readFile(new URL(".github/workflows/check.yml", root), "utf8");
+    expect(schema.$id).toBe("https://delib.mashbean.net/schemas/delib-feedback/v1.json");
+    expect(schema.properties.dataCard.properties.submittedAutomatically.const).toBe(false);
+    expect(workflow).toContain("contents: read");
+    expect(workflow).toContain("persist-credentials: false");
+    expect(workflow).toContain("npm run check");
+  });
+
   it("accounts for every catalog tool in the direct-integration audit", async () => {
     const tools = JSON.parse(await readFile(new URL("public/data/tools.json", root), "utf8"));
     const audit = JSON.parse(await readFile(new URL("public/data/integrations.json", root), "utf8"));

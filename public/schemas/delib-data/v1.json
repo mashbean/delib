@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://delib.mashbean.net/schemas/delib-data/v1.json",
+  "title": "Delib cross-tool data bundle v1",
+  "description": "A source-preserving envelope for deliberation phases, items, responses and outcomes. It does not imply that different tools have equivalent semantics.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "bundleId", "exportedAt", "source", "phases", "items", "responses", "outcomes", "summary", "provenance", "dataCard"],
+  "properties": {
+    "schema": { "const": "https://delib.mashbean.net/schemas/delib-data/v1.json" },
+    "kind": { "const": "delib-data-bundle" },
+    "bundleId": { "type": "string", "minLength": 1, "maxLength": 240 },
+    "exportedAt": { "type": "string", "format": "date-time" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tool", "sourceSchema", "sourceId", "title", "description", "url"],
+      "properties": {
+        "tool": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "sourceSchema": { "type": "string", "format": "uri", "maxLength": 2000 },
+        "sourceId": { "type": "string", "maxLength": 240 },
+        "title": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "description": { "type": "string", "maxLength": 2000 },
+        "url": { "type": "string", "format": "uri", "maxLength": 2000 }
+      }
+    },
+    "phases": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/phase" } },
+    "items": { "type": "array", "items": { "$ref": "#/$defs/item" } },
+    "responses": { "type": "array", "items": { "$ref": "#/$defs/response" } },
+    "outcomes": { "type": "array", "items": { "$ref": "#/$defs/outcome" } },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["participants", "items", "responses", "coverage"],
+      "properties": {
+        "participants": { "type": "integer", "minimum": 0 },
+        "items": { "type": "integer", "minimum": 0 },
+        "responses": { "type": "integer", "minimum": 0 },
+        "coverage": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["adapter", "transformedAt", "sourceArtifacts", "notes"],
+      "properties": {
+        "adapter": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "transformedAt": { "type": "string", "format": "date-time" },
+        "sourceArtifacts": { "type": "array", "items": { "type": "object" } },
+        "notes": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "dataCard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["containsParticipantData", "containsDirectIdentifiers", "containsParticipantFreeText", "containsPseudonymousLinkage", "aggregation", "publicationStatus", "storedByDelib", "suitableForPublicSharing", "limitations"],
+      "properties": {
+        "containsParticipantData": { "type": "boolean" },
+        "containsDirectIdentifiers": { "type": "boolean" },
+        "containsParticipantFreeText": { "type": "boolean" },
+        "containsPseudonymousLinkage": { "type": "boolean" },
+        "aggregation": { "type": "string" },
+        "publicationStatus": { "type": "string" },
+        "storedByDelib": { "type": "boolean" },
+        "suitableForPublicSharing": { "type": "boolean" },
+        "limitations": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  "$defs": {
+    "phase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "title", "status"],
+      "properties": {
+        "id": { "type": "string" }, "type": { "type": "string" }, "title": { "type": "string" }, "status": { "type": "string" }
+      }
+    },
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "phaseId", "type", "text", "status", "origin", "createdAt"],
+      "properties": {
+        "id": { "type": "string" }, "phaseId": { "type": "string" }, "type": { "type": "string" }, "text": { "type": "string" }, "status": { "type": "string" }, "origin": { "type": "string" }, "createdAt": { "type": ["string", "null"], "format": "date-time" }
+      }
+    },
+    "response": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "phaseId", "subjectRef", "participantRef", "response", "count", "occurredAt"],
+      "properties": {
+        "id": { "type": "string" }, "phaseId": { "type": "string" }, "subjectRef": { "type": "string" }, "objectRef": { "type": "string" }, "participantRef": { "type": ["string", "null"] }, "response": { "enum": ["agree", "disagree", "pass", "prefer-subject", "prefer-object", "equal"] }, "count": { "type": "integer", "minimum": 1 }, "occurredAt": { "type": ["string", "null"], "format": "date-time" }
+      }
+    },
+    "outcome": {
+      "type": "object",
+      "required": ["id", "phaseId", "type", "itemRef"],
+      "properties": {
+        "id": { "type": "string" }, "phaseId": { "type": "string" }, "type": { "type": "string" }, "itemRef": { "type": "string" }, "rank": { "type": "integer", "minimum": 1 }, "score": { "type": "number" }, "observations": { "type": "integer", "minimum": 0 }, "counts": { "type": "object" }
+      }
+    }
+  }
+}
