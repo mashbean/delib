@@ -14,13 +14,13 @@ export const RECEIPT_HANDOFF_TARGETS = Object.freeze({
     label: "成果回報場 · Call-in",
     hash: "launch-call-in",
     carried: Object.freeze(["活動名稱", "成果狀態與下一步說明"]),
-    omitted: "不帶排序計數、個別判斷或管理連結；公開簡報網址仍要由主辦者確認。",
+    omitted: "不帶成果統計、逐筆參與資料或管理連結；公開簡報網址仍要由主辦者確認。",
   }),
   harmonica: Object.freeze({
     label: "補訪缺席聲音 · Harmonica",
     hash: "launch-harmonica",
     carried: Object.freeze(["補訪目標", "背景情境", "三個起始問題"]),
-    omitted: "不帶排序計數、個別判斷、參與者資料或 API key。",
+    omitted: "不帶成果統計、逐筆參與資料或 API key。",
   }),
   "talk-to-the-city": Object.freeze({
     label: "整理下一輪文字 · TTTC",
@@ -32,7 +32,7 @@ export const RECEIPT_HANDOFF_TARGETS = Object.freeze({
     label: "開放新陳述 · Pol.is",
     hash: "launch-polis",
     carried: Object.freeze(["建立新對話模式", "下一輪對話名稱"]),
-    omitted: "不帶種子陳述、排序資料、Site ID 或登入資訊。",
+    omitted: "不帶種子陳述、成果統計、Site ID 或登入資訊。",
   }),
 });
 
