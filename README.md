@@ -28,15 +28,16 @@
    `/.well-known/delib/SKILL.md`。
 8. 直接在站內建立七天的 Call-in 活動，不需帳號；
 9. 免登入在 `polis.mashbean.net` 代建 Pocket Polis，交回參與、成果與私人管理連結，並提供 Agent 準備提示；
-10. 在站內嵌入既有官方 Pol.is 對話，或用 Site ID 準備自動建立工作區；
-11. 在站內嵌入既有 Agora Citizen Network 公開對話；
-12. 在站內嵌入已發布的 HeyForm 表單；
-13. 在站內開啟 Talk to the City 官方建立流程，登入與 CSV 不經 Delib；
-14. 使用 tab-only Harmonica API key 直接建立 AI 對話 session，或複製 MCP 啟動提示；
-15. 使用內建 Power Ranker 完成本機成對排序，或建立 24 小時／7 天自動清除的多人結果收件室；
-16. 把群體彙整接成 `delib-ranking-receipt/v1` 成果頁，分開呈現工具計算、主辦者解讀、未納入聲音、決策狀態與下一步責任；
-17. 從成果頁預覽並帶入 `delib-handoff/v1` 草稿，接續 Call-in 成果回報、Harmonica 補訪、TTTC 文字整理或 Pol.is 新一輪；
-18. `delib-integrations/v1` 與 `delib-hosting/v1` 盤點，加入 Pocket Polis、Agora 與 Parti DemosX，明確區分可用、共用託管、元件、研究與阻擋項目。
+10. 把 Pocket Polis 的 `statements.csv` 與 `votes.csv` 留在瀏覽器本機檢查，下載可攜 JSON、TTTC CSV 或 Agora 三檔匯入包；
+11. 在站內嵌入既有官方 Pol.is 對話，或用 Site ID 準備自動建立工作區；
+12. 在站內嵌入既有 Agora Citizen Network 公開對話；
+13. 在站內嵌入已發布的 HeyForm 表單；
+14. 在站內開啟 Talk to the City 官方建立流程，登入與 CSV 不經 Delib；
+15. 使用 tab-only Harmonica API key 直接建立 AI 對話 session，或複製 MCP 啟動提示；
+16. 使用內建 Power Ranker 完成本機成對排序，或建立 24 小時／7 天自動清除的多人結果收件室；
+17. 把群體彙整接成 `delib-ranking-receipt/v1` 成果頁，分開呈現工具計算、主辦者解讀、未納入聲音、決策狀態與下一步責任；
+18. 從成果頁預覽並帶入 `delib-handoff/v1` 草稿，接續 Call-in 成果回報、Harmonica 補訪、TTTC 文字整理或 Pol.is 新一輪；
+19. `delib-integrations/v1` 與 `delib-hosting/v1` 盤點，加入 Pocket Polis、Agora 與 Parti DemosX，明確區分可用、共用託管、元件、研究與阻擋項目。
 
 Delib 伺服器不保存 API key 或使用者建立的流程。Power Ranker 預設仍可完全
 在瀏覽器處理；只有主辦者明確選擇短期收件室時，才會保存公開題目、去連結化
@@ -108,7 +109,12 @@ OpenAI 官方目前建議文字生成使用
 - **Pocket Polis／口袋審議**：輸入標題、說明與 5–15 句起始陳述後，
   Delib 會呼叫 `polis.mashbean.net` 的公開建立 API，免登入交回參與、成果與
   私人管理連結。管理 token 只存在建立者的分頁，Delib 不保存活動內容或參與資料。
-  主辦者亦可匯出去識別 CSV，或把 MIT 原始碼一鍵部署到自己的 Cloudflare。
+  收完後，主辦者可把 `statements.csv` 與 `votes.csv` 放入
+  [`/integrations/pocket-polis-data.html`](https://delib.mashbean.net/integrations/pocket-polis-data.html)：
+  欄位、匿名代碼、重複票、跨檔彙整與 SHA-256 都在瀏覽器本機處理，接著下載
+  `delib-pocket-polis/v1` JSON、TTTC CSV 或 Agora summary/comments/votes 三檔。
+  匿名代碼仍可串連同一人的投票，自由文字也可能自行揭露身分，因此下載前另有人工確認。
+  主辦者也可把 MIT 原始碼一鍵部署到自己的 Cloudflare。
   它是輕量重做、不是官方 Pol.is；防分身能力較弱，不適合單獨用於高對抗投票。
 - **Pol.is**：已有對話可直接嵌入。建立模式使用公開的 Site ID 與
   page ID；第一次開啟工作區時才會在 Pol.is 建立對話。完整 Pol.is 需要

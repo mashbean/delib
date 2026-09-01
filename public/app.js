@@ -42,6 +42,7 @@ const RESULT_TITLES = {
 };
 
 const POCKET_POLIS_STORAGE_KEY = "delib:pocket-polis-instance";
+const POCKET_POLIS_DATA_STORAGE_KEY = "delib:pocket-polis-data-source";
 
 let tools = [];
 let integrations = new Map();
@@ -693,20 +694,26 @@ async function createPocketPolis(event) {
     .map((statement) => statement.trim())
     .filter(Boolean);
   const button = document.querySelector("#create-pocket-polis");
+  const title = document.querySelector("#pocket-polis-title").value.trim();
+  const description = document.querySelector("#pocket-polis-description").value.trim();
   button.disabled = true;
   status.textContent = "正在建立口袋審議與三種連結…";
   try {
     const data = await postJson("/api/integrations/pocket-polis", {
-      title: document.querySelector("#pocket-polis-title").value.trim(),
-      description: document.querySelector("#pocket-polis-description").value.trim(),
+      title,
+      description,
       seedStatements,
       autoApprove: document.querySelector("#pocket-polis-auto-approve").checked,
       allowSubmissions: document.querySelector("#pocket-polis-allow-submissions").checked,
       openData: document.querySelector("#pocket-polis-open-data").checked,
       confirmed: true,
     });
-    sessionStorage.setItem(POCKET_POLIS_STORAGE_KEY, JSON.stringify(data));
     renderPocketPolisInstance(data);
+    sessionStorage.setItem(POCKET_POLIS_STORAGE_KEY, JSON.stringify(data));
+    sessionStorage.setItem(
+      POCKET_POLIS_DATA_STORAGE_KEY,
+      JSON.stringify({ title, description, reportUrl: data.reportUrl }),
+    );
     status.textContent = "活動已建立；請先測試參與頁，並把私人管理連結交給真正的主辦者。";
   } catch (error) {
     status.textContent = error instanceof Error ? error.message : "Pocket Polis 暫時沒有完成建立。";
@@ -719,7 +726,14 @@ function restorePocketPolisInstance() {
   const saved = sessionStorage.getItem(POCKET_POLIS_STORAGE_KEY);
   if (!saved) return;
   try {
-    renderPocketPolisInstance(JSON.parse(saved));
+    const data = JSON.parse(saved);
+    renderPocketPolisInstance(data);
+    if (!sessionStorage.getItem(POCKET_POLIS_DATA_STORAGE_KEY)) {
+      sessionStorage.setItem(
+        POCKET_POLIS_DATA_STORAGE_KEY,
+        JSON.stringify({ title: data.title, description: "", reportUrl: data.reportUrl }),
+      );
+    }
     document.querySelector("#pocket-polis-status").textContent = "已復原這個分頁剛建立的三種連結。";
   } catch {
     sessionStorage.removeItem(POCKET_POLIS_STORAGE_KEY);

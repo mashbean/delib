@@ -74,7 +74,7 @@
       "outputs": ["insights", "proposals", "evidence", "receipt"],
       "hosting": "cloudflare-worker",
       "deploy": "https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/pocket-polis",
-      "handoff": "Delib 可免登入代建並交回參與、成果、私人管理三種連結；主辦者可匯出去識別 CSV，管理 token 只留在建立者分頁。"
+      "handoff": "Delib 可免登入代建並交回參與、成果、私人管理三種連結；主辦者可在本機資料工作台驗證 statements.csv 與 votes.csv，再下載可攜 JSON、TTTC CSV 或 Agora 三檔匯入包。管理 token 只留在建立者分頁。"
     },
     {
       "id": "polis",

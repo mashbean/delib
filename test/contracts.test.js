@@ -98,6 +98,30 @@ describe("public contracts", () => {
     expect(schema.allOf[0].then.properties.dataCard.properties.storedByDelib.const).toBe(false);
   });
 
+  it("publishes a participant-aware Pocket Polis handoff schema", async () => {
+    const schema = JSON.parse(
+      await readFile(new URL("public/schemas/delib-pocket-polis/v1.json", root), "utf8"),
+    );
+    expect(schema.$id).toBe("https://delib.mashbean.net/schemas/delib-pocket-polis/v1.json");
+    expect(schema.properties.source.properties.persistedByDelib.const).toBe(false);
+    expect(schema.properties.dataCard.properties.containsParticipantData.const).toBe(true);
+    expect(schema.properties.dataCard.properties.containsParticipantFreeText.const).toBe(true);
+    expect(schema.properties.dataCard.properties.containsPseudonymousLinkage.const).toBe(true);
+    expect(schema.properties.dataCard.properties.storedByDelib.const).toBe(false);
+  });
+
+  it("keeps the Pocket Polis admin capability out of the data-workbench handoff", async () => {
+    const app = await readFile(new URL("public/app.js", root), "utf8");
+    const workbench = await readFile(
+      new URL("public/integrations/pocket-polis-data.js", root),
+      "utf8",
+    );
+    expect(app).toContain('"delib:pocket-polis-data-source"');
+    expect(workbench).toContain('"delib:pocket-polis-data-source"');
+    expect(workbench).not.toContain('"delib:pocket-polis-instance"');
+    expect(workbench).not.toContain("adminUrl");
+  });
+
   it("publishes a layered, fragment-only schema for ranking result receipts", async () => {
     const schema = JSON.parse(
       await readFile(new URL("public/schemas/delib-ranking-receipt/v1.json", root), "utf8"),

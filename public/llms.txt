@@ -18,6 +18,9 @@ decision authority.
 Direct actions currently implemented:
 
 - POST /api/integrations/call-in — create a confirmed seven-day hosted event.
+- POST /api/integrations/pocket-polis — create a confirmed Pocket Polis conversation without an account and return separate public and fragment-held private links.
+- /integrations/pocket-polis-data.html — validate Pocket Polis statements.csv and votes.csv locally, then download a participant-aware JSON bundle, TTTC CSV or Agora summary/comments/votes CSVs. Files never leave browser memory.
+- /schemas/delib-pocket-polis/v1.json — machine-readable contract for the local Pocket Polis handoff.
 - POST /api/integrations/polis — validate and prepare an embedded Pol.is workspace.
 - GET /api/integrations/polis/status — report whether this deployment has a connected Site ID.
 - POST /api/integrations/heyform — validate and prepare an existing public HeyForm workspace.
@@ -32,6 +35,10 @@ Direct actions currently implemented:
 - POST /api/integrations/power-ranker/rooms/:id/submissions — immediately reduce one browser session to pair counts; raw judgments are not stored.
 
 Every preparation or external-write path requires an explicit human gate.
+Pocket Polis CSVs remain in browser memory. Their pseudonymous participant IDs
+can still link votes within one conversation, and participant-authored text may
+contain self-disclosed identifiers, so the resulting files are declared as
+participant data and require a separate download confirmation.
 HeyForm, TTTC and Harmonica participant data remain upstream; Harmonica
 credentials are forwarded once and never stored by Delib. Power Ranker local
 judgments and imported files stay in browser memory. Optional rooms store only

@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta name="description" content="在瀏覽器本機檢查 Pocket Polis CSV，準備可攜 JSON、Talk to the City 與 Agora 匯入檔。" />
+    <title>Pocket Polis 資料工作台 · Delib 審議拼圖</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/styles.css" />
+    <script type="module" src="/integrations/pocket-polis-data.js"></script>
+  </head>
+  <body class="workspace-body">
+    <a class="skip-link" href="#workspace-main">跳到資料工作台</a>
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <a class="brand" href="/" aria-label="回 Delib 審議拼圖">
+          <span class="brand-mark" aria-hidden="true">⿻</span>
+          <span><strong>Delib</strong><span class="brand-divider">·</span>Pocket Polis 資料工作台</span>
+        </a>
+        <a class="button button-small button-ghost" href="/#launch-pocket-polis">回到 Pocket Polis</a>
+      </div>
+    </header>
+
+    <main id="workspace-main" class="workspace-main">
+      <div class="wrap workspace-wrap data-workspace">
+        <div id="pocket-polis-memory" class="handoff-toast" hidden>
+          <strong>已接回剛才建立的活動</strong>
+          <p>只帶入活動名稱與公開成果網址；私人管理連結沒有進入資料工作台。</p>
+        </div>
+
+        <div class="workspace-heading">
+          <div>
+            <p class="section-kicker">Post-collection handoff</p>
+            <h1>收完資料，接到下一塊拼圖</h1>
+            <p class="section-lede">從 Pocket Polis 管理頁下載 <code>statements.csv</code> 和 <code>votes.csv</code>，三步完成本機檢查與轉檔。</p>
+          </div>
+          <a class="button button-ghost" href="https://polis.mashbean.net/" target="_blank" rel="noreferrer">打開 Pocket Polis ↗</a>
+        </div>
+
+        <div class="workspace-trust">
+          <strong>只在這台裝置</strong>
+          <span>CSV 只由目前瀏覽器讀取、驗證與轉檔；Delib 不上傳、不保存，也不需要管理 token。</span>
+          <span>匿名代碼仍能串連同一人的多筆投票，自由文字也可能自行揭露身分；下載後請當成參與資料保管。</span>
+        </div>
+
+        <form id="pocket-polis-data-form" class="data-import-card">
+          <div class="data-step-heading">
+            <span>1</span>
+            <div>
+              <h2>告訴我們資料來自哪一輪</h2>
+              <p>成果網址用來保留來源，不會用來抓取資料或取得管理權限。</p>
+            </div>
+          </div>
+          <div class="data-source-grid">
+            <label>
+              活動名稱
+              <input id="pocket-polis-data-title" maxlength="120" required placeholder="例如：我們想要怎樣的社區公園？" />
+            </label>
+            <label>
+              公開成果網址
+              <input id="pocket-polis-data-report" type="url" maxlength="2000" required placeholder="https://polis.mashbean.net/r/…" />
+            </label>
+          </div>
+          <label>
+            活動說明（選填）
+            <textarea id="pocket-polis-data-description" rows="3" maxlength="2000" placeholder="這一輪想理解什麼，以及主辦者會如何回應"></textarea>
+          </label>
+
+          <div class="data-step-heading data-step-divider">
+            <span>2</span>
+            <div>
+              <h2>放入兩份原始 CSV</h2>
+              <p>請在同一次管理頁匯出後一起放入，避免彙整票數來自不同時間點。</p>
+            </div>
+          </div>
+          <div class="data-import-grid">
+            <label class="file-drop">
+              <strong>意見清單</strong>
+              <span>原檔名通常是 statements.csv</span>
+              <input id="pocket-polis-statements-file" type="file" accept=".csv,text/csv" required />
+            </label>
+            <label class="file-drop">
+              <strong>投票紀錄</strong>
+              <span>原檔名通常是 votes.csv</span>
+              <input id="pocket-polis-votes-file" type="file" accept=".csv,text/csv" required />
+            </label>
+          </div>
+          <p class="field-note">每份檔案上限 20 MiB。欄位、資料型態、匿名代碼、重複票與跨檔案票數會先檢查。</p>
+          <button id="check-pocket-polis-data" class="button button-primary" type="submit">檢查兩份 CSV</button>
+          <p id="pocket-polis-data-status" class="action-status" role="status" aria-live="polite"></p>
+        </form>
+
+        <section id="pocket-polis-data-result" class="data-result" hidden aria-live="polite">
+          <div class="data-step-heading">
+            <span>3</span>
+            <div>
+              <p class="section-kicker">Checked locally</p>
+              <h2>選擇下一塊拼圖</h2>
+              <p id="pocket-polis-data-consistency"></p>
+            </div>
+          </div>
+
+          <div id="pocket-polis-data-metrics" class="receipt-metrics data-metrics"></div>
+          <div id="pocket-polis-data-warnings" class="data-warning" hidden></div>
+
+          <details class="data-preview">
+            <summary>先看幾句意見與資料限制</summary>
+            <ol id="pocket-polis-statement-preview"></ol>
+            <ul id="pocket-polis-limitations"></ul>
+          </details>
+
+          <div class="data-card-notice">
+            <strong>這不是「無個資」資料</strong>
+            <p>檔案沒有姓名、email 或真實參與者 ID，但包含可串連同一人投票的匿名代碼，以及可能由參與者撰寫的自由文字。Delib 不會替你把這些內容公開。</p>
+          </div>
+          <label class="consent-row data-export-consent">
+            <input id="pocket-polis-data-consent" type="checkbox" />
+            <span>我理解下載檔包含參與資料，會依原活動告知的用途、權限與保存方式處理，也會在公開前人工檢查自由文字。</span>
+          </label>
+
+          <div class="data-export-grid">
+            <article>
+              <span class="receipt-layer-label">保留完整來源</span>
+              <h3>Delib 可攜 JSON</h3>
+              <p>保留陳述、匿名投票、原檔 SHA-256、來源網址、資料卡與限制，適合交給下一個 Agent 或分析服務。</p>
+              <button class="button button-ghost data-download" type="button" data-download="bundle" disabled>下載 JSON</button>
+              <a href="/schemas/delib-pocket-polis/v1.json" target="_blank">查看資料契約 ↗</a>
+            </article>
+            <article>
+              <span class="receipt-layer-label receipt-layer-human">文字聚類</span>
+              <h3>Talk to the City</h3>
+              <p>輸出目前支援的 <code>id, interview, comment</code> CSV，只包含已核准意見；不帶匿名投票。</p>
+              <button class="button button-ghost data-download" type="button" data-download="tttc" disabled>下載 TTTC CSV</button>
+              <a href="/integrations/tttc.html">接著到 TTTC 工作區 →</a>
+            </article>
+            <article>
+              <span class="receipt-layer-label receipt-layer-decision">重新計算群組</span>
+              <h3>Agora Pol.is 匯入包</h3>
+              <p>下載 summary、comments、votes 三份 CSV。Pocket Polis 沒有投稿者連結，因此作者欄會標成未知。</p>
+              <div class="data-download-row">
+                <button class="button button-ghost data-download" type="button" data-download="agora-summary" disabled>summary</button>
+                <button class="button button-ghost data-download" type="button" data-download="agora-comments" disabled>comments</button>
+                <button class="button button-ghost data-download" type="button" data-download="agora-votes" disabled>votes</button>
+              </div>
+              <a href="https://www.agoracitizen.app/" target="_blank" rel="noreferrer">到 Agora 登入匯入 ↗</a>
+            </article>
+          </div>
+          <p class="source-note">為避免試算表把意見當成公式，以 =、+、- 或 @ 開頭的文字會加上單引號。轉換不代表 TTTC 或 Agora 已成功匯入，仍需在上游服務確認預覽與權限。</p>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>

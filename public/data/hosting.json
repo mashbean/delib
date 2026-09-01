@@ -51,11 +51,11 @@
       "toolId": "pocket-polis",
       "route": "direct",
       "label": "本站代建＋Cloudflare 一鍵部署",
-      "summary": "MIT 的單一 Cloudflare Worker + Durable Objects SQLite 服務；Delib 現在可免登入代建，也可部署自己的 instance。",
+      "summary": "MIT 的單一 Cloudflare Worker + Durable Objects SQLite 服務；Delib 可免登入代建、部署自己的 instance，並在瀏覽器本機轉接匯出資料。",
       "source": { "url": "https://github.com/mashbean/pocket-polis", "license": "MIT", "reusable": true },
-      "embed": "direct-create-and-links",
+      "embed": "direct-create-links-and-local-data-handoff",
       "cloudflareNative": true,
-      "nextAction": "把去識別 CSV 轉成 delib-bundle，保留來源、同意範圍與人工解讀欄位。",
+      "nextAction": "以實際活動驗證 TTTC 與 Agora 上游匯入結果，再補上主辦者解讀與下一輪行動成果頁。",
       "evidence": [
         "https://polis.mashbean.net/",
         "https://github.com/mashbean/pocket-polis/blob/main/AGENT.md"

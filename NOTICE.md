@@ -28,6 +28,12 @@ projects, but does not imply endorsement by their maintainers.
   Cloudflare Worker project. It is a lightweight reimplementation, not the
   official Pol.is service or codebase. Delib does not persist its conversation
   data or fragment-held admin token.
+- The local Pocket Polis data adapter follows the upstream Pocket Polis CSV
+  exports, the current Apache-2.0 Talk to the City `id,interview,comment` sample,
+  and the AGPL-3.0 Agora Pol.is summary/comments/votes parser. Delib implements
+  the format conversion independently in browser JavaScript; it does not copy
+  or run either downstream application's source and does not imply that a
+  converted file has passed a hosted import.
 - The managed Call-in activation calls the separately deployed
   [Call-in](https://github.com/mashbean/call-in) hosted creator. Call-in is
   Apache-2.0 licensed and keeps its own seven-day event lifecycle.

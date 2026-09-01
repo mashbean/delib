@@ -13,6 +13,7 @@ human-readable result + offline gears + care checks
 share URL / JSON / Markdown       direct activation adapters
                                   ├─ Call-in managed creator
                                   ├─ Pocket Polis managed creator
+                                  │          └─ browser-only CSV validation + TTTC / Agora / JSON handoff
                                   ├─ Pol.is connected workspace
                                   ├─ Agora public-conversation workspace
                                   ├─ HeyForm published-form workspace
@@ -48,6 +49,14 @@ human gate is mandatory.
   returned URLs from a validated conversation ID and admin token. Public
   participation and report URLs are separated from the fragment-held private
   admin URL; Delib stores none of them server-side.
+- `/integrations/pocket-polis-data.html` reads Pocket Polis `statements.csv`
+  and `votes.csv` only in browser memory. It validates the exact export headers,
+  foreign keys, pseudonymous participant codes, duplicate votes and aggregate
+  count consistency, then hashes both originals. The participant-aware
+  `delib-pocket-polis/v1` JSON preserves all rows plus provenance and a data
+  card; the TTTC adapter keeps approved statement text only; the Agora adapter
+  emits summary, comments and votes CSVs while explicitly marking missing
+  author linkage. No admin token is accepted or restored.
 - `POST /api/integrations/polis` validates an existing conversation or a
   public Site ID integration and returns a same-site workspace URL. Loading the
   Site ID workspace is the external write, so it remains a separate click.
@@ -97,7 +106,11 @@ The remaining tools stay read-only recommendations until the credential,
 retention, export and end-to-end creation paths have been verified. An embedded
 upstream UI is labelled separately from a managed create API.
 
-## Planned data plane
+## Data plane direction
+
+The first local data adapter is now implemented for Pocket Polis. It deliberately
+keeps participant exports out of Worker storage and separate from the planning
+`delib-bundle/v1` schema. The larger cross-tool data plane remains planned:
 
 Future adapters should produce a versioned bundle:
 

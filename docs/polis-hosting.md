@@ -62,6 +62,28 @@ URLs, and does not persist them server-side.
 - an Agent may draft seed statements and settings, but a person confirms before
   any external conversation is created.
 
+## Pocket Polis post-collection handoff
+
+The organizer downloads `statements.csv` and `votes.csv` from the Pocket Polis
+admin page, then opens `/integrations/pocket-polis-data.html`. Delib reads both
+files only in browser memory and never asks for the admin token. It verifies the
+exact upstream columns, anonymous participant codes, statement references,
+duplicate participant/statement votes and the agreement totals copied into the
+statement export. SHA-256 for each original is recorded in the local bundle.
+
+Three handoffs are available after an explicit participant-data confirmation:
+
+- `delib-pocket-polis/v1` JSON keeps statements, pseudonymous votes, provenance,
+  consistency warnings and an explicit data card;
+- TTTC CSV uses `id,interview,comment` and includes approved statements only;
+- Agora Pol.is CSV uses the upstream summary/comments/votes layout. Pocket Polis
+  does not export statement authors, so `author-id` is `-1`, `commenters` is `0`
+  and Agora must calculate groups again.
+
+Potential spreadsheet formulas in free text receive a leading apostrophe. A
+successful local conversion is not evidence that the hosted TTTC or Agora import
+succeeded; that remains a separate upstream-account and preview check.
+
 ## The official Pol.is one-click gate
 
 Running the containers is only the operator step. A non-engineer still needs:
@@ -101,6 +123,8 @@ account.
 - <https://polis.mashbean.net/>
 - <https://github.com/mashbean/pocket-polis>
 - <https://github.com/mashbean/pocket-polis/blob/main/AGENT.md>
+- <https://github.com/AIObjectives/tttc-light-js>
+- <https://github.com/zkorum/agora/blob/main/services/api/src/service/polisCsvParser.ts>
 - <https://github.com/compdemocracy/polis>
 - <https://github.com/compdemocracy/polis/blob/edge/docker-compose.yml>
 - <https://github.com/compdemocracy/polis/blob/edge/server/src/routes/implicitConversation.ts>

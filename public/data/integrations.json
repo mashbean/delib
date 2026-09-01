@@ -41,13 +41,21 @@
       "readiness": "available",
       "activation": "managed-create",
       "label": "免登入直接建立",
-      "summary": "在 Delib 填入標題、說明與 5–15 句起始陳述，直接由 polis.mashbean.net 建立活動。",
+      "summary": "在 Delib 填入標題、說明與 5–15 句起始陳述，直接由 polis.mashbean.net 建立活動；收完後可在本機驗證 CSV 並轉成 TTTC、Agora 或可攜 JSON。",
       "accountRequired": false,
       "credentialRequired": false,
       "freePath": "使用 mashbean 維運的 Pocket Polis 共用主機，或按 Deploy to Cloudflare 建立自己的獨立服務。",
       "writesExternalState": "按下確認後，Delib Worker 會呼叫 Pocket Polis 公開建立 API，立即建立活動。",
-      "retention": "由 Pocket Polis 營運者與活動主辦者的政策決定；目前未驗證自動到期或刪除契約。Delib 不保存活動資料或管理 token。",
+      "retention": "由 Pocket Polis 營運者與活動主辦者的政策決定；目前未驗證自動到期或刪除契約。Delib 不保存活動資料或管理 token；資料工作台只在瀏覽器記憶體讀取匯出檔。",
       "inAppEndpoint": "/api/integrations/pocket-polis",
+      "dataHandoff": {
+        "endpoint": "/integrations/pocket-polis-data.html",
+        "input": ["statements.csv", "votes.csv"],
+        "portableSchema": "/schemas/delib-pocket-polis/v1.json",
+        "outputs": ["delib-pocket-polis/v1 JSON", "Talk to the City CSV", "Agora Pol.is summary/comments/votes CSV"],
+        "storage": "browser-memory-only",
+        "humanGate": "下載前確認參與資料用途、權限、保存方式，並在公開前人工檢查自由文字。"
+      },
       "selfHost": {
         "supported": true,
         "platform": "Cloudflare Workers + Durable Objects SQLite",
@@ -64,7 +72,8 @@
       "knownLimitations": [
         "Pocket Polis 是 MIT 輕量重做，不是官方 Pol.is，也不宣稱分析結果完全等同官方 Pol.is。",
         "防分身能力較弱，不適合單獨作為高對抗、具法定效力或高風險投票。",
-        "共用主機限制每個來源的建立頻率；大量活動應部署自己的 instance。"
+        "共用主機限制每個來源的建立頻率；大量活動應部署自己的 instance。",
+        "匯出檔沒有直接識別欄位，但匿名參與者代碼可串連投票，自由文字也可能自行揭露身分。"
       ],
       "evidence": [
         "https://polis.mashbean.net/",
