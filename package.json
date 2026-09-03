@@ -1,6 +1,6 @@
 {
   "name": "@mashbean/delib",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "審議拼圖：為非工程師組合數位審議工具、資料交接與下一輪行動。",
   "type": "module",

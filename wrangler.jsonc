@@ -13,6 +13,10 @@
     "PublicReceipt": {
       "type": "durable-object",
       "storage": "sqlite"
+    },
+    "ReceiptIndex": {
+      "type": "durable-object",
+      "storage": "sqlite"
     }
   },
   "durable_objects": {
@@ -24,6 +28,10 @@
       {
         "name": "PUBLIC_RECEIPTS",
         "class_name": "PublicReceipt"
+      },
+      {
+        "name": "RECEIPT_INDEX",
+        "class_name": "ReceiptIndex"
       }
     ]
   },
@@ -62,6 +70,10 @@
           {
             "name": "PUBLIC_RECEIPTS",
             "class_name": "PublicReceipt"
+          },
+          {
+            "name": "RECEIPT_INDEX",
+            "class_name": "ReceiptIndex"
           }
         ]
       },

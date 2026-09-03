@@ -892,3 +892,26 @@ fieldset > p { color: var(--muted); margin: 7px 0 22px; }
 
 /* Form field borders need at least 3:1 against white (WCAG 1.4.11). */
 .launch-form input, .launch-form textarea, .launch-form select, .feedback-form input, .feedback-form textarea, .feedback-form select, .receipt-form input, .receipt-form textarea, .receipt-form select, .data-import-card input, .data-import-card textarea { border-color: #8a8596; }
+
+/* Tool synthesis layer: picking an excerpt in the workbench and showing it on the result page. */
+.synthesis-import { margin: 22px 0 6px; padding: 18px; border: 1px dashed var(--line); border-radius: var(--radius-md); background: var(--canvas); }
+.synthesis-import h3 { margin: 4px 0 0; font-size: 1.1rem; }
+.synthesis-import .receipt-section-heading { margin-bottom: 8px; }
+.synthesis-provenance { color: var(--muted); font-size: .86rem; margin: 6px 0 12px; }
+.synthesis-group { margin-top: 14px; display: grid; gap: 8px; }
+.synthesis-picker { display: grid; gap: 8px; }
+.synthesis-option { display: grid; grid-template-columns: 22px 1fr; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: #fff; cursor: pointer; }
+.synthesis-option:has(input:checked) { border-color: var(--purple-dark); background: var(--purple-soft); }
+.synthesis-option input { width: 18px; height: 18px; margin-top: 3px; accent-color: var(--purple-dark); }
+.synthesis-option > span { display: grid; gap: 3px; justify-items: start; }
+.synthesis-option small, .synthesis-list small { display: block; color: var(--muted); font-size: .86rem; }
+.synthesis-direction { display: inline-block; padding: 1px 8px; border-radius: 999px; background: var(--green-soft); color: var(--green); font-size: .74rem; font-weight: 700; }
+.synthesis-direction-disagree { background: var(--danger-soft); color: var(--danger); }
+.synthesis-citation { color: var(--purple-ink); font-size: .78rem; }
+.receipt-layer-tool { background: #e6ecfb; color: #2f4a86; }
+.receipt-synthesis .synthesis-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 14px; }
+.receipt-synthesis h3 { font-size: 1.05rem; margin: 0 0 10px; }
+.synthesis-list { margin: 0; padding-left: 1.2em; display: grid; gap: 12px; }
+.synthesis-list li strong { font: 600 1rem/1.5 var(--reading); }
+.synthesis-question { color: var(--green); }
+@media (max-width: 680px) { .receipt-synthesis .synthesis-columns { grid-template-columns: 1fr; } }

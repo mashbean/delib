@@ -58,6 +58,18 @@ Updated: 2026-09-03
   handoff chooser; Power Ranker is launchable from recommendations.
 - Feedback form prefills the GitHub issue form field by field; labels exist.
 
+### Tool synthesis layer (2026-09-03, second pass)
+
+- Pocket Polis receipts can carry an organizer-selected excerpt of the
+  tool's own synthesis (Workers AI Gemma or deterministic) as a labelled
+  "tool layer" with model, timestamp, staleness and cited statement ids.
+- Ranking rooms can be closed by the organizer; public receipts get a
+  slug registry for takedowns; receipt validation now checks arithmetic.
+- Deliberately not done: Delib does not call Workers AI itself. The
+  account's free neuron budget is already reserved by Pocket Polis
+  (9,000 of 10,000 per day); a Delib-side model call needs its own ledger
+  and a deterministic fallback before it is worth adding.
+
 ## Still intentionally incomplete
 
 - `delib-data/v1` has two adapters, not coverage for all 28 catalog tools.
@@ -84,4 +96,4 @@ Updated: 2026-09-03
    tool popularity.
 5. Watch `uptime.yml` and Worker logs for two weeks; tune the per-IP limits
    (20 creates and 120 submissions per minute) against real workshop traffic.
-6. Decide whether a slug index (KV) is needed for public-receipt takedowns.
+6. Test whether readers mistake the labelled "tool layer" excerpt for endorsement or consensus.

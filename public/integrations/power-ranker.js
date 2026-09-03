@@ -83,6 +83,7 @@ function bindEvents() {
     document.querySelector("#ranking-delete-room").disabled = !event.target.checked;
   });
   document.querySelector("#ranking-delete-room").addEventListener("click", deleteRoom);
+  document.querySelector("#ranking-close-room").addEventListener("click", closeRoom);
   document.querySelector("#ranking-download-json").addEventListener("click", () =>
     downloadFile(currentBundle, "delib-power-ranker-result.json", "application/json"),
   );
@@ -322,10 +323,37 @@ async function deleteRoom() {
   }
 }
 
+async function closeRoom() {
+  const button = document.querySelector("#ranking-close-room");
+  if (!adminToken || button.disabled) return;
+  button.disabled = true;
+  try {
+    const snapshot = await jsonRequest(`/api/integrations/power-ranker/rooms/${roomId}/close`, {
+      method: "POST",
+      headers: { "X-Ranking-Admin": adminToken },
+    });
+    renderRoomSnapshot(snapshot);
+    actionStatus.textContent = "已停止收件；參與者仍能在本機完成排序，但不能再送進這個收件室。";
+  } catch (reason) {
+    button.disabled = false;
+    actionStatus.textContent = reason instanceof Error ? reason.message : "暫時無法停止收件，請稍後再試。";
+  }
+}
+
 function renderRoomSnapshot(snapshot) {
   const sessions = Number(snapshot.sessionsReceived) || 0;
-  document.querySelector("#ranking-room-count").textContent = `已收到 ${sessions} 份不重複 session`;
+  const closed = snapshot.closedByOrganizer === true;
+  document.querySelector("#ranking-room-count").textContent =
+    `已收到 ${sessions} 份不重複結果${closed ? "（主辦者已停止收件）" : ""}`;
   document.querySelector("#ranking-room-expiry").textContent = `預計於 ${formatDate(snapshot.expiresAt)} 自動清除。`;
+  const closeButton = document.querySelector("#ranking-close-room");
+  closeButton.disabled = closed;
+  closeButton.textContent = closed ? "已停止收件" : "停止收件";
+  const submitButton = document.querySelector("#ranking-submit-room");
+  submitButton.disabled = closed;
+  if (closed && !snapshot.admin) {
+    status.textContent = "主辦者已停止收件；你仍可以在本機完成排序並下載個人結果。";
+  }
   const aggregateStatus = document.querySelector("#room-aggregate-status");
   const aggregateResult = document.querySelector("#room-aggregate-result");
   roomAggregateBundle = null;

@@ -6,12 +6,18 @@ import {
 } from "/pocket-polis-data-core.js";
 import { pocketPolisBundleToDelibData } from "/delib-data-core.js";
 import {
+  TOOL_SYNTHESIS_MODE_LABELS,
   createPocketPolisReceipt,
   pocketPolisReceiptToMarkdown,
   pocketPolisReceiptUrl,
+  selectToolSynthesis,
 } from "/pocket-polis-receipt-core.js";
+import { formatDateTime } from "/ui-shared.js";
 
 const STORAGE_KEY = "delib:pocket-polis-data-source";
+const MAX_SYNTHESIS_POINT_PICKS = 6;
+const MAX_SYNTHESIS_TENSION_PICKS = 4;
+let currentSynthesis = null;
 const MAX_FILE_BYTES = 20 * 1024 * 1024;
 const form = document.querySelector("#pocket-polis-data-form");
 const result = document.querySelector("#pocket-polis-data-result");
@@ -35,6 +41,11 @@ document.querySelector("#pocket-polis-receipt-form").addEventListener("input", i
 document.querySelector("#pocket-polis-receipt-form").addEventListener("change", invalidatePreparedReceipt);
 document.querySelector("#pocket-receipt-filter").addEventListener("input", renderReceiptCandidates);
 document.querySelector("#pocket-receipt-statement-list").addEventListener("change", selectReceiptStatement);
+document.querySelector("#pocket-receipt-synthesis-load").addEventListener("click", loadSynthesis);
+document.querySelector("#pocket-receipt-synthesis-points").addEventListener("change", (event) =>
+  limitSynthesisPicks(event, MAX_SYNTHESIS_POINT_PICKS, "共同點最多放 6 點"));
+document.querySelector("#pocket-receipt-synthesis-tensions").addEventListener("change", (event) =>
+  limitSynthesisPicks(event, MAX_SYNTHESIS_TENSION_PICKS, "張力最多放 4 組"));
 document.querySelector("#pocket-receipt-copy-link").addEventListener("click", copyReceiptLink);
 document.querySelector("#pocket-receipt-download-json").addEventListener("click", () => {
   if (!currentReceipt) return;
@@ -191,6 +202,7 @@ function setReceiptSource(bundle) {
   document.querySelector("#pocket-polis-receipt-result").hidden = true;
   document.querySelector("#pocket-receipt-confirm").checked = false;
   document.querySelector("#pocket-receipt-filter").value = "";
+  resetSynthesisPanel();
   const blocker = !bundle.consistency.countMatches
     ? "兩份 CSV 的票數不一致；請重新下載後再準備公開成果。"
     : bundle.summary.participants < 3
@@ -261,9 +273,20 @@ function prepareReceipt(event) {
     return;
   }
   try {
+    let toolSynthesis = null;
+    if (document.querySelector("#pocket-receipt-synthesis-include").checked) {
+      if (!currentSynthesis) throw new Error("請先按「讀取綜整」，或取消「把勾選的工具整理放進成果頁」。");
+      toolSynthesis = selectToolSynthesis(currentSynthesis, {
+        includeOverview: document.querySelector("#pocket-receipt-synthesis-overview").checked,
+        pointIndexes: checkedIndexes("#pocket-receipt-synthesis-points"),
+        tensionIndexes: checkedIndexes("#pocket-receipt-synthesis-tensions"),
+      });
+      if (!toolSynthesis) throw new Error("請至少勾選概述、一個共同點或一組張力，或取消「把勾選的工具整理放進成果頁」。");
+    }
     currentReceipt = createPocketPolisReceipt({
       bundle: currentBundle,
       selectedStatementIds: [...selectedReceiptStatementIds],
+      toolSynthesis,
       organizer: {
         interpretation: document.querySelector("#pocket-receipt-interpretation").value,
         missingVoices: document.querySelector("#pocket-receipt-missing-voices").value,
@@ -382,6 +405,141 @@ function clearReceiptBuilder() {
   currentReceiptUrl = "";
   document.querySelector("#pocket-polis-receipt-builder").hidden = true;
   document.querySelector("#pocket-polis-receipt-result").hidden = true;
+  resetSynthesisPanel();
+}
+
+function resetSynthesisPanel() {
+  currentSynthesis = null;
+  document.querySelector("#pocket-receipt-synthesis-body").hidden = true;
+  document.querySelector("#pocket-receipt-synthesis-points").replaceChildren();
+  document.querySelector("#pocket-receipt-synthesis-tensions").replaceChildren();
+  document.querySelector("#pocket-receipt-synthesis-include").checked = false;
+  document.querySelector("#pocket-receipt-synthesis-overview").checked = true;
+  document.querySelector("#pocket-receipt-synthesis-status").textContent = "";
+}
+
+async function loadSynthesis() {
+  const statusNode = document.querySelector("#pocket-receipt-synthesis-status");
+  const button = document.querySelector("#pocket-receipt-synthesis-load");
+  if (!currentBundle) {
+    statusNode.textContent = "請先檢查兩份 CSV。";
+    return;
+  }
+  button.disabled = true;
+  statusNode.textContent = "正在向 Pocket Polis 讀取綜整…";
+  try {
+    const response = await fetch(
+      `/api/integrations/pocket-polis/synthesis?conversation=${encodeURIComponent(currentBundle.source.conversationId)}`,
+      { headers: { Accept: "application/json" } },
+    );
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.error || "暫時讀不到綜整，請稍後再試。");
+    if (payload.sourceUrl && currentBundle.source.origin && new URL(payload.sourceUrl).origin !== currentBundle.source.origin) {
+      throw new Error("這個活動不在本站連接的 Pocket Polis 主機上，無法讀取它的綜整。");
+    }
+    if (payload.status !== "ready") {
+      currentSynthesis = null;
+      document.querySelector("#pocket-receipt-synthesis-body").hidden = true;
+      statusNode.textContent = payload.status === "pending"
+        ? "Pocket Polis 正在產生綜整，通常需要幾分鐘；稍後再按一次「讀取綜整」。"
+        : payload.status === "insufficient"
+          ? `Pocket Polis 還無法綜整：${payload.reason || "參與者或意見群不足"}。`
+          : `Pocket Polis 暫時無法提供綜整${payload.reason ? `：${payload.reason}` : ""}。`;
+      return;
+    }
+    currentSynthesis = payload;
+    renderSynthesisPanel(payload);
+    statusNode.textContent = "已讀取；勾選要放進成果頁的部分，再勾選下方的確認。";
+  } catch (error) {
+    currentSynthesis = null;
+    document.querySelector("#pocket-receipt-synthesis-body").hidden = true;
+    statusNode.textContent = error instanceof Error ? error.message : "暫時讀不到綜整，請稍後再試。";
+  } finally {
+    button.disabled = false;
+  }
+}
+
+function renderSynthesisPanel(synthesis) {
+  const modeLabel = TOOL_SYNTHESIS_MODE_LABELS[synthesis.generationMode] || synthesis.generationMode;
+  const counts = synthesis.provenance || {};
+  document.querySelector("#pocket-receipt-synthesis-provenance").textContent =
+    `由 ${synthesis.model} 於 ${formatDateTime(synthesis.generatedAt)} 產生（${modeLabel}）` +
+    `${synthesis.isStale ? "；投票資料其後有更新，數字可能已不同" : ""}` +
+    `${counts.participantCount ? `；當時 ${counts.participantCount} 位參與者、${counts.groupCount || "?"} 個意見群` : ""}。`;
+  const overviewText = document.querySelector("#pocket-receipt-synthesis-overview-text");
+  const overviewOption = document.querySelector("#pocket-receipt-synthesis-overview");
+  overviewText.textContent = synthesis.overview?.summary || "（這份綜整沒有整體概述）";
+  overviewOption.checked = Boolean(synthesis.overview?.summary);
+  overviewOption.disabled = !synthesis.overview?.summary;
+
+  const points = document.querySelector("#pocket-receipt-synthesis-points");
+  const keyPoints = synthesis.commonGround?.keyPoints || [];
+  points.replaceChildren(
+    ...keyPoints.map((point, index) =>
+      synthesisOption(index, point.title, [
+        point.description,
+        point.citedStatementIds?.length ? `引用陳述 ${point.citedStatementIds.join("、")}` : "",
+      ], point.direction === "agree" ? "跨群同意" : "跨群不同意")),
+  );
+  if (!keyPoints.length) points.append(emptyNote("這份綜整沒有列出跨群共同點。"));
+
+  const tensions = document.querySelector("#pocket-receipt-synthesis-tensions");
+  const tensionItems = synthesis.tensions || [];
+  tensions.replaceChildren(
+    ...tensionItems.map((tension, index) =>
+      synthesisOption(index, tension.topic, [
+        `${tension.groupALabel}：${tension.groupAPerspective || "—"}／${tension.groupBLabel}：${tension.groupBPerspective || "—"}`,
+        tension.bridgingQuestion ? `橋接提問：${tension.bridgingQuestion}` : "",
+        tension.citedStatementIds?.length ? `引用陳述 ${tension.citedStatementIds.join("、")}` : "",
+      ])),
+  );
+  if (!tensionItems.length) tensions.append(emptyNote("這份綜整沒有列出分歧與張力。"));
+  document.querySelector("#pocket-receipt-synthesis-body").hidden = false;
+}
+
+function synthesisOption(index, title, lines, chip = "") {
+  const label = document.createElement("label");
+  label.className = "synthesis-option";
+  const input = document.createElement("input");
+  input.type = "checkbox";
+  input.value = String(index);
+  const body = document.createElement("span");
+  const heading = document.createElement("strong");
+  heading.textContent = title;
+  body.append(heading);
+  if (chip) {
+    const badge = document.createElement("span");
+    badge.className = `synthesis-direction${chip === "跨群不同意" ? " synthesis-direction-disagree" : ""}`;
+    badge.textContent = chip;
+    body.append(badge);
+  }
+  for (const line of lines.filter(Boolean)) {
+    const small = document.createElement("small");
+    small.textContent = line;
+    body.append(small);
+  }
+  label.append(input, body);
+  return label;
+}
+
+function emptyNote(text) {
+  const note = document.createElement("p");
+  note.className = "field-note";
+  note.textContent = text;
+  return note;
+}
+
+function limitSynthesisPicks(event, limit, message) {
+  if (!(event.target instanceof HTMLInputElement) || !event.target.checked) return;
+  const picked = event.currentTarget.querySelectorAll("input:checked").length;
+  if (picked > limit) {
+    event.target.checked = false;
+    document.querySelector("#pocket-receipt-synthesis-status").textContent = `${message}；請先取消一個。`;
+  }
+}
+
+function checkedIndexes(selector) {
+  return [...document.querySelectorAll(`${selector} input:checked`)].map((input) => Number(input.value));
 }
 
 function restorePublicContext() {

@@ -24,6 +24,7 @@ export type RankingRoomConfig = {
 export type RankingRoomRpcResult = {
   status: string;
   duplicate?: boolean;
+  closedByOrganizer?: boolean;
   limit?: number;
   question?: { title: string; items: RankingItem[] };
   createdAt?: number;
@@ -62,6 +63,7 @@ type RoomRow = {
   admin_hash: string;
   sessions: number;
   judgments: number;
+  accepting: number;
 };
 
 type PairRow = {
@@ -125,6 +127,13 @@ export class RankingRoom extends DurableObject<Env> {
         INSERT INTO _sql_schema_migrations (id) VALUES (1);
       `);
     }
+    if (version < 2) {
+      // Organizers can stop accepting results before the room expires.
+      this.ctx.storage.sql.exec(`
+        ALTER TABLE room ADD COLUMN accepting INTEGER NOT NULL DEFAULT 1;
+        INSERT INTO _sql_schema_migrations (id) VALUES (2);
+      `);
+    }
   }
 
   private hasSchema(): boolean {
@@ -181,6 +190,7 @@ export class RankingRoom extends DurableObject<Env> {
       return { status: "expired" };
     }
 
+    if (row.accepting !== 1) return { status: "closed" };
     const items = parseItems(row.items_json);
     const judgments = normalizeJudgments(items, rawJudgments);
     if (judgments.length < items.length - 1) return { status: "invalid" };
@@ -235,15 +245,33 @@ export class RankingRoom extends DurableObject<Env> {
     return { status: "deleted" };
   }
 
+  /** Stop accepting new results while keeping the aggregate readable until expiry. */
+  async closeRoom(adminToken: string): Promise<RankingRoomRpcResult> {
+    if (this.deleted) return { status: "not_found" };
+    const suppliedHash = await sha256(adminToken);
+    const row = this.roomRow();
+    if (!row) return { status: "not_found" };
+    if (Date.now() >= row.expires_at) {
+      await this.clearStorage();
+      return { status: "expired" };
+    }
+    if (!constantTimeEqual(suppliedHash, row.admin_hash)) return { status: "forbidden" };
+    this.ctx.storage.sql.exec("UPDATE room SET accepting = 0 WHERE id = 1");
+    const updated = this.roomRow();
+    return updated ? this.snapshot(updated, true) : { status: "not_found" };
+  }
+
   async alarm(): Promise<void> {
     await this.clearStorage();
   }
 
   private roomRow(): RoomRow | null {
     if (this.deleted || !this.hasSchema()) return null;
+    // Rooms created before the `accepting` column existed are upgraded on first read.
+    this.ensureSchema();
     const rows = this.ctx.storage.sql
       .exec<RoomRow>(
-        `SELECT title, items_json, created_at, expires_at, admin_hash, sessions, judgments
+        `SELECT title, items_json, created_at, expires_at, admin_hash, sessions, judgments, accepting
          FROM room WHERE id = 1`,
       )
       .toArray();
@@ -281,7 +309,8 @@ export class RankingRoom extends DurableObject<Env> {
       resultThreshold: PUBLIC_RESULT_THRESHOLD,
       sessionsReceived: row.sessions,
       admin,
-      acceptingSubmissions: row.sessions < MAX_SESSIONS,
+      acceptingSubmissions: row.accepting === 1 && row.sessions < MAX_SESSIONS,
+      closedByOrganizer: row.accepting !== 1,
       sessionLimit: MAX_SESSIONS,
       dataCard: {
         storedByDelib: true,

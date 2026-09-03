@@ -10,14 +10,14 @@ Updated: 2026-09-03
 
 | 項目 | 現況 |
 | --- | --- |
-| 執行環境 | 一個 Cloudflare Worker（`delib`）＋ Workers Static Assets ＋ 兩個 SQLite Durable Object namespace（`RankingRoom`、`PublicReceipt`） |
+| 執行環境 | 一個 Cloudflare Worker（`delib`）＋ Workers Static Assets ＋ 三個 SQLite Durable Object namespace（`RankingRoom`、`PublicReceipt`、`ReceiptIndex`） |
 | 正式網域 | `delib.mashbean.net`，只綁在 `env.production` |
 | 部署路徑 | GitHub `main` → `deploy.yml`（檢查 → 部署 → 煙霧測試）；secret 未設定前，由筆電 `npm run deploy:production` |
 | 健康檢查 | `GET`／`HEAD /api/health`，回傳 `version`、`build.sha`、`build.deployedAt` |
 | 監測 | `uptime.yml` 每 30 分鐘跑 `scripts/smoke.mjs` 並探測 polis／call-in；失敗會寄信給 repo owner |
 | 日誌 | `observability.enabled: true`、全量取樣；只記錄路徑、方法與錯誤訊息，不記錄 body 或 header |
 | 限流 | production 才有：`WRITE_LIMIT` 每 IP 20 次／分鐘（所有 POST）；`SUBMIT_LIMIT` 每 IP 120 次／分鐘（排序提交）。限流服務故障時放行 |
-| 依賴的上游 | `polis.mashbean.net`（Pocket Polis）、`call-in.mashbean.net`（Call-in）、`app.harmonica.chat`、`api.openai.com`；全部有 12 秒逾時（OpenAI 45 秒） |
+| 依賴的上游 | `polis.mashbean.net`（Pocket Polis 建立與綜整代理）、`call-in.mashbean.net`（Call-in）、`app.harmonica.chat`、`api.openai.com`；全部有 12 秒逾時（OpenAI 45 秒） |
 
 ## 日常指令
 
@@ -73,8 +73,7 @@ curl -X DELETE https://delib.mashbean.net/api/receipts/<slug> \
   -H "Origin: https://delib.mashbean.net" -H "X-Receipt-Operator: $OPERATOR_TOKEN"
 ```
 
-`/api/health` 的 `operatorTakedown` 會顯示是否已設定。目前沒有 slug 清單；若
-需要，下一步是在建立時把 `slug、kind、createdAt` 寫進 KV 索引。
+`/api/health` 的 `operatorTakedown` 會顯示是否已設定。slug 清單見下方「Pocket Polis 綜整代理與 Workers AI 額度」一節末尾的指令。
 
 ### 上游服務掛了
 
@@ -98,3 +97,20 @@ Zone 已啟用 Cloudflare Web Analytics（自動注入 beacon）。它不用 coo
 個人；CSP 已允許 `static.cloudflareinsights.com` 與 `cloudflareinsights.com`，
 頁尾也有揭露。若要關閉，請在 Cloudflare dashboard 停用注入並同步移除
 `public/_headers` 與 `src/index.ts` 裡的兩個來源。
+
+## Pocket Polis 綜整代理與 Workers AI 額度
+
+`GET /api/integrations/pocket-polis/synthesis?conversation=<id>` 只會向 `POCKET_POLIS_ORIGIN`
+讀取公開綜整；Delib 本身不呼叫任何模型。上游 Pocket Polis 用同一個 Cloudflare 帳號的
+Workers AI 免費額度（每日 10,000 神經元，Pocket Polis 自我上限 9,000）產生綜整；讀取
+可能觸發一次重新產生，所以這個 GET 計入 Delib 的每 IP 寫入限流。若日後要讓 Delib 自己
+呼叫 Gemma（例如免金鑰的主持簡報），必須另外分配神經元預算，避免把 Pocket Polis 的
+綜整擠成統計摘要。
+
+要看目前有哪些公開成果短網址：
+
+```bash
+curl https://delib.mashbean.net/api/receipts -H "X-Receipt-Operator: $OPERATOR_TOKEN"
+```
+
+回傳 slug、種類、建立與到期時間（`ReceiptIndex` Durable Object，到期或刪除自動移除）。

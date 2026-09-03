@@ -12,19 +12,27 @@ import {
   type PublicReceiptRecord,
 } from "./public-receipt";
 
+import { ReceiptIndex } from "./receipt-index";
 import packageJson from "../package.json";
 
-export { PublicReceipt, RankingRoom };
+export { PublicReceipt, RankingRoom, ReceiptIndex };
 
 type RateLimiter = { limit(options: { key: string }): Promise<{ success: boolean }> };
 
 type WorkerEnv = Omit<
   Env,
-  "RANKING_ROOMS" | "PUBLIC_RECEIPTS" | "ASSETS" | "WRITE_LIMIT" | "SUBMIT_LIMIT" | "CF_VERSION_METADATA"
+  | "RANKING_ROOMS"
+  | "PUBLIC_RECEIPTS"
+  | "RECEIPT_INDEX"
+  | "ASSETS"
+  | "WRITE_LIMIT"
+  | "SUBMIT_LIMIT"
+  | "CF_VERSION_METADATA"
 > & {
   ASSETS: Fetcher;
   RANKING_ROOMS: DurableObjectNamespace<RankingRoom>;
   PUBLIC_RECEIPTS: { getByName(name: string): PublicReceiptRpcStub };
+  RECEIPT_INDEX: DurableObjectNamespace<ReceiptIndex>;
   CALL_IN_ORIGIN?: string;
   POCKET_POLIS_ORIGIN?: string;
   POLIS_SITE_ID?: string;
@@ -158,6 +166,17 @@ async function route(request: Request, env: WorkerEnv, url: URL): Promise<Respon
 
     if (url.pathname === "/api/integrations/pocket-polis" && request.method === "POST") {
       return handlePocketPolisRequest(
+        request,
+        fetch,
+        env.POCKET_POLIS_ORIGIN || DEFAULT_POCKET_POLIS_ORIGIN,
+      );
+    }
+
+    if (url.pathname === "/api/integrations/pocket-polis/synthesis" && request.method === "GET") {
+      // Reading a synthesis can start a model job upstream, so it shares the write budget.
+      const limited = await enforceRateLimit(env.WRITE_LIMIT, request);
+      if (limited) return limited;
+      return handlePocketPolisSynthesisRequest(
         request,
         fetch,
         env.POCKET_POLIS_ORIGIN || DEFAULT_POCKET_POLIS_ORIGIN,
@@ -335,10 +354,22 @@ type PublicReceiptRpcStub = {
 
 export async function handlePublicReceiptRequest(
   request: Request,
-  env: Pick<WorkerEnv, "PUBLIC_RECEIPTS" | "OPERATOR_TOKEN_SHA256">,
+  env: Pick<WorkerEnv, "PUBLIC_RECEIPTS" | "RECEIPT_INDEX" | "OPERATOR_TOKEN_SHA256">,
 ): Promise<Response> {
   const url = new URL(request.url);
   const basePath = "/api/receipts";
+
+  if (url.pathname === basePath && request.method === "GET") {
+    // Operator-only registry of live slugs, for takedowns and abuse review.
+    const denied = await verifyOperatorToken(request, env);
+    if (denied) return denied;
+    const listing = await env.RECEIPT_INDEX.getByName("index").list(500);
+    return json({
+      ...listing,
+      fields: ["slug", "kind", "createdAt", "expiresAt"],
+      note: "Entries expire with their receipts; page content is only readable at /r/<slug>.",
+    }, 200);
+  }
 
   if (url.pathname === basePath && request.method === "POST") {
     if (!isSameOriginRequest(request)) return json({ error: "origin not allowed" }, 403);
@@ -399,16 +430,9 @@ export async function handlePublicReceiptRequest(
 
   if (request.method === "DELETE") {
     if (!isSameOriginRequest(request)) return json({ error: "origin not allowed" }, 403);
-    const operatorToken = request.headers.get("X-Receipt-Operator")?.trim();
-    if (operatorToken) {
-      // Operator takedown for abusive public pages. Configure with
-      // `wrangler secret put OPERATOR_TOKEN_SHA256 --env production`.
-      const expected = env.OPERATOR_TOKEN_SHA256?.trim().toLowerCase();
-      if (!expected || !/^[a-f0-9]{64}$/.test(expected)) {
-        return json({ error: "這個部署尚未設定營運者下架權杖" }, 403);
-      }
-      const supplied = await sha256(operatorToken);
-      if (!constantTimeEqualHex(supplied, expected)) return json({ error: "營運者權杖不正確" }, 403);
+    if (request.headers.has("X-Receipt-Operator")) {
+      const denied = await verifyOperatorToken(request, env);
+      if (denied) return denied;
       return publicReceiptResult(await stub.forceDelete());
     }
     const adminToken = request.headers.get("X-Receipt-Admin")?.trim();
@@ -417,6 +441,26 @@ export async function handlePublicReceiptRequest(
   }
 
   return json({ error: "method not allowed" }, 405);
+}
+
+/**
+ * Operator authentication for takedowns and the slug registry. Configure with
+ * `wrangler secret put OPERATOR_TOKEN_SHA256 --env production`; the Worker only
+ * ever holds the SHA-256 of the operator's secret.
+ */
+async function verifyOperatorToken(
+  request: Request,
+  env: Pick<WorkerEnv, "OPERATOR_TOKEN_SHA256">,
+): Promise<Response | null> {
+  const operatorToken = request.headers.get("X-Receipt-Operator")?.trim();
+  if (!operatorToken) return json({ error: "缺少營運者權杖" }, 401);
+  const expected = env.OPERATOR_TOKEN_SHA256?.trim().toLowerCase();
+  if (!expected || !/^[a-f0-9]{64}$/.test(expected)) {
+    return json({ error: "這個部署尚未設定營運者下架權杖" }, 403);
+  }
+  const supplied = await sha256(operatorToken);
+  if (!constantTimeEqualHex(supplied, expected)) return json({ error: "營運者權杖不正確" }, 403);
+  return null;
 }
 
 function constantTimeEqualHex(left: string, right: string): boolean {
@@ -488,7 +532,7 @@ export async function handleRankingRoomRequest(
   }
 
   const match = url.pathname.match(
-    /^\/api\/integrations\/power-ranker\/rooms\/([a-f0-9]{64})(?:\/(submissions))?$/,
+    /^\/api\/integrations\/power-ranker\/rooms\/([a-f0-9]{64})(?:\/(submissions|close))?$/,
   );
   if (!match) return json({ error: "not found" }, 404);
   const [, roomId, child] = match;
@@ -514,7 +558,15 @@ export async function handleRankingRoomRequest(
     const result = await stub.submit(sessionId, body.judgments as RankingJudgment[]);
     if (result.status === "invalid") return json({ error: "至少要完成基本比較，且每組配對只能出現一次" }, 400);
     if (result.status === "full") return json({ error: "這個收件室已達 300 份上限，不再接受新結果" }, 409);
+    if (result.status === "closed") return json({ error: "主辦者已停止收件；已收到的結果仍可查看到期為止" }, 409);
     return rankingRoomResult(result, result.duplicate === true ? 200 : 201);
+  }
+
+  if (child === "close" && request.method === "POST") {
+    if (!isSameOriginRequest(request)) return json({ error: "origin not allowed" }, 403);
+    const adminToken = request.headers.get("X-Ranking-Admin")?.trim();
+    if (!adminToken) return json({ error: "缺少管理權杖" }, 401);
+    return rankingRoomResult(await stub.closeRoom(adminToken));
   }
 
   if (!child && request.method === "DELETE") {
@@ -763,6 +815,242 @@ export async function handlePocketPolisRequest(
     },
     201,
   );
+}
+
+type SynthesisPoint = {
+  title: string;
+  description: string;
+  direction: "agree" | "disagree";
+  citedStatementIds: number[];
+};
+
+type SynthesisTension = {
+  topic: string;
+  groupALabel: string;
+  groupBLabel: string;
+  groupAPerspective: string;
+  groupBPerspective: string;
+  tensions: string;
+  bridgingQuestion: string;
+  citedStatementIds: number[];
+};
+
+const SYNTHESIS_MAX_POINTS = 12;
+const SYNTHESIS_MAX_TENSIONS = 8;
+const SYNTHESIS_MAX_CITED = 24;
+const RECEIPT_MAX_SYNTHESIS_POINTS = 6;
+const RECEIPT_MAX_SYNTHESIS_TENSIONS = 4;
+
+/**
+ * Read-only proxy for a Pocket Polis AI synthesis (Workers AI Gemma or the
+ * deterministic fallback). Only the configured origin is reachable, only
+ * whitelisted fields pass through, and provenance (model, generation mode,
+ * timestamps, counts) is preserved so a receipt can label the layer honestly.
+ */
+export async function handlePocketPolisSynthesisRequest(
+  request: Request,
+  upstreamFetch: typeof fetch = fetch,
+  configuredOrigin = DEFAULT_POCKET_POLIS_ORIGIN,
+): Promise<Response> {
+  const url = new URL(request.url);
+  const conversationId = cleanMatchingString(url.searchParams.get("conversation"), /^[a-z0-9]{10}$/, 10);
+  if (!conversationId) return json({ error: "請提供有效的 Pocket Polis 活動代碼" }, 400);
+  const pocketPolisOrigin = normalizeServiceOrigin(configuredOrigin);
+  if (!pocketPolisOrigin) return json({ error: "Pocket Polis 主機設定不完整" }, 503);
+
+  let upstream: Response;
+  try {
+    upstream = await upstreamFetch(`${pocketPolisOrigin}/api/conversations/${conversationId}/synthesis`, {
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
+    });
+  } catch (error) {
+    return upstreamFailure(error, "Pocket Polis");
+  }
+  if (upstream.status === 404) return json({ error: "找不到這個 Pocket Polis 活動" }, 404);
+  if (!upstream.ok) return json({ error: "Pocket Polis 暫時無法提供綜整，請稍後再試" }, 502);
+
+  let payload: unknown;
+  try {
+    payload = await upstream.json();
+  } catch {
+    return json({ error: "Pocket Polis 綜整回應格式不完整" }, 502);
+  }
+  const normalized = normalizeSynthesisPayload(payload, `${pocketPolisOrigin}/r/${conversationId}`);
+  if (!normalized) return json({ error: "Pocket Polis 綜整回應格式不完整" }, 502);
+  return json(normalized, 200, false, {
+    "Cache-Control": normalized.status === "ready" ? "public, max-age=60" : "no-store",
+  });
+}
+
+function normalizeSynthesisPayload(
+  payload: unknown,
+  sourceUrl: string,
+): Record<string, unknown> | null {
+  if (!isRecord(payload) || typeof payload.status !== "string") return null;
+  if (payload.status !== "ready") {
+    if (!["pending", "insufficient", "unavailable"].includes(payload.status)) return null;
+    return {
+      status: payload.status,
+      reason: cleanOptionalString(payload.reason, 300),
+      retryAfterMs: typeof payload.retryAfterMs === "number" && Number.isFinite(payload.retryAfterMs)
+        ? Math.max(0, Math.min(3_600_000, Math.round(payload.retryAfterMs)))
+        : null,
+      sourceUrl,
+    };
+  }
+  const generationMode = payload.generationMode === "ai" ? "ai" : payload.generationMode === "deterministic" ? "deterministic" : null;
+  const model = cleanMatchingString(payload.model, /^[A-Za-z0-9@/._:-]{1,80}$/, 80);
+  const generatedAt = typeof payload.generatedAt === "number" && Number.isFinite(payload.generatedAt)
+    ? new Date(payload.generatedAt).toISOString()
+    : null;
+  const mathRevision = typeof payload.mathRevision === "number" && Number.isFinite(payload.mathRevision)
+    ? Math.round(payload.mathRevision)
+    : 0;
+  if (!generationMode || !model || !generatedAt) return null;
+  const provenance = isRecord(payload.provenance) ? payload.provenance : {};
+  const overview = isRecord(payload.overview) ? payload.overview : {};
+  const commonGround = isRecord(payload.commonGround) ? payload.commonGround : {};
+  return {
+    status: "ready",
+    tool: "Pocket Polis",
+    sourceUrl,
+    model,
+    generationMode,
+    generatedAt,
+    mathRevision,
+    isStale: payload.isStale === true,
+    lang: payload.lang === "en" ? "en" : "zh",
+    provenance: Object.fromEntries(
+      ["participantCount", "clusteredCount", "statementCount", "voteCount", "groupCount"].map((key) => [
+        key,
+        integerInRange(provenance[key], 0, 100_000_000) ? Number(provenance[key]) : null,
+      ]),
+    ),
+    overview: {
+      summary: cleanOptionalString(overview.summary, 600),
+      participantContext: cleanOptionalString(overview.participantContext, 200),
+      citedStatementIds: cleanStatementIds(overview.citedStatementIds),
+    },
+    themes: (Array.isArray(payload.themes) ? payload.themes : []).slice(0, 12).flatMap((theme) => {
+      if (!isRecord(theme)) return [];
+      const title = cleanRequiredString(theme.title, 80);
+      if (!title) return [];
+      return [{
+        id: cleanMatchingString(theme.id, /^[A-Za-z0-9_-]{1,20}$/, 20) || "",
+        title,
+        description: cleanOptionalString(theme.description, 300),
+        statementIds: cleanStatementIds(theme.statementIds, 200),
+      }];
+    }),
+    commonGround: {
+      summary: cleanOptionalString(commonGround.summary, 400),
+      keyPoints: normalizeSynthesisPoints(commonGround.keyPoints, SYNTHESIS_MAX_POINTS),
+    },
+    groupPortraits: (Array.isArray(payload.groupPortraits) ? payload.groupPortraits : []).slice(0, 8).flatMap((portrait) => {
+      if (!isRecord(portrait)) return [];
+      const groupLabel = cleanRequiredString(portrait.groupLabel, 40);
+      if (!groupLabel) return [];
+      return [{
+        groupLabel,
+        size: integerInRange(portrait.size, 0, 100_000_000) ? Number(portrait.size) : null,
+        title: cleanOptionalString(portrait.title, 120),
+        summary: cleanOptionalString(portrait.summary, 400),
+        citedStatementIds: cleanStatementIds(portrait.citedStatementIds),
+      }];
+    }),
+    tensions: normalizeSynthesisTensions(payload.tensions, SYNTHESIS_MAX_TENSIONS),
+  };
+}
+
+function normalizeSynthesisPoints(value: unknown, limit: number): SynthesisPoint[] {
+  return (Array.isArray(value) ? value : []).slice(0, limit).flatMap((point) => {
+    if (!isRecord(point)) return [];
+    const title = cleanRequiredString(point.title, 120);
+    const direction = point.direction === "agree" ? "agree" : point.direction === "disagree" ? "disagree" : null;
+    if (!title || !direction) return [];
+    return [{
+      title,
+      description: cleanOptionalString(point.description, 400),
+      direction,
+      citedStatementIds: cleanStatementIds(point.citedStatementIds),
+    }];
+  });
+}
+
+function normalizeSynthesisTensions(value: unknown, limit: number): SynthesisTension[] {
+  return (Array.isArray(value) ? value : []).slice(0, limit).flatMap((tension) => {
+    if (!isRecord(tension)) return [];
+    const topic = cleanRequiredString(tension.topic, 120);
+    const groupALabel = cleanRequiredString(tension.groupALabel, 40);
+    const groupBLabel = cleanRequiredString(tension.groupBLabel, 40);
+    if (!topic || !groupALabel || !groupBLabel) return [];
+    return [{
+      topic,
+      groupALabel,
+      groupBLabel,
+      groupAPerspective: cleanOptionalString(tension.groupAPerspective, 400),
+      groupBPerspective: cleanOptionalString(tension.groupBPerspective, 400),
+      tensions: cleanOptionalString(tension.tensions, 400),
+      bridgingQuestion: cleanOptionalString(tension.bridgingQuestion, 300),
+      citedStatementIds: cleanStatementIds(tension.citedStatementIds),
+    }];
+  });
+}
+
+function cleanStatementIds(value: unknown, limit = SYNTHESIS_MAX_CITED): number[] {
+  if (!Array.isArray(value)) return [];
+  const ids: number[] = [];
+  for (const candidate of value) {
+    if (!integerInRange(candidate, 1, 1_000_000)) continue;
+    const id = Number(candidate);
+    if (!ids.includes(id)) ids.push(id);
+    if (ids.length >= limit) break;
+  }
+  return ids;
+}
+
+/** Organizer-selected subset of a synthesis embedded in a public receipt. */
+function validToolSynthesis(value: unknown): boolean {
+  if (!isRecord(value) || !hasOnlyKeys(value, [
+    "tool",
+    "model",
+    "generationMode",
+    "generatedAt",
+    "mathRevision",
+    "isStale",
+    "overview",
+    "commonGround",
+    "tensions",
+  ])) return false;
+  if (
+    value.tool !== "Pocket Polis" ||
+    !cleanMatchingString(value.model, /^[A-Za-z0-9@/._:-]{1,80}$/, 80) ||
+    !["ai", "deterministic"].includes(String(value.generationMode)) ||
+    !validDateTimeValue(value.generatedAt) ||
+    !integerInRange(value.mathRevision, 0, Number.MAX_SAFE_INTEGER) ||
+    typeof value.isStale !== "boolean" ||
+    typeof value.overview !== "string" || value.overview.length > 600 ||
+    !Array.isArray(value.commonGround) || value.commonGround.length > RECEIPT_MAX_SYNTHESIS_POINTS ||
+    !Array.isArray(value.tensions) || value.tensions.length > RECEIPT_MAX_SYNTHESIS_TENSIONS
+  ) return false;
+  const points = normalizeSynthesisPoints(value.commonGround, RECEIPT_MAX_SYNTHESIS_POINTS);
+  const tensions = normalizeSynthesisTensions(value.tensions, RECEIPT_MAX_SYNTHESIS_TENSIONS);
+  if (points.length !== value.commonGround.length || tensions.length !== value.tensions.length) return false;
+  const pointKeys = ["title", "description", "direction", "citedStatementIds"];
+  const tensionKeys = [
+    "topic",
+    "groupALabel",
+    "groupBLabel",
+    "groupAPerspective",
+    "groupBPerspective",
+    "tensions",
+    "bridgingQuestion",
+    "citedStatementIds",
+  ];
+  if (!value.commonGround.every((point) => isRecord(point) && hasOnlyKeys(point, pointKeys))) return false;
+  if (!value.tensions.every((tension) => isRecord(tension) && hasOnlyKeys(tension, tensionKeys))) return false;
+  return value.overview.trim().length > 0 || points.length > 0 || tensions.length > 0;
 }
 
 export async function handleHeyFormRequest(request: Request): Promise<Response> {
@@ -1319,11 +1607,13 @@ function normalizePublicReceipt(value: unknown, requestOrigin: string): {
         "organizer",
         "dataCard",
       ];
+  const optionalTopLevel = kind === "pocket-polis-receipt" ? ["toolSynthesis"] : [];
   if (
-    !hasOnlyKeys(value, expectedTopLevel) ||
+    !hasKeys(value, expectedTopLevel, optionalTopLevel) ||
     !validDateTimeValue(value.preparedAt) ||
     !validPublicOrganizer(value.organizer)
   ) return null;
+  if ("toolSynthesis" in value && !validToolSynthesis(value.toolSynthesis)) return null;
   if (!isRecord(value.dataCard) || value.dataCard.containsDirectIdentifiers !== false) return null;
   if (
     value.dataCard.containsParticipantData !== true ||
@@ -1415,7 +1705,10 @@ function validPocketReceipt(value: Record<string, unknown>): boolean {
   ) {
     return false;
   }
-  return findings.length >= 1 && findings.length <= 8 && findings.every((finding) => {
+  if (Number(scope.includedStatements) > Number(scope.approvedStatements)) return false;
+  const statementIds = new Set<number>();
+  let responsesTotal = 0;
+  const findingsValid = findings.length >= 1 && findings.length <= 8 && findings.every((finding) => {
     if (!isRecord(finding) || !hasOnlyKeys(finding, [
       "statementId",
       "text",
@@ -1425,8 +1718,11 @@ function validPocketReceipt(value: Record<string, unknown>): boolean {
       "passes",
       "responses",
     ])) return false;
-    return integerInRange(finding.statementId, 1, 100_000) &&
-      cleanRequiredString(finding.text, 280) !== null &&
+    const statementId = Number(finding.statementId);
+    if (!integerInRange(finding.statementId, 1, 100_000) || statementIds.has(statementId)) return false;
+    statementIds.add(statementId);
+    responsesTotal += Number(finding.responses);
+    return cleanRequiredString(finding.text, 280) !== null &&
       typeof finding.isSeed === "boolean" &&
       integerInRange(finding.agrees, 0, 1_000_000) &&
       integerInRange(finding.disagrees, 0, 1_000_000) &&
@@ -1434,6 +1730,8 @@ function validPocketReceipt(value: Record<string, unknown>): boolean {
       integerInRange(finding.responses, 3, 1_000_000) &&
       finding.responses === Number(finding.agrees) + Number(finding.disagrees) + Number(finding.passes);
   });
+  // Selected statements cannot carry more responses than the whole round received.
+  return findingsValid && responsesTotal <= Number(scope.totalVotes);
 }
 
 /**
@@ -1498,24 +1796,59 @@ function validRankingReceipt(value: Record<string, unknown>, requestOrigin: stri
   if (!integerInRange(aggregate.sessions, 3, 300) || !integerInRange(aggregate.judgments, 1, 13_500)) {
     return false;
   }
-  if (aggregate.pairwise.length > 45 || !aggregate.pairwise.every((pair) => {
+  // A "checkable" receipt has to add up: every pair total equals its parts, no
+  // pair repeats, judgments equal the sum of pair totals, each item's
+  // observations equal the totals of the pairs it appears in, ranks are a
+  // permutation, and coverage is derived from the pairs actually compared.
+  const itemOrder = new Map([...itemIds].map((id, index) => [id, index]));
+  const seenPairs = new Set<string>();
+  const observations = new Map<string, number>([...itemIds].map((id) => [id, 0]));
+  let judgmentTotal = 0;
+  if (aggregate.pairwise.length > 45) return false;
+  for (const pair of aggregate.pairwise) {
     if (!isRecord(pair) || !hasOnlyKeys(pair, ["alpha", "beta", "alphaWins", "betaWins", "equal", "total"])) {
       return false;
     }
-    return itemIds.has(String(pair.alpha)) && itemIds.has(String(pair.beta)) && pair.alpha !== pair.beta &&
-      integerInRange(pair.alphaWins, 0, 300) && integerInRange(pair.betaWins, 0, 300) &&
-      integerInRange(pair.equal, 0, 300) && integerInRange(pair.total, 0, 900);
-  })) return false;
-  if (result.length !== questionItems.length || !result.every((item) => {
+    const alpha = String(pair.alpha);
+    const beta = String(pair.beta);
+    if (!itemIds.has(alpha) || !itemIds.has(beta) || alpha === beta) return false;
+    if ((itemOrder.get(alpha) ?? 0) >= (itemOrder.get(beta) ?? 0) || seenPairs.has(`${alpha}:${beta}`)) return false;
+    if (
+      !integerInRange(pair.alphaWins, 0, 300) ||
+      !integerInRange(pair.betaWins, 0, 300) ||
+      !integerInRange(pair.equal, 0, 300) ||
+      !integerInRange(pair.total, 1, 900) ||
+      Number(pair.total) !== Number(pair.alphaWins) + Number(pair.betaWins) + Number(pair.equal)
+    ) return false;
+    seenPairs.add(`${alpha}:${beta}`);
+    judgmentTotal += Number(pair.total);
+    observations.set(alpha, (observations.get(alpha) || 0) + Number(pair.total));
+    observations.set(beta, (observations.get(beta) || 0) + Number(pair.total));
+  }
+  if (judgmentTotal !== Number(aggregate.judgments)) return false;
+
+  const itemCount = questionItems.length;
+  if (result.length !== itemCount) return false;
+  const resultIds = new Set<string>();
+  const ranks = new Set<number>();
+  for (const item of result) {
     if (!isRecord(item) || !hasOnlyKeys(item, ["id", "label", "score", "observations", "rank"])) return false;
-    return itemIds.has(String(item.id)) && cleanRequiredString(item.label, 80) !== null &&
-      numberInRange(item.score, 0, 1) && integerInRange(item.observations, 0, 13_500) &&
-      integerInRange(item.rank, 1, questionItems.length);
-  })) return false;
+    const id = String(item.id);
+    if (!itemIds.has(id) || resultIds.has(id) || cleanRequiredString(item.label, 80) === null) return false;
+    if (!numberInRange(item.score, 0, 1) || !integerInRange(item.rank, 1, itemCount) || ranks.has(Number(item.rank))) {
+      return false;
+    }
+    if (!integerInRange(item.observations, 0, 13_500) || Number(item.observations) !== observations.get(id)) return false;
+    resultIds.add(id);
+    ranks.add(Number(item.rank));
+  }
+
+  const totalPairs = (itemCount * (itemCount - 1)) / 2;
   return hasOnlyKeys(coverage, ["comparedPairs", "totalPairs", "ratio"]) &&
-    integerInRange(coverage.comparedPairs, 1, 45) &&
-    integerInRange(coverage.totalPairs, 3, 45) &&
-    numberInRange(coverage.ratio, 0, 1);
+    Number(coverage.comparedPairs) === seenPairs.size &&
+    Number(coverage.totalPairs) === totalPairs &&
+    numberInRange(coverage.ratio, 0, 1) &&
+    Math.abs(Number(coverage.ratio) - seenPairs.size / totalPairs) < 0.005;
 }
 
 function sameOriginUrl(value: string, origin: string): boolean {
@@ -1545,8 +1878,15 @@ function validPublicOrganizer(value: unknown): boolean {
     cleanRequiredString(value.authority, 120) !== null &&
     cleanRequiredString(value.responsibleActor, 120) !== null &&
     cleanRequiredString(value.nextAction, 500) !== null &&
-    (value.responseBy === "" || /^\d{4}-\d{2}-\d{2}$/.test(String(value.responseBy))) &&
+    (value.responseBy === "" || validCalendarDate(value.responseBy)) &&
     (value.evidenceUrl === "" || cleanHttpsUrl(value.evidenceUrl, 2_000) !== null);
+}
+
+/** `YYYY-MM-DD` that also exists on the calendar (no 2026-99-99). */
+function validCalendarDate(value: unknown): boolean {
+  if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const parsed = new Date(`${value}T00:00:00.000Z`);
+  return !Number.isNaN(parsed.valueOf()) && parsed.toISOString().slice(0, 10) === value;
 }
 
 function isBoundedPublicValue(value: unknown, depth = 0): boolean {
@@ -1576,6 +1916,12 @@ function hasOnlyKeys(value: Record<string, unknown>, expected: string[]): boolea
   return keys.length === expected.length && keys.every((key) => expected.includes(key));
 }
 
+function hasKeys(value: Record<string, unknown>, required: string[], optional: string[]): boolean {
+  const keys = Object.keys(value);
+  return required.every((key) => keys.includes(key)) &&
+    keys.every((key) => required.includes(key) || optional.includes(key));
+}
+
 function integerInRange(value: unknown, min: number, max: number): boolean {
   return Number.isInteger(value) && Number(value) >= min && Number(value) <= max;
 }
@@ -1584,8 +1930,10 @@ function numberInRange(value: unknown, min: number, max: number): boolean {
   return typeof value === "number" && Number.isFinite(value) && value >= min && value <= max;
 }
 
+/** ISO 8601 date-time with an explicit offset, as every Delib core emits via toISOString(). */
 function validDateTimeValue(value: unknown): boolean {
   if (typeof value !== "string") return false;
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d{1,3})?)?(Z|[+-]\d{2}:\d{2})$/.test(value)) return false;
   const parsed = new Date(value);
   return !Number.isNaN(parsed.valueOf());
 }

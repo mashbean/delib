@@ -1,5 +1,6 @@
 import { DurableObject } from "cloudflare:workers";
 import { sha256 } from "./ranking-room";
+import type { ReceiptIndex } from "./receipt-index";
 
 export type PublicReceiptKind = "pocket-polis-receipt" | "ranking-receipt";
 export type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
@@ -93,7 +94,28 @@ export class PublicReceipt extends DurableObject<Env> {
       await this.clearStorage();
       throw error;
     }
+    await this.updateIndex((index, slug) =>
+      index.add({ slug, kind: input.kind, createdAt: input.createdAt, expiresAt: input.expiresAt }));
     return { created: true };
+  }
+
+  /**
+   * Keep the operator registry in sync. Registry failures are logged, never
+   * surfaced: the receipt itself is the source of truth.
+   */
+  private async updateIndex(
+    change: (index: DurableObjectStub<ReceiptIndex>, slug: string) => Promise<void>,
+  ): Promise<void> {
+    const slug = this.ctx.id.name;
+    const namespace = this.env.RECEIPT_INDEX;
+    if (!slug || !namespace) return;
+    try {
+      await change(namespace.getByName("index"), slug);
+    } catch (error) {
+      console.error("delib receipt index update failed", {
+        message: error instanceof Error ? error.message : String(error),
+      });
+    }
   }
 
   async getReceipt(): Promise<PublicReceiptRecord> {
@@ -153,6 +175,7 @@ export class PublicReceipt extends DurableObject<Env> {
     await this.ctx.storage.deleteAlarm();
     await this.ctx.storage.deleteAll();
     this.deleted = true;
+    await this.updateIndex((index, slug) => index.remove(slug));
   }
 }
 

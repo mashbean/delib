@@ -14,6 +14,7 @@ import {
 } from "../public/pocket-polis-data-core.js";
 import {
   createPocketPolisReceipt,
+  selectToolSynthesis,
   pocketPolisReceiptToMarkdown,
   pocketPolisReceiptUrl,
 } from "../public/pocket-polis-receipt-core.js";
@@ -42,6 +43,12 @@ const [publicInfo, publicResults, statementsCsv, votesCsv] = await Promise.all([
   fetchText(`${apiBase}/export/votes.csv`),
 ]);
 
+// The synthesis is public; reading it may ask Pocket Polis to (re)generate one.
+const synthesisPayload = await fetchJson(`${apiBase}/synthesis`).catch(() => null);
+const synthesisSelection = configuration.toolSynthesis && synthesisPayload?.status === "ready"
+  ? selectToolSynthesis(synthesisPayload, configuration.toolSynthesis)
+  : null;
+
 if (publicInfo.openData !== true) {
   throw new Error("這個活動沒有開放匿名 CSV；pilot 不會要求或繞過私人管理金鑰");
 }
@@ -67,6 +74,7 @@ const receipt = createPocketPolisReceipt({
   selectedStatementIds: configuration.selectedStatementIds,
   organizer: configuration.organizer,
   preparedAt: exportedAt,
+  toolSynthesis: synthesisSelection,
 });
 const tttcCsv = pocketPolisToTttcCsv(bundle);
 const delibData = pocketPolisBundleToDelibData(bundle, exportedAt);
@@ -81,7 +89,7 @@ const handoffs = Object.fromEntries(
   }),
 );
 
-const checks = runChecks({ bundle, delibData, receipt, tttcCsv, agora, handoffs, publicInfo, publicResults });
+const checks = runChecks({ bundle, delibData, receipt, tttcCsv, agora, handoffs, publicInfo, publicResults, synthesisSelection });
 if (checks.some((check) => !check.ok)) {
   const failures = checks.filter((check) => !check.ok).map((check) => check.label).join("、");
   throw new Error(`Pilot 驗證失敗：${failures}`);
@@ -97,6 +105,7 @@ await mkdir(resolve(outputDirectory, "handoffs"), { recursive: true });
 await Promise.all([
   writeFile(resolve(outputDirectory, "source", "conversation.json"), jsonText(publicInfo)),
   writeFile(resolve(outputDirectory, "source", "results.json"), jsonText(publicResults)),
+  ...(synthesisPayload ? [writeFile(resolve(outputDirectory, "source", "synthesis.json"), jsonText(synthesisPayload))] : []),
   writeFile(resolve(outputDirectory, "source", "statements.csv"), statementsCsv),
   writeFile(resolve(outputDirectory, "source", "votes.csv"), votesCsv),
   writeFile(resolve(outputDirectory, "portable", "delib-pocket-polis.json"), jsonText(bundle)),
@@ -121,6 +130,7 @@ const pilotReport = renderPilotReport({
   bundle,
   receipt,
   checks,
+  synthesisPayload,
   receiptUrl: pocketPolisReceiptUrl(receipt, configuration.delibOrigin),
 });
 await writeFile(resolve(outputDirectory, "pilot-report.md"), pilotReport);
@@ -168,7 +178,11 @@ function fileEvidence(role, name, content) {
   };
 }
 
-function runChecks({ bundle, delibData, receipt, tttcCsv, agora, handoffs, publicInfo, publicResults }) {
+function runChecks({ bundle, delibData, receipt, tttcCsv, agora, handoffs, publicInfo, publicResults, synthesisSelection }) {
+  const statementIds = new Set(bundle.statements.map((statement) => statement.statementId));
+  const citedIds = receipt.toolSynthesis
+    ? [...receipt.toolSynthesis.commonGround, ...receipt.toolSynthesis.tensions].flatMap((item) => item.citedStatementIds)
+    : [];
   const serializedReceipt = JSON.stringify(receipt);
   const selectedTexts = receipt.findings.map((finding) => finding.text);
   const serializedHandoffs = JSON.stringify(handoffs);
@@ -198,6 +212,10 @@ function runChecks({ bundle, delibData, receipt, tttcCsv, agora, handoffs, publi
     check("四個下一步 handoff 都已建立", Object.keys(handoffs).length === 4),
     check("Handoff 不帶公開陳述原文", selectedTexts.every((text) => !serializedHandoffs.includes(text))),
     check("Handoff 不帶逐句票數欄", !serializedHandoffs.includes('"agrees"') && !serializedHandoffs.includes('"disagrees"')),
+    check("工具整理只在綜整就緒時納入，且標明模型與產生時間",
+      !synthesisSelection || (typeof receipt.toolSynthesis?.model === "string" && typeof receipt.toolSynthesis?.generatedAt === "string")),
+    check("工具整理引用的陳述編號都存在於來源", citedIds.every((id) => statementIds.has(id))),
+    check("工具整理有對應的限制聲明", !receipt.toolSynthesis || receipt.dataCard.limitations.some((line) => line.includes("工具整理"))),
   ];
 }
 
@@ -213,8 +231,15 @@ function jsonText(value) {
   return `${JSON.stringify(value, null, 2)}\n`;
 }
 
-function renderPilotReport({ configuration, publicInfo, publicResults, bundle, receipt, checks, receiptUrl }) {
+function renderPilotReport({ configuration, publicInfo, publicResults, bundle, receipt, checks, receiptUrl, synthesisPayload }) {
   const result = publicResults.result;
+  const synthesisSection = receipt.toolSynthesis
+    ? `## 工具整理（Pocket Polis 綜整節錄）\n\n` +
+      `- 模型：${receipt.toolSynthesis.model}（${receipt.toolSynthesis.generationMode === "ai" ? "AI 綜整" : "統計摘要"}）\n` +
+      `- 產生時間：${receipt.toolSynthesis.generatedAt}${receipt.toolSynthesis.isStale ? "（資料其後有更新）" : ""}\n` +
+      `- 納入：概述 ${receipt.toolSynthesis.overview ? "是" : "否"}、共同點 ${receipt.toolSynthesis.commonGround.length} 點、張力 ${receipt.toolSynthesis.tensions.length} 組\n\n` +
+      `這一層由工具產生、由 pilot 設定挑選，並在收據限制聲明中標明；它不是主辦者解讀，也不是共識證明。\n\n`
+    : `## 工具整理\n\n${synthesisPayload ? `Pocket Polis 綜整狀態為 ${synthesisPayload.status}，本次未納入。` : "本次沒有讀取到 Pocket Polis 綜整，收據不含工具整理層。"}\n\n`;
   const findings = receipt.findings
     .map((finding) => `| ${finding.statementId} | ${escapeTable(finding.text)} | ${finding.agrees} | ${finding.disagrees} | ${finding.passes} |`)
     .join("\n");
@@ -239,7 +264,9 @@ function renderPilotReport({ configuration, publicInfo, publicResults, bundle, r
     `4. TTTC \`id,interview,comment\` CSV；\n` +
     `5. Agora Pol.is summary/comments/votes 三檔；\n` +
     `6. \`delib-pocket-polis-receipt/v1\` JSON、Markdown 與 fragment-only 成果網址；\n` +
-    `7. Call-in、Harmonica、TTTC、Pol.is 四份兩小時、一次性 handoff 草稿。\n\n` +
+    `7. Call-in、Harmonica、TTTC、Pol.is 四份兩小時、一次性 handoff 草稿；\n` +
+    `8. Pocket Polis 綜整（Workers AI Gemma 或統計摘要）的節錄與出處。\n\n` +
+    synthesisSection +
     `## 自動驗證\n\n${checks.map((item) => `- ${item.ok ? "通過" : "失敗"}：${item.label}`).join("\n")}\n\n` +
     `## 尚未越過的外部邊界\n\n` +
     `本 pilot 會驗證 TTTC／Agora 檔案格式與 Delib 內的目的工具預填，但不把「產生檔案」宣稱為「上游匯入成功」。真正建立 TTTC 或 Agora 專案仍需要登入、上傳、預覽與人工確認。\n`;

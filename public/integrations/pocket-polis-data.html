@@ -171,6 +171,37 @@
                 <p id="pocket-receipt-selection-status" class="action-status" role="status"></p>
                 <div id="pocket-receipt-statement-list" class="receipt-statement-picker"></div>
 
+                <div id="pocket-receipt-synthesis" class="synthesis-import">
+                  <div class="receipt-section-heading">
+                    <div>
+                      <span class="receipt-layer-label receipt-layer-tool">工具整理（選填）</span>
+                      <h3>把 Pocket Polis 的綜整帶進成果頁</h3>
+                    </div>
+                    <button id="pocket-receipt-synthesis-load" class="button button-ghost button-small" type="button">讀取綜整</button>
+                  </div>
+                  <p class="field-note">Pocket Polis 會用 Cloudflare Workers AI 的 Gemma 模型（或不用模型的統計摘要）整理跨群共同點與分歧，每一點都引用陳述編號。放進成果頁時會標明模型與產生時間，和主辦者解讀分開；它不是共識證明。</p>
+                  <p id="pocket-receipt-synthesis-status" class="action-status" role="status"></p>
+                  <div id="pocket-receipt-synthesis-body" hidden>
+                    <p id="pocket-receipt-synthesis-provenance" class="synthesis-provenance"></p>
+                    <label class="synthesis-option">
+                      <input id="pocket-receipt-synthesis-overview" type="checkbox" checked />
+                      <span><strong>整體概述</strong><small id="pocket-receipt-synthesis-overview-text"></small></span>
+                    </label>
+                    <div class="synthesis-group">
+                      <strong>跨群共同點（最多選 6 點）</strong>
+                      <div id="pocket-receipt-synthesis-points" class="synthesis-picker"></div>
+                    </div>
+                    <div class="synthesis-group">
+                      <strong>分歧與張力（最多選 4 組）</strong>
+                      <div id="pocket-receipt-synthesis-tensions" class="synthesis-picker"></div>
+                    </div>
+                    <label class="consent-row">
+                      <input id="pocket-receipt-synthesis-include" type="checkbox" />
+                      <span>把勾選的工具整理放進成果頁；成果頁會標明它由 Pocket Polis 的模型產生、只是主辦者挑選的節錄。</span>
+                    </label>
+                  </div>
+                </div>
+
                 <div class="receipt-form-grid">
                   <div>
                     <label for="pocket-receipt-decision-status">目前決策狀態</label>
@@ -217,6 +248,7 @@
                   <ul>
                     <li>整輪參與人數、投票數、涵蓋率，以及你挑選的逐句彙整票數；</li>
                     <li>挑選陳述的原文，可能是參與者自由文字；不帶匿名代碼與逐筆投票；</li>
+                    <li>若有勾選：Pocket Polis 綜整的節錄，標明模型名稱與產生時間；</li>
                     <li>主辦者填寫的解讀、未納入聲音、決策狀態與下一步責任。</li>
                   </ul>
                 </div>

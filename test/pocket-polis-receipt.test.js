@@ -9,6 +9,7 @@ import {
   pocketPolisReceiptToHash,
   pocketPolisReceiptToMarkdown,
   pocketPolisReceiptUrl,
+  selectToolSynthesis,
 } from "../public/pocket-polis-receipt-core.js";
 import { createReceiptHandoff } from "../public/receipt-handoff-core.js";
 
@@ -150,5 +151,55 @@ describe("Pocket Polis result receipt", () => {
     const handoff = createReceiptHandoff({ receipt, target: "talk-to-the-city" });
     expect(handoff.draft.description).toContain("請回資料工作台下載已核准意見 CSV");
     expect(handoff.draft.description).not.toContain("。。");
+  });
+});
+
+describe("Pocket Polis receipt tool synthesis layer", () => {
+  const synthesis = {
+    status: "ready",
+    model: "@cf/google/gemma-4-26b-a4b-it",
+    generationMode: "ai",
+    generatedAt: 1788325567906,
+    mathRevision: 1788325565622,
+    isStale: false,
+    overview: { summary: "照明與草地保存呈現取捨。", participantContext: "3 位參與者", citedStatementIds: [1, 2] },
+    commonGround: {
+      summary: "1 項共通點",
+      keyPoints: [
+        { title: "照明有共識", description: "三位參與者都同意增加照明。", direction: "agree", citedStatementIds: [1] },
+        { title: "不公開姓名", description: "沒有人支持公開姓名。", direction: "disagree", citedStatementIds: [4] },
+      ],
+    },
+    tensions: [
+      { groupALabel: "A 群", groupBLabel: "B 群", topic: "草地", groupAPerspective: "保留", groupBPerspective: "改建", tensions: "使用方式不同", bridgingQuestion: "哪些時段可以共用？", citedStatementIds: [2] },
+    ],
+  };
+
+  it("carries an organizer-selected excerpt with provenance and a matching limitation", () => {
+    const toolSynthesis = selectToolSynthesis(synthesis, { includeOverview: true, pointIndexes: [0, 0, 5], tensionIndexes: [0] });
+    expect(toolSynthesis.commonGround).toHaveLength(1);
+    expect(toolSynthesis.generatedAt).toBe("2026-09-02T05:06:07.906Z");
+    const receipt = createPocketPolisReceipt({
+      bundle: bundleFixture(),
+      selectedStatementIds: [1, 2],
+      organizer,
+      preparedAt: "2026-09-01T03:00:00.000Z",
+      toolSynthesis,
+    });
+    expect(receipt.toolSynthesis.model).toBe("@cf/google/gemma-4-26b-a4b-it");
+    expect(receipt.toolSynthesis.tensions[0].bridgingQuestion).toBe("哪些時段可以共用？");
+    expect(receipt.dataCard.limitations.some((line) => line.includes("工具整理"))).toBe(true);
+    expect(pocketPolisReceiptToMarkdown(receipt)).toContain("## 工具整理（AI 綜整）");
+    const roundTrip = pocketPolisReceiptFromHash(`#${pocketPolisReceiptToHash(receipt)}`);
+    expect(roundTrip.toolSynthesis).toEqual(receipt.toolSynthesis);
+  });
+
+  it("drops empty or malformed excerpts instead of publishing them", () => {
+    expect(selectToolSynthesis(synthesis, { includeOverview: false })).toBeNull();
+    expect(selectToolSynthesis({ ...synthesis, status: "pending" }, { includeOverview: true })).toBeNull();
+    expect(normalizePocketPolisReceipt({
+      ...createPocketPolisReceipt({ bundle: bundleFixture(), selectedStatementIds: [1], organizer, preparedAt: "2026-09-01T03:00:00.000Z" }),
+      toolSynthesis: { tool: "Pocket Polis", model: "x", generationMode: "magic", generatedAt: "2026-09-01T00:00:00.000Z", mathRevision: 1, isStale: false, overview: "?", commonGround: [], tensions: [] },
+    })).toBeNull();
   });
 });

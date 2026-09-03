@@ -20,7 +20,8 @@
   `delib-data/v1`、TTTC CSV 與 Agora 三檔匯入包。
 - **成果收據**：`delib-pocket-polis-receipt/v1`、`delib-ranking-receipt/v1`
   公開成果頁，預設只放在網址片段；可選建立會到期、可刪除的 `/r/<slug>` 短網址；
-  `delib-handoff/v1` 把下一步草稿帶回工具設定。
+  `delib-handoff/v1` 把下一步草稿帶回工具設定。Pocket Polis 收據可帶入該工具的
+  AI 綜整節錄，標明模型與時間，和主辦者解讀分開。
 - **迭代**：[/deploy](https://delib.mashbean.net/deploy) 部署中心、
   [/feedback](https://delib.mashbean.net/feedback) 開發者回饋、
   `npm run pilot:pocket-polis` 可重跑的虛構案例。

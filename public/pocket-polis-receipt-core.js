@@ -17,8 +17,89 @@ export const POCKET_POLIS_DECISION_STATUS_LABELS = Object.freeze({
 const MAX_RECEIPT_BYTES = 18_000;
 const MAX_INCLUDED_STATEMENTS = 8;
 const MIN_PUBLIC_RESPONSES = 3;
+const MAX_SYNTHESIS_POINTS = 6;
+const MAX_SYNTHESIS_TENSIONS = 4;
+const MAX_SYNTHESIS_CITATIONS = 24;
 
-export function createPocketPolisReceipt({ bundle, selectedStatementIds, organizer, preparedAt }) {
+export const TOOL_SYNTHESIS_MODE_LABELS = Object.freeze({
+  ai: "AI 綜整",
+  deterministic: "統計摘要（未使用模型）",
+});
+
+/**
+ * Pick the parts of a Pocket Polis synthesis that an organizer chose to carry
+ * into the public receipt. Provenance always travels with the excerpt.
+ */
+export function selectToolSynthesis(synthesis, { includeOverview = true, pointIndexes = [], tensionIndexes = [] } = {}) {
+  if (!synthesis || typeof synthesis !== "object" || synthesis.status !== "ready") return null;
+  const points = Array.isArray(synthesis.commonGround?.keyPoints) ? synthesis.commonGround.keyPoints : [];
+  const tensions = Array.isArray(synthesis.tensions) ? synthesis.tensions : [];
+  const candidate = {
+    tool: "Pocket Polis",
+    model: synthesis.model,
+    generationMode: synthesis.generationMode,
+    generatedAt: synthesis.generatedAt,
+    mathRevision: synthesis.mathRevision,
+    isStale: synthesis.isStale === true,
+    overview: includeOverview ? synthesis.overview?.summary || "" : "",
+    commonGround: uniqueIndexes(pointIndexes).map((index) => points[index]).filter(Boolean),
+    tensions: uniqueIndexes(tensionIndexes).map((index) => tensions[index]).filter(Boolean),
+  };
+  return normalizeToolSynthesis(candidate);
+}
+
+export function normalizeToolSynthesis(value) {
+  if (!value || typeof value !== "object" || value.tool !== "Pocket Polis") return null;
+  const model = typeof value.model === "string" && /^[A-Za-z0-9@/._:-]{1,80}$/.test(value.model) ? value.model : "";
+  const generationMode = value.generationMode === "ai" || value.generationMode === "deterministic"
+    ? value.generationMode
+    : "";
+  const generatedAt = validDateTime(value.generatedAt);
+  const mathRevision = nonNegativeInteger(value.mathRevision);
+  const overview = cleanOptionalText(value.overview, 600);
+  if (!model || !generationMode || !generatedAt || mathRevision === null || typeof value.isStale !== "boolean" || overview === null) {
+    return null;
+  }
+  if (!Array.isArray(value.commonGround) || value.commonGround.length > MAX_SYNTHESIS_POINTS) return null;
+  if (!Array.isArray(value.tensions) || value.tensions.length > MAX_SYNTHESIS_TENSIONS) return null;
+  const commonGround = value.commonGround.map((point) => {
+    if (!point || typeof point !== "object") return null;
+    const title = cleanLine(point.title, 120);
+    const description = cleanOptionalText(point.description, 400);
+    const direction = point.direction === "agree" || point.direction === "disagree" ? point.direction : "";
+    if (!title || description === null || !direction) return null;
+    return { title, description, direction, citedStatementIds: cleanStatementIds(point.citedStatementIds) };
+  });
+  const tensions = value.tensions.map((tension) => {
+    if (!tension || typeof tension !== "object") return null;
+    const topic = cleanLine(tension.topic, 120);
+    const groupALabel = cleanLine(tension.groupALabel, 40);
+    const groupBLabel = cleanLine(tension.groupBLabel, 40);
+    const groupAPerspective = cleanOptionalText(tension.groupAPerspective, 400);
+    const groupBPerspective = cleanOptionalText(tension.groupBPerspective, 400);
+    const tensionText = cleanOptionalText(tension.tensions, 400);
+    const bridgingQuestion = cleanOptionalText(tension.bridgingQuestion, 300);
+    if (
+      !topic || !groupALabel || !groupBLabel || groupAPerspective === null || groupBPerspective === null ||
+      tensionText === null || bridgingQuestion === null
+    ) return null;
+    return {
+      topic,
+      groupALabel,
+      groupBLabel,
+      groupAPerspective,
+      groupBPerspective,
+      tensions: tensionText,
+      bridgingQuestion,
+      citedStatementIds: cleanStatementIds(tension.citedStatementIds),
+    };
+  });
+  if (commonGround.some((point) => !point) || tensions.some((tension) => !tension)) return null;
+  if (!overview && commonGround.length === 0 && tensions.length === 0) return null;
+  return { tool: "Pocket Polis", model, generationMode, generatedAt, mathRevision, isStale: value.isStale, overview, commonGround, tensions };
+}
+
+export function createPocketPolisReceipt({ bundle, selectedStatementIds, organizer, preparedAt, toolSynthesis }) {
   const source = normalizeSourceBundle(bundle);
   if (!source) throw new Error("需要一份有效的 Pocket Polis 本機資料包");
   if (!source.consistency.countMatches) throw new Error("兩份 CSV 的票數不一致，請重新下載後再準備公開成果");
@@ -53,12 +134,15 @@ export function createPocketPolisReceipt({ bundle, selectedStatementIds, organiz
   if (!normalizedOrganizer) {
     throw new Error("請完整填寫解讀、未納入聲音、決策狀態與下一步責任");
   }
+  const synthesis = toolSynthesis === undefined || toolSynthesis === null ? null : normalizeToolSynthesis(toolSynthesis);
+  if (toolSynthesis && !synthesis) throw new Error("工具綜整的內容格式不完整，請重新讀取後再挑選");
 
   return buildReceipt({
     source,
     findings,
     organizer: normalizedOrganizer,
     preparedAt: validDateTime(preparedAt) || new Date().toISOString(),
+    toolSynthesis: synthesis,
   });
 }
 
@@ -77,7 +161,9 @@ export function normalizePocketPolisReceipt(value) {
   const findings = normalizeFindings(value.findings);
   const scope = normalizeScope(value.scope, findings?.length);
   if (!preparedAt || !source || !organizer || !findings || !scope) return null;
-  return buildNormalizedReceipt({ source, findings, organizer, scope, preparedAt });
+  const toolSynthesis = value.toolSynthesis === undefined ? null : normalizeToolSynthesis(value.toolSynthesis);
+  if (value.toolSynthesis !== undefined && !toolSynthesis) return null;
+  return buildNormalizedReceipt({ source, findings, organizer, scope, preparedAt, toolSynthesis });
 }
 
 export function pocketPolisReceiptToHash(value) {
@@ -138,6 +224,7 @@ export function pocketPolisReceiptToMarkdown(value) {
     `- 已核准陳述：${receipt.scope.approvedStatements}\n` +
     `- 已核准陳述投票涵蓋率：${Math.round(receipt.scope.coverage * 100)}%\n\n` +
     `票數只描述這一輪已收到的回應，不是代表性民調，也不能單獨證明共識。\n\n` +
+    toolSynthesisMarkdown(receipt.toolSynthesis) +
     `## 主辦者解讀\n\n${receipt.organizer.interpretation}\n\n` +
     `## 未納入與限制\n\n${receipt.organizer.missingVoices}\n\n` +
     `## 決策狀態\n\n- 狀態：${pocketPolisDecisionStatusLabel(receipt.organizer.decisionStatus)}\n` +
@@ -321,7 +408,48 @@ function normalizeOrganizer(value) {
   return { interpretation, missingVoices, decisionStatus, authority, responsibleActor, responseBy, nextAction, evidenceUrl };
 }
 
-function buildReceipt({ source, findings, organizer, preparedAt }) {
+function toolSynthesisMarkdown(synthesis) {
+  if (!synthesis) return "";
+  const points = synthesis.commonGround
+    .map((point) =>
+      `- ${escapeMarkdown(point.title)}（${point.direction === "agree" ? "跨群同意" : "跨群不同意"}）：${escapeMarkdown(point.description)}${citationSuffix(point.citedStatementIds)}`)
+    .join("\n");
+  const tensions = synthesis.tensions
+    .map((tension) =>
+      `- ${escapeMarkdown(tension.topic)}：${escapeMarkdown(tension.groupALabel)}／${escapeMarkdown(tension.groupBLabel)}${tension.tensions ? `。${escapeMarkdown(tension.tensions)}` : ""}${tension.bridgingQuestion ? `橋接提問：${escapeMarkdown(tension.bridgingQuestion)}` : ""}${citationSuffix(tension.citedStatementIds)}`)
+    .join("\n");
+  return `## 工具整理（${TOOL_SYNTHESIS_MODE_LABELS[synthesis.generationMode]}）\n\n` +
+    `${synthesis.overview ? `${escapeMarkdown(synthesis.overview)}\n\n` : ""}` +
+    `${points ? `跨群共同點：\n${points}\n\n` : ""}` +
+    `${tensions ? `分歧與張力：\n${tensions}\n\n` : ""}` +
+    `由 Pocket Polis 於 ${formatDate(synthesis.generatedAt)} 以 ${escapeMarkdown(synthesis.model)} 產生` +
+    `${synthesis.isStale ? "（資料其後有更新）" : ""}；引用的陳述編號可在來源成果頁核對。這是工具整理，不是主辦者解讀，也不是共識證明。\n\n`;
+}
+
+function citationSuffix(ids) {
+  return ids.length ? `（引用陳述 ${ids.join("、")}）` : "";
+}
+
+function uniqueIndexes(value) {
+  const seen = new Set();
+  return (Array.isArray(value) ? value : []).filter((index) => {
+    if (!Number.isSafeInteger(index) || index < 0 || seen.has(index)) return false;
+    seen.add(index);
+    return true;
+  });
+}
+
+function cleanStatementIds(value) {
+  const ids = [];
+  for (const candidate of Array.isArray(value) ? value : []) {
+    if (!Number.isSafeInteger(candidate) || candidate < 1 || ids.includes(candidate)) continue;
+    ids.push(candidate);
+    if (ids.length >= MAX_SYNTHESIS_CITATIONS) break;
+  }
+  return ids;
+}
+
+function buildReceipt({ source, findings, organizer, preparedAt, toolSynthesis }) {
   return buildNormalizedReceipt({
     source: {
       tool: "Pocket Polis",
@@ -335,6 +463,7 @@ function buildReceipt({ source, findings, organizer, preparedAt }) {
     findings,
     organizer,
     preparedAt,
+    toolSynthesis,
     scope: {
       participants: source.summary.participants,
       approvedStatements: source.summary.approvedStatements,
@@ -345,7 +474,10 @@ function buildReceipt({ source, findings, organizer, preparedAt }) {
   });
 }
 
-function buildNormalizedReceipt({ source, findings, organizer, scope, preparedAt }) {
+function buildNormalizedReceipt({ source, findings, organizer, scope, preparedAt, toolSynthesis = null }) {
+  const synthesisLimitation = toolSynthesis
+    ? [`「工具整理」段落由 Pocket Polis 以 ${toolSynthesis.model} 產生（${TOOL_SYNTHESIS_MODE_LABELS[toolSynthesis.generationMode]}），主辦者只挑選了其中幾點；它不是主辦者解讀，也不是共識證明。`]
+    : [];
   return {
     schema: POCKET_POLIS_RECEIPT_SCHEMA,
     kind: "pocket-polis-receipt",
@@ -353,6 +485,7 @@ function buildNormalizedReceipt({ source, findings, organizer, scope, preparedAt
     source,
     scope,
     findings,
+    ...(toolSynthesis ? { toolSynthesis } : {}),
     organizer,
     dataCard: {
       containsParticipantData: true,
@@ -370,6 +503,7 @@ function buildNormalizedReceipt({ source, findings, organizer, scope, preparedAt
         "公開陳述由主辦者從已核准且至少有 3 份回應的文字中挑選，選擇本身會影響讀者看見的結果。",
         "Pocket Polis CSV 不含群組分群結果；這張成果頁只呈現逐句彙整票數。",
         "主辦者解讀、決策狀態與下一步是人工聲明，不是由工具推論。",
+        ...synthesisLimitation,
       ],
     },
   };

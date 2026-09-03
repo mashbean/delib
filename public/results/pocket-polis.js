@@ -1,4 +1,5 @@
 import {
+  TOOL_SYNTHESIS_MODE_LABELS,
   pocketPolisDecisionStatusLabel,
   normalizePocketPolisReceipt,
   pocketPolisReceiptFromHash,
@@ -72,6 +73,7 @@ function renderReceipt(value) {
   document.querySelector("#pocket-receipt-coverage").textContent = `${Math.round(value.scope.coverage * 100)}%`;
   document.querySelector("#pocket-receipt-source-link").href = value.source.reportUrl;
   renderFindings(document.querySelector("#pocket-receipt-finding-list"), value.findings);
+  renderToolSynthesis(value.toolSynthesis || null);
 
   document.querySelector("#pocket-receipt-interpretation").textContent = value.organizer.interpretation;
   document.querySelector("#pocket-receipt-missing-voices").textContent = value.organizer.missingVoices;
@@ -88,6 +90,84 @@ function renderReceipt(value) {
   }
   document.querySelector("#pocket-receipt-source-note").textContent =
     `來源資料匯出於 ${formatDateTime(value.source.sourceExportedAt)}；兩份 CSV 的逐票紀錄與彙整票數相符。Pocket Polis CSV 不含分群結果，因此本頁不呈現或推論意見群組。`;
+}
+
+function renderToolSynthesis(synthesis) {
+  const section = document.querySelector("#pocket-receipt-synthesis-section");
+  if (!section) return;
+  if (!synthesis) {
+    section.hidden = true;
+    return;
+  }
+  const modeLabel = TOOL_SYNTHESIS_MODE_LABELS[synthesis.generationMode] || synthesis.generationMode;
+  document.querySelector("#pocket-receipt-synthesis-mode").textContent = modeLabel;
+  const overview = document.querySelector("#pocket-receipt-synthesis-overview");
+  overview.textContent = synthesis.overview;
+  overview.hidden = !synthesis.overview;
+
+  const common = document.querySelector("#pocket-receipt-synthesis-common");
+  const commonList = common.querySelector("ul");
+  commonList.replaceChildren(
+    ...synthesis.commonGround.map((point) => {
+      const item = document.createElement("li");
+      const title = document.createElement("strong");
+      title.textContent = point.title;
+      const direction = document.createElement("span");
+      direction.className = "synthesis-direction";
+      direction.textContent = point.direction === "agree" ? "跨群同意" : "跨群不同意";
+      const description = document.createElement("small");
+      description.textContent = point.description;
+      item.append(title, " ", direction, description, citationNote(point.citedStatementIds));
+      return item;
+    }),
+  );
+  common.hidden = synthesis.commonGround.length === 0;
+
+  const tensions = document.querySelector("#pocket-receipt-synthesis-tensions");
+  const tensionList = tensions.querySelector("ul");
+  tensionList.replaceChildren(
+    ...synthesis.tensions.map((tension) => {
+      const item = document.createElement("li");
+      const title = document.createElement("strong");
+      title.textContent = tension.topic;
+      const sides = document.createElement("small");
+      sides.textContent = `${tension.groupALabel}：${tension.groupAPerspective || "—"}／${tension.groupBLabel}：${tension.groupBPerspective || "—"}`;
+      item.append(title, sides);
+      if (tension.tensions) {
+        const detail = document.createElement("small");
+        detail.textContent = tension.tensions;
+        item.append(detail);
+      }
+      if (tension.bridgingQuestion) {
+        const question = document.createElement("small");
+        question.className = "synthesis-question";
+        question.textContent = `橋接提問：${tension.bridgingQuestion}`;
+        item.append(question);
+      }
+      item.append(citationNote(tension.citedStatementIds));
+      return item;
+    }),
+  );
+  tensions.hidden = synthesis.tensions.length === 0;
+
+  document.querySelector("#pocket-receipt-synthesis-provenance").textContent =
+    `由 Pocket Polis 於 ${formatDateTime(synthesis.generatedAt)} 以 ${synthesis.model} 產生（${modeLabel}）` +
+    `${synthesis.isStale ? "，投票資料其後有更新" : ""}。主辦者只挑選了其中幾點；引用的陳述編號可在來源成果頁核對。這是工具整理，不是主辦者解讀，也不是共識證明。`;
+  const dataList = document.querySelector("#pocket-receipt-data-list");
+  if (dataList && !dataList.querySelector("[data-synthesis-note]")) {
+    const note = document.createElement("li");
+    note.dataset.synthesisNote = "true";
+    note.textContent = "包含 Pocket Polis 產生的綜整節錄，並標明模型、產生時間與是否過期；不包含模型看過的逐筆投票。";
+    dataList.append(note);
+  }
+  section.hidden = false;
+}
+
+function citationNote(ids) {
+  const note = document.createElement("small");
+  note.className = "synthesis-citation";
+  note.textContent = ids.length ? `引用陳述 ${ids.join("、")}` : "";
+  return note;
 }
 
 function bindReceiptActions(value) {

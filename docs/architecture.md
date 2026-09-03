@@ -134,6 +134,20 @@ human gate is mandatory.
   participant and report links are public capabilities; the admin fragment is
   never written to Delib logs, plan URLs or exports.
 
+- `GET /api/integrations/pocket-polis/synthesis?conversation=<id>` proxies
+  the public synthesis of the configured Pocket Polis host (Workers AI Gemma
+  or its deterministic fallback), passing through only whitelisted fields and
+  provenance. The data workbench lets the organizer pick an excerpt, and the
+  receipt carries it as `toolSynthesis`: a tool-produced layer with model,
+  timestamp, staleness and cited statement ids, separate from organizer
+  interpretation and flagged in the data card as neither interpretation nor
+  proof of consensus.
+- `POST /api/integrations/power-ranker/rooms/:id/close` lets the organizer
+  stop accepting results; the aggregate stays readable until expiry.
+- `GET /api/receipts` (operator token) lists live public receipt slugs from
+  the `ReceiptIndex` Durable Object, which stores only slug, kind and
+  timestamps and is updated on create, delete and expiry.
+
 The remaining tools stay read-only recommendations until the credential,
 retention, export and end-to-end creation paths have been verified. An embedded
 upstream UI is labelled separately from a managed create API.
