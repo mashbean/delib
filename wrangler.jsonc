@@ -3,6 +3,8 @@
   "name": "delib",
   "main": "src/index.ts",
   "compatibility_date": "2026-08-31",
+  // Durable Objects are declared with `exports` (mutually exclusive with
+  // `migrations`); wrangler creates both SQLite namespaces on first deploy.
   "exports": {
     "RankingRoom": {
       "type": "durable-object",
@@ -25,18 +27,29 @@
       }
     ]
   },
+  "version_metadata": {
+    "binding": "CF_VERSION_METADATA"
+  },
   "assets": {
     "directory": "./public",
     "binding": "ASSETS",
-    "run_worker_first": true
+    // Only API routes and public receipt slugs go through the Worker. Static
+    // pages are served directly (no Worker invocation) with public/_headers.
+    "run_worker_first": ["/api/*", "/r/*"]
   },
   "observability": {
-    "enabled": false
+    "enabled": true,
+    "logs": {
+      "head_sampling_rate": 1
+    }
   },
   "vars": {
     "CALL_IN_ORIGIN": "https://call-in.mashbean.net",
     "POCKET_POLIS_ORIGIN": "https://polis.mashbean.net"
   },
+  // `production` is the only environment bound to delib.mashbean.net, so the
+  // Deploy button (default environment) never claims the official domain.
+  // It keeps the same Worker name so Durable Object data continues.
   "env": {
     "production": {
       "name": "delib",
@@ -52,6 +65,24 @@
           }
         ]
       },
+      "version_metadata": {
+        "binding": "CF_VERSION_METADATA"
+      },
+      // Per-IP write limits: creates (receipts, rooms, upstream activations,
+      // BYOK agent) share one budget; room submissions get a larger one so a
+      // classroom behind one NAT can still vote.
+      "ratelimits": [
+        {
+          "name": "WRITE_LIMIT",
+          "namespace_id": "1001",
+          "simple": { "limit": 20, "period": 60 }
+        },
+        {
+          "name": "SUBMIT_LIMIT",
+          "namespace_id": "1002",
+          "simple": { "limit": 120, "period": 60 }
+        }
+      ],
       "vars": {
         "CALL_IN_ORIGIN": "https://call-in.mashbean.net",
         "POCKET_POLIS_ORIGIN": "https://polis.mashbean.net"

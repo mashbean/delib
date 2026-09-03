@@ -75,17 +75,17 @@ type PairRow = {
 const MAX_SESSIONS = 300;
 const PUBLIC_RESULT_THRESHOLD = 3;
 
+/**
+ * One short-lived ranking room per Durable Object.
+ *
+ * The schema is created only inside `init()`, never in the constructor, so a
+ * request for an expired or unknown room does not re-create tables that no
+ * alarm would ever clean up again.
+ */
 export class RankingRoom extends DurableObject<Env> {
   private deleted = false;
 
-  constructor(ctx: DurableObjectState, env: Env) {
-    super(ctx, env);
-    ctx.blockConcurrencyWhile(async () => {
-      this.migrate();
-    });
-  }
-
-  private migrate(): void {
+  private ensureSchema(): void {
     this.ctx.storage.sql.exec(`
       CREATE TABLE IF NOT EXISTS _sql_schema_migrations (
         id INTEGER PRIMARY KEY,
@@ -127,8 +127,16 @@ export class RankingRoom extends DurableObject<Env> {
     }
   }
 
+  private hasSchema(): boolean {
+    return this.ctx.storage.sql
+      .exec<{ name: string }>("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'room'")
+      .toArray().length > 0;
+  }
+
   async init(config: RankingRoomConfig): Promise<{ created: boolean }> {
-    if (this.deleted || this.roomRow()) return { created: false };
+    if (this.deleted) return { created: false };
+    this.ensureSchema();
+    if (this.roomRow()) return { created: false };
     this.ctx.storage.sql.exec(
       `INSERT INTO room
         (id, title, items_json, created_at, expires_at, admin_hash)
@@ -142,8 +150,7 @@ export class RankingRoom extends DurableObject<Env> {
     try {
       await this.ctx.storage.setAlarm(config.expiresAt);
     } catch (error) {
-      await this.ctx.storage.deleteAll();
-      this.deleted = true;
+      await this.clearStorage();
       throw error;
     }
     return { created: true };
@@ -233,7 +240,7 @@ export class RankingRoom extends DurableObject<Env> {
   }
 
   private roomRow(): RoomRow | null {
-    if (this.deleted) return null;
+    if (this.deleted || !this.hasSchema()) return null;
     const rows = this.ctx.storage.sql
       .exec<RoomRow>(
         `SELECT title, items_json, created_at, expires_at, admin_hash, sessions, judgments
@@ -287,6 +294,7 @@ export class RankingRoom extends DurableObject<Env> {
   }
 
   private async clearStorage(): Promise<void> {
+    await this.ctx.storage.deleteAlarm();
     await this.ctx.storage.deleteAll();
     this.deleted = true;
   }

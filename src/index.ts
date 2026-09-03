@@ -12,15 +12,30 @@ import {
   type PublicReceiptRecord,
 } from "./public-receipt";
 
+import packageJson from "../package.json";
+
 export { PublicReceipt, RankingRoom };
 
-type WorkerEnv = Omit<Env, "RANKING_ROOMS" | "PUBLIC_RECEIPTS"> & {
+type RateLimiter = { limit(options: { key: string }): Promise<{ success: boolean }> };
+
+type WorkerEnv = Omit<
+  Env,
+  "RANKING_ROOMS" | "PUBLIC_RECEIPTS" | "ASSETS" | "WRITE_LIMIT" | "SUBMIT_LIMIT" | "CF_VERSION_METADATA"
+> & {
   ASSETS: Fetcher;
   RANKING_ROOMS: DurableObjectNamespace<RankingRoom>;
   PUBLIC_RECEIPTS: { getByName(name: string): PublicReceiptRpcStub };
   CALL_IN_ORIGIN?: string;
   POCKET_POLIS_ORIGIN?: string;
   POLIS_SITE_ID?: string;
+  /** SHA-256 hex of an operator secret that may take down abusive public receipts. */
+  OPERATOR_TOKEN_SHA256?: string;
+  /** Injected by `npm run deploy:production` (`--var BUILD_SHA:<git sha>`). */
+  BUILD_SHA?: string;
+  /** Only bound in the production environment; absent in tests and Deploy-button installs. */
+  WRITE_LIMIT?: RateLimiter;
+  SUBMIT_LIMIT?: RateLimiter;
+  CF_VERSION_METADATA?: { id?: string; tag?: string; timestamp?: string };
 };
 
 type AgentPlan = {
@@ -51,6 +66,10 @@ const PUBLIC_RECEIPT_SCHEMA = new Map<string, PublicReceiptKind>([
 const DEFAULT_MODEL = "gpt-5.6";
 const DEFAULT_CALL_IN_ORIGIN = "https://call-in.mashbean.net";
 const DEFAULT_POCKET_POLIS_ORIGIN = "https://polis.mashbean.net";
+/** Upstream creators answer in a few seconds; the BYOK model call may take longer. */
+const UPSTREAM_TIMEOUT_MS = 12_000;
+const AGENT_TIMEOUT_MS = 45_000;
+const SERVICE_VERSION = packageJson.version;
 
 const AGENT_INSTRUCTIONS = `你是審議流程的協作助理，不是決策者。請使用正體中文，根據已經由規則引擎選出的流程與工具，產生一份簡短、可執行的主持簡報。
 
@@ -66,19 +85,54 @@ const AGENT_INSTRUCTIONS = `你是審議流程的協作助理，不是決策者�
 export default {
   async fetch(request, env): Promise<Response> {
     const url = new URL(request.url);
+    try {
+      return await route(request, env, url);
+    } catch (error) {
+      // Never log bodies or headers: they may carry BYOK keys or admin tokens.
+      console.error("delib unhandled error", {
+        path: url.pathname,
+        method: request.method,
+        message: error instanceof Error ? error.message : String(error),
+      });
+      if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/r/")) {
+        return json({ error: "服務暫時無法回應，請稍後再試" }, 500);
+      }
+      return new Response("服務暫時無法回應，請稍後再試。", {
+        status: 500,
+        headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" },
+      });
+    }
+  },
+} satisfies ExportedHandler<WorkerEnv>;
 
-    if (url.pathname === "/api/health" && request.method === "GET") {
+async function route(request: Request, env: WorkerEnv, url: URL): Promise<Response> {
+    if (url.pathname === "/api/health" && (request.method === "GET" || request.method === "HEAD")) {
       return json(
         {
           ok: true,
           service: "delib",
+          version: SERVICE_VERSION,
+          build: {
+            sha: env.BUILD_SHA || null,
+            versionId: env.CF_VERSION_METADATA?.id || null,
+            deployedAt: env.CF_VERSION_METADATA?.timestamp || null,
+          },
           ai: "bring-your-own-key",
           storage: "optional-ephemeral-ranking-rooms-and-public-receipts",
           dataContract: "delib-data/v1",
           publicReceiptRetentionDays: [...PUBLIC_RECEIPT_RETENTION_DAYS],
+          rateLimited: Boolean(env.WRITE_LIMIT),
+          operatorTakedown: Boolean(env.OPERATOR_TOKEN_SHA256),
         },
         200,
+        request.method === "HEAD",
       );
+    }
+
+    if (url.pathname.startsWith("/api/") && request.method === "POST") {
+      const limiter = url.pathname.endsWith("/submissions") ? env.SUBMIT_LIMIT : env.WRITE_LIMIT;
+      const limited = await enforceRateLimit(limiter, request);
+      if (limited) return limited;
     }
 
     if (url.pathname === "/api/agent" && request.method === "POST") {
@@ -146,19 +200,54 @@ export default {
     if (publicReceiptMatch && (request.method === "GET" || request.method === "HEAD")) {
       const receiptStub = env.PUBLIC_RECEIPTS.getByName(publicReceiptMatch[1]);
       const record = await receiptStub.getReceipt();
-      if (record.status !== "ready") return publicReceiptResult(record);
-      const resultPage = record.kind === "pocket-polis-receipt"
-        ? "/results/pocket-polis"
-        : "/results/power-ranker";
+      // Unknown, expired or deleted slugs still get the result page so a person
+      // sees a readable explanation; the page fetches the JSON status itself.
+      const resultPage = record.kind === "ranking-receipt"
+        ? "/results/power-ranker"
+        : "/results/pocket-polis";
       const assetUrl = new URL(resultPage, url);
       const assetResponse = await env.ASSETS.fetch(new Request(assetUrl, request));
-      return withSecurityHeaders(assetResponse, url.pathname);
+      const page = withSecurityHeaders(assetResponse, url.pathname);
+      if (record.status === "ready" || !assetResponse.ok) return page;
+      const status = record.status === "expired" ? 410 : 404;
+      const headers = new Headers(page.headers);
+      headers.set("Cache-Control", "no-store");
+      return new Response(page.body, { status, headers });
     }
 
     const assetResponse = await env.ASSETS.fetch(request);
     return withSecurityHeaders(assetResponse, url.pathname);
-  },
-} satisfies ExportedHandler<WorkerEnv>;
+}
+
+async function enforceRateLimit(limiter: RateLimiter | undefined, request: Request): Promise<Response | null> {
+  if (!limiter) return null;
+  const key = request.headers.get("CF-Connecting-IP") || "unknown";
+  try {
+    const { success } = await limiter.limit({ key });
+    if (success) return null;
+  } catch (error) {
+    // Fail open: a limiter outage must not take the product down.
+    console.error("delib rate limiter unavailable", {
+      message: error instanceof Error ? error.message : String(error),
+    });
+    return null;
+  }
+  return json({ error: "這個來源短時間內的操作太多，請一分鐘後再試" }, 429, false, {
+    "Retry-After": "60",
+  });
+}
+
+function upstreamFailure(error: unknown, serviceName: string): Response {
+  const timedOut = error instanceof Error && error.name === "TimeoutError";
+  return json(
+    {
+      error: timedOut
+        ? `${serviceName} 回應逾時，請稍後再試；如果已經建立，請到原站確認`
+        : `暫時連不上 ${serviceName}，請稍後再試`,
+    },
+    timedOut ? 504 : 502,
+  );
+}
 
 type CallInRequest = {
   title?: unknown;
@@ -241,11 +330,12 @@ type PublicReceiptRpcStub = {
   }): Promise<{ created: boolean }>;
   getReceipt(): Promise<PublicReceiptRecord>;
   deleteReceipt(adminToken: string): Promise<PublicReceiptRecord>;
+  forceDelete(): Promise<PublicReceiptRecord>;
 };
 
 export async function handlePublicReceiptRequest(
   request: Request,
-  env: Pick<WorkerEnv, "PUBLIC_RECEIPTS">,
+  env: Pick<WorkerEnv, "PUBLIC_RECEIPTS" | "OPERATOR_TOKEN_SHA256">,
 ): Promise<Response> {
   const url = new URL(request.url);
   const basePath = "/api/receipts";
@@ -260,7 +350,7 @@ export async function handlePublicReceiptRequest(
       ? body.retentionDays
       : null;
     if (!retentionDays) return json({ error: "保存期限只能選 30 天、1 年或 3 年" }, 400);
-    const normalized = normalizePublicReceipt(body.receipt);
+    const normalized = normalizePublicReceipt(body.receipt, url.origin);
     if (!normalized) {
       return json({ error: "只接受已去除個別紀錄、管理憑證與參與者代碼的 Delib 公開成果收據" }, 400);
     }
@@ -309,12 +399,33 @@ export async function handlePublicReceiptRequest(
 
   if (request.method === "DELETE") {
     if (!isSameOriginRequest(request)) return json({ error: "origin not allowed" }, 403);
+    const operatorToken = request.headers.get("X-Receipt-Operator")?.trim();
+    if (operatorToken) {
+      // Operator takedown for abusive public pages. Configure with
+      // `wrangler secret put OPERATOR_TOKEN_SHA256 --env production`.
+      const expected = env.OPERATOR_TOKEN_SHA256?.trim().toLowerCase();
+      if (!expected || !/^[a-f0-9]{64}$/.test(expected)) {
+        return json({ error: "這個部署尚未設定營運者下架權杖" }, 403);
+      }
+      const supplied = await sha256(operatorToken);
+      if (!constantTimeEqualHex(supplied, expected)) return json({ error: "營運者權杖不正確" }, 403);
+      return publicReceiptResult(await stub.forceDelete());
+    }
     const adminToken = request.headers.get("X-Receipt-Admin")?.trim();
     if (!adminToken || !/^[a-f0-9]{64}$/.test(adminToken)) return json({ error: "缺少私人刪除權杖" }, 401);
     return publicReceiptResult(await stub.deleteReceipt(adminToken));
   }
 
   return json({ error: "method not allowed" }, 405);
+}
+
+function constantTimeEqualHex(left: string, right: string): boolean {
+  if (left.length !== right.length) return false;
+  let mismatch = 0;
+  for (let index = 0; index < left.length; index += 1) {
+    mismatch |= left.charCodeAt(index) ^ right.charCodeAt(index);
+  }
+  return mismatch === 0;
 }
 
 export async function handleRankingRoomRequest(
@@ -351,7 +462,7 @@ export async function handleRankingRoomRequest(
     });
     if (!initialized.created) return json({ error: "房間識別碼衝突，請再試一次" }, 503);
 
-    const participantUrl = new URL("/integrations/power-ranker.html", url);
+    const participantUrl = new URL("/integrations/power-ranker", url);
     participantUrl.searchParams.set("room", roomId);
     const manageUrl = new URL(participantUrl);
     manageUrl.hash = `admin=${adminToken}`;
@@ -402,9 +513,8 @@ export async function handleRankingRoomRequest(
     if (!sessionId || !Array.isArray(body.judgments)) return json({ error: "排序資料不完整" }, 400);
     const result = await stub.submit(sessionId, body.judgments as RankingJudgment[]);
     if (result.status === "invalid") return json({ error: "至少要完成基本比較，且每組配對只能出現一次" }, 400);
-    if (result.status === "full") return json({ error: "這個收件室已達 300 份上限" }, 429);
-    const response = rankingRoomResult(result, result.duplicate === true ? 200 : 201);
-    return response;
+    if (result.status === "full") return json({ error: "這個收件室已達 300 份上限，不再接受新結果" }, 409);
+    return rankingRoomResult(result, result.duplicate === true ? 200 : 201);
   }
 
   if (!child && request.method === "DELETE") {
@@ -442,9 +552,10 @@ export async function handleCallInRequest(
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title, description, deckUrl, locale }),
+      signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
     });
-  } catch {
-    return json({ error: "暫時連不上 Call-in，請稍後再試" }, 502);
+  } catch (error) {
+    return upstreamFailure(error, "Call-in");
   }
 
   if (!upstream.ok) {
@@ -506,7 +617,7 @@ export async function handlePolisRequest(request: Request, defaultSiteId?: strin
   if (body instanceof Response) return body;
   if (body.confirmed !== true) return json({ error: "開啟前請先確認這次會連到 Pol.is" }, 400);
 
-  const workspaceUrl = new URL("/integrations/polis.html", request.url);
+  const workspaceUrl = new URL("/integrations/polis", request.url);
   if (body.mode === "existing") {
     const conversationId = parsePolisConversationId(body.conversation);
     if (!conversationId) return json({ error: "找不到有效的 Pol.is 對話代碼或網址" }, 400);
@@ -595,9 +706,10 @@ export async function handlePocketPolisRequest(
         allowSubmissions: body.allowSubmissions,
         openData: body.openData,
       }),
+      signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
     });
-  } catch {
-    return json({ error: "暫時連不上 Pocket Polis，請稍後再試" }, 502);
+  } catch (error) {
+    return upstreamFailure(error, "Pocket Polis");
   }
 
   if (!upstream.ok) {
@@ -662,7 +774,7 @@ export async function handleHeyFormRequest(request: Request): Promise<Response> 
   const formId = parseHeyFormId(body.form);
   if (!formId) return json({ error: "請貼上有效的 HeyForm 公開表單網址" }, 400);
   const participantUrl = `https://heyform.net/f/${formId}`;
-  const workspaceUrl = new URL("/integrations/heyform.html", request.url);
+  const workspaceUrl = new URL("/integrations/heyform", request.url);
   workspaceUrl.searchParams.set("form", formId);
 
   return json({
@@ -690,7 +802,7 @@ export async function handleAgoraRequest(request: Request): Promise<Response> {
   if (!conversationSlug) return json({ error: "請貼上有效的 Agora 公開對話網址" }, 400);
   const participantUrl = `https://www.agoracitizen.app/conversation/${encodeURIComponent(conversationSlug)}`;
   const embedUrl = `${participantUrl}/embed`;
-  const workspaceUrl = new URL("/integrations/agora.html", request.url);
+  const workspaceUrl = new URL("/integrations/agora", request.url);
   workspaceUrl.searchParams.set("conversation", conversationSlug);
 
   return json({
@@ -717,7 +829,7 @@ export async function handleTttcRequest(request: Request): Promise<Response> {
   const description = cleanOptionalString(body.description, 500);
   if (!title) return json({ error: "先幫這份分析取一個名字" }, 400);
 
-  const workspaceUrl = new URL("/integrations/tttc.html", request.url);
+  const workspaceUrl = new URL("/integrations/tttc", request.url);
   workspaceUrl.searchParams.set("title", title);
   if (description) workspaceUrl.searchParams.set("description", description);
   const createUrl = new URL("https://talktothe.city/create");
@@ -785,9 +897,10 @@ export async function handleHarmonicaRequest(
         ...(questions.length ? { questions } : {}),
         cross_pollination: body.crossPollination === true,
       }),
+      signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
     });
-  } catch {
-    return json({ error: "暫時連不上 Harmonica，請稍後再試" }, 502);
+  } catch (error) {
+    return upstreamFailure(error, "Harmonica");
   }
 
   if (!upstream.ok) {
@@ -817,7 +930,7 @@ export async function handleHarmonicaRequest(
   if (!sessionId) return json({ error: "Harmonica 回應缺少 session ID" }, 502);
 
   const participantUrl = `https://app.harmonica.chat/chat?s=${encodeURIComponent(sessionId)}`;
-  const workspaceUrl = new URL("/integrations/harmonica.html", request.url);
+  const workspaceUrl = new URL("/integrations/harmonica", request.url);
   workspaceUrl.searchParams.set("session", sessionId);
   workspaceUrl.searchParams.set("title", topic);
 
@@ -898,9 +1011,10 @@ export async function handleAgentRequest(
           organizer_context: context || "（未提供補充說明）",
         }),
       }),
+      signal: AbortSignal.timeout(AGENT_TIMEOUT_MS),
     });
-  } catch {
-    return json({ error: "暫時連不上 OpenAI，請稍後再試" }, 502);
+  } catch (error) {
+    return upstreamFailure(error, "OpenAI");
   }
 
   if (!upstream.ok) {
@@ -1183,7 +1297,7 @@ function randomHex(byteLength: number): string {
   return [...bytes].map((byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
-function normalizePublicReceipt(value: unknown): {
+function normalizePublicReceipt(value: unknown, requestOrigin: string): {
   kind: PublicReceiptKind;
   receipt: JsonValue;
 } | null {
@@ -1256,7 +1370,7 @@ function normalizePublicReceipt(value: unknown): {
     ]) ||
     value.dataCard.containsParticipantFreeText !== false ||
     value.dataCard.aggregation !== "pair-counts-without-session-links" ||
-    !validRankingReceipt(value)
+    !validRankingReceipt(value, requestOrigin)
   ) {
     return null;
   }
@@ -1285,7 +1399,7 @@ function validPocketReceipt(value: Record<string, unknown>): boolean {
     typeof source.description !== "string" ||
     source.description.length > 2_000 ||
     !cleanMatchingString(source.conversationId, /^[a-z0-9]{10}$/, 10) ||
-    !cleanHttpsUrl(source.reportUrl, 2_000) ||
+    !validPocketPolisReportUrl(source.reportUrl, String(source.conversationId)) ||
     !validDateTimeValue(source.sourceExportedAt)
   ) {
     return false;
@@ -1322,7 +1436,26 @@ function validPocketReceipt(value: Record<string, unknown>): boolean {
   });
 }
 
-function validRankingReceipt(value: Record<string, unknown>): boolean {
+/**
+ * A public receipt may only point back at a Pocket Polis public result page
+ * (`/r/<10 lowercase alphanumerics>`, no query or fragment). Any other link
+ * would turn the short-URL store into anonymous link hosting.
+ */
+function validPocketPolisReportUrl(value: unknown, conversationId: string): boolean {
+  if (typeof value !== "string" || value.length > 2_000) return false;
+  try {
+    const parsed = new URL(value.trim());
+    if (parsed.protocol !== "https:" || parsed.username || parsed.password || parsed.search || parsed.hash) {
+      return false;
+    }
+    const match = parsed.pathname.match(/^\/r\/([a-z0-9]{10})\/?$/);
+    return Boolean(match) && match?.[1] === conversationId;
+  } catch {
+    return false;
+  }
+}
+
+function validRankingReceipt(value: Record<string, unknown>, requestOrigin: string): boolean {
   const source = value.source;
   const question = value.question;
   const method = value.method;
@@ -1342,6 +1475,8 @@ function validRankingReceipt(value: Record<string, unknown>): boolean {
     source.generator !== "Delib · Power Ranker" ||
     !["local", "ephemeral-room"].includes(String(source.aggregateStorage)) ||
     !cleanHttpsUrl(source.aggregateUrl, 2_000) ||
+    // The aggregate always lives on this Delib deployment's own ranking page.
+    !sameOriginUrl(String(source.aggregateUrl), requestOrigin) ||
     !(source.aggregateExpiresAt === null || validDateTimeValue(source.aggregateExpiresAt))
   ) return false;
   if (!hasOnlyKeys(method, ["name", "normalization", "flow", "source", "implementation"])) return false;
@@ -1381,6 +1516,14 @@ function validRankingReceipt(value: Record<string, unknown>): boolean {
     integerInRange(coverage.comparedPairs, 1, 45) &&
     integerInRange(coverage.totalPairs, 3, 45) &&
     numberInRange(coverage.ratio, 0, 1);
+}
+
+function sameOriginUrl(value: string, origin: string): boolean {
+  try {
+    return new URL(value).origin === origin;
+  } catch {
+    return false;
+  }
 }
 
 function validPublicOrganizer(value: unknown): boolean {
@@ -1487,15 +1630,22 @@ function rankingRoomResult(result: RankingRoomRpcResult, readyStatus = 200): Res
   }
 }
 
-function json(data: unknown, status: number): Response {
-  return Response.json(data, {
-    status,
-    headers: {
-      "Cache-Control": "no-store",
-      "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'",
-      "X-Content-Type-Options": "nosniff",
-    },
-  });
+function json(
+  data: unknown,
+  status: number,
+  headOnly = false,
+  extraHeaders: Record<string, string> = {},
+): Response {
+  const headers = {
+    "Cache-Control": "no-store",
+    "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'",
+    "X-Content-Type-Options": "nosniff",
+    ...extraHeaders,
+  };
+  if (headOnly) {
+    return new Response(null, { status, headers: { ...headers, "Content-Type": "application/json" } });
+  }
+  return Response.json(data, { status, headers });
 }
 
 function withSecurityHeaders(response: Response, pathname: string): Response {
@@ -1517,9 +1667,12 @@ function withSecurityHeaders(response: Response, pathname: string): Response {
           : harmonicaWorkspace
             ? "https://app.harmonica.chat"
             : "'none'";
+  // Keep in sync with public/_headers (static pages). The Cloudflare Web
+  // Analytics beacon is cookieless and injected by the zone, so allow it here
+  // instead of logging a CSP violation on every page view.
   next.headers.set(
     "Content-Security-Policy",
-    `default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-src ${frameSource}; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'`,
+    `default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self'; img-src 'self' data:; connect-src 'self' https://cloudflareinsights.com; frame-src ${frameSource}; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'`,
   );
   next.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   next.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");

@@ -1,6 +1,6 @@
 {
   "name": "@mashbean/delib",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "審議拼圖：為非工程師組合數位審議工具、資料交接與下一輪行動。",
   "type": "module",
@@ -14,12 +14,13 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run --config vitest.config.ts && vitest run --config vitest.worker.config.ts",
     "deploy:dry": "wrangler deploy --dry-run --env production",
-    "check:scripts": "node --check public/app.js && node --check public/core.js && node --check public/delib-data-core.js && node --check public/feedback-core.js && node --check public/feedback.js && node --check public/deploy.js && node --check public/public-receipt-client.js && node --check public/power-ranker-core.js && node --check public/ranking-receipt-core.js && node --check public/receipt-handoff-core.js && node --check public/pocket-polis-data-core.js && node --check public/pocket-polis-receipt-core.js && node --check public/integrations/pocket-polis-data.js && node --check public/integrations/polis.js && node --check public/integrations/agora.js && node --check public/integrations/heyform.js && node --check public/integrations/tttc.js && node --check public/integrations/harmonica.js && node --check public/integrations/power-ranker.js && node --check public/results/power-ranker.js && node --check public/results/pocket-polis.js && node --check scripts/install-skill.mjs && node --check scripts/run-pocket-polis-pilot.mjs",
+    "check:scripts": "node --check public/app.js && node --check public/core.js && node --check public/delib-data-core.js && node --check public/feedback-core.js && node --check public/feedback.js && node --check public/deploy.js && node --check public/public-receipt-client.js && node --check public/power-ranker-core.js && node --check public/ranking-receipt-core.js && node --check public/receipt-handoff-core.js && node --check public/pocket-polis-data-core.js && node --check public/pocket-polis-receipt-core.js && node --check public/integrations/pocket-polis-data.js && node --check public/integrations/polis.js && node --check public/integrations/agora.js && node --check public/integrations/heyform.js && node --check public/integrations/tttc.js && node --check public/integrations/harmonica.js && node --check public/integrations/power-ranker.js && node --check public/results/power-ranker.js && node --check public/results/pocket-polis.js && node --check scripts/install-skill.mjs && node --check scripts/run-pocket-polis-pilot.mjs && node --check scripts/smoke.mjs",
     "check": "npm run check:scripts && npm run check:types && npm run typecheck && npm test && npm run deploy:dry",
     "deploy": "wrangler deploy",
-    "deploy:production": "wrangler deploy --env production",
+    "deploy:production": "wrangler deploy --env production --var BUILD_SHA:$(git rev-parse --short HEAD)",
     "install-skill": "node scripts/install-skill.mjs install-skill",
-    "pilot:pocket-polis": "node scripts/run-pocket-polis-pilot.mjs"
+    "pilot:pocket-polis": "node scripts/run-pocket-polis-pilot.mjs",
+    "smoke": "node scripts/smoke.mjs"
   },
   "cloudflare": {
     "bindings": {
@@ -31,6 +32,9 @@
       },
       "POCKET_POLIS_ORIGIN": {
         "description": "Optional Pocket Polis managed host. The public default is https://polis.mashbean.net; replace it only with a compatible deployment you operate."
+      },
+      "CALL_IN_ORIGIN": {
+        "description": "Optional Call-in managed host. The public default is https://call-in.mashbean.net; replace it only with a compatible deployment you operate."
       }
     }
   },

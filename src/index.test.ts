@@ -289,7 +289,7 @@ describe("direct integrations", () => {
     );
     expect(response.status).toBe(200);
     const body = (await response.json()) as Record<string, unknown>;
-    expect(body.workspaceUrl).toBe("https://delib.example/integrations/polis.html?conversation=2demo");
+    expect(body.workspaceUrl).toBe("https://delib.example/integrations/polis?conversation=2demo");
     expect(body.storedByDelib).toBe(false);
   });
 
@@ -339,7 +339,7 @@ describe("direct integrations", () => {
     );
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toMatchObject({
-      workspaceUrl: "https://delib.example/integrations/heyform.html?form=dCN9pF7U",
+      workspaceUrl: "https://delib.example/integrations/heyform?form=dCN9pF7U",
       storedByDelib: false,
       writesWhenSubmitted: true,
     });
@@ -373,7 +373,7 @@ describe("direct integrations", () => {
     expect(response.status).toBe(200);
     await expect(response.json()).resolves.toMatchObject({
       integration: "agora-citizen-network",
-      workspaceUrl: "https://delib.example/integrations/agora.html?conversation=ss_4Cg",
+      workspaceUrl: "https://delib.example/integrations/agora?conversation=ss_4Cg",
       participantUrl: "https://www.agoracitizen.app/conversation/ss_4Cg",
       embedUrl: "https://www.agoracitizen.app/conversation/ss_4Cg/embed",
       storedByDelib: false,
@@ -407,7 +407,7 @@ describe("direct integrations", () => {
     expect(response.status).toBe(200);
     const body = (await response.json()) as Record<string, unknown>;
     expect(body.workspaceUrl).toBe(
-      "https://delib.example/integrations/tttc.html?title=%E5%85%AC%E5%9C%92%E8%A8%AA%E8%AB%87&description=%E5%B7%B2%E5%8E%BB%E8%AD%98%E5%88%A5%E7%9A%84%E8%A8%AA%E8%AB%87",
+      "https://delib.example/integrations/tttc?title=%E5%85%AC%E5%9C%92%E8%A8%AA%E8%AB%87&description=%E5%B7%B2%E5%8E%BB%E8%AD%98%E5%88%A5%E7%9A%84%E8%A8%AA%E8%AB%87",
     );
     expect(body.writesWhenOpened).toBe(false);
     expect(body.storedByDelib).toBe(false);
@@ -459,7 +459,7 @@ describe("direct integrations", () => {
     expect(body).toMatchObject({
       participantUrl: "https://app.harmonica.chat/chat?s=session_12345678",
       workspaceUrl:
-        "https://delib.example/integrations/harmonica.html?session=session_12345678&title=%E5%85%AC%E5%9C%92%E6%B7%B1%E5%BA%A6%E5%B0%8D%E8%A9%B1",
+        "https://delib.example/integrations/harmonica?session=session_12345678&title=%E5%85%AC%E5%9C%92%E6%B7%B1%E5%BA%A6%E5%B0%8D%E8%A9%B1",
       storedByDelib: false,
       credentialStoredByDelib: false,
     });
