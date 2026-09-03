@@ -278,7 +278,7 @@
       "toolId": "power-ranker",
       "route": "direct",
       "label": "站內直接用",
-      "summary": "MIT TypeScript library 的 rankCentrality 路徑已移植成瀏覽器原生工具；可完全本機下載、用短期 SQLite Durable Object 收件室自動彙整，並把 aggregate 接成 fragment-only 成果收據。",
+      "summary": "MIT TypeScript library 的 rankCentrality 路徑已移植成瀏覽器原生工具；可完全本機下載、用短期 SQLite Durable Object 收件室自動彙整，並把 aggregate 接成 只放在網址片段的 成果收據。",
       "source": { "url": "https://github.com/zaratanDotWorld/powerRanker", "license": "MIT", "reusable": true },
       "embed": "implemented-native",
       "cloudflareNative": true,

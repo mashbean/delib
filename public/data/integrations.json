@@ -45,8 +45,8 @@
       "accountRequired": false,
       "credentialRequired": false,
       "freePath": "使用 mashbean 維運的 Pocket Polis 共用主機，或按 Deploy to Cloudflare 建立自己的獨立服務。",
-      "writesExternalState": "按下確認後，Delib Worker 會呼叫 Pocket Polis 公開建立 API，立即建立活動。",
-      "retention": "由 Pocket Polis 營運者與活動主辦者的政策決定；目前未驗證自動到期或刪除契約。Delib 不保存活動資料或管理 token；資料工作台只在瀏覽器記憶體讀取匯出檔。",
+      "writesExternalState": "按下確認後，本站伺服器 會呼叫 Pocket Polis 公開建立 API，立即建立活動。",
+      "retention": "由 Pocket Polis 營運者與活動主辦者的政策決定；目前未驗證自動到期或刪除契約。Delib 不保存活動資料或管理權杖；資料工作台只在瀏覽器記憶體讀取匯出檔。",
       "inAppEndpoint": "/api/integrations/pocket-polis",
       "dataHandoff": {
         "endpoint": "/integrations/pocket-polis-data",
@@ -159,7 +159,7 @@
       "accountRequired": true,
       "credentialRequired": "需要 Harmonica settings 產生的 hm_live_ API key；只保存在目前分頁並單次轉送。",
       "freePath": "官方提供 Start for free；可用額度與模型限制仍由 Harmonica 帳號方案決定。",
-      "writesExternalState": "按下確認後，Delib Worker 會呼叫官方 REST API，立即建立 Harmonica session。",
+      "writesExternalState": "按下確認後，本站伺服器 會呼叫官方 REST API，立即建立 Harmonica session。",
       "retention": "由 Harmonica 帳號與部署政策決定；Delib 不保存 API key、對話或 session metadata。",
       "inAppEndpoint": "/api/integrations/harmonica",
       "selfHost": {
@@ -189,7 +189,7 @@
       "credentialRequired": false,
       "freePath": "本機模式純靜態；短期收件室使用 SQLite Durable Objects，可在 Workers Free 額度內運作，超額時操作會失敗。",
       "writesExternalState": "只有選擇短期收件室並確認後才建立；本機模式不寫入伺服器。",
-      "retention": "本機模式不保存。短期收件室保存公開題目、pair counts 與隨機 session ID 雜湊，24 小時或 7 天後以 alarm 全部清除；主辦者可提前刪除。",
+      "retention": "本機模式不保存。短期收件室保存公開題目、pair counts 與隨機參與代碼 雜湊，24 小時或 7 天後以 alarm 全部清除；主辦者可提前刪除。",
       "inAppEndpoint": "/integrations/power-ranker",
       "roomEndpoint": "/api/integrations/power-ranker/rooms",
       "receiptEndpoint": "/results/power-ranker",

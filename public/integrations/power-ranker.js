@@ -160,7 +160,7 @@ async function loadRoom() {
     document.querySelector("#ranking-trust-copy").textContent =
       "送出時，逐題判斷只用來立即增加成對計數；Delib 不保存可逐份還原的原始判斷。";
     document.querySelector("#ranking-trust-detail").textContent =
-      "伺服器保存公開題目、彙整計數與隨機 session ID 的 SHA-256 雜湊；到期或主辦者提前刪除時一併清除。";
+      "伺服器保存公開題目、彙整計數與隨機參與代碼 的 無法回推的摘要（SHA-256）；到期或主辦者提前刪除時一併清除。";
     document.querySelector("#ranking-room-summary").hidden = false;
     document.querySelector("#room-aggregate-panel").hidden = false;
     document.querySelector("#local-aggregate-panel").hidden = true;
@@ -292,7 +292,7 @@ async function submitRoom() {
     finishRanking();
     actionStatus.textContent = snapshot.duplicate
       ? "這個瀏覽器 session 已經送過，沒有重複計入。"
-      : "已合併成去連結化計數；伺服器沒有保存這份逐題判斷。";
+      : "已合併成無法回推個人計數；伺服器沒有保存這份逐題判斷。";
   } catch (reason) {
     actionStatus.textContent = reason instanceof Error ? reason.message : "這輪選擇暫時沒有送出。";
     button.disabled = false;
@@ -314,7 +314,7 @@ async function deleteRoom() {
     document.querySelector("#ranking-room-summary").hidden = true;
     document.querySelector("#room-aggregate-result").hidden = true;
     document.querySelector("#ranking-admin-controls").hidden = true;
-    document.querySelector("#room-aggregate-status").textContent = "收件室已刪除；題目、session 雜湊與彙整計數都已清除。";
+    document.querySelector("#room-aggregate-status").textContent = "收件室已刪除；題目、參與代碼摘要與彙整計數都已清除。";
     clearReceiptBuilder();
   } catch (reason) {
     document.querySelector("#room-aggregate-status").textContent =

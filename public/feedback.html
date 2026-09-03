@@ -16,7 +16,7 @@
     <main id="main" class="workspace-main">
       <div class="wrap feedback-wrap">
         <header class="workspace-heading"><div><p class="section-kicker">給維護者的回饋迴路</p><h1>把卡關，變成下一個可以修的問題。</h1><p class="section-lede">這裡不做隱藏分析。資料只在本機整理；你預覽後，才選擇下載或開啟 GitHub issue。</p></div></header>
-        <aside class="workspace-trust"><strong>不要貼進來</strong><span>參與者原話、投票、姓名、email、匿名代碼或敏感情境。</span><span>API key、管理 token，以及 # 後方含私人權限的網址。</span></aside>
+        <aside class="workspace-trust"><strong>不要貼進來</strong><span>參與者原話、投票、姓名、email、匿名代碼或敏感情境。</span><span>API key、管理權杖，以及 # 後方含私人權限的網址。</span></aside>
         <form id="feedback-form" class="data-import-card feedback-form">
           <div class="data-step-heading"><span>1</span><div><h2>這個問題發生在哪裡？</h2><p>先把階段、工具與影響說清楚。</p></div></div>
           <div class="feedback-grid">
@@ -33,7 +33,7 @@
           <label>目前怎麼補救？（選填）<textarea name="workaround" rows="3" maxlength="1000"></textarea></label>
           <label>環境（選填）<textarea name="environment" rows="2" maxlength="500" placeholder="例如：Safari 20、Cloudflare Workers 免費方案"></textarea></label>
           <label>可公開成果網址（選填）<input name="publicUrl" type="url" maxlength="2000" placeholder="https://…（不可含 #）" /></label>
-          <label class="consent-row"><input name="confirmed" type="checkbox" value="true" /><span>我已確認內容不含參與者原話、逐筆回應、個資、匿名代碼、API key、管理 token 或含私人權限的網址。</span></label>
+          <label class="consent-row"><input name="confirmed" type="checkbox" value="true" /><span>我已確認內容不含參與者原話、逐筆回應、個資、匿名代碼、API key、管理權杖 或含私人權限的網址。</span></label>
           <button class="button button-primary" type="submit">產生回饋預覽</button>
           <p id="feedback-status" class="action-status" role="status"></p>
         </form>

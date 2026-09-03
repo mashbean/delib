@@ -87,7 +87,7 @@
           <p class="boundary-note">模型分數是這批成對選擇形成的相對權重，不是支持率、預算比例，也不能單獨證明群體共識。</p>
           <label id="ranking-room-consent-row" class="consent-row" hidden>
             <input id="ranking-room-consent" type="checkbox" />
-            <span>我知道送出後，Delib 會立即把這輪判斷合併成計數，只保存隨機 session ID 的雜湊，不保存我的逐題判斷。</span>
+            <span>我知道送出後，Delib 會立即把這輪判斷合併成計數，只保存隨機參與代碼 的雜湊，不保存我的逐題判斷。</span>
           </label>
           <div class="result-actions">
             <button id="ranking-submit-room" class="button button-primary" type="button" hidden>送出這輪選擇</button>
@@ -109,7 +109,7 @@
           </div>
           <div id="room-aggregate-result" hidden>
             <ol id="room-aggregate-result-list" class="ranking-list"></ol>
-            <p class="boundary-note">只呈現去連結化的成對計數；這不是代表性樣本、支持率或正式共識。</p>
+            <p class="boundary-note">只呈現無法回推個人的成對計數；這不是代表性樣本、支持率或正式共識。</p>
             <div class="result-actions">
               <button id="room-aggregate-download-json" class="button button-primary" type="button">下載群體 JSON</button>
               <button id="room-aggregate-download-portable" class="button button-ghost" type="button">下載通用資料</button>
@@ -207,8 +207,8 @@
             <div class="write-preview">
               <strong>產生後會發生：</strong>
               <ul>
-                <li>只帶入去連結化的彙整計數，不含個別 session、逐題判斷或管理權杖；</li>
-                <li>成果資料編碼在網址 # 後方，不會隨頁面請求送進 Delib Worker；</li>
+                <li>只帶入無法回推個人的彙整計數，不含個別 session、逐題判斷或管理權杖；</li>
+                <li>成果資料編碼在網址 # 後方，不會隨頁面請求送到本站伺服器；</li>
                 <li>任何拿到連結的人都能閱讀、複製與再次分享，請把它視為公開成果。</li>
               </ul>
             </div>

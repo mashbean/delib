@@ -113,3 +113,51 @@ export function createElement(tag, className, text) {
 export function prefersReducedMotion() {
   return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches === true;
 }
+
+export function emptyState(message) {
+  const node = document.createElement("div");
+  node.className = "empty-state";
+  node.textContent = message;
+  return node;
+}
+
+/**
+ * Embed an upstream participation surface. A cross-origin iframe never
+ * reports a refused load, so the "loaded" text stays cautious and the direct
+ * link remains the fallback the page points people to.
+ */
+export function mountEmbeddedFrame({
+  root,
+  status,
+  src,
+  title,
+  testId,
+  height = 900,
+  allow = "",
+  allowFullscreen = false,
+  serviceName,
+  initialText = "",
+}) {
+  const frame = document.createElement("iframe");
+  if (testId) frame.dataset.testid = testId;
+  frame.title = title;
+  frame.src = src;
+  frame.width = "100%";
+  frame.height = String(height);
+  frame.loading = "eager";
+  frame.referrerPolicy = "strict-origin-when-cross-origin";
+  if (allow) frame.allow = allow;
+  if (allowFullscreen) frame.allowFullscreen = true;
+  frame.style.border = "0";
+  frame.style.background = "white";
+  frame.addEventListener("load", () => {
+    status.textContent = `畫面已嵌入。若下方一直空白，表示 ${serviceName} 拒絕被嵌入或被瀏覽器阻擋，請改用右上角按鈕直接開啟。`;
+  });
+  frame.addEventListener("error", () => {
+    root.replaceChildren(emptyState(`${serviceName} 暫時載不進來；請改用右上角按鈕直接開啟。`));
+    status.textContent = `目前無法載入 ${serviceName}。`;
+  });
+  root.replaceChildren(frame);
+  if (initialText) status.textContent = initialText;
+  return frame;
+}

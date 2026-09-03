@@ -1,3 +1,5 @@
+import { emptyState } from "/ui-shared.js";
+
 const params = new URLSearchParams(location.search);
 const conversation = params.get("conversation")?.trim() || "";
 const siteId = params.get("site")?.trim() || "";
@@ -10,6 +12,7 @@ const heading = document.querySelector("#polis-workspace-title");
 const directLink = document.querySelector("#polis-direct-link");
 
 heading.textContent = title;
+document.title = `${title} · Pol.is 工作區 · Delib`;
 
 if (isConversationId(conversation)) {
   directLink.href = `https://pol.is/${conversation}`;
@@ -18,7 +21,7 @@ if (isConversationId(conversation)) {
   directLink.hidden = true;
   mountPolis({ siteId, pageId });
 } else {
-  root.replaceChildren(errorMessage("這個工作區連結不完整。回到 Delib 重新貼一次對話網址就好。"));
+  root.replaceChildren(emptyState("這個工作區連結不完整。回到 Delib 重新貼一次對話網址就好。"));
   status.textContent = "找不到可以開啟的 Pol.is 對話。";
 }
 
@@ -58,7 +61,7 @@ function mountPolis(config) {
       : "正在向 Pol.is 開啟這輪對話；第一次載入可能會多等幾秒。若一直空白，請改用右上角按鈕。";
   });
   frame.addEventListener("error", () => {
-    root.replaceChildren(errorMessage("Pol.is 暫時載不進來。這可能是網路或內容阻擋器造成的，不是你的操作錯誤。"));
+    root.replaceChildren(emptyState("Pol.is 暫時載不進來。這可能是網路或內容阻擋器造成的，不是你的操作錯誤。"));
     status.textContent = "目前無法載入 Pol.is。";
   });
 
@@ -84,12 +87,6 @@ function referrerOrigin() {
   }
 }
 
-function errorMessage(message) {
-  const node = document.createElement("div");
-  node.className = "empty-state";
-  node.textContent = message;
-  return node;
-}
 
 function isConversationId(value) {
   return /^[A-Za-z0-9_-]{2,80}$/.test(value);

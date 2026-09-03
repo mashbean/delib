@@ -271,8 +271,8 @@
                 <label for="pocket-polis-description">給參與者看的說明（選填）</label>
                 <textarea id="pocket-polis-description" rows="3" maxlength="2000" placeholder="這一輪要理解的問題、主辦者與後續回覆方式"></textarea>
                 <label for="pocket-polis-seeds">起始陳述（一行一句，5–15 句）</label>
-                <textarea id="pocket-polis-seeds" rows="9" maxlength="4215" required placeholder="公園應優先增加夜間照明。&#10;應保留更多安靜、不安排活動的草地。&#10;兒童遊具比新增停車位更重要。&#10;預算應先改善無障礙動線。&#10;規劃完成前應再辦一次居民討論。"></textarea>
-                <p class="field-note">每句最多 280 字、只表達一個可同意或不同意的觀點。不要放姓名、聯絡方式或未公開個資。</p>
+                <textarea id="pocket-polis-seeds" rows="9" maxlength="4215" required placeholder="公園應優先增加夜間照明。&#10;應保留更多安靜、不安排活動的草地。&#10;兒童遊具比新增停車位更重要。&#10;預算應先改善無障礙動線。&#10;規劃完成前應再辦一次居民討論。" aria-describedby="pocket-polis-seeds-note"></textarea>
+                <p class="field-note" id="pocket-polis-seeds-note">每句最多 280 字、只表達一個可同意或不同意的觀點。不要放姓名、聯絡方式或未公開個資。</p>
                 <details class="advanced-fields">
                   <summary>投稿、審核與開放資料</summary>
                   <label class="consent-row">
@@ -296,7 +296,7 @@
                   <strong>按下建立後會發生：</strong>
                   <ul>
                     <li>Pocket Polis 會立即建立活動並回傳參與、成果與私人管理連結；</li>
-                    <li>Delib 不保存活動內容、投票、陳述或管理 token；</li>
+                    <li>Delib 不保存活動內容、投票、陳述或管理權杖；</li>
                     <li>私人管理連結只暫存在這個分頁，請交給真正的主辦者保管。</li>
                   </ul>
                 </div>
@@ -329,7 +329,7 @@
                 <a href="https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/pocket-polis" target="_blank" rel="noreferrer">部署自己的 Pocket Polis ↗</a>
                 <a href="https://github.com/mashbean/pocket-polis" target="_blank" rel="noreferrer">查看 MIT 原始碼 ↗</a>
               </div>
-              <p class="boundary-note">Pocket Polis 是為 Cloudflare Workers／Durable Objects 重做的輕量 MIT 工具，不是官方 Pol.is。適合社群、課堂與工作坊；防分身能力較弱，不應單獨用於高對抗或具法定效力的投票。</p>
+              <p class="boundary-note">Pocket Polis 是為 Cloudflare Workers 重做的輕量 MIT 工具，不是官方 Pol.is。適合社群、課堂與工作坊；防分身能力較弱，不應單獨用於高對抗或具法定效力的投票。</p>
             </details>
 
             <details id="launch-polis" class="launch-card">
@@ -402,8 +402,8 @@
 
               <form id="agora-form" class="launch-form">
                 <label for="agora-url">Agora 公開對話網址</label>
-                <input id="agora-url" type="url" maxlength="2048" required placeholder="https://www.agoracitizen.app/conversation/…" />
-                <p class="field-note">接受官方新網址與舊的 agoracitizen.network 分享網址；不接受後台、查詢參數或登入資料。</p>
+                <input id="agora-url" type="url" maxlength="2048" required placeholder="https://www.agoracitizen.app/conversation/…" aria-describedby="agora-url-note" />
+                <p class="field-note" id="agora-url-note">接受官方新網址與舊的 agoracitizen.network 分享網址；不接受後台、查詢參數或登入資料。</p>
                 <div class="write-preview">
                   <strong>開啟後會發生：</strong>
                   <ul>
@@ -444,8 +444,8 @@
 
               <form id="heyform-form" class="launch-form">
                 <label for="heyform-url">HeyForm 公開表單網址</label>
-                <input id="heyform-url" type="url" maxlength="2048" required placeholder="https://heyform.net/f/…" />
-                <p class="field-note">只接受公開參與網址，不接受後台網址、cookie、帳號或密碼。</p>
+                <input id="heyform-url" type="url" maxlength="2048" required placeholder="https://heyform.net/f/…" aria-describedby="heyform-url-note" />
+                <p class="field-note" id="heyform-url-note">只接受公開參與網址，不接受後台網址、cookie、帳號或密碼。</p>
                 <div class="write-preview">
                   <strong>開啟後會發生：</strong>
                   <ul>
@@ -494,7 +494,7 @@
                   <strong>開啟後會發生：</strong>
                   <ul>
                     <li>Delib 只把名稱與說明帶入 TTTC 官方建立頁；</li>
-                    <li>登入 token 與 CSV 不會交給 Delib；</li>
+                    <li>登入憑證與 CSV 不會交給 Delib；</li>
                     <li>按下 TTTC 的建立按鈕前，仍可返回或關閉。</li>
                   </ul>
                 </div>
@@ -511,7 +511,7 @@
                 <p>登入與資料上傳只發生在 Talk to the City。</p>
                 <a id="tttc-workspace" class="button button-primary" target="_blank" rel="noreferrer">留在 Delib 開啟 ↗</a>
               </section>
-              <p class="boundary-note">TTTC 現行版本使用 Firebase、Google Cloud Storage、Redis、Pub/Sub 與模型服務；舊 MetaGov adaptor 的 API 網域已不是現行公開入口，因此這版採官方 UI 連接，不要求使用者擷取 Firebase token。</p>
+              <p class="boundary-note">TTTC 現行版本使用 Firebase、Google Cloud Storage、Redis、Pub/Sub 與模型服務；舊 MetaGov adaptor 的 API 網域已不是現行公開入口，因此這版採官方 UI 連接，不要求使用者擷取 Firebase 登入憑證。</p>
             </details>
 
             <details id="launch-harmonica" class="launch-card">
@@ -605,8 +605,8 @@
                 <label for="power-ranker-title">要排序的問題</label>
                 <input id="power-ranker-title" maxlength="120" required placeholder="例如：社區公園下一步應優先做什麼？" />
                 <label for="power-ranker-items">候選項目（一行一項）</label>
-                <textarea id="power-ranker-items" rows="7" maxlength="810" required placeholder="增加夜間照明&#10;保留安靜草地&#10;增設兒童遊具"></textarea>
-                <p class="field-note">需要 3–10 個不重複項目，每項最多 80 字。請先確認這些題目適合出現在分享網址。</p>
+                <textarea id="power-ranker-items" rows="7" maxlength="810" required placeholder="增加夜間照明&#10;保留安靜草地&#10;增設兒童遊具" aria-describedby="power-ranker-items-note"></textarea>
+                <p class="field-note" id="power-ranker-items-note">需要 3–10 個不重複項目，每項最多 80 字。請先確認這些題目適合出現在分享網址。</p>
                 <div id="power-ranker-room-fields" hidden>
                   <label for="power-ranker-retention">自動清除期限</label>
                   <select id="power-ranker-retention">
@@ -907,7 +907,7 @@
         </div>
         <div>
           <strong>資料承諾</strong>
-          <p>伺服器不保存流程或 API key；短期排序收件室只留去連結化計數與 session 雜湊。公開成果短網址只保存成果頁已揭露的彙整與主辦者說明，並按期限清除。本機下載檔由使用者自行保管。頁面瀏覽統計使用 Cloudflare Web Analytics：不用 cookie、不辨識個人。</p>
+          <p>伺服器不保存流程或 API key；短期排序收件室只留無法回推個人計數與 參與代碼摘要。公開成果短網址只保存成果頁已揭露的彙整與主辦者說明，並按期限清除。本機下載檔由使用者自行保管。頁面瀏覽統計使用 Cloudflare Web Analytics：不用 cookie、不辨識個人。</p>
         </div>
       </div>
     </footer>
