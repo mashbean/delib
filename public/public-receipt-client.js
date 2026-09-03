@@ -10,14 +10,40 @@ export function receiptDeleteTokenFromHash(hash = location.hash) {
   return /^[a-f0-9]{64}$/.test(token) ? token : "";
 }
 
+export class StoredReceiptError extends Error {
+  constructor(message, status) {
+    super(message);
+    this.name = "StoredReceiptError";
+    this.status = status;
+  }
+}
+
+/**
+ * Load a receipt published under /r/<slug>. Returns null when the page is not
+ * a short URL; throws StoredReceiptError with a person-readable message when
+ * the short URL exists but cannot be shown (expired, deleted, offline).
+ */
 export async function loadStoredReceipt(normalize, expectedKind) {
   const slug = receiptSlugFromPath();
   if (!slug) return null;
-  const response = await fetch(`/api/receipts/${slug}`, { headers: { Accept: "application/json" } });
-  if (!response.ok) return null;
-  const payload = await response.json();
+  let response;
+  try {
+    response = await fetch(`/api/receipts/${slug}`, { headers: { Accept: "application/json" } });
+  } catch {
+    throw new StoredReceiptError("目前連不上 Delib 伺服器；請確認網路後重新整理。", 0);
+  }
+  let payload = null;
+  try {
+    payload = await response.json();
+  } catch {
+    payload = null;
+  }
+  if (response.status === 410) throw new StoredReceiptError("這份公開成果已到期，內容已依承諾清除。", 410);
+  if (response.status === 404) throw new StoredReceiptError("找不到這份公開成果；它可能已被主辦者刪除，或網址抄錯了。", 404);
+  if (!response.ok || !payload) throw new StoredReceiptError("公開成果暫時無法讀取，請稍後再試。", response.status);
+  if (payload.status === "deleted") throw new StoredReceiptError("這份公開成果已由主辦者刪除。", 200);
   const receipt = payload.kind === expectedKind ? normalize(payload.receipt) : null;
-  if (!receipt) return null;
+  if (!receipt) throw new StoredReceiptError("這個短網址指向的成果格式與這個頁面不符。", 200);
   return {
     receipt,
     createdAt: Number(payload.createdAt),

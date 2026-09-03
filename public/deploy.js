@@ -1,14 +1,34 @@
-const response = await fetch("/data/deployments.json", { cache: "no-cache" });
-if (!response.ok) throw new Error("deployment registry unavailable");
-const registry = await response.json();
+const recipesRoot = document.querySelector("#deployment-recipes");
+const operatorRoot = document.querySelector("#operator-paths");
+recipesRoot.replaceChildren(loadingNote("正在讀取部署配方…"));
 
-document.querySelector("#deployment-updated").textContent = `最後查核 ${registry.updatedAt}`;
-document.querySelector("#deployment-recipes").replaceChildren(
-  ...registry.recipes.map((recipe, index) => recipeCard(recipe, index)),
-);
-document.querySelector("#operator-paths").replaceChildren(
-  ...registry.operatorPaths.map(operatorCard),
-);
+try {
+  const response = await fetch("/data/deployments.json");
+  if (!response.ok) throw new Error(`deployment registry responded ${response.status}`);
+  const registry = await response.json();
+  document.querySelector("#deployment-updated").textContent = `最後查核 ${registry.updatedAt}`;
+  const lede = document.querySelector("#deployment-lede");
+  if (lede) {
+    lede.textContent = `目前有 ${registry.recipes.length} 個可重現的 Cloudflare 部署配方，涵蓋 ${new Set(registry.recipes.flatMap((recipe) => recipe.gears || [recipe.id])).size} 個站內齒輪。其他工具會清楚說明需要共用主機、上游帳號或先整修的原因。`;
+  }
+  recipesRoot.replaceChildren(...registry.recipes.map((recipe, index) => recipeCard(recipe, index)));
+  operatorRoot.replaceChildren(...registry.operatorPaths.map(operatorCard));
+} catch (error) {
+  console.error(error);
+  const failure = document.createElement("div");
+  failure.className = "registry-error";
+  failure.setAttribute("role", "alert");
+  failure.textContent = "部署配方暫時讀不到；請重新整理，或直接到 GitHub 查看 wrangler 設定。";
+  recipesRoot.replaceChildren(failure);
+}
+
+function loadingNote(text) {
+  const note = document.createElement("p");
+  note.className = "loading-note";
+  note.setAttribute("role", "status");
+  note.textContent = text;
+  return note;
+}
 
 function recipeCard(recipe, index) {
   const article = document.createElement("article");
@@ -21,7 +41,7 @@ function recipeCard(recipe, index) {
   const title = document.createElement("h2");
   const summary = document.createElement("p");
   label.className = "receipt-layer-label receipt-layer-next";
-  label.textContent = "已驗證的 Cloudflare 一鍵路徑";
+  label.textContent = recipe.verification?.label || "可重現的 Cloudflare 部署配方";
   title.textContent = recipe.name;
   summary.textContent = recipe.summary;
   heading.append(label, title, summary);
@@ -38,6 +58,7 @@ function recipeCard(recipe, index) {
     detail("需要帳號", recipe.account),
     detail("資料邊界", recipe.dataBoundary),
   );
+  if (recipe.verification?.summary) details.append(detail("驗證狀態", recipe.verification.summary));
   const actions = document.createElement("div");
   actions.className = "result-actions";
   actions.append(

@@ -17,7 +17,7 @@ if (/^[A-Za-z0-9_-]{2,120}$/.test(formId)) {
   frame.style.border = "0";
   frame.style.background = "white";
   frame.addEventListener("load", () => {
-    status.textContent = "表單已載入；送出的回答會直接交給 HeyForm。";
+    status.textContent = "畫面已嵌入。若下方一直空白，表示對方拒絕被嵌入或被瀏覽器阻擋，請改用右上角按鈕直接開啟。";
   });
   frame.addEventListener("error", () => {
     root.replaceChildren(errorMessage("HeyForm 暫時載不進來；請改用上方按鈕直接開啟。"));

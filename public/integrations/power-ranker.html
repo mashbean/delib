@@ -26,7 +26,7 @@
       <div class="wrap workspace-wrap ranking-workspace">
         <div class="workspace-heading">
           <div>
-            <p id="ranking-kicker" class="section-kicker">Local pairwise ranking</p>
+            <p id="ranking-kicker" class="section-kicker">本機成對排序</p>
             <h1 id="ranking-title">成對排序</h1>
             <p id="ranking-status" class="section-lede" role="status">正在讀取題目。</p>
           </div>
@@ -35,8 +35,8 @@
 
         <div class="workspace-trust">
           <strong id="ranking-trust-heading">只在本機</strong>
-          <span id="ranking-trust-copy">題目放在網址的 # 後方，選擇只留在目前分頁；Delib 不會收到或保存答案。</span>
-          <span id="ranking-trust-detail">匯出的隨機 session ID 可協助排除重複檔，但仍應視為化名參與資料。</span>
+          <span id="ranking-trust-copy">題目放在網址井字號（#）後面，選擇只留在目前分頁；Delib 不會收到或保存答案。</span>
+          <span id="ranking-trust-detail">匯出的隨機參與代碼可協助排除重複檔，但仍應視為化名參與資料。</span>
         </div>
 
         <section id="ranking-room-summary" class="room-summary" hidden aria-live="polite">
@@ -81,7 +81,7 @@
         <section id="ranking-result" class="ranking-result" hidden aria-labelledby="ranking-result-heading">
           <div class="panel-heading">
             <span class="panel-number">✓</span>
-            <div><p>LOCAL RESULT</p><h2 id="ranking-result-heading">目前這一輪的排序</h2></div>
+            <div><p>本機結果</p><h2 id="ranking-result-heading">目前這一輪的排序</h2></div>
           </div>
           <ol id="ranking-result-list" class="ranking-list"></ol>
           <p class="boundary-note">模型分數是這批成對選擇形成的相對權重，不是支持率、預算比例，也不能單獨證明群體共識。</p>
@@ -232,7 +232,7 @@
         </section>
 
         <p class="source-note">
-          排序核心是 MIT 授權 PowerRanker `rankCentrality` 路徑的瀏覽器原生移植；完整來源與修改說明見
+          排序方法是 MIT 授權 PowerRanker 演算法的瀏覽器版本；完整來源與修改說明見
           <a href="https://github.com/mashbean/delib/blob/main/NOTICE.md" target="_blank" rel="noreferrer">Delib NOTICE ↗</a>。
         </p>
       </div>

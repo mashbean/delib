@@ -14,8 +14,13 @@ import {
   rankingReceiptToMarkdown,
   rankingReceiptUrl,
 } from "/ranking-receipt-core.js";
+import { formatDateTime, storageGet, storageSet } from "/ui-shared.js";
 
-const roomId = new URLSearchParams(location.search).get("room") || "";
+const pageParams = new URLSearchParams(location.search);
+const roomId = pageParams.get("room") || "";
+// /integrations/power-ranker?mode=aggregate: organizer arrives from the homepage
+// data-handoff chooser with participant JSON files, not with a question.
+const aggregateOnly = !roomId && pageParams.get("mode") === "aggregate";
 const adminToken = roomId ? new URLSearchParams(location.hash.replace(/^#/, "")).get("admin") || "" : "";
 let config = roomId ? null : rankingConfigFromHash(location.hash);
 let itemMap = new Map();
@@ -53,6 +58,13 @@ if (roomId) {
   loadRoom();
 } else if (config) {
   startRanking();
+} else if (aggregateOnly) {
+  document.querySelector("#ranking-kicker").textContent = "主辦者彙整";
+  title.textContent = "把多人結果合在一起";
+  status.textContent = "選取參與者交回的個人結果 JSON；合併在本機完成，不會上傳。";
+  document.title = "合併 Power Ranker 結果 · Delib";
+  document.querySelector("#local-aggregate-panel")?.scrollIntoView({ block: "start" });
+  queueMicrotask(() => document.querySelector("#aggregate-files")?.focus({ preventScroll: true }));
 } else {
   showLoadError("無法讀取排序題目。", "這個連結沒有有效題目。請回到 Delib，填入 3–10 個不重複選項。");
 }
@@ -141,8 +153,8 @@ async function loadRoom() {
     config = normalizeRankingConfig(snapshot.question);
     if (!config) throw new Error("收件室的題目格式不完整");
     document.querySelector("#ranking-kicker").textContent = adminToken
-      ? "Ephemeral room · organizer"
-      : "Ephemeral room · participant";
+      ? "短期收件室 · 主辦者"
+      : "短期收件室 · 參與者";
     document.querySelector("#ranking-trust-heading").textContent = "短期彙整";
     document.querySelector("#ranking-trust-copy").textContent =
       "送出時，逐題判斷只用來立即增加成對計數；Delib 不保存可逐份還原的原始判斷。";
@@ -568,17 +580,15 @@ function publicSourceUrl() {
 function getSessionId(reset = false) {
   if (!roomId) return crypto.randomUUID();
   const key = `delib:power-ranker-room:${roomId}`;
-  const existing = reset ? "" : sessionStorage.getItem(key) || "";
+  const existing = reset ? "" : storageGet(key) || "";
   if (/^[A-Za-z0-9_-]{8,80}$/.test(existing)) return existing;
   const next = crypto.randomUUID();
-  sessionStorage.setItem(key, next);
+  storageSet(key, next);
   return next;
 }
 
 function formatDate(value) {
-  return new Intl.DateTimeFormat("zh-Hant-TW", { dateStyle: "long", timeStyle: "short" }).format(
-    new Date(value),
-  );
+  return formatDateTime(value);
 }
 
 function showLoadError(statusText, detail) {

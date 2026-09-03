@@ -24,16 +24,28 @@
 
     <header class="site-header">
       <div class="wrap header-inner">
-        <a class="brand" href="/" aria-label="Delib 審議拼圖首頁">
+        <a class="brand" href="/">
           <span class="brand-mark" aria-hidden="true">⿻</span>
           <span><strong>Delib</strong><span class="brand-divider">·</span>審議拼圖</span>
         </a>
         <nav aria-label="主要選單">
-          <a href="#journey">流程地圖</a>
-          <a href="#compare">工具比較</a>
+          <a href="#how">三條路</a>
           <a href="#launch">直接啟用</a>
-          <a href="/deploy.html">一鍵部署</a>
-          <a href="#care">Care check</a>
+          <a href="#compare">工具比較</a>
+          <a href="#journey">流程地圖</a>
+          <a href="/deploy">一鍵部署</a>
+          <details class="mobile-nav" id="mobile-nav">
+            <summary aria-label="開啟選單">選單 <span aria-hidden="true">☰</span></summary>
+            <div>
+              <a href="#how">三條路</a>
+              <a href="#launch">直接啟用</a>
+              <a href="#compare">工具比較</a>
+              <a href="#journey">流程地圖</a>
+              <a href="#care">六件事</a>
+              <a href="/deploy">一鍵部署</a>
+              <a href="/feedback">開發者回饋</a>
+            </div>
+          </details>
           <button class="button button-small button-primary" data-start="listen">開始拼一輪 →</button>
         </nav>
       </div>
@@ -43,7 +55,7 @@
       <section class="hero">
         <div class="wrap hero-grid">
           <div>
-            <p class="kicker">Deliberation, with a next step</p>
+            <p class="kicker">有下一步的審議</p>
             <h1>把一場審議，<strong>拼成下一輪</strong>。</h1>
             <p class="lede">
               不用先會寫程式，也不用先懂 AI Agent。說說你想聽見誰、做到什麼，
@@ -69,51 +81,15 @@
         </div>
       </section>
 
-      <section id="journey" class="section journey-section">
-        <div class="wrap">
-          <p class="section-kicker">People flow × data flow × feedback loop</p>
-          <h2>一輪審議，不只是一場活動。</h2>
-          <p class="section-lede">
-            紫色看參與者怎麼走，綠色看資料怎麼交接。點選任一步驟，再看工具、人工關卡與交付成果。
-          </p>
-
-          <div class="process-legend" aria-label="流程圖圖例">
-            <span class="process-guide process-guide-people"><i aria-hidden="true">人</i><strong>人流</strong><small>誰被邀請、加入、退出或收到回覆</small></span>
-            <span class="process-guide process-guide-data"><i aria-hidden="true">資料</i><strong>資料流</strong><small>什麼被蒐集、轉接、公開或留在受限空間</small></span>
-          </div>
-
-          <div id="process-track" class="process-track" aria-label="審議流程八個步驟"></div>
-
-          <section id="process-detail" class="process-detail" aria-live="polite" aria-labelledby="process-detail-title">
-            <div>
-              <p class="process-detail-label">目前步驟</p>
-              <h3 id="process-detail-title">讀取流程中…</h3>
-              <p id="process-detail-description"></p>
-            </div>
-            <dl>
-              <div><dt>可用工具</dt><dd id="process-detail-tools"></dd></div>
-              <div><dt>人工關卡</dt><dd id="process-detail-gate"></dd></div>
-              <div><dt>交給下一步</dt><dd id="process-detail-output"></dd></div>
-            </dl>
-          </section>
-
-          <p class="feedback-return-label"><span aria-hidden="true">↺</span> 成果回到招募、議程與工具設計</p>
-          <div id="feedback-loops" class="feedback-loops" aria-label="三個回饋迴路"></div>
-          <p class="process-boundary">
-            <strong>資料分流：</strong>招募名冊、聯絡方式與可近用需求應留在受限空間；公開成果只帶彙整、解讀、限制與責任，不帶逐筆參與紀錄。
-          </p>
-          <p class="process-icon-credit">流程圖示採用 <a href="https://lucide.dev/" target="_blank" rel="noreferrer">Lucide</a> 同系列開源 SVG；<a href="/assets/lucide-LICENSE.txt">查看授權</a>。</p>
-        </div>
-      </section>
-
       <section id="how" class="section flows-section">
         <div class="wrap">
           <p class="section-kicker">從今天最想完成的事開始</p>
-          <h2>三條路，都會回到同一個 loop</h2>
+          <h2>三條路，都會回到同一個循環</h2>
           <p class="section-lede">先選一條最接近現在狀況的；進階設定稍後再出現。</p>
+          <div id="registry-error" class="registry-error" role="alert" hidden></div>
 
           <div class="flow-grid">
-            <button class="flow-card" data-start="listen">
+            <button class="flow-card" data-start="listen" type="button">
               <span class="flow-tag">A · 約 3 分鐘</span>
               <span class="flow-icon" aria-hidden="true">👂</span>
               <strong>我有一個問題，想找到合適工具</strong>
@@ -122,29 +98,29 @@
               <b>開始找工具 →</b>
             </button>
 
-            <button class="flow-card" data-start="followup">
+            <button class="flow-card" data-start-handoff type="button">
               <span class="flow-tag">B · 約 5 分鐘</span>
               <span class="flow-icon" aria-hidden="true">🔄</span>
               <strong>我已經辦完活動或收完資料</strong>
-              <span>把問題池、投票或公開資料接到分析、回覆與成果頁。</span>
-              <small>目標是留下 closed-loop receipt。</small>
+              <span>先說你手上有哪種資料，再接到檢查、成果頁與回覆。</span>
+              <small>目標是留下一份有回覆的成果收據。</small>
               <b>安排資料交接 →</b>
             </button>
 
-            <button class="flow-card" data-start-agent>
+            <button class="flow-card" data-start-agent type="button">
               <span class="flow-tag">C · 約 2 分鐘</span>
               <span class="flow-icon" aria-hidden="true">🧭</span>
               <strong>我想讓 AI Agent 一起協作</strong>
-              <span>貼入自己的 API key 產生主持簡報，或下載 bounded、可關閉的 Delib skill。</span>
+              <span>貼入自己的 OpenAI 金鑰產生主持簡報，或下載有邊界、可隨時關掉的 Delib skill。</span>
               <small>AI 幫忙整理，不替人製造共識。</small>
               <b>看看兩種方式 →</b>
             </button>
           </div>
 
           <div class="trust-strip">
-            <strong>default-safe</strong>
+            <strong>預設安全</strong>
             <span>固定選項留在分享連結；自由文字不會自動發布。</span>
-            <span>API key 只活在這個分頁，關掉就清除。</span>
+            <span>金鑰只留在這個分頁，關掉就清除。</span>
             <span>敏感資料會先建議本機／人工流程。</span>
           </div>
         </div>
@@ -155,7 +131,7 @@
           <div class="result-heading">
             <div>
               <p class="section-kicker">你的第一版審議拼圖</p>
-              <h2 id="result-title">這一輪，先聽見，再回覆。</h2>
+              <h2 id="result-title" tabindex="-1">這一輪，先聽見，再回覆。</h2>
               <p id="result-summary" class="section-lede"></p>
             </div>
             <button class="button button-ghost" data-start>編輯需求</button>
@@ -187,12 +163,12 @@
 
           <section class="loops-panel">
             <div>
-              <span class="loop-label">參與者與主辦者的 loop</span>
+              <span class="loop-label">參與者與主辦者的循環</span>
               <h3>讓每個人知道：我說的話去了哪裡？</h3>
               <p>成果頁要分開呈現原話、工具整理、主持判斷、正式決定與尚未回答的問題。</p>
             </div>
             <div>
-              <span class="loop-label">工具開發者的 loop</span>
+              <span class="loop-label">工具開發者的循環</span>
               <h3>讓每次卡關都能回到工具與流程</h3>
               <p>記錄 schema 缺口、轉接失敗、人工補救與使用者放棄點，但不回傳參與內容。</p>
             </div>
@@ -204,56 +180,18 @@
             <button class="button button-ghost" id="download-markdown">下載執行手冊</button>
             <button class="button button-dark" data-open-agent>讓 AI 整理主持簡報 →</button>
           </div>
+          <div class="share-url-row">
+            <label for="share-url">分享連結（只含固定選項，可直接貼給同事）</label>
+            <input id="share-url" type="url" readonly aria-describedby="action-status" />
+          </div>
           <p id="action-status" class="action-status" role="status"></p>
-        </div>
-      </section>
-
-      <section id="compare" class="section comparison-section">
-        <div class="wrap comparison-wrap">
-          <p class="section-kicker">Deployment and interoperability · 最後查核 2026-09-01</p>
-          <div class="comparison-heading">
-            <div>
-              <h2>先比較「怎麼用」，再比較功能。</h2>
-              <p class="section-lede">
-                第一眼只回答：能不能從 Delib 開始、要用誰的服務、資料能不能帶走。部署與授權細節需要時再展開。
-              </p>
-            </div>
-            <a class="button button-ghost" href="/deploy.html">查看一鍵部署中心 →</a>
-          </div>
-
-          <div class="comparison-filters" aria-label="依部署方式篩選工具">
-            <button class="comparison-filter active" type="button" aria-pressed="true" data-comparison-filter="all">全部</button>
-            <button class="comparison-filter" type="button" aria-pressed="false" data-comparison-filter="direct">在 Delib 開始</button>
-            <button class="comparison-filter" type="button" aria-pressed="false" data-comparison-filter="one-click">部署自己的</button>
-            <button class="comparison-filter" type="button" aria-pressed="false" data-comparison-filter="upstream">用現成服務</button>
-            <button class="comparison-filter" type="button" aria-pressed="false" data-comparison-filter="data">資料可轉接</button>
-            <button class="comparison-filter" type="button" aria-pressed="false" data-comparison-filter="shared-host">要找人維運</button>
-            <button class="comparison-filter" type="button" aria-pressed="false" data-comparison-filter="early">仍在早期</button>
-          </div>
-
-          <div class="comparison-table-wrap" role="region" aria-label="審議工具使用方式與資料互通比較表">
-            <table class="comparison-table">
-              <thead>
-                <tr>
-                  <th scope="col">工具與用途</th>
-                  <th scope="col">怎麼開始</th>
-                  <th scope="col">資料能帶去哪裡</th>
-                </tr>
-              </thead>
-              <tbody id="comparison-body"></tbody>
-            </table>
-          </div>
-          <p id="comparison-empty" class="empty-state" hidden>這個分類目前沒有工具。</p>
-          <button id="comparison-more" class="button button-ghost comparison-more" type="button" hidden>顯示更多工具</button>
-          <p class="source-note">
-            每列連到官方服務或原始碼；「可互通」只列已實作或明確標為待驗證的路徑。OpenDLP、Panelot 補上招募與 sortition 的缺口，但目前都還沒有 Delib adapter。
-          </p>
+          <p class="microcopy">下一步：在下方「直接啟用」把推薦的工具開起來，或先下載執行手冊和同事討論。</p>
         </div>
       </section>
 
       <section id="launch" class="section launch-section">
         <div class="wrap">
-          <p class="section-kicker">From recommendation to a working room</p>
+          <p class="section-kicker">從推薦到真正開起來的房間</p>
           <h2>不用離開這裡，先把工具開起來。</h2>
           <p class="section-lede">
             選一個工具再展開設定。公開參與連結和私人管理連結會分開顯示；未展開的工具不會要求你先讀完所有技術細節。
@@ -377,16 +315,16 @@
                   <strong>可以分享</strong>
                   <a id="pocket-polis-participate" class="button button-primary" target="_blank" rel="noreferrer">打開參與頁 ↗</a>
                   <a id="pocket-polis-report" class="button button-ghost" target="_blank" rel="noreferrer">打開成果頁 ↗</a>
-                  <a class="button button-ghost" href="/integrations/pocket-polis-data.html">整理 CSV 與成果收據 →</a>
+                  <a class="button button-ghost" href="/integrations/pocket-polis-data">整理 CSV 與成果收據 →</a>
                 </div>
                 <details class="private-links">
                   <summary>私人管理連結</summary>
-                  <p>網址 # 後方含管理 token，只交給真正的主辦者。Delib 只暫存在目前分頁。</p>
+                  <p>網址井字號（#）後面含管理權杖，只交給真正的主辦者。Delib 只暫存在目前分頁。</p>
                   <a id="pocket-polis-admin" target="_blank" rel="noreferrer">管理活動 ↗</a>
                 </details>
               </section>
               <div class="resource-links">
-                <a href="/integrations/pocket-polis-data.html">已有 CSV？整理資料與成果收據 →</a>
+                <a href="/integrations/pocket-polis-data">已有 CSV？整理資料與成果收據 →</a>
                 <a href="https://polis.mashbean.net/" target="_blank" rel="noreferrer">直接使用 Pocket Polis ↗</a>
                 <a href="https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/pocket-polis" target="_blank" rel="noreferrer">部署自己的 Pocket Polis ↗</a>
                 <a href="https://github.com/mashbean/pocket-polis" target="_blank" rel="noreferrer">查看 MIT 原始碼 ↗</a>
@@ -592,7 +530,7 @@
                   <input id="harmonica-key" type="password" autocomplete="off" placeholder="hm_live_…" aria-describedby="harmonica-key-note" />
                   <button class="button button-small button-ghost" id="clear-harmonica-key" type="button">清除</button>
                 </div>
-                <p id="harmonica-key-note" class="field-note">key 只存在這個分頁；建立時單次經 Delib Worker 傳給 Harmonica，不寫入本站。</p>
+                <p id="harmonica-key-note" class="field-note">金鑰只存在這個分頁；建立時經本站伺服器單次轉送給 Harmonica，不寫入本站。</p>
                 <div class="inline-actions">
                   <a href="https://app.harmonica.chat/settings?tab=api-keys" target="_blank" rel="noreferrer">登入 Harmonica 取得 API key ↗</a>
                   <button id="copy-harmonica-agent" class="text-button" type="button">讓 Agent 用 MCP 建立</button>
@@ -675,12 +613,12 @@
                     <option value="24">24 小時</option>
                     <option value="168">7 天</option>
                   </select>
-                  <p class="field-note">最多接收 300 份；到期後題目、session 雜湊與彙整計數會一起刪除。</p>
+                  <p class="field-note">最多接收 300 份；到期後題目、參與代碼摘要與彙整計數會一起刪除。</p>
                 </div>
                 <div id="power-ranker-local-preview" class="write-preview">
                   <strong>準備後會發生：</strong>
                   <ul>
-                    <li>題目只放在網址的 # 後方，不會送進 Worker request；</li>
+                    <li>題目只放在網址井字號（#）後面，不會送到本站伺服器；</li>
                     <li>每位參與者的選擇只存在目前分頁；</li>
                     <li>個人 JSON 可交回主辦者，在同一頁離線彙整並匯出 CSV。</li>
                   </ul>
@@ -688,7 +626,7 @@
                 <div id="power-ranker-room-preview" class="write-preview" hidden>
                   <strong>建立後會發生：</strong>
                   <ul>
-                    <li>Delib 保存公開題目、去連結化的成對計數與隨機 session ID 的雜湊；</li>
+                    <li>Delib 只保存公開題目、無法回推個人的成對計數，以及隨機參與代碼的摘要；</li>
                     <li>不保存逐份原始判斷、姓名、聯絡方式，也不向參與者收自由文字；</li>
                     <li>至少收到 3 份才向參與者顯示群體結果；主辦者可提前刪除。</li>
                   </ul>
@@ -709,29 +647,112 @@
                   <a id="power-ranker-workspace" class="button button-primary" target="_blank" rel="noreferrer">打開排序頁 ↗</a>
                   <button id="copy-power-ranker-link" class="button button-ghost" type="button">複製參與連結</button>
                 </div>
+                <div class="share-url-row">
+                  <input id="power-ranker-link" type="url" readonly hidden aria-label="參與連結" />
+                </div>
                 <details id="power-ranker-private-links" class="private-links" hidden>
                   <summary>私人管理連結</summary>
                   <p id="power-ranker-expiry"></p>
-                  <p>權杖只放在網址 # 後方；持有者可查看未滿三份的彙整並提前刪除，請勿分享給參與者。</p>
+                  <p>權杖只放在網址井字號（#）後面；持有者可查看未滿三份的彙整並提前刪除，請勿分享給參與者。</p>
                   <a id="power-ranker-manage" target="_blank" rel="noreferrer">開啟管理頁 ↗</a>
                   <button id="copy-power-ranker-manage" class="text-button" type="button">複製私人管理連結</button>
                 </details>
               </section>
-              <p class="boundary-note">這是 MIT 授權 PowerRanker `rankCentrality` 演算法的瀏覽器原生移植。短期收件室使用 Cloudflare SQLite Durable Objects，在 Free 額度內可免費運作；超額時會停止接受操作。模型分數不是支持率或共識證明。</p>
+              <p class="boundary-note">排序方法是 MIT 授權 PowerRanker 演算法的瀏覽器版本。短期收件室存在本站的小型資料庫，在 Cloudflare 免費額度內可免費運作；超額時會停止接受操作。模型分數不是支持率或共識證明。</p>
             </details>
           </div>
 
           <div class="next-integrations">
             <div><span>已串接</span><strong>八個站內入口</strong><p>Call-in 與 Pocket Polis 可免登入代建；Power Ranker 可本機排序或短期自動彙整；官方 Pol.is、Agora、Harmonica、HeyForm、TTTC 各自保留上游邊界。</p></div>
             <div><span>原始碼盤點</span><strong>直接用、共用主機、元件三條路</strong><p>每張工具卡會直接說明是否能內嵌、取原始碼，以及為何不能只靠 Cloudflare 免費完成。</p></div>
-            <a href="/data/hosting.json">查看 28 項機器可讀盤點 →</a>
+            <a href="/data/hosting.json">查看 28 項機器可讀盤點（JSON，給工程師）→</a>
           </div>
+        </div>
+      </section>
+
+      <section id="compare" class="section comparison-section">
+        <div class="wrap comparison-wrap">
+          <p class="section-kicker">部署與資料互通 · 最後查核 <span id="comparison-updated">2026-09-01</span></p>
+          <div class="comparison-heading">
+            <div>
+              <h2>先比較「怎麼用」，再比較功能。</h2>
+              <p class="section-lede">
+                第一眼只回答：能不能從 Delib 開始、要用誰的服務、資料能不能帶走。部署與授權細節需要時再展開。
+              </p>
+            </div>
+            <a class="button button-ghost" href="/deploy">查看一鍵部署中心 →</a>
+          </div>
+
+          <div class="comparison-filters" role="group" aria-label="依部署方式篩選工具">
+            <button class="comparison-filter active" type="button" aria-pressed="true" data-comparison-filter="all">全部</button>
+            <button class="comparison-filter" type="button" aria-pressed="false" data-comparison-filter="direct">在 Delib 開始</button>
+            <button class="comparison-filter" type="button" aria-pressed="false" data-comparison-filter="one-click">部署自己的</button>
+            <button class="comparison-filter" type="button" aria-pressed="false" data-comparison-filter="upstream">用現成服務</button>
+            <button class="comparison-filter" type="button" aria-pressed="false" data-comparison-filter="data">資料可轉接</button>
+            <button class="comparison-filter" type="button" aria-pressed="false" data-comparison-filter="shared-host">要找人維運</button>
+            <button class="comparison-filter" type="button" aria-pressed="false" data-comparison-filter="early">仍在早期</button>
+          </div>
+
+          <div class="comparison-table-wrap" role="region" aria-label="審議工具使用方式與資料互通比較表">
+            <table class="comparison-table">
+              <thead>
+                <tr>
+                  <th scope="col">工具與用途</th>
+                  <th scope="col">怎麼開始</th>
+                  <th scope="col">資料能帶去哪裡</th>
+                </tr>
+              </thead>
+              <tbody id="comparison-body"></tbody>
+            </table>
+          </div>
+          <p id="comparison-empty" class="empty-state" hidden>這個分類目前沒有工具。</p>
+          <button id="comparison-more" class="button button-ghost comparison-more" type="button" hidden>顯示更多工具</button>
+          <p class="source-note">
+            每列連到官方服務或原始碼；「可互通」只列已實作或明確標為待驗證的路徑。OpenDLP、Panelot 補上招募與 sortition 的缺口，但目前都還沒有 Delib adapter。
+          </p>
+        </div>
+      </section>
+
+      <section id="journey" class="section journey-section">
+        <div class="wrap">
+          <p class="section-kicker">人流 × 資料流 × 回饋迴路</p>
+          <h2>一輪審議，不只是一場活動。</h2>
+          <p class="section-lede">
+            紫色看參與者怎麼走，綠色看資料怎麼交接。點選任一步驟，再看工具、人工關卡與交付成果。
+          </p>
+
+          <div class="process-legend" role="group" aria-label="流程圖圖例">
+            <span class="process-guide process-guide-people"><i aria-hidden="true">人</i><strong>人流</strong><small>誰被邀請、加入、退出或收到回覆</small></span>
+            <span class="process-guide process-guide-data"><i aria-hidden="true">資料</i><strong>資料流</strong><small>什麼被蒐集、轉接、公開或留在受限空間</small></span>
+          </div>
+
+          <div id="process-track" class="process-track" role="group" aria-label="審議流程八個步驟"></div>
+
+          <section id="process-detail" class="process-detail" aria-live="polite" aria-labelledby="process-detail-title">
+            <div>
+              <p class="process-detail-label">目前步驟</p>
+              <h3 id="process-detail-title">讀取流程中…</h3>
+              <p id="process-detail-description"></p>
+            </div>
+            <dl>
+              <div><dt>可用工具</dt><dd id="process-detail-tools"></dd></div>
+              <div><dt>人工關卡</dt><dd id="process-detail-gate"></dd></div>
+              <div><dt>交給下一步</dt><dd id="process-detail-output"></dd></div>
+            </dl>
+          </section>
+
+          <p class="feedback-return-label"><span aria-hidden="true">↺</span> 成果回到招募、議程與工具設計</p>
+          <div id="feedback-loops" class="feedback-loops" role="group" aria-label="三個回饋迴路"></div>
+          <p class="process-boundary">
+            <strong>資料分流：</strong>招募名冊、聯絡方式與可近用需求應留在受限空間；公開成果只帶彙整、解讀、限制與責任，不帶逐筆參與紀錄。
+          </p>
+          <p class="process-icon-credit">流程圖示採用 <a href="https://lucide.dev/" target="_blank" rel="noreferrer">Lucide</a> 同系列開源 SVG；<a href="/assets/lucide-LICENSE.txt">查看授權</a>。</p>
         </div>
       </section>
 
       <section id="care" class="section care-section">
         <div class="wrap">
-          <p class="section-kicker">參考 civic.ai · 6-Pack of Care</p>
+          <p class="section-kicker">參考 Civic AI · 六件事</p>
           <h2>AI 進場之前，先問六件事</h2>
           <p class="section-lede">
             這些不是裝飾性的價值宣言，而是會出現在每份流程成果裡的治理檢查。
@@ -753,7 +774,7 @@
 
       <section id="agent" class="section agent-section">
         <div class="wrap">
-          <p class="section-kicker">Optional AI collaboration</p>
+          <p class="section-kicker">可選的 AI 協作</p>
           <h2>需要 Agent 時，有兩種入口</h2>
           <p class="section-lede">不想貼 API key，完全沒關係；skill 路徑可以在自己的環境執行。</p>
 
@@ -776,7 +797,7 @@
                 <button class="button button-small button-ghost" id="clear-key" type="button">清除</button>
               </div>
               <p id="key-note" class="field-note">
-                按下送出後，key 會經本站 Worker 傳到 OpenAI；本站不保存、不記錄。關閉分頁即清除。
+                按下送出後，金鑰會經本站伺服器單次轉送給 OpenAI；本站不保存、不記錄。關閉分頁即清除。
               </p>
               <label for="agent-context">補充在地情境（選填）</label>
               <textarea
@@ -838,13 +859,13 @@
                   <input id="tool-search" type="search" placeholder="例如：投票、提問、證據" />
                 </label>
               </div>
-              <div class="tool-filters" aria-label="依可用方式篩選">
-                <button class="filter-chip active" data-filter="all">全部</button>
-                <button class="filter-chip" data-filter="direct">站內啟用</button>
-                <button class="filter-chip" data-filter="source">可取原始碼</button>
-                <button class="filter-chip" data-filter="shared-host">需要共用主機</button>
-                <button class="filter-chip" data-filter="component">元件／原型</button>
-                <button class="filter-chip" data-filter="unverified">尚未可用</button>
+              <div class="tool-filters" role="group" aria-label="依可用方式篩選">
+                <button class="filter-chip active" type="button" data-filter="all">全部</button>
+                <button class="filter-chip" type="button" data-filter="direct">站內啟用</button>
+                <button class="filter-chip" type="button" data-filter="source">可取原始碼</button>
+                <button class="filter-chip" type="button" data-filter="shared-host">需要共用主機</button>
+                <button class="filter-chip" type="button" data-filter="component">元件／原型</button>
+                <button class="filter-chip" type="button" data-filter="unverified">尚未可用</button>
               </div>
               <div id="tool-library" class="tool-grid"></div>
               <p id="no-tools" class="empty-state" hidden>找不到符合的工具。換一個比較白話的關鍵字試試？</p>
@@ -859,7 +880,7 @@
 
       <section class="section final-cta">
         <div class="wrap">
-          <p class="section-kicker">One closed loop at a time</p>
+          <p class="section-kicker">一次拼好一輪</p>
           <h2>先拼一輪，再讓下一輪變得更容易。</h2>
           <div class="final-actions">
             <button class="button button-primary button-large" data-start="listen">🧩 開始拼一輪</button>
@@ -881,12 +902,12 @@
           <a href="https://github.com/mashbean/delib">Source ↗</a>
           <a href="https://metagov.org/projects/interop">MetaGov InterOp ↗</a>
           <a href="https://civic.ai/">Civic AI ↗</a>
-          <a href="/deploy.html">一鍵部署中心</a>
-          <a href="/feedback.html">開發者回饋</a>
+          <a href="/deploy">一鍵部署中心</a>
+          <a href="/feedback">開發者回饋</a>
         </div>
         <div>
           <strong>資料承諾</strong>
-          <p>伺服器不保存流程或 API key；短期排序收件室只留去連結化計數與 session 雜湊。公開成果短網址只保存成果頁已揭露的彙整與主辦者說明，並按期限清除。本機下載檔由使用者自行保管。</p>
+          <p>伺服器不保存流程或 API key；短期排序收件室只留去連結化計數與 session 雜湊。公開成果短網址只保存成果頁已揭露的彙整與主辦者說明，並按期限清除。本機下載檔由使用者自行保管。頁面瀏覽統計使用 Cloudflare Web Analytics：不用 cookie、不辨識個人。</p>
         </div>
       </div>
     </footer>
@@ -895,7 +916,7 @@
       <form id="planner-form" method="dialog">
         <div class="dialog-header">
           <div>
-            <span class="dialog-kicker">DELIBERATION BUILDER</span>
+            <span class="dialog-kicker">審議拼圖精靈</span>
             <h2 id="planner-title">先完成今天這一輪</h2>
           </div>
           <button class="icon-button" type="button" data-close-dialog aria-label="關閉">×</button>
@@ -965,6 +986,43 @@
           <button class="button button-primary" id="planner-submit" type="submit" hidden>產生我的拼圖 →</button>
         </div>
         <p id="planner-error" class="form-error" role="alert"></p>
+      </form>
+    </dialog>
+
+    <dialog id="handoff-dialog" aria-labelledby="handoff-title">
+      <form id="planner-handoff" class="handoff-form" method="dialog">
+        <div class="dialog-header">
+          <div>
+            <span class="dialog-kicker">資料交接</span>
+            <h2 id="handoff-title">你手上有哪一種資料？</h2>
+          </div>
+          <button class="icon-button" type="button" data-close-dialog aria-label="關閉">×</button>
+        </div>
+        <p>資料只在你的瀏覽器裡檢查；接下來每一步都會先預覽，再由你確認。</p>
+        <div class="handoff-options">
+          <a class="handoff-option" href="/integrations/pocket-polis-data">
+            <strong>Pocket Polis 匯出的兩份 CSV</strong>
+            <span>檢查陳述與投票檔、轉成 TTTC 或 Agora 匯入檔，並挑選陳述做成公開成果頁。</span>
+            <small>檔案留在本機，不上傳</small>
+          </a>
+          <a class="handoff-option" href="/integrations/power-ranker?mode=aggregate">
+            <strong>參與者交回的 Power Ranker 個人結果 JSON</strong>
+            <span>在本機合併多份結果、匯出群體排序，再做成成果收據。</span>
+            <small>檔案留在本機，不上傳</small>
+          </a>
+          <button class="handoff-option" id="handoff-plan" type="button">
+            <strong>還沒有資料，先規劃怎麼回覆</strong>
+            <span>走四步精靈，選「回覆並啟動下一輪」，取得線下齒輪與工具建議。</span>
+          </button>
+        </div>
+      </form>
+      <form id="handoff-open-form" class="handoff-form handoff-open">
+        <label for="handoff-url">已經有成果頁？貼上本站的成果網址</label>
+        <div class="share-url-row">
+          <input id="handoff-url" type="url" placeholder="https://delib.mashbean.net/r/…" />
+          <button class="button button-ghost" type="submit">打開成果頁</button>
+        </div>
+        <p id="handoff-error" class="form-error" role="alert"></p>
       </form>
     </dialog>
   </body>

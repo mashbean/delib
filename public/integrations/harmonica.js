@@ -27,7 +27,7 @@ if (!/^[A-Za-z0-9_-]{8,128}$/.test(sessionId)) {
   frame.style.border = "0";
   frame.style.background = "white";
   frame.addEventListener("load", () => {
-    status.textContent = "Harmonica 對話已載入；回答不會經過 Delib。";
+    status.textContent = "畫面已嵌入。若下方一直空白，表示對方拒絕被嵌入或被瀏覽器阻擋，請改用右上角按鈕直接開啟。";
   });
   frame.addEventListener("error", () => {
     root.replaceChildren(errorMessage("Harmonica 暫時載不進來；請改用上方按鈕直接開啟。"));

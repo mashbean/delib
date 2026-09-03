@@ -49,14 +49,14 @@
       "retention": "由 Pocket Polis 營運者與活動主辦者的政策決定；目前未驗證自動到期或刪除契約。Delib 不保存活動資料或管理 token；資料工作台只在瀏覽器記憶體讀取匯出檔。",
       "inAppEndpoint": "/api/integrations/pocket-polis",
       "dataHandoff": {
-        "endpoint": "/integrations/pocket-polis-data.html",
+        "endpoint": "/integrations/pocket-polis-data",
         "input": ["statements.csv", "votes.csv"],
         "portableSchema": "/schemas/delib-pocket-polis/v1.json",
         "outputs": ["delib-pocket-polis/v1 JSON", "Talk to the City CSV", "Agora Pol.is summary/comments/votes CSV", "delib-pocket-polis-receipt/v1 public receipt"],
         "storage": "browser-memory-only",
         "humanGate": "下載前確認參與資料用途、權限與保存方式。公開收據另要求至少 3 位實際投票者、每句入選陳述至少 3 份回應，並由主辦者逐句確認自由文字與補上解讀、缺席聲音、權責和下一步。"
       },
-      "receiptEndpoint": "/results/pocket-polis.html",
+      "receiptEndpoint": "/results/pocket-polis",
       "receiptSchema": "/schemas/delib-pocket-polis-receipt/v1.json",
       "nextStepSchema": "/schemas/delib-handoff/v1.json",
       "selfHost": {
@@ -190,9 +190,9 @@
       "freePath": "本機模式純靜態；短期收件室使用 SQLite Durable Objects，可在 Workers Free 額度內運作，超額時操作會失敗。",
       "writesExternalState": "只有選擇短期收件室並確認後才建立；本機模式不寫入伺服器。",
       "retention": "本機模式不保存。短期收件室保存公開題目、pair counts 與隨機 session ID 雜湊，24 小時或 7 天後以 alarm 全部清除；主辦者可提前刪除。",
-      "inAppEndpoint": "/integrations/power-ranker.html",
+      "inAppEndpoint": "/integrations/power-ranker",
       "roomEndpoint": "/api/integrations/power-ranker/rooms",
-      "receiptEndpoint": "/results/power-ranker.html",
+      "receiptEndpoint": "/results/power-ranker",
       "receiptSchema": "/schemas/delib-ranking-receipt/v1.json",
       "selfHost": {
         "supported": true,

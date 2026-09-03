@@ -1,43 +1,81 @@
 {
   "schema": "delib-deployments/v1",
-  "updatedAt": "2026-09-01",
+  "updatedAt": "2026-09-03",
   "promise": "Only show a one-click button when the linked repository has a reproducible Cloudflare-native deployment path.",
   "recipes": [
     {
       "id": "delib-suite",
       "name": "Delib 審議拼圖",
       "status": "one-click",
-      "tools": ["流程推薦", "Power Ranker", "成果收據", "跨工具資料層", "Agent 協作"],
+      "tools": [
+        "流程推薦",
+        "Power Ranker",
+        "成果收據",
+        "跨工具資料層",
+        "Agent 協作"
+      ],
       "summary": "一個 Worker 提供規劃、站內排序、短期收件室、通用資料轉接與公開成果短網址。",
       "runtime": "Cloudflare Workers + Static Assets + SQLite Durable Objects",
       "account": "需要自己的 Cloudflare 帳號；不需要 Delib 帳號。",
       "dataBoundary": "規劃預設不保存；只有主辦者明確建立的短期房間或公開成果會進入 Durable Objects。",
       "repositoryUrl": "https://github.com/mashbean/delib",
-      "deployUrl": "https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/delib"
+      "deployUrl": "https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/delib",
+      "verification": {
+        "label": "設定已檢查的 Cloudflare 部署配方",
+        "summary": "2026-09-03：wrangler deploy --dry-run 與設定檢查通過；正式站以同一份設定部署。尚未用第三方 Cloudflare 帳號實際按過 Deploy 按鈕。"
+      },
+      "gears": [
+        "delib",
+        "power-ranker"
+      ]
     },
     {
       "id": "pocket-polis",
       "name": "Pocket Polis",
       "status": "one-click",
-      "tools": ["陳述蒐集", "同意／不同意／略過", "群組分析", "CSV 匯出"],
+      "tools": [
+        "陳述蒐集",
+        "同意／不同意／略過",
+        "群組分析",
+        "CSV 匯出"
+      ],
       "summary": "MIT 的單 Worker 口袋審議服務，可建立自己的活動主機。",
       "runtime": "Cloudflare Workers + SQLite Durable Objects",
       "account": "需要自己的 Cloudflare 帳號；參與者免登入。",
       "dataBoundary": "自己的部署就是資料控制者；主辦者需自行設定告知、保存與刪除政策。",
       "repositoryUrl": "https://github.com/mashbean/pocket-polis",
-      "deployUrl": "https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/pocket-polis"
+      "deployUrl": "https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/pocket-polis",
+      "verification": {
+        "label": "設定已檢查的 Cloudflare 部署配方",
+        "summary": "2026-09-03：Durable Object migrations 與 Queue 設定已檢查；正式站以同一份設定運作。尚未用第三方帳號實際按過 Deploy 按鈕。"
+      },
+      "gears": [
+        "pocket-polis"
+      ]
     },
     {
       "id": "call-in",
       "name": "Call-in",
       "status": "one-click",
-      "tools": ["現場提問", "反應", "投票", "主持畫面"],
+      "tools": [
+        "現場提問",
+        "反應",
+        "投票",
+        "主持畫面"
+      ],
       "summary": "Apache-2.0 的現場互動服務，獨立活動預設七天到期。",
       "runtime": "Cloudflare Workers + SQLite Durable Objects",
       "account": "需要自己的 Cloudflare 帳號；活動參與者免登入。",
       "dataBoundary": "公開頁與含權限的設定／協作網址分開；管理網址不可公開。",
       "repositoryUrl": "https://github.com/mashbean/call-in",
-      "deployUrl": "https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/call-in"
+      "deployUrl": "https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/call-in",
+      "verification": {
+        "label": "設定已檢查的 Cloudflare 部署配方",
+        "summary": "2026-09-03：自訂網域已移到 production 環境，Deploy 按鈕不會再嘗試綁定 call-in.mashbean.net。尚未用第三方帳號實際按過 Deploy 按鈕。"
+      },
+      "gears": [
+        "call-in"
+      ]
     }
   ],
   "operatorPaths": [

@@ -17,15 +17,33 @@ import {
 } from "/receipt-handoff-core.js";
 
 let receipt = pocketPolisReceiptFromHash(location.hash);
-const storedReceipt = receipt
-  ? null
-  : await loadStoredReceipt(normalizePocketPolisReceipt, "pocket-polis-receipt");
-receipt ||= storedReceipt?.receipt || null;
 const error = document.querySelector("#pocket-receipt-page-error");
 const content = document.querySelector("#pocket-receipt-page-content");
 const actionStatus = document.querySelector("#pocket-receipt-action-status");
+let storedReceipt = null;
+let loadFailure = null;
+if (!receipt) {
+  const loading = document.createElement("p");
+  loading.className = "loading-note";
+  loading.setAttribute("role", "status");
+  loading.textContent = "正在讀取公開成果…";
+  document.querySelector("#receipt-main")?.prepend(loading);
+  try {
+    storedReceipt = await loadStoredReceipt(normalizePocketPolisReceipt, "pocket-polis-receipt");
+  } catch (failure) {
+    loadFailure = failure;
+  }
+  loading.remove();
+  receipt = storedReceipt?.receipt || null;
+}
 
 if (!receipt) {
+  if (loadFailure) {
+    const detail = document.createElement("p");
+    detail.textContent = loadFailure instanceof Error ? loadFailure.message : "公開成果暫時無法讀取。";
+    error.querySelector("h1").textContent = "這份公開成果現在看不到";
+    error.querySelector("h1").after(detail);
+  }
   error.hidden = false;
 } else {
   renderReceipt(receipt);

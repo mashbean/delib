@@ -30,8 +30,10 @@ function mountPolis(config) {
     ? encodeURIComponent(config.conversation)
     : `${encodeURIComponent(config.siteId)}/${encodeURIComponent(config.pageId)}`;
   const embedUrl = new URL(`https://pol.is/${path}`);
-  embedUrl.searchParams.set("parent_url", location.href);
-  embedUrl.searchParams.set("referrer", document.referrer);
+  // Send only the page location without its query (which carries the title)
+  // and the referrer origin, never a full URL that may describe a plan.
+  embedUrl.searchParams.set("parent_url", `${location.origin}${location.pathname}`);
+  embedUrl.searchParams.set("referrer", referrerOrigin());
   embedUrl.searchParams.set("ui_lang", "zh_Hant");
 
   directLink.href = `https://pol.is/${path}`;
@@ -52,8 +54,8 @@ function mountPolis(config) {
 
   frame.addEventListener("load", () => {
     status.textContent = config.conversation
-      ? "對話已載入；你的陳述與投票會直接送到 Pol.is。"
-      : "正在向 Pol.is 開啟這輪對話；第一次載入可能會多等幾秒。";
+      ? "畫面已嵌入；若下方一直空白，請改用右上角按鈕直接在 Pol.is 開啟。"
+      : "正在向 Pol.is 開啟這輪對話；第一次載入可能會多等幾秒。若一直空白，請改用右上角按鈕。";
   });
   frame.addEventListener("error", () => {
     root.replaceChildren(errorMessage("Pol.is 暫時載不進來。這可能是網路或內容阻擋器造成的，不是你的操作錯誤。"));
@@ -72,6 +74,14 @@ function mountPolis(config) {
       frame.height = String(Math.max(560, Number(message.height)));
     }
   });
+}
+
+function referrerOrigin() {
+  try {
+    return document.referrer ? new URL(document.referrer).origin : "";
+  } catch {
+    return "";
+  }
 }
 
 function errorMessage(message) {

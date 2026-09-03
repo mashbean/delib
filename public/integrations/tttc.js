@@ -24,7 +24,7 @@ frame.allow = "clipboard-write";
 frame.style.border = "0";
 frame.style.background = "white";
 frame.addEventListener("load", () => {
-  status.textContent = "官方建立頁已載入；登入與資料上傳只會交給 Talk to the City。";
+  status.textContent = "畫面已嵌入。若下方一直空白，表示對方拒絕被嵌入或被瀏覽器阻擋，請改用右上角按鈕直接開啟。";
 });
 frame.addEventListener("error", () => {
   root.replaceChildren(errorMessage("Talk to the City 暫時載不進來；請改用上方按鈕直接開啟。"));

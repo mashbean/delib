@@ -7,12 +7,17 @@ import {
   stateFromSearch,
   stateToSearch,
 } from "./core.js";
-import { normalizeRankingConfig, rankingConfigToHash } from "./power-ranker-core.js";
 import {
-  RECEIPT_HANDOFF_STORAGE_KEY,
-  RECEIPT_HANDOFF_TARGETS,
-  normalizeReceiptHandoff,
-} from "./receipt-handoff-core.js";
+  copyText,
+  createElement,
+  downloadFile,
+  formatDateTime,
+  postJson,
+  storageGet,
+  storageGetJson,
+  storageRemove,
+  storageSet,
+} from "./ui-shared.js";
 
 const STAGE_LABELS = {
   evaluating: "現況評估",
@@ -28,7 +33,7 @@ const STAGE_LABELS = {
 
 const STATUS_LABELS = {
   integrated: "可直接試",
-  adapter: "已有 adaptor",
+  adapter: "可轉接",
   catalog: "待接入",
 };
 
@@ -38,11 +43,35 @@ const RESULT_TITLES = {
   evidence: "讓證據成為入口，不是最後一句話。",
   propose: "讓每次修正都看得到理由。",
   decide: "先說清楚權限，再作成決定。",
-  followup: "審議結束，loop 才正要開始。",
+  followup: "審議結束，下一輪才正要開始。",
 };
 
+/** Integrations that have an in-site form or workspace card on this page. */
+const LAUNCHABLE_ACTIVATIONS = new Set([
+  "managed-create",
+  "credentialed-create",
+  "embedded-workspace",
+  "local-tool",
+  "local-or-ephemeral-room",
+]);
+
+const REGISTRY_PATHS = [
+  "/data/tools.json",
+  "/data/integrations.json",
+  "/data/hosting.json",
+  "/data/deliberation-process.json",
+  "/data/tool-comparison.json",
+];
+
+const OPENAI_KEY_STORAGE_KEY = "delib:openai-key";
+const HARMONICA_KEY_STORAGE_KEY = "delib:harmonica-key";
+const CALL_IN_STORAGE_KEY = "delib:call-in-instance";
 const POCKET_POLIS_STORAGE_KEY = "delib:pocket-polis-instance";
 const POCKET_POLIS_DATA_STORAGE_KEY = "delib:pocket-polis-data-source";
+// Mirrors RECEIPT_HANDOFF_STORAGE_KEY in receipt-handoff-core.js. The module
+// itself is loaded only when a draft is waiting, so the homepage stays light.
+const RECEIPT_HANDOFF_STORAGE_KEY = "delib:receipt-handoff";
+const COMPARISON_PAGE_SIZE = 8;
 
 let tools = [];
 let integrations = new Map();
@@ -50,6 +79,9 @@ let hosting = new Map();
 let processSteps = [];
 let feedbackLoops = [];
 let comparisonTools = [];
+let registriesReady = false;
+let registryFailed = false;
+let pendingState = null;
 let currentPlan = null;
 let currentStep = 0;
 let activeFilter = "all";
@@ -57,94 +89,152 @@ let activeComparisonFilter = "all";
 let comparisonExpanded = false;
 let polisDeploymentConnected = false;
 
-const COMPARISON_PAGE_SIZE = 8;
+const $ = (selector) => document.querySelector(selector);
+const plannerDialog = $("#planner-dialog");
+const plannerForm = $("#planner-form");
+const plannerProgress = $("#planner-progress");
+const stepCount = $("#step-count");
+const plannerBack = $("#planner-back");
+const plannerNext = $("#planner-next");
+const plannerSubmit = $("#planner-submit");
+const plannerError = $("#planner-error");
+const handoffDialog = $("#handoff-dialog");
+const resultSection = $("#result");
+const resultTitle = $("#result-title");
+const actionStatus = $("#action-status");
+const agentStatus = $("#agent-status");
+const agentOutput = $("#agent-output");
+const apiKeyInput = $("#openai-key");
+const harmonicaKeyInput = $("#harmonica-key");
 
-const plannerDialog = document.querySelector("#planner-dialog");
-const plannerForm = document.querySelector("#planner-form");
-const plannerProgress = document.querySelector("#planner-progress");
-const stepCount = document.querySelector("#step-count");
-const plannerBack = document.querySelector("#planner-back");
-const plannerNext = document.querySelector("#planner-next");
-const plannerSubmit = document.querySelector("#planner-submit");
-const plannerError = document.querySelector("#planner-error");
-const resultSection = document.querySelector("#result");
-const actionStatus = document.querySelector("#action-status");
-const agentStatus = document.querySelector("#agent-status");
-const agentOutput = document.querySelector("#agent-output");
-const apiKeyInput = document.querySelector("#openai-key");
-const harmonicaKeyInput = document.querySelector("#harmonica-key");
+// Interactive controls work before any data arrives: the wizard, every launch
+// form and every copy button are bound synchronously, then registries load.
+bindEvents();
+restoreLocalState();
+updatePolisMode();
+updatePowerRankerMode();
+openLaunchCardFromHash();
+handleEntryState();
+loadPolisStatus();
+loadRegistries();
 
-init().catch((error) => {
-  console.error(error);
-  const library = document.querySelector("#tool-library");
-  library.replaceChildren(
-    createElement("p", "empty-state", "工具目錄暫時讀不到，但你仍可下載 skill 或稍後再試。"),
-  );
-});
-
-async function init() {
-  const [response, integrationResponse, hostingResponse, processResponse, comparisonResponse] = await Promise.all([
-    fetch("/data/tools.json", { cache: "no-cache" }),
-    fetch("/data/integrations.json", { cache: "no-cache" }),
-    fetch("/data/hosting.json", { cache: "no-cache" }),
-    fetch("/data/deliberation-process.json", { cache: "no-cache" }),
-    fetch("/data/tool-comparison.json", { cache: "no-cache" }),
-  ]);
-  if (
-    !response.ok ||
-    !integrationResponse.ok ||
-    !hostingResponse.ok ||
-    !processResponse.ok ||
-    !comparisonResponse.ok
-  ) {
-    throw new Error("tool registry unavailable");
+async function loadRegistries() {
+  registryFailed = false;
+  hideRegistryError();
+  try {
+    const [registry, integrationRegistry, hostingRegistry, processRegistry, comparisonRegistry] =
+      await Promise.all(REGISTRY_PATHS.map(fetchJson));
+    tools = Array.isArray(registry.tools) ? registry.tools : [];
+    processSteps = Array.isArray(processRegistry.steps) ? processRegistry.steps : [];
+    feedbackLoops = Array.isArray(processRegistry.feedbackLoops) ? processRegistry.feedbackLoops : [];
+    comparisonTools = Array.isArray(comparisonRegistry.tools) ? comparisonRegistry.tools : [];
+    integrations = new Map(
+      (Array.isArray(integrationRegistry.integrations) ? integrationRegistry.integrations : []).map((item) => [
+        item.toolId,
+        item,
+      ]),
+    );
+    hosting = new Map(
+      (Array.isArray(hostingRegistry.tools) ? hostingRegistry.tools : []).map((item) => [item.toolId, item]),
+    );
+    registriesReady = true;
+    $("#tool-count").textContent = String(tools.length);
+    const comparisonUpdated = $("#comparison-updated");
+    if (comparisonUpdated && typeof comparisonRegistry.updatedAt === "string") {
+      comparisonUpdated.textContent = comparisonRegistry.updatedAt;
+    }
+    renderProcessMap();
+    renderComparisonTable();
+    renderToolLibrary();
+    if (pendingState) {
+      const state = pendingState;
+      pendingState = null;
+      renderResult(state, true);
+    }
+  } catch (error) {
+    console.error(error);
+    registryFailed = true;
+    showRegistryError();
   }
-  const registry = await response.json();
-  const integrationRegistry = await integrationResponse.json();
-  const hostingRegistry = await hostingResponse.json();
-  const processRegistry = await processResponse.json();
-  const comparisonRegistry = await comparisonResponse.json();
-  tools = Array.isArray(registry.tools) ? registry.tools : [];
-  processSteps = Array.isArray(processRegistry.steps) ? processRegistry.steps : [];
-  feedbackLoops = Array.isArray(processRegistry.feedbackLoops) ? processRegistry.feedbackLoops : [];
-  comparisonTools = Array.isArray(comparisonRegistry.tools) ? comparisonRegistry.tools : [];
-  integrations = new Map(
-    (Array.isArray(integrationRegistry.integrations) ? integrationRegistry.integrations : []).map((item) => [
-      item.toolId,
-      item,
-    ]),
-  );
-  hosting = new Map(
-    (Array.isArray(hostingRegistry.tools) ? hostingRegistry.tools : []).map((item) => [item.toolId, item]),
-  );
-  document.querySelector("#tool-count").textContent = String(tools.length);
-  renderProcessMap();
-  renderComparisonTable();
-  renderToolLibrary();
-  bindEvents();
-  openLaunchCardFromHash();
-  updatePolisMode();
-  loadPolisStatus();
+}
 
-  apiKeyInput.value = sessionStorage.getItem("delib:openai-key") || "";
-  harmonicaKeyInput.value = sessionStorage.getItem("delib:harmonica-key") || "";
+async function fetchJson(path) {
+  const response = await fetch(path);
+  if (!response.ok) throw new Error(`${path} responded ${response.status}`);
+  return response.json();
+}
+
+function showRegistryError() {
+  const banner = $("#registry-error");
+  if (banner) {
+    banner.replaceChildren(
+      createElement("span", "", "工具目錄暫時讀不到，推薦與比較表無法顯示；直接啟用的表單仍可使用。"),
+      retryButton(),
+    );
+    banner.hidden = false;
+  }
+  const library = $("#tool-library");
+  if (library) library.replaceChildren(createElement("p", "empty-state", "工具目錄暫時讀不到；請稍後重試。"));
+  if (pendingState && resultSection) {
+    resultTitle.textContent = "工具目錄暫時讀不到";
+    $("#result-summary").replaceChildren(
+      document.createTextNode("推薦清單需要工具目錄才能產生。你的選擇已保留，"),
+      retryButton(),
+    );
+  }
+}
+
+function retryButton() {
+  const button = createElement("button", "text-button", "重試讀取");
+  button.type = "button";
+  button.addEventListener("click", loadRegistries);
+  return button;
+}
+
+function hideRegistryError() {
+  const banner = $("#registry-error");
+  if (banner) {
+    banner.hidden = true;
+    banner.replaceChildren();
+  }
+}
+
+function restoreLocalState() {
+  apiKeyInput.value = storageGet(OPENAI_KEY_STORAGE_KEY) || "";
+  harmonicaKeyInput.value = storageGet(HARMONICA_KEY_STORAGE_KEY) || "";
   restoreCallInInstance();
   restorePocketPolisInstance();
   restoreReceiptHandoff();
+}
+
+function handleEntryState() {
   const state = stateFromSearch(location.search);
-  if (state) renderResult(state, false);
+  if (state) {
+    renderResult(state, true);
+    return;
+  }
+  const params = new URLSearchParams(location.search);
+  const requestedGoal = params.get("start") || "";
+  if (location.hash === "#start" || requestedGoal) {
+    openPlanner(Object.hasOwn(OPTIONS.goal, requestedGoal) ? requestedGoal : null);
+  }
 }
 
 function bindEvents() {
   document.querySelectorAll("[data-start]").forEach((button) => {
     button.addEventListener("click", () => openPlanner(button.dataset.start || null));
   });
+  document.querySelectorAll("[data-start-handoff]").forEach((button) => {
+    button.addEventListener("click", openHandoffDialog);
+  });
   document.querySelectorAll("[data-close-dialog]").forEach((button) => {
-    button.addEventListener("click", () => plannerDialog.close());
+    button.addEventListener("click", () => button.closest("dialog")?.close());
   });
-  plannerDialog.addEventListener("click", (event) => {
-    if (event.target === plannerDialog) plannerDialog.close();
-  });
+  for (const dialog of [plannerDialog, handoffDialog]) {
+    dialog?.addEventListener("click", (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+  }
   plannerBack.addEventListener("click", () => showStep(currentStep - 1));
   plannerNext.addEventListener("click", () => {
     if (!validateStep(currentStep)) return;
@@ -153,6 +243,11 @@ function bindEvents() {
   plannerForm.addEventListener("submit", (event) => {
     event.preventDefault();
     if (!validateStep(currentStep)) return;
+    // Enter on a radio button submits the form; treat that as "next" until the last step.
+    if (currentStep < 3) {
+      showStep(currentStep + 1);
+      return;
+    }
     const state = formState();
     if (!normalizeState(state)) {
       plannerError.textContent = "還有一個選擇沒有完成。";
@@ -160,26 +255,45 @@ function bindEvents() {
     }
     const query = stateToSearch(state);
     history.pushState({}, "", `${location.pathname}?${query}#result`);
-    renderResult(state, true);
     plannerDialog.close();
+    renderResult(state, true);
   });
 
-  document.querySelector("#copy-link").addEventListener("click", copyShareLink);
-  document.querySelector("#download-json").addEventListener("click", downloadBundle);
-  document.querySelector("#download-markdown").addEventListener("click", downloadRunbook);
-  document.querySelectorAll("[data-open-agent]").forEach((button) => {
-    button.addEventListener("click", () => document.querySelector("#agent").scrollIntoView());
+  $("#handoff-plan")?.addEventListener("click", () => {
+    handoffDialog?.close();
+    openPlanner("followup");
   });
-  document.querySelectorAll("[data-start-agent]").forEach((button) => {
-    button.addEventListener("click", () => document.querySelector("#agent").scrollIntoView());
+  $("#handoff-open-form")?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const target = resolveResultUrl($("#handoff-url").value);
+    const error = $("#handoff-error");
+    if (!target) {
+      error.textContent = "只接受本站的成果頁網址，例如 /r/ 開頭的短網址或 /results/ 開頭的完整連結。";
+      $("#handoff-url").focus();
+      return;
+    }
+    error.textContent = "";
+    location.assign(target);
   });
 
-  document.querySelector("#tool-search").addEventListener("input", renderToolLibrary);
+  $("#copy-link").addEventListener("click", copyShareLink);
+  $("#download-json").addEventListener("click", downloadBundle);
+  $("#download-markdown").addEventListener("click", downloadRunbook);
+  document.querySelectorAll("[data-open-agent], [data-start-agent]").forEach((button) => {
+    button.addEventListener("click", () => {
+      $("#agent").scrollIntoView();
+      queueMicrotask(() => $("#openai-model")?.focus({ preventScroll: true }));
+    });
+  });
+
+  $("#tool-search").addEventListener("input", renderToolLibrary);
   document.querySelectorAll("[data-filter]").forEach((button) => {
+    button.setAttribute("aria-pressed", button.classList.contains("active") ? "true" : "false");
     button.addEventListener("click", () => {
       activeFilter = button.dataset.filter;
       document.querySelectorAll("[data-filter]").forEach((candidate) => {
         candidate.classList.toggle("active", candidate === button);
+        candidate.setAttribute("aria-pressed", candidate === button ? "true" : "false");
       });
       renderToolLibrary();
     });
@@ -195,7 +309,7 @@ function bindEvents() {
       renderComparisonTable();
     });
   });
-  document.querySelector("#comparison-more").addEventListener("click", () => {
+  $("#comparison-more").addEventListener("click", () => {
     comparisonExpanded = !comparisonExpanded;
     renderComparisonTable();
   });
@@ -211,58 +325,58 @@ function bindEvents() {
 
   apiKeyInput.addEventListener("input", () => {
     const key = apiKeyInput.value.trim();
-    if (key) sessionStorage.setItem("delib:openai-key", key);
-    else sessionStorage.removeItem("delib:openai-key");
+    if (key) storageSet(OPENAI_KEY_STORAGE_KEY, key);
+    else storageRemove(OPENAI_KEY_STORAGE_KEY);
   });
-  document.querySelector("#clear-key").addEventListener("click", () => {
-    sessionStorage.removeItem("delib:openai-key");
+  $("#clear-key").addEventListener("click", () => {
+    storageRemove(OPENAI_KEY_STORAGE_KEY);
     apiKeyInput.value = "";
     apiKeyInput.focus();
-    agentStatus.textContent = "這個分頁裡的 key 已清除。";
+    agentStatus.textContent = "這個分頁裡的金鑰已清除。";
   });
-  document.querySelector("#run-agent").addEventListener("click", runAgent);
-  document.querySelector("#call-in-form").addEventListener("submit", createCallIn);
-  document.querySelector("#pocket-polis-form").addEventListener("submit", createPocketPolis);
-  document.querySelector("#polis-form").addEventListener("submit", preparePolis);
-  document.querySelector("#agora-form").addEventListener("submit", prepareAgora);
-  document.querySelector("#heyform-form").addEventListener("submit", prepareHeyForm);
-  document.querySelector("#tttc-form").addEventListener("submit", prepareTttc);
-  document.querySelector("#harmonica-form").addEventListener("submit", createHarmonica);
-  document.querySelector("#power-ranker-form").addEventListener("submit", preparePowerRanker);
-  document.querySelector("#copy-power-ranker-link").addEventListener("click", copyPowerRankerLink);
-  document.querySelector("#copy-power-ranker-manage").addEventListener("click", copyPowerRankerManageLink);
+  $("#run-agent").addEventListener("click", runAgent);
+  $("#call-in-form").addEventListener("submit", createCallIn);
+  $("#pocket-polis-form").addEventListener("submit", createPocketPolis);
+  $("#polis-form").addEventListener("submit", preparePolis);
+  $("#agora-form").addEventListener("submit", prepareAgora);
+  $("#heyform-form").addEventListener("submit", prepareHeyForm);
+  $("#tttc-form").addEventListener("submit", prepareTttc);
+  $("#harmonica-form").addEventListener("submit", createHarmonica);
+  $("#power-ranker-form").addEventListener("submit", preparePowerRanker);
+  $("#copy-power-ranker-link").addEventListener("click", copyPowerRankerLink);
+  $("#copy-power-ranker-manage").addEventListener("click", copyPowerRankerManageLink);
   document.querySelectorAll('input[name="power-ranker-mode"]').forEach((input) => {
     input.addEventListener("change", updatePowerRankerMode);
   });
   harmonicaKeyInput.addEventListener("input", () => {
     const key = harmonicaKeyInput.value.trim();
-    if (key) sessionStorage.setItem("delib:harmonica-key", key);
-    else sessionStorage.removeItem("delib:harmonica-key");
+    if (key) storageSet(HARMONICA_KEY_STORAGE_KEY, key);
+    else storageRemove(HARMONICA_KEY_STORAGE_KEY);
   });
-  document.querySelector("#clear-harmonica-key").addEventListener("click", () => {
-    sessionStorage.removeItem("delib:harmonica-key");
+  $("#clear-harmonica-key").addEventListener("click", () => {
+    storageRemove(HARMONICA_KEY_STORAGE_KEY);
     harmonicaKeyInput.value = "";
     harmonicaKeyInput.focus();
-    document.querySelector("#harmonica-status").textContent = "這個分頁裡的 Harmonica key 已清除。";
+    $("#harmonica-status").textContent = "這個分頁裡的 Harmonica 金鑰已清除。";
   });
-  document.querySelector("#copy-harmonica-agent").addEventListener("click", () =>
+  $("#copy-harmonica-agent").addEventListener("click", () =>
     copyText(
       "請使用 Harmonica MCP 幫我設計並建立一個審議 session。先問清楚主題、目標、參與者、資料邊界、人工複核與結束條件；建立外部 session 前讓我確認。可用 npx harmonica-mcp 啟動，API key 只放在本機環境，不要貼進對話或網址。",
-      document.querySelector("#harmonica-status"),
+      $("#harmonica-status"),
       "Harmonica MCP 啟動提示已複製。",
     ),
   );
-  document.querySelector("#copy-polis-agent").addEventListener("click", () =>
+  $("#copy-polis-agent").addEventListener("click", () =>
     copyText(
       "請幫我連接 Delib 與 Pol.is：先開啟 Pol.is 的帳號整合頁；若需要登入就停下來讓我操作。登入後找出帳號自動產生的 Site ID，再讓我選擇貼進 Delib，或設成 Cloudflare Worker 的 POLIS_SITE_ID。不要讀取、保存或回傳我的密碼與 session cookie。",
-      document.querySelector("#polis-status"),
+      $("#polis-status"),
       "Agent 連接指令已複製；請貼到支援瀏覽器操作的 Agent。",
     ),
   );
-  document.querySelector("#copy-pocket-polis-agent").addEventListener("click", () =>
+  $("#copy-pocket-polis-agent").addEventListener("click", () =>
     copyText(
       "請先閱讀 https://github.com/mashbean/pocket-polis/blob/main/AGENT.md，協助我設計一輪 Pocket Polis 口袋審議。請問清楚主題、參與者、後續回覆責任與資料公開範圍，草擬 5–15 句彼此不重複、每句只有一個觀點的起始陳述；建立前列出標題、說明、陳述、投稿審核與 openData 設定讓我確認。只有我確認後，才能在我擁有的 https://polis.mashbean.net 建立；私人 admin URL 只回傳給我，不要貼到公開文件或 log。也可以用 npx --yes github:mashbean/pocket-polis install-skill 安裝 skill。",
-      document.querySelector("#pocket-polis-status"),
+      $("#pocket-polis-status"),
       "Pocket Polis Agent 提示已複製；建立外部活動前仍會請你確認。",
     ),
   );
@@ -270,7 +384,8 @@ function bindEvents() {
     input.addEventListener("change", updatePolisMode);
   });
   document.querySelectorAll("[data-copy-command]").forEach((button) => {
-    button.addEventListener("click", () => copyText("npx --yes github:mashbean/delib install-skill", agentStatus, "安裝指令已複製。"));
+    button.addEventListener("click", () =>
+      copyText("npx --yes github:mashbean/delib install-skill", agentStatus, "安裝指令已複製。"));
   });
   document.querySelectorAll("[data-copy-prompt]").forEach((button) => {
     button.addEventListener("click", () =>
@@ -286,6 +401,7 @@ function bindEvents() {
     if (state) renderResult(state, false);
     else {
       currentPlan = null;
+      pendingState = null;
       resultSection.hidden = true;
     }
   });
@@ -299,14 +415,35 @@ function openPlanner(presetGoal) {
     if (input) input.checked = true;
   }
   showStep(0);
-  plannerDialog.showModal();
+  if (!plannerDialog.open) plannerDialog.showModal();
   const firstChoice = plannerForm.querySelector('[data-step="0"] input:checked') || plannerForm.querySelector('[data-step="0"] input');
   queueMicrotask(() => firstChoice?.focus());
 }
 
+function openHandoffDialog() {
+  if (!handoffDialog) {
+    openPlanner("followup");
+    return;
+  }
+  $("#handoff-error").textContent = "";
+  if (!handoffDialog.open) handoffDialog.showModal();
+  queueMicrotask(() => handoffDialog.querySelector(".handoff-option")?.focus());
+}
+
+function resolveResultUrl(value) {
+  try {
+    const url = new URL(String(value || "").trim(), location.origin);
+    if (url.origin !== location.origin) return null;
+    if (!/^\/(r\/[a-f0-9]{16}|results\/(pocket-polis|power-ranker)(\.html)?)$/.test(url.pathname)) return null;
+    return url.href;
+  } catch {
+    return null;
+  }
+}
+
 function fillForm(state) {
-  for (const [name, value] of Object.entries(state)) {
-    const input = plannerForm.querySelector(`input[name="${name}"][value="${value}"]`);
+  for (const name of ["goal", "format", "scale", "privacy", "output"]) {
+    const input = plannerForm.querySelector(`input[name="${name}"][value="${state[name]}"]`);
     if (input) input.checked = true;
   }
 }
@@ -346,13 +483,26 @@ function formState() {
 }
 
 function renderResult(state, scroll) {
-  currentPlan = buildPlan(state, tools);
+  const normalized = normalizeState(state);
+  if (!normalized) return;
   resultSection.hidden = false;
-  document.querySelector("#result-title").textContent = RESULT_TITLES[currentPlan.goal];
-  document.querySelector("#result-summary").textContent = `${currentPlan.labels.format} · ${currentPlan.labels.scale} · ${currentPlan.labels.privacy}。目標是留下${currentPlan.labels.output}。`;
-  document.querySelector("#sensitive-warning").hidden = currentPlan.privacy !== "sensitive";
+  if (!registriesReady) {
+    pendingState = normalized;
+    resultTitle.textContent = registryFailed ? "工具目錄暫時讀不到" : "正在準備你的審議拼圖…";
+    $("#result-summary").textContent = registryFailed
+      ? "推薦清單需要工具目錄才能產生；請按上方的「重試讀取」。"
+      : "正在讀取工具目錄，通常幾秒內完成。";
+    if (registryFailed) showRegistryError();
+    if (scroll) focusResult();
+    return;
+  }
 
-  const gearRoot = document.querySelector("#offline-gears");
+  currentPlan = buildPlan(normalized, tools);
+  resultTitle.textContent = RESULT_TITLES[currentPlan.goal];
+  $("#result-summary").textContent = `${currentPlan.labels.format} · ${currentPlan.labels.scale} · ${currentPlan.labels.privacy}。目標是留下${currentPlan.labels.output}。`;
+  $("#sensitive-warning").hidden = currentPlan.privacy !== "sensitive";
+
+  const gearRoot = $("#offline-gears");
   gearRoot.replaceChildren(
     ...currentPlan.offlineGears.map((gear) => {
       const node = createElement("article", "gear");
@@ -361,10 +511,27 @@ function renderResult(state, scroll) {
     }),
   );
 
-  const toolRoot = document.querySelector("#recommended-tools");
-  toolRoot.replaceChildren(...currentPlan.tools.map(renderRecommendation));
+  const toolRoot = $("#recommended-tools");
+  if (currentPlan.tools.length) {
+    toolRoot.replaceChildren(...currentPlan.tools.map(renderRecommendation));
+  } else {
+    toolRoot.replaceChildren(
+      createElement(
+        "p",
+        "empty-state",
+        "目錄裡還沒有完全符合這組條件的工具。先用線下齒輪開始，或放寬人數與資料條件再試一次。",
+      ),
+    );
+  }
+  const shareInput = $("#share-url");
+  if (shareInput) shareInput.value = shareUrl();
   actionStatus.textContent = "";
-  if (scroll) resultSection.scrollIntoView({ block: "start" });
+  if (scroll) focusResult();
+}
+
+function focusResult() {
+  resultSection.scrollIntoView({ block: "start" });
+  queueMicrotask(() => resultTitle.focus({ preventScroll: true }));
 }
 
 function renderRecommendation(tool) {
@@ -405,19 +572,15 @@ function renderRecommendation(tool) {
 }
 
 function renderProcessMap() {
-  const track = document.querySelector("#process-track");
-  const loopContainer = document.querySelector("#feedback-loops");
+  const track = $("#process-track");
+  const loopContainer = $("#feedback-loops");
   if (!track || !loopContainer || !processSteps.length) return;
 
   const nodes = processSteps.map((step, index) => {
     const button = createElement("button", `process-step process-step-${index + 1}`);
     button.type = "button";
     button.dataset.processStep = step.id;
-    button.setAttribute(
-      "aria-label",
-      `${step.number} ${step.title}。人流：${step.humanFlow}。資料流：${step.dataFlow}。工具：${(step.tools || []).join("、")}`,
-    );
-    button.setAttribute("aria-pressed", index === 0 ? "true" : "false");
+    if (index === 0) button.setAttribute("aria-current", "step");
     const heading = createElement("span", "process-step-heading");
     heading.append(
       createProcessIcon(step.icon),
@@ -479,24 +642,25 @@ function selectProcessStep(stepId) {
   const step = processSteps.find((item) => item.id === stepId);
   if (!step) return;
   document.querySelectorAll("[data-process-step]").forEach((button) => {
-    button.setAttribute("aria-pressed", button.dataset.processStep === stepId ? "true" : "false");
+    if (button.dataset.processStep === stepId) button.setAttribute("aria-current", "step");
+    else button.removeAttribute("aria-current");
   });
-  document.querySelector("#process-detail-title").textContent = `${step.number} · ${step.title}`;
-  document.querySelector("#process-detail-description").textContent = step.detail;
-  document.querySelector("#process-detail-tools").textContent = (step.tools || []).join("、");
-  document.querySelector("#process-detail-gate").textContent = step.gate;
-  document.querySelector("#process-detail-output").textContent = step.output;
+  $("#process-detail-title").textContent = `${step.number} · ${step.title}`;
+  $("#process-detail-description").textContent = step.detail;
+  $("#process-detail-tools").textContent = (step.tools || []).join("、");
+  $("#process-detail-gate").textContent = step.gate;
+  $("#process-detail-output").textContent = step.output;
 }
 
 function renderComparisonTable() {
-  const body = document.querySelector("#comparison-body");
-  const empty = document.querySelector("#comparison-empty");
+  const body = $("#comparison-body");
+  const empty = $("#comparison-empty");
   if (!body || !empty) return;
   const matches = comparisonTools.filter(matchesComparisonFilter);
   const visible = comparisonExpanded ? matches : matches.slice(0, COMPARISON_PAGE_SIZE);
   body.replaceChildren(...visible.map(renderComparisonRow));
   empty.hidden = matches.length > 0;
-  const more = document.querySelector("#comparison-more");
+  const more = $("#comparison-more");
   more.hidden = matches.length <= COMPARISON_PAGE_SIZE;
   more.textContent = comparisonExpanded
     ? "收起工具列表"
@@ -603,7 +767,7 @@ function comparisonSourceLabel(status) {
 
 function renderToolLibrary() {
   if (!tools.length) return;
-  const term = document.querySelector("#tool-search")?.value.trim().toLocaleLowerCase("zh-Hant") || "";
+  const term = $("#tool-search")?.value.trim().toLocaleLowerCase("zh-Hant") || "";
   const matches = tools.filter((tool) => {
     const hostingPath = hosting.get(tool.id);
     if (activeFilter === "direct" && !launchableIntegration(tool.id)) return false;
@@ -623,8 +787,8 @@ function renderToolLibrary() {
       .toLocaleLowerCase("zh-Hant");
     return haystack.includes(term);
   });
-  document.querySelector("#tool-library").replaceChildren(...matches.map(renderToolCard));
-  document.querySelector("#no-tools").hidden = matches.length > 0;
+  $("#tool-library").replaceChildren(...matches.map(renderToolCard));
+  $("#no-tools").hidden = matches.length > 0;
 }
 
 function renderToolCard(tool) {
@@ -656,9 +820,8 @@ function renderToolCard(tool) {
 
 function launchableIntegration(toolId) {
   const integration = integrations.get(toolId);
-  return integration && ["managed-create", "credentialed-create", "embedded-workspace", "local-tool"].includes(integration.activation)
-    ? integration
-    : null;
+  if (!integration || !LAUNCHABLE_ACTIVATIONS.has(integration.activation)) return null;
+  return document.getElementById(`launch-${toolId}`) ? integration : null;
 }
 
 function launchButton(toolId, integration) {
@@ -667,7 +830,7 @@ function launchButton(toolId, integration) {
     "direct-launch",
     ["managed-create", "credentialed-create"].includes(integration.activation)
       ? "在這裡建立"
-      : integration.activation === "local-tool"
+      : ["local-tool", "local-or-ephemeral-room"].includes(integration.activation)
         ? "在這裡使用"
         : "在這裡開啟",
   );
@@ -677,38 +840,32 @@ function launchButton(toolId, integration) {
 }
 
 function launchTool(toolId) {
-  const target = document.querySelector(`#launch-${CSS.escape(toolId)}`);
+  const target = document.getElementById(`launch-${toolId}`);
   if (!target) return;
   openLaunchCard(target);
   if (currentPlan) {
     const suggestedTitle = RESULT_TITLES[currentPlan.goal];
-    if (toolId === "call-in" && !document.querySelector("#call-in-title").value) {
-      document.querySelector("#call-in-title").value = suggestedTitle;
-    }
-    if (toolId === "polis" && !document.querySelector("#polis-title").value) {
-      document.querySelector("#polis-title").value = suggestedTitle;
-    }
-    if (toolId === "pocket-polis" && !document.querySelector("#pocket-polis-title").value) {
-      document.querySelector("#pocket-polis-title").value = suggestedTitle;
-    }
-    if (toolId === "talk-to-the-city" && !document.querySelector("#tttc-title").value) {
-      document.querySelector("#tttc-title").value = suggestedTitle;
-    }
-    if (toolId === "harmonica" && !document.querySelector("#harmonica-topic").value) {
-      document.querySelector("#harmonica-topic").value = suggestedTitle;
-      document.querySelector("#harmonica-goal").value = currentPlan.tools
+    const prefill = {
+      "call-in": "#call-in-title",
+      polis: "#polis-title",
+      "pocket-polis": "#pocket-polis-title",
+      "talk-to-the-city": "#tttc-title",
+      harmonica: "#harmonica-topic",
+      "power-ranker": "#power-ranker-title",
+    }[toolId];
+    const field = prefill ? $(prefill) : null;
+    if (field && !field.value) field.value = suggestedTitle;
+    if (toolId === "harmonica" && !$("#harmonica-goal").value) {
+      $("#harmonica-goal").value = currentPlan.tools
         .map((tool) => tool.summary)
         .filter(Boolean)
         .slice(0, 2)
         .join(" ");
     }
-    if (toolId === "power-ranker" && !document.querySelector("#power-ranker-title").value) {
-      document.querySelector("#power-ranker-title").value = suggestedTitle;
-    }
   }
   target.scrollIntoView({ block: "start" });
   const firstInput = target.querySelector("input:not([type=checkbox]):not([type=radio])");
-  queueMicrotask(() => firstInput?.focus());
+  queueMicrotask(() => firstInput?.focus({ preventScroll: true }));
 }
 
 function openLaunchCard(card) {
@@ -723,49 +880,50 @@ function openLaunchCardFromHash() {
 }
 
 function updatePowerRankerMode() {
-  const roomMode = document.querySelector('input[name="power-ranker-mode"]:checked')?.value === "room";
-  document.querySelector("#power-ranker-room-fields").hidden = !roomMode;
-  document.querySelector("#power-ranker-local-preview").hidden = roomMode;
-  document.querySelector("#power-ranker-room-preview").hidden = !roomMode;
-  document.querySelector("#prepare-power-ranker").textContent = roomMode ? "建立短期收件室" : "準備排序頁";
+  const roomMode = $('input[name="power-ranker-mode"]:checked')?.value === "room";
+  $("#power-ranker-room-fields").hidden = !roomMode;
+  $("#power-ranker-local-preview").hidden = roomMode;
+  $("#power-ranker-room-preview").hidden = !roomMode;
+  $("#prepare-power-ranker").textContent = roomMode ? "建立短期收件室" : "準備排序頁";
 }
 
 async function preparePowerRanker(event) {
   event.preventDefault();
-  const status = document.querySelector("#power-ranker-status");
-  const confirm = document.querySelector("#power-ranker-confirm");
+  const status = $("#power-ranker-status");
+  const confirm = $("#power-ranker-confirm");
   if (!confirm.checked) {
     status.textContent = "先確認決策權限與題目資料邊界，再準備分享連結。";
     confirm.focus();
     return;
   }
 
-  const config = normalizeRankingConfig({
-    title: document.querySelector("#power-ranker-title").value,
-    items: document.querySelector("#power-ranker-items").value.split(/\r?\n/),
-  });
-  if (!config) {
-    status.textContent = "請填入問題與 3–10 個不重複項目；每個項目都要獨立一行。";
-    document.querySelector("#power-ranker-items").focus();
-    return;
-  }
-
-  const mode = document.querySelector('input[name="power-ranker-mode"]:checked')?.value || "local";
-  const button = document.querySelector("#prepare-power-ranker");
+  const button = $("#prepare-power-ranker");
   button.disabled = true;
   try {
+    const { normalizeRankingConfig, rankingConfigToHash } = await import("./power-ranker-core.js");
+    const config = normalizeRankingConfig({
+      title: $("#power-ranker-title").value,
+      items: $("#power-ranker-items").value.split(/\r?\n/),
+    });
+    if (!config) {
+      status.textContent = "請填入問題與 3–10 個不重複項目；每個項目都要獨立一行。";
+      $("#power-ranker-items").focus();
+      return;
+    }
+
+    const mode = $('input[name="power-ranker-mode"]:checked')?.value || "local";
     if (mode === "room") {
       status.textContent = "正在建立短期收件室；只會送出題目、選項與清除期限。";
       const data = await postJson("/api/integrations/power-ranker/rooms", {
         title: config.title,
         items: config.items,
-        retentionHours: Number(document.querySelector("#power-ranker-retention").value),
+        retentionHours: Number($("#power-ranker-retention").value),
         confirmed: true,
       });
       renderPowerRankerInstance(data);
       status.textContent = "收件室已建立。先保存私人管理連結，再分享公開參與連結。";
     } else {
-      const workspace = new URL("/integrations/power-ranker.html", location.origin);
+      const workspace = new URL("/integrations/power-ranker", location.origin);
       workspace.hash = rankingConfigToHash(config);
       renderPowerRankerInstance({ participantUrl: workspace.href, storedByDelib: false });
       status.textContent = "排序頁已在本機準備好；尚未建立帳號、專案或外部資料。";
@@ -780,60 +938,62 @@ async function preparePowerRanker(event) {
 
 function renderPowerRankerInstance(data) {
   const roomMode = data.storedByDelib === true;
-  document.querySelector("#power-ranker-workspace").href = data.participantUrl;
-  document.querySelector("#power-ranker-result-heading").textContent = roomMode
+  $("#power-ranker-workspace").href = data.participantUrl;
+  const linkInput = $("#power-ranker-link");
+  if (linkInput) {
+    linkInput.value = data.participantUrl;
+    linkInput.hidden = false;
+  }
+  $("#power-ranker-result-heading").textContent = roomMode
     ? "短期收件室準備好了"
     : "排序頁準備好了";
-  document.querySelector("#power-ranker-result-copy").textContent = roomMode
+  $("#power-ranker-result-copy").textContent = roomMode
     ? "先自己測試，再把公開連結分享給參與者；私人管理連結可以看彙整與提前刪除。"
     : "先自己試排一次，再分享給參與者；主辦者可在排序頁匯入多人結果。";
-  const privateLinks = document.querySelector("#power-ranker-private-links");
+  const privateLinks = $("#power-ranker-private-links");
   privateLinks.hidden = !roomMode;
   if (roomMode) {
-    document.querySelector("#power-ranker-manage").href = data.manageUrl;
-    const expires = new Intl.DateTimeFormat("zh-Hant-TW", { dateStyle: "long", timeStyle: "short" }).format(
-      new Date(data.expiresAt),
-    );
-    document.querySelector("#power-ranker-expiry").textContent = `資料預計保留到 ${expires}，也可以提前刪除。`;
+    $("#power-ranker-manage").href = data.manageUrl;
+    $("#power-ranker-expiry").textContent = `資料預計保留到 ${formatDateTime(data.expiresAt)}，也可以提前刪除。`;
   }
-  document.querySelector("#power-ranker-result").hidden = false;
+  $("#power-ranker-result").hidden = false;
 }
 
 function copyPowerRankerLink() {
-  const link = document.querySelector("#power-ranker-workspace");
+  const link = $("#power-ranker-workspace");
   if (!link.href) return;
-  copyText(link.href, document.querySelector("#power-ranker-status"), "參與連結已複製。");
+  copyText(link.href, $("#power-ranker-status"), "參與連結已複製。", $("#power-ranker-link"));
 }
 
 function copyPowerRankerManageLink() {
-  const link = document.querySelector("#power-ranker-manage");
+  const link = $("#power-ranker-manage");
   if (!link.href) return;
-  copyText(link.href, document.querySelector("#power-ranker-status"), "私人管理連結已複製，請放在安全的地方。 ");
+  copyText(link.href, $("#power-ranker-status"), "私人管理連結已複製，請放在安全的地方。");
 }
 
 async function createCallIn(event) {
   event.preventDefault();
-  const status = document.querySelector("#call-in-status");
-  const confirm = document.querySelector("#call-in-confirm");
+  const status = $("#call-in-status");
+  const confirm = $("#call-in-confirm");
   if (!confirm.checked) {
-    status.textContent = "先看完建立預覽，再勾選確認；這不是額外條款，只是防止誤建活動。";
+    status.textContent = "先看完建立預覽，再勾選確認；這一步只是避免誤建活動。";
     confirm.focus();
     return;
   }
 
-  const button = document.querySelector("#create-call-in");
+  const button = $("#create-call-in");
   button.disabled = true;
   button.textContent = "正在建立，大概幾秒鐘…";
   status.textContent = "只會送出活動名稱、說明與公開簡報網址；不會送出你的審議拼圖。";
   try {
     const data = await postJson("/api/integrations/call-in", {
-      title: document.querySelector("#call-in-title").value.trim(),
-      description: document.querySelector("#call-in-description").value.trim(),
-      deckUrl: document.querySelector("#call-in-deck").value.trim(),
+      title: $("#call-in-title").value.trim(),
+      description: $("#call-in-description").value.trim(),
+      deckUrl: $("#call-in-deck").value.trim(),
       locale: "zh-Hant-TW",
       confirmed: true,
     });
-    sessionStorage.setItem("delib:call-in-instance", JSON.stringify(data));
+    storageSet(CALL_IN_STORAGE_KEY, JSON.stringify(data));
     renderCallInInstance(data);
     status.textContent = "活動已建立。先把私人連結存到安全的地方，再分享參與頁。";
   } catch (error) {
@@ -845,67 +1005,63 @@ async function createCallIn(event) {
 }
 
 function restoreCallInInstance() {
-  const raw = sessionStorage.getItem("delib:call-in-instance");
-  if (!raw) return;
-  try {
-    const data = JSON.parse(raw);
-    if (data?.status === "ready" && data?.audienceUrl && data?.setupUrl) renderCallInInstance(data);
-    else sessionStorage.removeItem("delib:call-in-instance");
-  } catch {
-    sessionStorage.removeItem("delib:call-in-instance");
-  }
+  const data = storageGetJson(CALL_IN_STORAGE_KEY);
+  if (!data) return;
+  if (data?.status === "ready" && data?.audienceUrl && data?.setupUrl) renderCallInInstance(data);
+  else storageRemove(CALL_IN_STORAGE_KEY);
 }
 
-function restoreReceiptHandoff() {
-  const raw = sessionStorage.getItem(RECEIPT_HANDOFF_STORAGE_KEY);
+async function restoreReceiptHandoff() {
+  const raw = storageGet(RECEIPT_HANDOFF_STORAGE_KEY);
   if (!raw) return;
-  sessionStorage.removeItem(RECEIPT_HANDOFF_STORAGE_KEY);
+  storageRemove(RECEIPT_HANDOFF_STORAGE_KEY);
   try {
+    const { normalizeReceiptHandoff, RECEIPT_HANDOFF_TARGETS } = await import("./receipt-handoff-core.js");
     const handoff = normalizeReceiptHandoff(JSON.parse(raw));
     if (!handoff) return;
-    applyReceiptHandoff(handoff);
+    applyReceiptHandoff(handoff, RECEIPT_HANDOFF_TARGETS);
   } catch {
     // Invalid or expired drafts are consumed without touching any form.
   }
 }
 
-function applyReceiptHandoff(handoff) {
+function applyReceiptHandoff(handoff, targets) {
   const draft = handoff.draft;
   let focusTarget = null;
   if (handoff.target === "call-in") {
-    document.querySelector("#call-in-title").value = draft.title;
-    document.querySelector("#call-in-description").value = draft.description;
-    document.querySelector("#call-in-form .advanced-fields").open = true;
-    document.querySelector("#call-in-confirm").checked = false;
-    document.querySelector("#call-in-result").hidden = true;
-    focusTarget = document.querySelector("#call-in-deck");
+    $("#call-in-title").value = draft.title;
+    $("#call-in-description").value = draft.description;
+    $("#call-in-form .advanced-fields").open = true;
+    $("#call-in-confirm").checked = false;
+    $("#call-in-result").hidden = true;
+    focusTarget = $("#call-in-deck");
   } else if (handoff.target === "harmonica") {
-    document.querySelector("#harmonica-topic").value = draft.topic;
-    document.querySelector("#harmonica-goal").value = draft.goal;
-    document.querySelector("#harmonica-context").value = draft.context;
-    document.querySelector("#harmonica-critical").value = draft.critical;
-    document.querySelector("#harmonica-questions").value = draft.questions.join("\n");
-    document.querySelector("#harmonica-form .advanced-fields").open = true;
-    document.querySelector("#harmonica-confirm").checked = false;
-    document.querySelector("#harmonica-result").hidden = true;
-    focusTarget = document.querySelector("#harmonica-topic");
+    $("#harmonica-topic").value = draft.topic;
+    $("#harmonica-goal").value = draft.goal;
+    $("#harmonica-context").value = draft.context;
+    $("#harmonica-critical").value = draft.critical;
+    $("#harmonica-questions").value = draft.questions.join("\n");
+    $("#harmonica-form .advanced-fields").open = true;
+    $("#harmonica-confirm").checked = false;
+    $("#harmonica-result").hidden = true;
+    focusTarget = $("#harmonica-topic");
   } else if (handoff.target === "talk-to-the-city") {
-    document.querySelector("#tttc-title").value = draft.title;
-    document.querySelector("#tttc-description").value = draft.description;
-    document.querySelector("#tttc-confirm").checked = false;
-    document.querySelector("#tttc-result").hidden = true;
-    focusTarget = document.querySelector("#tttc-title");
+    $("#tttc-title").value = draft.title;
+    $("#tttc-description").value = draft.description;
+    $("#tttc-confirm").checked = false;
+    $("#tttc-result").hidden = true;
+    focusTarget = $("#tttc-title");
   } else {
-    const siteMode = document.querySelector('input[name="polis-mode"][value="site"]');
+    const siteMode = $('input[name="polis-mode"][value="site"]');
     siteMode.checked = true;
-    document.querySelector("#polis-title").value = draft.title;
-    document.querySelector("#polis-confirm").checked = false;
-    document.querySelector("#polis-result").hidden = true;
+    $("#polis-title").value = draft.title;
+    $("#polis-confirm").checked = false;
+    $("#polis-result").hidden = true;
     updatePolisMode();
-    focusTarget = document.querySelector("#polis-title");
+    focusTarget = $("#polis-title");
   }
 
-  const card = document.querySelector(`#${RECEIPT_HANDOFF_TARGETS[handoff.target].hash}`);
+  const card = document.getElementById(targets[handoff.target].hash);
   openLaunchCard(card);
   const form = card.querySelector(".launch-form");
   const toast = document.createElement("section");
@@ -914,7 +1070,7 @@ function applyReceiptHandoff(handoff) {
   const heading = document.createElement("strong");
   heading.textContent = "已從成果收據帶入草稿";
   const summary = document.createElement("p");
-  summary.textContent = `${handoff.source.title} → ${RECEIPT_HANDOFF_TARGETS[handoff.target].label}`;
+  summary.textContent = `${handoff.source.title} → ${targets[handoff.target].label}`;
   const boundary = document.createElement("p");
   boundary.textContent = "尚未建立任何外部活動，也沒有上傳參與資料。草稿暫存已刪除；請逐欄檢查後再勾選確認。";
   toast.append(heading, summary, boundary);
@@ -924,35 +1080,31 @@ function applyReceiptHandoff(handoff) {
 }
 
 function renderCallInInstance(data) {
-  document.querySelector("#call-in-audience").href = data.audienceUrl;
-  document.querySelector("#call-in-presenter").href = data.presenterUrl;
-  document.querySelector("#call-in-setup").href = data.setupUrl;
-  document.querySelector("#call-in-moderator").href = data.moderatorUrl;
-  const expires = new Intl.DateTimeFormat("zh-Hant-TW", { dateStyle: "long", timeStyle: "short" }).format(
-    new Date(data.expiresAt),
-  );
-  document.querySelector("#call-in-expiry").textContent = `預計保留到 ${expires}。`;
-  document.querySelector("#call-in-result").hidden = false;
+  $("#call-in-audience").href = data.audienceUrl;
+  $("#call-in-presenter").href = data.presenterUrl;
+  $("#call-in-setup").href = data.setupUrl;
+  $("#call-in-moderator").href = data.moderatorUrl;
+  $("#call-in-expiry").textContent = `預計保留到 ${formatDateTime(data.expiresAt)}。`;
+  $("#call-in-result").hidden = false;
 }
 
 async function createPocketPolis(event) {
   event.preventDefault();
-  const status = document.querySelector("#pocket-polis-status");
-  const confirm = document.querySelector("#pocket-polis-confirm");
+  const status = $("#pocket-polis-status");
+  const confirm = $("#pocket-polis-confirm");
   if (!confirm.checked) {
     status.textContent = "先確認起始陳述、審核方式、公開範圍與主辦者責任。";
     confirm.focus();
     return;
   }
 
-  const seedStatements = document
-    .querySelector("#pocket-polis-seeds")
+  const seedStatements = $("#pocket-polis-seeds")
     .value.split(/\r?\n/)
     .map((statement) => statement.trim())
     .filter(Boolean);
-  const button = document.querySelector("#create-pocket-polis");
-  const title = document.querySelector("#pocket-polis-title").value.trim();
-  const description = document.querySelector("#pocket-polis-description").value.trim();
+  const button = $("#create-pocket-polis");
+  const title = $("#pocket-polis-title").value.trim();
+  const description = $("#pocket-polis-description").value.trim();
   button.disabled = true;
   status.textContent = "正在建立口袋審議與三種連結…";
   try {
@@ -960,18 +1112,21 @@ async function createPocketPolis(event) {
       title,
       description,
       seedStatements,
-      autoApprove: document.querySelector("#pocket-polis-auto-approve").checked,
-      allowSubmissions: document.querySelector("#pocket-polis-allow-submissions").checked,
-      openData: document.querySelector("#pocket-polis-open-data").checked,
+      autoApprove: $("#pocket-polis-auto-approve").checked,
+      allowSubmissions: $("#pocket-polis-allow-submissions").checked,
+      openData: $("#pocket-polis-open-data").checked,
       confirmed: true,
     });
-    renderPocketPolisInstance(data);
-    sessionStorage.setItem(POCKET_POLIS_STORAGE_KEY, JSON.stringify(data));
-    sessionStorage.setItem(
+    // Persist before rendering: the private admin link must survive a display glitch.
+    storageSet(POCKET_POLIS_STORAGE_KEY, JSON.stringify(data));
+    storageSet(
       POCKET_POLIS_DATA_STORAGE_KEY,
       JSON.stringify({ title, description, reportUrl: data.reportUrl }),
     );
-    status.textContent = "活動已建立；請先測試參與頁，並把私人管理連結交給真正的主辦者。";
+    const rendered = renderPocketPolisInstance(data);
+    status.textContent = rendered.strict
+      ? "活動已建立；請先測試參與頁，並把私人管理連結交給真正的主辦者。"
+      : "活動已建立，但連結格式和預期不同；請先到 Pocket Polis 管理頁確認，再分享參與連結。";
   } catch (error) {
     status.textContent = error instanceof Error ? error.message : "Pocket Polis 暫時沒有完成建立。";
   } finally {
@@ -980,33 +1135,50 @@ async function createPocketPolis(event) {
 }
 
 function restorePocketPolisInstance() {
-  const saved = sessionStorage.getItem(POCKET_POLIS_STORAGE_KEY);
-  if (!saved) return;
+  const data = storageGetJson(POCKET_POLIS_STORAGE_KEY);
+  if (!data) return;
   try {
-    const data = JSON.parse(saved);
     renderPocketPolisInstance(data);
-    if (!sessionStorage.getItem(POCKET_POLIS_DATA_STORAGE_KEY)) {
-      sessionStorage.setItem(
+    if (!storageGet(POCKET_POLIS_DATA_STORAGE_KEY)) {
+      storageSet(
         POCKET_POLIS_DATA_STORAGE_KEY,
         JSON.stringify({ title: data.title, description: "", reportUrl: data.reportUrl }),
       );
     }
-    document.querySelector("#pocket-polis-status").textContent = "已復原這個分頁剛建立的三種連結。";
+    $("#pocket-polis-status").textContent = "已復原這個分頁剛建立的三種連結。";
   } catch {
-    sessionStorage.removeItem(POCKET_POLIS_STORAGE_KEY);
+    storageRemove(POCKET_POLIS_STORAGE_KEY);
   }
 }
 
 function renderPocketPolisInstance(data) {
   const serviceOrigin = validateServiceOrigin(data.serviceOrigin);
-  const participateUrl = validatePocketPolisUrl(data.participateUrl, "c", false, serviceOrigin);
-  const reportUrl = validatePocketPolisUrl(data.reportUrl, "r", false, serviceOrigin);
-  const adminUrl = validatePocketPolisUrl(data.adminUrl, "a", true, serviceOrigin);
+  const strict = {
+    participate: validatePocketPolisUrl(data.participateUrl, "c", false, serviceOrigin),
+    report: validatePocketPolisUrl(data.reportUrl, "r", false, serviceOrigin),
+    admin: validatePocketPolisUrl(data.adminUrl, "a", true, serviceOrigin),
+  };
+  const isStrict = Boolean(strict.participate && strict.report && strict.admin);
+  // Fall back to a plain HTTPS check so an upstream format change never hides
+  // the only copy of the organizer's admin link.
+  const participateUrl = strict.participate || httpsUrlOrNull(data.participateUrl);
+  const reportUrl = strict.report || httpsUrlOrNull(data.reportUrl);
+  const adminUrl = strict.admin || httpsUrlOrNull(data.adminUrl);
   if (!participateUrl || !reportUrl || !adminUrl) throw new Error("Pocket Polis 連結格式不完整");
-  document.querySelector("#pocket-polis-participate").href = participateUrl;
-  document.querySelector("#pocket-polis-report").href = reportUrl;
-  document.querySelector("#pocket-polis-admin").href = adminUrl;
-  document.querySelector("#pocket-polis-result").hidden = false;
+  $("#pocket-polis-participate").href = participateUrl;
+  $("#pocket-polis-report").href = reportUrl;
+  $("#pocket-polis-admin").href = adminUrl;
+  $("#pocket-polis-result").hidden = false;
+  return { strict: isStrict };
+}
+
+function httpsUrlOrNull(value) {
+  try {
+    const parsed = new URL(String(value));
+    return parsed.protocol === "https:" && !parsed.username && !parsed.password ? parsed.toString() : null;
+  } catch {
+    return null;
+  }
 }
 
 function validateServiceOrigin(value) {
@@ -1038,15 +1210,15 @@ function validatePocketPolisUrl(value, route, requiresToken, serviceOrigin) {
 }
 
 function updatePolisMode() {
-  const mode = document.querySelector('input[name="polis-mode"]:checked')?.value || "existing";
-  const existing = document.querySelector("#polis-existing-fields");
-  const site = document.querySelector("#polis-site-fields");
+  const mode = $('input[name="polis-mode"]:checked')?.value || "existing";
+  const existing = $("#polis-existing-fields");
+  const site = $("#polis-site-fields");
   existing.hidden = mode !== "existing";
   site.hidden = mode !== "site";
-  document.querySelector("#polis-conversation").required = mode === "existing";
-  document.querySelector("#polis-site-id").required = mode === "site" && !polisDeploymentConnected;
-  document.querySelector("#polis-title").required = mode === "site";
-  document.querySelector("#open-polis").textContent =
+  $("#polis-conversation").required = mode === "existing";
+  $("#polis-site-id").required = mode === "site" && !polisDeploymentConnected;
+  $("#polis-title").required = mode === "site";
+  $("#open-polis").textContent =
     mode === "existing" ? "開啟 Pol.is 工作區" : "準備新的 Pol.is 對話";
 }
 
@@ -1057,8 +1229,8 @@ async function loadPolisStatus() {
     const data = await response.json();
     polisDeploymentConnected = data.configured === true;
     if (polisDeploymentConnected) {
-      document.querySelector("#polis-site-id").placeholder = "部署時已連接，可留白";
-      document.querySelector("#polis-site-note").textContent =
+      $("#polis-site-id").placeholder = "部署時已連接，可留白";
+      $("#polis-site-note").textContent =
         "這個 Delib 部署已連接 Pol.is Site ID；留白即可自動使用。Site ID 是公開識別碼，不是密碼。";
       updatePolisMode();
     }
@@ -1069,28 +1241,27 @@ async function loadPolisStatus() {
 
 async function preparePolis(event) {
   event.preventDefault();
-  const status = document.querySelector("#polis-status");
-  const confirm = document.querySelector("#polis-confirm");
+  const status = $("#polis-status");
+  const confirm = $("#polis-confirm");
   if (!confirm.checked) {
     status.textContent = "先確認這個畫面會連到 Pol.is；如果是新對話，第一次開啟才會真的建立。";
     confirm.focus();
     return;
   }
-  const mode = document.querySelector('input[name="polis-mode"]:checked')?.value || "existing";
-  const button = document.querySelector("#open-polis");
+  const mode = $('input[name="polis-mode"]:checked')?.value || "existing";
+  const button = $("#open-polis");
   button.disabled = true;
   status.textContent = mode === "existing" ? "正在檢查對話網址…" : "正在準備一個可復原的工作區網址…";
   try {
     const data = await postJson("/api/integrations/polis", {
       mode,
-      conversation: document.querySelector("#polis-conversation").value.trim(),
-      siteId: document.querySelector("#polis-site-id").value.trim(),
-      title: document.querySelector("#polis-title").value.trim(),
+      conversation: $("#polis-conversation").value.trim(),
+      siteId: $("#polis-site-id").value.trim(),
+      title: $("#polis-title").value.trim(),
       confirmed: true,
     });
-    const workspace = document.querySelector("#polis-workspace");
-    workspace.href = data.workspaceUrl;
-    document.querySelector("#polis-result").hidden = false;
+    $("#polis-workspace").href = data.workspaceUrl;
+    $("#polis-result").hidden = false;
     status.textContent =
       data.writesWhenOpened === true
         ? "工作區網址已準備好；按下開啟時，Pol.is 才會新增對話。"
@@ -1105,23 +1276,23 @@ async function preparePolis(event) {
 
 async function prepareHeyForm(event) {
   event.preventDefault();
-  const status = document.querySelector("#heyform-status");
-  const confirm = document.querySelector("#heyform-confirm");
+  const status = $("#heyform-status");
+  const confirm = $("#heyform-confirm");
   if (!confirm.checked) {
     status.textContent = "先確認回答會直接交給 HeyForm，而且表單已說明資料用途與保存方式。";
     confirm.focus();
     return;
   }
-  const button = document.querySelector("#open-heyform");
+  const button = $("#open-heyform");
   button.disabled = true;
   status.textContent = "正在檢查公開表單網址…";
   try {
     const data = await postJson("/api/integrations/heyform", {
-      form: document.querySelector("#heyform-url").value.trim(),
+      form: $("#heyform-url").value.trim(),
       confirmed: true,
     });
-    document.querySelector("#heyform-workspace").href = data.workspaceUrl;
-    document.querySelector("#heyform-result").hidden = false;
+    $("#heyform-workspace").href = data.workspaceUrl;
+    $("#heyform-result").hidden = false;
     status.textContent = "工作區網址已準備好；Delib 不會接收或保存表單回答。";
   } catch (error) {
     status.textContent = error instanceof Error ? error.message : "HeyForm 工作區暫時沒有準備好。";
@@ -1132,23 +1303,23 @@ async function prepareHeyForm(event) {
 
 async function prepareAgora(event) {
   event.preventDefault();
-  const status = document.querySelector("#agora-status");
-  const confirm = document.querySelector("#agora-confirm");
+  const status = $("#agora-status");
+  const confirm = $("#agora-confirm");
   if (!confirm.checked) {
     status.textContent = "先確認登入、意見、比較與投票會直接交給 Agora。";
     confirm.focus();
     return;
   }
-  const button = document.querySelector("#open-agora");
+  const button = $("#open-agora");
   button.disabled = true;
   status.textContent = "正在檢查官方公開對話網址…";
   try {
     const data = await postJson("/api/integrations/agora", {
-      conversation: document.querySelector("#agora-url").value.trim(),
+      conversation: $("#agora-url").value.trim(),
       confirmed: true,
     });
-    document.querySelector("#agora-workspace").href = data.workspaceUrl;
-    document.querySelector("#agora-result").hidden = false;
+    $("#agora-workspace").href = data.workspaceUrl;
+    $("#agora-result").hidden = false;
     status.textContent = "工作區網址已準備好；Delib 不會接收或保存 Agora 的參與資料。";
   } catch (error) {
     status.textContent = error instanceof Error ? error.message : "Agora 工作區暫時沒有準備好。";
@@ -1159,24 +1330,24 @@ async function prepareAgora(event) {
 
 async function prepareTttc(event) {
   event.preventDefault();
-  const status = document.querySelector("#tttc-status");
-  const confirm = document.querySelector("#tttc-confirm");
+  const status = $("#tttc-status");
+  const confirm = $("#tttc-confirm");
   if (!confirm.checked) {
     status.textContent = "先確認資料已去識別，且分析結果發布前會有人逐項複核。";
     confirm.focus();
     return;
   }
-  const button = document.querySelector("#open-tttc");
+  const button = $("#open-tttc");
   button.disabled = true;
   status.textContent = "正在準備官方建立工作區；目前不會上傳資料或建立報告…";
   try {
     const data = await postJson("/api/integrations/tttc", {
-      title: document.querySelector("#tttc-title").value.trim(),
-      description: document.querySelector("#tttc-description").value.trim(),
+      title: $("#tttc-title").value.trim(),
+      description: $("#tttc-description").value.trim(),
       confirmed: true,
     });
-    document.querySelector("#tttc-workspace").href = data.workspaceUrl;
-    document.querySelector("#tttc-result").hidden = false;
+    $("#tttc-workspace").href = data.workspaceUrl;
+    $("#tttc-result").hidden = false;
     status.textContent = "工作區已準備好；登入、CSV 與模型處理都不會經過 Delib。";
   } catch (error) {
     status.textContent = error instanceof Error ? error.message : "Talk to the City 工作區暫時沒有準備好。";
@@ -1187,8 +1358,8 @@ async function prepareTttc(event) {
 
 async function createHarmonica(event) {
   event.preventDefault();
-  const status = document.querySelector("#harmonica-status");
-  const confirm = document.querySelector("#harmonica-confirm");
+  const status = $("#harmonica-status");
+  const confirm = $("#harmonica-confirm");
   const key = harmonicaKeyInput.value.trim();
   if (!key) {
     status.textContent = "請先貼上 Harmonica API key；也可以改用 MCP 讓自己的 Agent 建立。";
@@ -1201,13 +1372,12 @@ async function createHarmonica(event) {
     return;
   }
 
-  const button = document.querySelector("#create-harmonica");
+  const button = $("#create-harmonica");
   button.disabled = true;
   button.textContent = "正在建立，大概幾秒鐘…";
-  status.textContent = "主題、目標與選填情境將送到 Harmonica；key 不會被 Delib 保存。";
+  status.textContent = "主題、目標與選填情境將送到 Harmonica；金鑰不會被 Delib 保存。";
   try {
-    const questions = document
-      .querySelector("#harmonica-questions")
+    const questions = $("#harmonica-questions")
       .value.split(/\r?\n/)
       .map((line) => line.trim())
       .filter(Boolean)
@@ -1215,19 +1385,19 @@ async function createHarmonica(event) {
     const data = await postJson(
       "/api/integrations/harmonica",
       {
-        topic: document.querySelector("#harmonica-topic").value.trim(),
-        goal: document.querySelector("#harmonica-goal").value.trim(),
-        context: document.querySelector("#harmonica-context").value.trim(),
-        critical: document.querySelector("#harmonica-critical").value.trim(),
+        topic: $("#harmonica-topic").value.trim(),
+        goal: $("#harmonica-goal").value.trim(),
+        context: $("#harmonica-context").value.trim(),
+        critical: $("#harmonica-critical").value.trim(),
         questions,
         crossPollination: false,
         confirmed: true,
       },
       { "X-Harmonica-Key": key },
     );
-    document.querySelector("#harmonica-workspace").href = data.workspaceUrl;
-    document.querySelector("#harmonica-manage").href = data.manageUrl;
-    document.querySelector("#harmonica-result").hidden = false;
+    $("#harmonica-workspace").href = data.workspaceUrl;
+    $("#harmonica-manage").href = data.manageUrl;
+    $("#harmonica-result").hidden = false;
     status.textContent = "Session 已建立；先自己走一次參與流程，再分享公開連結。";
   } catch (error) {
     status.textContent = error instanceof Error ? error.message : "Harmonica 暫時沒有完成建立。";
@@ -1237,26 +1407,17 @@ async function createHarmonica(event) {
   }
 }
 
-async function postJson(url, body, extraHeaders = {}) {
-  const response = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...extraHeaders },
-    body: JSON.stringify(body),
-  });
-  let data;
-  try {
-    data = await response.json();
-  } catch {
-    throw new Error("工具回應不完整，這不是你的輸入問題；稍後再試一次。");
-  }
-  if (!response.ok) throw new Error(data.error || "工具暫時沒有完成；稍後再試一次。");
-  return data;
-}
-
 async function copyShareLink() {
-  const shareUrl = new URL(location.href);
-  shareUrl.hash = "result";
-  await copyText(shareUrl.toString(), actionStatus, "成果連結已複製；連結只包含固定選項，沒有自由文字。");
+  if (!currentPlan) {
+    actionStatus.textContent = "推薦清單還沒產生，連結稍後再複製。";
+    return;
+  }
+  await copyText(
+    shareUrl(),
+    actionStatus,
+    "成果連結已複製；連結只包含固定選項，沒有自由文字。",
+    $("#share-url"),
+  );
 }
 
 function downloadBundle() {
@@ -1279,7 +1440,7 @@ async function runAgent() {
     return;
   }
   const key = apiKeyInput.value.trim();
-  const consent = document.querySelector("#agent-consent").checked;
+  const consent = $("#agent-consent").checked;
   if (!key) {
     agentStatus.textContent = "請貼上自己的 OpenAI API key，或改用右邊的 skill。";
     apiKeyInput.focus();
@@ -1287,31 +1448,26 @@ async function runAgent() {
   }
   if (!consent) {
     agentStatus.textContent = "請先確認補充說明的資料邊界。";
-    document.querySelector("#agent-consent").focus();
+    $("#agent-consent").focus();
     return;
   }
 
-  const button = document.querySelector("#run-agent");
+  const button = $("#run-agent");
   button.disabled = true;
   button.textContent = "正在整理…";
-  agentStatus.textContent = "只送出這次流程與你填的補充說明；不會把 key 寫進資料庫。";
+  agentStatus.textContent = "只送出這次流程與你填的補充說明；不會把金鑰寫進資料庫。";
   agentOutput.hidden = true;
 
   try {
-    const response = await fetch("/api/agent", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-OpenAI-Key": key,
-      },
-      body: JSON.stringify({
-        model: document.querySelector("#openai-model").value.trim(),
-        context: document.querySelector("#agent-context").value.trim(),
+    const data = await postJson(
+      "/api/agent",
+      {
+        model: $("#openai-model").value.trim(),
+        context: $("#agent-context").value.trim(),
         plan: currentPlan,
-      }),
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "AI 暫時無法完成");
+      },
+      { "X-OpenAI-Key": key },
+    );
     agentOutput.textContent = data.text;
     agentOutput.hidden = false;
     agentStatus.textContent = `已由 ${data.model} 產生；使用前請逐段人工複核。`;
@@ -1329,37 +1485,10 @@ function shareUrl() {
   return url.toString();
 }
 
-async function copyText(value, statusElement, message) {
-  try {
-    await navigator.clipboard.writeText(value);
-    statusElement.textContent = message;
-  } catch {
-    statusElement.textContent = "瀏覽器沒有開放剪貼簿；請手動選取並複製。";
-  }
-}
-
-function downloadFile(filename, contents, type) {
-  const url = URL.createObjectURL(new Blob([contents], { type: `${type};charset=utf-8` }));
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = filename;
-  document.body.append(link);
-  link.click();
-  link.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 0);
-}
-
 function externalLink(label, href) {
   const link = createElement("a", "", label);
   link.href = href;
   link.target = "_blank";
   link.rel = "noreferrer";
   return link;
-}
-
-function createElement(tag, className, text) {
-  const element = document.createElement(tag);
-  if (className) element.className = className;
-  if (text !== undefined) element.textContent = text;
-  return element;
 }

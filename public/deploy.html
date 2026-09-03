@@ -21,24 +21,24 @@
       <div class="wrap deployment-wrap">
         <header class="workspace-heading">
           <div>
-            <p class="section-kicker">Deployable, with honest boundaries</p>
+            <p class="section-kicker">能部署的，誠實說清楚邊界</p>
             <h1>把能一鍵部署的，真的放在一起。</h1>
-            <p class="section-lede">目前有 3 個可重現的 Cloudflare 部署配方，涵蓋 4 個站內齒輪。其他工具會清楚說明需要共用主機、上游帳號或先整修的原因。</p>
+            <p id="deployment-lede" class="section-lede">目前有 3 個可重現的 Cloudflare 部署配方，涵蓋 4 個站內齒輪。其他工具會清楚說明需要共用主機、上游帳號或先整修的原因。</p>
           </div>
           <span id="deployment-updated" class="status-chip"></span>
         </header>
         <aside class="workspace-trust" aria-label="部署承諾">
           <strong>一鍵的定義</strong>
-          <span>按鈕必須連到公開 repo 與可重現的 Cloudflare 部署流程。</span>
+          <span>按鈕必須連到公開 repo 與可重現的 Cloudflare 部署流程；每張卡片會標明驗證到哪一步。</span>
           <span>有原始碼、Docker 或 iframe，不等於免費一鍵部署。</span>
         </aside>
         <section id="one-click" aria-labelledby="one-click-heading">
-          <p class="section-kicker">Verified recipes</p>
+          <p class="section-kicker">可重現的配方</p>
           <h2 id="one-click-heading">現在可以部署</h2>
           <div id="deployment-recipes" class="deployment-grid"></div>
         </section>
         <section id="operator" class="operator-section" aria-labelledby="operator-heading">
-          <p class="section-kicker">Operator paths</p>
+          <p class="section-kicker">維運路徑</p>
           <h2 id="operator-heading">有原始碼，但需要真正的維運者</h2>
           <p class="section-lede">這些工具不是被排除；它們只是不能被誤寫成 GitHub + Cloudflare 免費單 Worker。</p>
           <div id="operator-paths" class="operator-grid"></div>
@@ -46,7 +46,7 @@
         <section class="receipt-actions">
           <strong>想加入下一個部署配方？</strong>
           <p>請提供可重現的 build、授權、資料出口、保存／刪除方式與最低維運責任；不要只貼 demo 網址。</p>
-          <div class="result-actions"><a class="button button-primary" href="/feedback.html?phase=deployment">提交開發者回饋</a><a class="button button-ghost" href="https://github.com/mashbean/delib" target="_blank" rel="noreferrer">查看 Delib source ↗</a></div>
+          <div class="result-actions"><a class="button button-primary" href="/feedback?phase=deployment">提交開發者回饋</a><a class="button button-ghost" href="https://github.com/mashbean/delib" target="_blank" rel="noreferrer">查看 Delib source ↗</a></div>
         </section>
       </div>
     </main>
