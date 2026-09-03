@@ -786,9 +786,10 @@ fieldset > p { color: var(--muted); margin: 7px 0 22px; }
   .section { padding: 64px 0; }
   .site-header nav > a { display: none; }
   .site-header nav { gap: 8px; }
-  .mobile-nav { display: block; }
-  /* Keep brand, menu and call to action on one row without clipping at 320–420px. */
-  .header-inner { gap: 10px; min-height: 60px; }
+  .site-header .mobile-nav { display: block; }
+  /* Keep brand, menu and call to action on one row at 375px; let the nav wrap under the brand on narrower phones instead of clipping. */
+  .header-inner { gap: 6px 10px; min-height: 60px; flex-wrap: wrap; }
+  .brand, .brand > span, .mobile-nav > summary { white-space: nowrap; }
   .brand { font-size: .98rem; gap: 7px; }
   .brand-mark { width: 30px; height: 30px; font-size: 1.1rem; }
   .site-header nav .button-primary { min-height: 36px; padding: 6px 10px; font-size: .82rem; white-space: nowrap; }
