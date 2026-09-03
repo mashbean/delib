@@ -64,7 +64,7 @@ jobs:
           token="$(printf '%s' "$CLOUDFLARE_API_TOKEN" | tr -d '[:space:]')"
           account="$(printf '%s' "$CLOUDFLARE_ACCOUNT_ID" | tr -d '[:space:]')"
           echo "::add-mask::$token"
-          echo "token length after trim: ${#token} (a Cloudflare API token is 40 characters)"
+          echo "token length after trim: ${#token}"
           echo "account id length after trim: ${#account} (expected 32)"
           verify="$(curl -s https://api.cloudflare.com/client/v4/user/tokens/verify -H "Authorization: Bearer $token")"
           echo "verify: $(printf '%s' "$verify" | jq -c '{success, status: .result.status, errors}')"
@@ -72,6 +72,9 @@ jobs:
             echo "::error::CLOUDFLARE_API_TOKEN is not a valid, active Cloudflare API token (see verify output above)."
             exit 1
           fi
+          # Which accounts the token can see (ids only) helps spot a token scoped to the wrong account.
+          echo "accounts visible to token: $(curl -s 'https://api.cloudflare.com/client/v4/accounts?per_page=20' -H "Authorization: Bearer $token" | jq -c '[.result[]?.id] // .errors')"
+          echo "expected account: $account"
           scripts="$(curl -s "https://api.cloudflare.com/client/v4/accounts/$account/workers/scripts?per_page=1" -H "Authorization: Bearer $token")"
           echo "workers scripts access: $(printf '%s' "$scripts" | jq -c '{success, errors}')"
           if ! printf '%s' "$scripts" | jq -e '.success' >/dev/null; then
