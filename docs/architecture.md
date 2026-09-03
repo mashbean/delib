@@ -57,7 +57,7 @@ human gate is mandatory.
   returned URLs from a validated conversation ID and admin token. Public
   participation and report URLs are separated from the fragment-held private
   admin URL; Delib stores none of them server-side.
-- `/integrations/pocket-polis-data.html` reads Pocket Polis `statements.csv`
+- `/integrations/pocket-polis-data` reads Pocket Polis `statements.csv`
   and `votes.csv` only in browser memory. It validates the exact export headers,
   foreign keys, pseudonymous participant codes, duplicate votes and aggregate
   count consistency, then hashes both originals. The participant-aware
@@ -76,7 +76,7 @@ human gate is mandatory.
   release. The receipt keeps selected statement text and aggregate
   agree/disagree/pass counts, but strips pseudonymous participant IDs, raw
   votes, original-file hashes and admin tokens. The public
-  `/results/pocket-polis.html` page reads it after `#`; this default path is not stored.
+  `/results/pocket-polis` page reads it after `#`; this default path is not stored.
 - `POST /api/integrations/polis` validates an existing conversation or a
   public Site ID integration and returns a same-site workspace URL. Loading the
   Site ID workspace is the external write, so it remains a separate click.
@@ -94,7 +94,7 @@ human gate is mandatory.
   bounded, confirmed session brief; it forwards one create request to the
   official REST API and returns only the session ID, participant workspace and
   management URL. Neither the key nor upstream response body is stored.
-- `/integrations/power-ranker.html` has two modes. Local mode encodes the
+- `/integrations/power-ranker` has two modes. Local mode encodes the
   question after `#`; judgments and imported files stay in page memory. Room
   mode creates one SQLite Durable Object per room. A submission is immediately
   reduced to pair counts; only the SHA-256 hash of its random session ID remains
@@ -108,7 +108,7 @@ human gate is mandatory.
   `delib-ranking-receipt/v1` result. The browser rebuilds the ranking from the
   pair counts, strips fragment-held admin capabilities, and requires separate
   fields for interpretation, missing voices, decision authority, response
-  owner and next action. The public `/results/power-ranker.html` page reads the
+  owner and next action. The public `/results/power-ranker` page reads the
   receipt after `#`; the fragment is not sent to or stored by the Worker. Both
   local and aggregate ranking bundles can additionally be exported through the
   same `delib-data/v1` envelope, with individual session linkage and aggregate

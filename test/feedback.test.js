@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   DELIB_FEEDBACK_SCHEMA,
+  FEEDBACK_URL_LIMIT,
   createFeedbackRecord,
+  feedbackGitHubLink,
   feedbackGitHubUrl,
   feedbackToMarkdown,
 } from "../public/feedback-core.js";
@@ -36,7 +38,16 @@ describe("developer feedback loop", () => {
     expect(feedbackToMarkdown(record)).toContain("如何重現");
     const issue = new URL(feedbackGitHubUrl(record));
     expect(issue.hostname).toBe("github.com");
-    expect(issue.searchParams.get("body")).toContain("不含參與內容");
+    expect(issue.searchParams.get("template")).toBe("interop-feedback.yml");
+    expect(issue.searchParams.get("phase")).toBe("export");
+    expect(issue.searchParams.get("reproduction")).toContain("虛構陳述");
+    expect(issue.searchParams.get("public_url")).toBe(fixture.publicUrl);
+    expect(issue.searchParams.has("body")).toBe(false);
+    const oversized = createFeedbackRecord({ ...fixture, reproduction: "重現步驟".repeat(450) }, "2026-09-01T00:00:00.000Z");
+    const link = feedbackGitHubLink(oversized);
+    expect(link.truncated).toBe(true);
+    expect(link.url.length).toBeLessThanOrEqual(FEEDBACK_URL_LIMIT);
+    expect(new URL(link.url).searchParams.get("summary")).toBe(fixture.summary);
   });
 
   it("rejects private fragments and unconfirmed reports", () => {

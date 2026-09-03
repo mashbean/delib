@@ -1,5 +1,5 @@
 name: Interoperability feedback
-description: Report a schema gap, integration failure, deployment friction, or closed-loop usability problem.
+description: Report a schema gap, integration failure, deployment friction, or closed-loop usability problem. Field ids match delib-feedback/v1 so /feedback can prefill them.
 title: "[Interop] "
 labels: ["interop-feedback"]
 body:
@@ -7,11 +7,33 @@ body:
     attributes:
       value: |
         Do not include participant content, personal data, pseudonymous participant IDs, API keys, admin tokens, or private URLs.
+        The privacy-safe builder at https://delib.mashbean.net/feedback fills this form for you.
+  - type: dropdown
+    id: role
+    attributes:
+      label: Your role
+      options: [organizer, participant, developer, operator, researcher]
+    validations:
+      required: true
   - type: dropdown
     id: phase
     attributes:
       label: Flow phase
-      options: [Recommendation, Deployment, Participation, Import, Export, Analysis, Result, Handoff, Agent, Accessibility]
+      options: [recommendation, deployment, participation, import, export, analysis, result, handoff, agent, accessibility]
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: Problem category
+      options: [schema-gap, integration-failure, deployment-friction, privacy-boundary, accessibility, usability, outcome-loop, other]
+    validations:
+      required: true
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options: [blocked, degraded, confusing, idea]
     validations:
       required: true
   - type: input
@@ -19,6 +41,12 @@ body:
     attributes:
       label: Tool or integration
       placeholder: Pocket Polis to TTTC
+  - type: input
+    id: summary
+    attributes:
+      label: One-line summary
+    validations:
+      required: true
   - type: textarea
     id: expected
     attributes:
@@ -38,6 +66,19 @@ body:
       description: Use fictional data, a public demo, or field names only.
     validations:
       required: true
+  - type: textarea
+    id: workaround
+    attributes:
+      label: Current workaround (optional)
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment (optional)
+      placeholder: Safari 20, Cloudflare Workers Free plan
+  - type: input
+    id: public_url
+    attributes:
+      label: Public result URL (optional, no "#" fragment)
   - type: checkboxes
     id: boundary
     attributes:

@@ -81,12 +81,56 @@ export function feedbackToMarkdown(record) {
     `資料聲明：這份回饋不含參與內容、直接識別資訊、API key、管理 token 或含權限的網址；由使用者預覽後明確送出。`;
 }
 
-export function feedbackGitHubUrl(record) {
-  const url = new URL("https://github.com/mashbean/delib/issues/new");
+export const FEEDBACK_ISSUE_URL = "https://github.com/mashbean/delib/issues/new";
+export const FEEDBACK_ISSUE_TEMPLATE = "interop-feedback.yml";
+/** GitHub rejects very long prefill URLs; stay under this after percent-encoding. */
+export const FEEDBACK_URL_LIMIT = 7_500;
+
+/**
+ * Prefill the repository's issue form field by field. Issue forms ignore the
+ * legacy `body` parameter, so each field id in .github/ISSUE_TEMPLATE must match
+ * the keys used here. Labels are applied only for maintainers; the template's
+ * own `labels` entry covers everyone else.
+ */
+export function feedbackGitHubUrl(record, { compact = false } = {}) {
+  if (record?.schema !== DELIB_FEEDBACK_SCHEMA || record?.kind !== "interop-feedback") {
+    throw new Error("回饋格式不完整");
+  }
+  const url = new URL(FEEDBACK_ISSUE_URL);
+  url.searchParams.set("template", FEEDBACK_ISSUE_TEMPLATE);
   url.searchParams.set("title", `[Interop] ${record.issue.summary}`);
-  url.searchParams.set("body", feedbackToMarkdown(record));
-  url.searchParams.set("labels", `interop-feedback,${record.issue.category}`);
+  url.searchParams.set("labels", "interop-feedback");
+  const fields = {
+    role: record.context.role,
+    phase: record.context.phase,
+    category: record.issue.category,
+    severity: record.issue.severity,
+    tool: record.context.tool,
+    summary: record.issue.summary,
+    public_url: record.context.publicUrl,
+  };
+  if (!compact) {
+    Object.assign(fields, {
+      expected: record.issue.expected,
+      actual: record.issue.actual,
+      reproduction: record.issue.reproduction,
+      workaround: record.issue.workaround,
+      environment: record.issue.environment,
+    });
+  } else {
+    fields.expected = "（內容較長，請貼上下載的 delib-interop-feedback.json 或 Markdown 預覽）";
+  }
+  for (const [key, value] of Object.entries(fields)) {
+    if (value) url.searchParams.set(key, value);
+  }
   return url.toString();
+}
+
+/** Returns the full prefill URL when GitHub can accept it, else a compact one. */
+export function feedbackGitHubLink(record) {
+  const full = feedbackGitHubUrl(record);
+  if (full.length <= FEEDBACK_URL_LIMIT) return { url: full, truncated: false };
+  return { url: feedbackGitHubUrl(record, { compact: true }), truncated: true };
 }
 
 function enumValue(value, allowed) {

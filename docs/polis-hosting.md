@@ -65,7 +65,7 @@ URLs, and does not persist them server-side.
 ## Pocket Polis post-collection handoff
 
 The organizer downloads `statements.csv` and `votes.csv` from the Pocket Polis
-admin page, then opens `/integrations/pocket-polis-data.html`. Delib reads both
+admin page, then opens `/integrations/pocket-polis-data`. Delib reads both
 files only in browser memory and never asks for the admin token. It verifies the
 exact upstream columns, anonymous participant codes, statement references,
 duplicate participant/statement votes and the agreement totals copied into the
@@ -97,7 +97,7 @@ status and authority, responsible actor, response date and next action.
 The receipt includes only those selected statement texts and aggregate
 agree/disagree/pass counts. It excludes participant pseudonyms, raw vote rows,
 original-file hashes and the Pocket Polis admin token. The encoded receipt stays
-after `#` in `/results/pocket-polis.html`; browsers do not send that fragment to
+after `#` in `/results/pocket-polis`; browsers do not send that fragment to
 the Worker and Delib does not store it. The full link is still a public
 capability, so anyone who receives it can read and reshare its participant-
 authored text.

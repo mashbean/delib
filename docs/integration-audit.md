@@ -1,6 +1,6 @@
 # Direct integration audit
 
-Last checked: 2026-09-01
+Last checked: 2026-09-03
 
 This audit separates discovery from a usable integration. A tool is not called
 “one click” merely because it has source code, an adaptor, an iframe, or a deploy
@@ -49,9 +49,10 @@ deterministically.
 tools. The useful groups are deliberately different:
 
 `public/data/deployments.json` is the smaller executable subset shown at
-`/deploy.html`. It has one-click buttons only for Delib, Pocket Polis and
-Call-in, whose repositories already have reproducible Cloudflare-native
-deployments. Power Ranker ships inside Delib. A tool cannot enter this subset
+`/deploy`. It has one-click buttons only for Delib, Pocket Polis and
+Call-in, whose repositories have reproducible Cloudflare-native
+configurations (dry-run verified, identical to production). Each recipe
+carries a `verification` note saying how far it was actually exercised. Power Ranker ships inside Delib. A tool cannot enter this subset
 from source availability alone: the recipe also needs a build, license, storage
 model, deletion path and named operator responsibility.
 

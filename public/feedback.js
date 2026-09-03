@@ -1,4 +1,4 @@
-import { createFeedbackRecord, feedbackGitHubUrl, feedbackToMarkdown } from "/feedback-core.js";
+import { createFeedbackRecord, feedbackGitHubLink, feedbackToMarkdown } from "/feedback-core.js";
 
 const form = document.querySelector("#feedback-form");
 const status = document.querySelector("#feedback-status");
@@ -18,9 +18,12 @@ form.addEventListener("submit", (event) => {
     currentRecord = createFeedbackRecord(fields, new Date().toISOString());
     const markdown = feedbackToMarkdown(currentRecord);
     document.querySelector("#feedback-preview").textContent = markdown;
-    document.querySelector("#feedback-github").href = feedbackGitHubUrl(currentRecord);
+    const link = feedbackGitHubLink(currentRecord);
+    document.querySelector("#feedback-github").href = link.url;
     result.hidden = false;
-    status.textContent = "回饋已在本機整理完成；請先預覽，再決定下載或送到 GitHub。";
+    status.textContent = link.truncated
+      ? "回饋已整理完成，但內容太長，GitHub 網址只能帶入摘要欄位；請先下載 JSON，再貼進 issue。"
+      : "回饋已在本機整理完成；請先預覽，再決定下載或送到 GitHub。";
     result.scrollIntoView({ block: "start" });
   } catch (error) {
     currentRecord = null;

@@ -1,0 +1,36 @@
+# Read-only probes every 30 minutes. A failed run emails the repository owner,
+# which is the only alert this project has until a Cloudflare notification is
+# configured. Nothing here creates rooms, receipts or upstream activities.
+name: Uptime
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Delib smoke test (read-only)
+        run: node scripts/smoke.mjs https://delib.mashbean.net
+      - name: Managed upstream hosts answer
+        run: |
+          set -e
+          for url in https://polis.mashbean.net/ https://call-in.mashbean.net/; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 "$url")
+            echo "$url -> $code"
+            case "$code" in
+              200|301|302|307|308) ;;
+              *) echo "::error::$url returned $code"; exit 1 ;;
+            esac
+          done
