@@ -356,6 +356,12 @@ describe("direct integrations", () => {
       hostUrl: `https://budget.mashbean.net/h/abc123def4#admin=${"a".repeat(32)}`,
       credentialStoredByDelib: false,
     });
+    const lines = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
+      expect(JSON.parse(String(init?.body)).options).toBe("甲, 60\n乙, 50");
+      return new Response(JSON.stringify({ budgetId: "abc123def4", adminToken: "a".repeat(32), mode: "knapsack", total: 100, options: 2 }), { status: 201 });
+    });
+    expect((await handlePocketBudgetRequest(new Request("https://delib.example/api/integrations/pocket-budget", { method: "POST", headers: { Origin: "https://delib.example", "Content-Type": "application/json" }, body: JSON.stringify({ title: "x", total: 100, options: "甲, 60\r\n\n  乙,   50 \n", confirmed: true }) }), lines as typeof fetch)).status).toBe(201);
+    expect(lines).toHaveBeenCalledTimes(1);
     const never = vi.fn();
     const oneOption = await handlePocketBudgetRequest(new Request("https://delib.example/api/integrations/pocket-budget", { method: "POST", headers: { Origin: "https://delib.example", "Content-Type": "application/json" }, body: JSON.stringify({ title: "x", total: 10, options: "只有一個, 5", confirmed: true }) }), never as typeof fetch);
     expect(oneOption.status).toBe(400);

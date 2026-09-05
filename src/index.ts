@@ -1108,8 +1108,8 @@ export async function handlePocketBudgetRequest(
   if (!Number.isFinite(total) || total <= 0) return json({ error: "總額要是大於 0 的數字" }, 400);
   const options = Array.isArray(body.options)
     ? body.options.filter(isRecord).map((option) => ({ name: cleanOptionalString(option.name, 80), cost: Number(option.cost), description: cleanOptionalString(option.description, 300), category: cleanOptionalString(option.category, 40) })).filter((option) => option.name && Number.isFinite(option.cost) && option.cost > 0)
-    : cleanOptionalString(body.options, 8_000);
-  if ((Array.isArray(options) ? options.length : options.split(/\r?\n/).filter((line) => line.trim()).length) < 2) return json({ error: "至少要有 2 個有名稱與成本的選項" }, 400);
+    : (typeof body.options === "string" ? body.options : "").split(/\r?\n/).map((line) => cleanOptionalString(line, 400)).filter(Boolean).slice(0, 40).join("\n");
+  if ((Array.isArray(options) ? options.length : options.split("\n").filter(Boolean).length) < 2) return json({ error: "至少要有 2 個有名稱與成本的選項" }, 400);
   const origin = normalizeServiceOrigin(configuredOrigin);
   if (!origin) return json({ error: "Pocket Budget 主機設定不完整" }, 503);
 
