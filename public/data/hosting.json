@@ -160,12 +160,12 @@
       "nextAction": "安全公告修補且 create API 穩定後，再做 API 代建。"
     },
     {
-      "toolId": "pocket-intake",
+      "toolId": "pocket-form",
       "route": "direct",
       "label": "本站代建＋Cloudflare 一鍵部署",
       "summary": "MIT 的單一 Cloudflare Worker + Durable Objects SQLite 表單服務，為審議收件而寫；Delib 可免登入代建，主辦者也能部署自己的 instance。",
       "source": {
-        "url": "https://github.com/mashbean/pocket-intake",
+        "url": "https://github.com/mashbean/pocket-form",
         "license": "MIT",
         "reusable": true
       },
@@ -173,8 +173,8 @@
       "cloudflareNative": true,
       "nextAction": "綁正式網域，並在規劃器加入從題目草稿一鍵建表的介面。",
       "evidence": [
-        "https://pocket-intake.mashbean.workers.dev/",
-        "https://github.com/mashbean/pocket-intake"
+        "https://form.mashbean.net/",
+        "https://github.com/mashbean/pocket-form"
       ]
     },
     {
@@ -209,7 +209,7 @@
       "cloudflareNative": true,
       "nextAction": "把成果收據的「補訪缺席聲音」交接改指向 Pocket Harmonica，並以真實受訪者評估訪談者的追問品質。",
       "evidence": [
-        "https://pocket-harmonica.mashbean.workers.dev/",
+        "https://harmonica.mashbean.net/",
         "https://github.com/mashbean/pocket-harmonica"
       ]
     },

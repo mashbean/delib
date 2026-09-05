@@ -137,17 +137,17 @@
       ]
     },
     {
-      "toolId": "pocket-intake",
+      "toolId": "pocket-form",
       "readiness": "available",
       "activation": "managed-create",
       "label": "免登入直接建立",
-      "summary": "在 Delib 或由 Agent 提供題目，直接在 Pocket Intake 建立審議收件表；主辦者頁可匯出 tttc.csv、Pocket Polis 種子、寬表與 JSON。",
+      "summary": "在 Delib 或由 Agent 提供題目，直接在 Pocket Form 建立審議收件表；主辦者頁可匯出 tttc.csv、Pocket Polis 種子、寬表與 JSON。",
       "accountRequired": false,
       "credentialRequired": false,
-      "freePath": "使用 mashbean 維運的 Pocket Intake 共用主機，或按 Deploy to Cloudflare 建立自己的獨立服務。",
-      "writesExternalState": "按下確認後，本站伺服器會呼叫 Pocket Intake 的建立 API，立即建立表單。",
-      "retention": "表單與回應留在 Pocket Intake 的 Durable Object，直到主辦者用管理連結刪除；Delib 不保存題目、回應或管理權杖。",
-      "inAppEndpoint": "/api/integrations/pocket-intake",
+      "freePath": "使用 mashbean 維運的 Pocket Form 共用主機，或按 Deploy to Cloudflare 建立自己的獨立服務。",
+      "writesExternalState": "按下確認後，本站伺服器會呼叫 Pocket Form 的建立 API，立即建立表單。",
+      "retention": "表單與回應留在 Pocket Form 的 Durable Object，直到主辦者用管理連結刪除；Delib 不保存題目、回應或管理權杖。",
+      "inAppEndpoint": "/api/integrations/pocket-form",
       "dataHandoff": {
         "endpoint": "/integrations/pocket-polis-data",
         "input": [
@@ -165,7 +165,7 @@
         "platform": "Cloudflare Workers + Durable Objects SQLite",
         "cloudflareNative": true,
         "freeTier": "一鍵部署到自己的 Cloudflare 帳號；每張表最多 2,000 份回應可在 wrangler.jsonc 調整。",
-        "deployUrl": "https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/pocket-intake"
+        "deployUrl": "https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/pocket-form"
       },
       "agent": {
         "canCreate": true,
@@ -176,8 +176,8 @@
         "每台裝置一份回應，靠瀏覽器儲存的代碼辨識，換裝置會被當成另一人。"
       ],
       "evidence": [
-        "https://pocket-intake.mashbean.workers.dev/",
-        "https://github.com/mashbean/pocket-intake"
+        "https://form.mashbean.net/",
+        "https://github.com/mashbean/pocket-form"
       ]
     },
     {
@@ -220,7 +220,7 @@
         "每台裝置一段對話，靠瀏覽器儲存的代碼辨識。"
       ],
       "evidence": [
-        "https://pocket-harmonica.mashbean.workers.dev/",
+        "https://harmonica.mashbean.net/",
         "https://github.com/mashbean/pocket-harmonica"
       ]
     },

@@ -602,7 +602,7 @@
       "id": "pocket-harmonica",
       "name": "Pocket Harmonica · 口袋訪談",
       "summary": "一對一 AI 訪談補訪缺席的聲音：主辦者給主題、想理解什麼與起始問題，訪談者依回答追問；逐字稿匯出 tttc.csv 並一鍵送進 Pocket TTTC。免帳號、免 API 金鑰。",
-      "url": "https://pocket-harmonica.mashbean.workers.dev/",
+      "url": "https://harmonica.mashbean.net/",
       "source": "https://github.com/mashbean/pocket-harmonica",
       "status": "integrated",
       "stages": [
@@ -1073,11 +1073,11 @@
       "handoff": "已發布表單可在 Delib 內嵌入；建立與管理仍留在 HeyForm，表單個資需與審議意見分開保存。"
     },
     {
-      "id": "pocket-intake",
-      "name": "Pocket Intake · 口袋收件",
+      "id": "pocket-form",
+      "name": "Pocket Form · 口袋表單",
       "summary": "審議前的報名、背景調查與問題蒐集表單：最多 12 題、六種題型、免帳號；出口直接是 tttc.csv 與 Pocket Polis 起始陳述。",
-      "url": "https://pocket-intake.mashbean.workers.dev/",
-      "source": "https://github.com/mashbean/pocket-intake",
+      "url": "https://form.mashbean.net/",
+      "source": "https://github.com/mashbean/pocket-form",
       "status": "integrated",
       "stages": [
         "evaluating",
@@ -1107,8 +1107,8 @@
         "evidence"
       ],
       "hosting": "cloudflare-worker",
-      "deploy": "https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/pocket-intake",
-      "handoff": "Delib 可免登入代建並交回填寫、主辦者兩種連結；主辦者頁能匯出 tttc.csv（接 Pocket TTTC 或資料工作台）、Pocket Polis 種子、寬表 CSV 與 JSON。表單、回應與管理權杖都留在 Pocket Intake。"
+      "deploy": "https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/pocket-form",
+      "handoff": "Delib 可免登入代建並交回填寫、主辦者兩種連結；主辦者頁能匯出 tttc.csv（接 Pocket TTTC 或資料工作台）、Pocket Polis 種子、寬表 CSV 與 JSON。表單、回應與管理權杖都留在 Pocket Form。"
     }
   ]
 }

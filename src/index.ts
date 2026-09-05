@@ -36,7 +36,7 @@ type WorkerEnv = Omit<
   CALL_IN_ORIGIN?: string;
   POCKET_POLIS_ORIGIN?: string;
   POCKET_TTTC_ORIGIN?: string;
-  POCKET_INTAKE_ORIGIN?: string;
+  POCKET_FORM_ORIGIN?: string;
   POCKET_HARMONICA_ORIGIN?: string;
   POLIS_SITE_ID?: string;
   /** SHA-256 hex of an operator secret that may take down abusive public receipts. */
@@ -78,8 +78,8 @@ const DEFAULT_MODEL = "gpt-5.6";
 const DEFAULT_CALL_IN_ORIGIN = "https://call-in.mashbean.net";
 const DEFAULT_POCKET_POLIS_ORIGIN = "https://polis.mashbean.net";
 const DEFAULT_POCKET_TTTC_ORIGIN = "https://ttt-city.mashbean.net";
-const DEFAULT_POCKET_INTAKE_ORIGIN = "https://pocket-intake.mashbean.workers.dev";
-const DEFAULT_POCKET_HARMONICA_ORIGIN = "https://pocket-harmonica.mashbean.workers.dev";
+const DEFAULT_POCKET_FORM_ORIGIN = "https://form.mashbean.net";
+const DEFAULT_POCKET_HARMONICA_ORIGIN = "https://harmonica.mashbean.net";
 /** Pocket TTTC 接受最多 3 MiB 的 CSV；這個端點的上限跟著它，而非一般整合的 12 KB。 */
 const MAX_POCKET_TTTC_BODY_BYTES = 3 * 1024 * 1024 + 64 * 1024;
 /** Upstream creators answer in a few seconds; the BYOK model call may take longer. */
@@ -184,8 +184,8 @@ async function route(request: Request, env: WorkerEnv, url: URL): Promise<Respon
       return handlePocketHarmonicaRequest(request, fetch, env.POCKET_HARMONICA_ORIGIN || DEFAULT_POCKET_HARMONICA_ORIGIN);
     }
 
-    if (url.pathname === "/api/integrations/pocket-intake" && request.method === "POST") {
-      return handlePocketIntakeRequest(request, fetch, env.POCKET_INTAKE_ORIGIN || DEFAULT_POCKET_INTAKE_ORIGIN);
+    if (url.pathname === "/api/integrations/pocket-form" && request.method === "POST") {
+      return handlePocketFormRequest(request, fetch, env.POCKET_FORM_ORIGIN || DEFAULT_POCKET_FORM_ORIGIN);
     }
 
     if (url.pathname === "/api/integrations/pocket-tttc" && request.method === "POST") {
@@ -848,7 +848,7 @@ export async function handlePocketHarmonicaRequest(
   );
 }
 
-type PocketIntakeRequest = {
+type PocketFormRequest = {
   title?: unknown;
   description?: unknown;
   language?: unknown;
@@ -860,16 +860,16 @@ type PocketIntakeRequest = {
 };
 
 /**
- * 在 Pocket Intake 建立一張審議收件表（報名、背景調查、問題蒐集）。題目由呼叫端給，
+ * 在 Pocket Form 建立一張審議收件表（報名、背景調查、問題蒐集）。題目由呼叫端給，
  * 上游負責驗證；Delib 不保存表單、回應或主辦者權杖，回應裡的 hostUrl 只出現這一次。
  */
-export async function handlePocketIntakeRequest(
+export async function handlePocketFormRequest(
   request: Request,
   upstreamFetch: typeof fetch = fetch,
-  configuredOrigin = DEFAULT_POCKET_INTAKE_ORIGIN,
+  configuredOrigin = DEFAULT_POCKET_FORM_ORIGIN,
 ): Promise<Response> {
   if (!isSameOriginRequest(request)) return json({ error: "origin not allowed" }, 403);
-  const body = await readJsonRequest<PocketIntakeRequest>(request, MAX_INTEGRATION_BODY_BYTES);
+  const body = await readJsonRequest<PocketFormRequest>(request, MAX_INTEGRATION_BODY_BYTES);
   if (body instanceof Response) return body;
   if (body.confirmed !== true) return json({ error: "建立前請先確認這張表收什麼、為什麼收、保存多久" }, 400);
   const title = cleanRequiredString(body.title, 120);
@@ -878,7 +878,7 @@ export async function handlePocketIntakeRequest(
     return json({ error: "請提供 1–12 題（type、label，選項題另附 options）" }, 400);
   }
   const origin = normalizeServiceOrigin(configuredOrigin);
-  if (!origin) return json({ error: "Pocket Intake 主機設定不完整" }, 503);
+  if (!origin) return json({ error: "Pocket Form 主機設定不完整" }, 503);
 
   let upstream: Response;
   try {
@@ -898,7 +898,7 @@ export async function handlePocketIntakeRequest(
       signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
     });
   } catch (error) {
-    return upstreamFailure(error, "Pocket Intake");
+    return upstreamFailure(error, "Pocket Form");
   }
 
   if (!upstream.ok) {
@@ -908,9 +908,9 @@ export async function handlePocketIntakeRequest(
     } catch {
       detail = "";
     }
-    if (upstream.status === 400) return json({ error: detail || "Pocket Intake 沒有接受這些題目" }, 400);
+    if (upstream.status === 400) return json({ error: detail || "Pocket Form 沒有接受這些題目" }, 400);
     return json(
-      { error: upstream.status === 429 ? "Pocket Intake 目前建立表單的次數已達上限，請稍後再試" : "Pocket Intake 沒有完成建立，請稍後再試" },
+      { error: upstream.status === 429 ? "Pocket Form 目前建立表單的次數已達上限，請稍後再試" : "Pocket Form 沒有完成建立，請稍後再試" },
       upstream.status === 429 ? 429 : 502,
     );
   }
@@ -919,16 +919,16 @@ export async function handlePocketIntakeRequest(
   try {
     payload = await upstream.json();
   } catch {
-    return json({ error: "Pocket Intake 回應格式不完整" }, 502);
+    return json({ error: "Pocket Form 回應格式不完整" }, 502);
   }
-  if (!isRecord(payload)) return json({ error: "Pocket Intake 回應格式不完整" }, 502);
+  if (!isRecord(payload)) return json({ error: "Pocket Form 回應格式不完整" }, 502);
   const formId = cleanMatchingString(payload.formId, /^[a-z0-9]{10}$/, 10);
   const adminToken = cleanMatchingString(payload.adminToken, /^[a-f0-9]{32}$/i, 32);
-  if (!formId || !adminToken) return json({ error: "Pocket Intake 回應缺少必要資訊" }, 502);
+  if (!formId || !adminToken) return json({ error: "Pocket Form 回應缺少必要資訊" }, 502);
 
   return json(
     {
-      integration: "pocket-intake",
+      integration: "pocket-form",
       status: "ready",
       serviceOrigin: origin,
       formId,
@@ -947,7 +947,7 @@ export async function handlePocketIntakeRequest(
       privacy: {
         privateUrls: ["hostUrl"],
         participantDataOwner: origin,
-        retention: "表單與回應留在 Pocket Intake，直到主辦者用管理連結刪除。",
+        retention: "表單與回應留在 Pocket Form，直到主辦者用管理連結刪除。",
       },
     },
     201,

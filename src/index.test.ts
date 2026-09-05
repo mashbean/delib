@@ -11,7 +11,7 @@ import {
   handlePolisRequest,
   handlePocketPolisRequest,
   handlePocketHarmonicaRequest,
-  handlePocketIntakeRequest,
+  handlePocketFormRequest,
   handlePocketTttcRequest,
   handlePublicReceiptRequest,
   handleRankingRoomRequest,
@@ -236,7 +236,7 @@ describe("direct integrations", () => {
 
   it("creates a Pocket Harmonica interview from the Harmonica-shaped draft without any API key", async () => {
     const upstream = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
-      expect(String(input)).toBe("https://pocket-harmonica.mashbean.workers.dev/api/sessions");
+      expect(String(input)).toBe("https://harmonica.mashbean.net/api/sessions");
       const sent = JSON.parse(String(init?.body));
       expect(sent).toMatchObject({ topic: "核電重啟：補訪", goal: "理解北海岸居民的顧慮", confirmed: true, askAlias: true });
       expect(sent.questions).toEqual(["你住哪裡？", "要先做到什麼？"]);
@@ -254,8 +254,8 @@ describe("direct integrations", () => {
     await expect(response.json()).resolves.toMatchObject({
       integration: "pocket-harmonica",
       sessionId: "abc123def4",
-      participateUrl: "https://pocket-harmonica.mashbean.workers.dev/s/abc123def4",
-      hostUrl: `https://pocket-harmonica.mashbean.workers.dev/h/abc123def4#admin=${"d".repeat(32)}`,
+      participateUrl: "https://harmonica.mashbean.net/s/abc123def4",
+      hostUrl: `https://harmonica.mashbean.net/h/abc123def4#admin=${"d".repeat(32)}`,
       budget: { worstCaseNeuronsPerSession: 8400 },
       credentialStoredByDelib: false,
     });
@@ -265,16 +265,16 @@ describe("direct integrations", () => {
     expect(never).not.toHaveBeenCalled();
   });
 
-  it("creates a Pocket Intake form and returns participate, host and export links", async () => {
+  it("creates a Pocket Form form and returns participate, host and export links", async () => {
     const upstream = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
-      expect(String(input)).toBe("https://pocket-intake.mashbean.workers.dev/api/forms");
+      expect(String(input)).toBe("https://form.mashbean.net/api/forms");
       const sent = JSON.parse(String(init?.body));
       expect(sent).toMatchObject({ title: "核電審議報名", askAlias: true, confirmed: true });
       expect(sent.questions).toHaveLength(2);
       return new Response(JSON.stringify({ formId: "abc123def4", adminToken: "c".repeat(32), questions: 2 }), { status: 201 });
     });
-    const response = await handlePocketIntakeRequest(
-      new Request("https://delib.example/api/integrations/pocket-intake", {
+    const response = await handlePocketFormRequest(
+      new Request("https://delib.example/api/integrations/pocket-form", {
         method: "POST",
         headers: { Origin: "https://delib.example", "Content-Type": "application/json" },
         body: JSON.stringify({ title: "核電審議報名", askAlias: true, questions: [{ type: "long", label: "一句話", required: true }, { type: "consent", label: "同意" }], confirmed: true }),
@@ -283,15 +283,15 @@ describe("direct integrations", () => {
     );
     expect(response.status).toBe(201);
     await expect(response.json()).resolves.toMatchObject({
-      integration: "pocket-intake",
+      integration: "pocket-form",
       formId: "abc123def4",
-      participateUrl: "https://pocket-intake.mashbean.workers.dev/f/abc123def4",
-      hostUrl: `https://pocket-intake.mashbean.workers.dev/h/abc123def4#admin=${"c".repeat(32)}`,
-      exports: { tttcCsv: "https://pocket-intake.mashbean.workers.dev/api/forms/abc123def4/export/tttc.csv" },
+      participateUrl: "https://form.mashbean.net/f/abc123def4",
+      hostUrl: `https://form.mashbean.net/h/abc123def4#admin=${"c".repeat(32)}`,
+      exports: { tttcCsv: "https://form.mashbean.net/api/forms/abc123def4/export/tttc.csv" },
       storedByDelib: false,
     });
     const never = vi.fn();
-    const unconfirmed = await handlePocketIntakeRequest(new Request("https://delib.example/api/integrations/pocket-intake", { method: "POST", headers: { Origin: "https://delib.example", "Content-Type": "application/json" }, body: JSON.stringify({ title: "x", questions: [{ type: "long", label: "y" }] }) }), never as typeof fetch);
+    const unconfirmed = await handlePocketFormRequest(new Request("https://delib.example/api/integrations/pocket-form", { method: "POST", headers: { Origin: "https://delib.example", "Content-Type": "application/json" }, body: JSON.stringify({ title: "x", questions: [{ type: "long", label: "y" }] }) }), never as typeof fetch);
     expect(unconfirmed.status).toBe(400);
     expect(never).not.toHaveBeenCalled();
   });
