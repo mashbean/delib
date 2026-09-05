@@ -430,3 +430,6 @@ function formulaSafeCell(value) {
 function participantSort(left, right) {
   return Number(left.slice(1)) - Number(right.slice(1));
 }
+
+// 供已是 TTTC 格式的 CSV 檢查器重用（public/tttc-csv-core.js）
+export { csvTable, formulaSafeCell, parseCsvWithHeaders };

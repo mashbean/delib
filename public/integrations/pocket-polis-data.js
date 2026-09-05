@@ -13,6 +13,7 @@ import {
   selectToolSynthesis,
 } from "/pocket-polis-receipt-core.js";
 import { formatDateTime } from "/ui-shared.js";
+import { mergeTttcFiles, parseTttcCsv, tttcRowsToCsv } from "/tttc-csv-core.js";
 
 const STORAGE_KEY = "delib:pocket-polis-data-source";
 const MAX_SYNTHESIS_POINT_PICKS = 6;
@@ -32,6 +33,98 @@ let currentReceiptUrl = "";
 
 restorePublicContext();
 form.addEventListener("submit", checkExports);
+
+// ---- 已是 TTTC 格式的 CSV：檢查、合併、重新輸出 ----
+const tttcForm = document.querySelector("#tttc-csv-form");
+const tttcResult = document.querySelector("#tttc-csv-result");
+const tttcStatus = document.querySelector("#tttc-csv-status");
+const tttcConsent = document.querySelector("#tttc-csv-consent");
+const tttcDownload = document.querySelector("#tttc-csv-download");
+let currentTttc = null;
+tttcForm.addEventListener("submit", checkTttcFiles);
+tttcForm.addEventListener("change", () => {
+  if (!currentTttc) return;
+  currentTttc = null;
+  tttcResult.hidden = true;
+  tttcConsent.checked = false;
+  tttcDownload.disabled = true;
+  tttcStatus.textContent = "檔案已變更，請重新檢查。";
+});
+tttcConsent.addEventListener("change", () => {
+  tttcDownload.disabled = !currentTttc || !tttcConsent.checked;
+});
+tttcDownload.addEventListener("click", () => {
+  if (!currentTttc || !tttcConsent.checked) return;
+  downloadText(`tttc-merged-${currentTttc.summary.rows}-rows.csv`, tttcRowsToCsv(currentTttc.rows), "text/csv;charset=utf-8");
+});
+
+async function checkTttcFiles(event) {
+  event.preventDefault();
+  const submit = document.querySelector("#check-tttc-csv");
+  const files = [...document.querySelector("#tttc-csv-files").files];
+  currentTttc = null;
+  tttcResult.hidden = true;
+  tttcConsent.checked = false;
+  tttcDownload.disabled = true;
+  submit.disabled = true;
+  tttcStatus.textContent = "正在目前瀏覽器檢查檔案…";
+  try {
+    if (files.length === 0) throw new Error("請選擇至少一份 TTTC CSV");
+    const parsed = [];
+    for (const file of files) {
+      const read = await readCsvFile(file, file.name);
+      parsed.push(parseTttcCsv({ text: read.text, label: file.name }));
+    }
+    currentTttc = mergeTttcFiles(parsed);
+    renderTttcResult(currentTttc);
+    tttcResult.hidden = false;
+    tttcStatus.textContent = `${files.length} 份檔案已在本機通過檢查；尚未上傳或保存。`;
+    tttcResult.scrollIntoView({ behavior: reducedMotion() ? "auto" : "smooth", block: "start" });
+  } catch (error) {
+    tttcStatus.textContent = error instanceof Error ? error.message : "目前無法檢查這些 CSV。";
+  } finally {
+    submit.disabled = false;
+  }
+}
+
+function renderTttcResult(merged) {
+  document.querySelector("#tttc-csv-summary").textContent = merged.summary.perFile
+    .map((entry) => `${entry.file}：${entry.rows} 列`)
+    .join("；");
+  const metrics = [
+    [merged.summary.rows, "合併後的發言"],
+    [merged.summary.files, "來源檔案"],
+    [merged.summary.interviews, "不同的 interview 標記"],
+    [merged.summary.blankInterviews, "沒有 interview 的列"],
+  ];
+  document.querySelector("#tttc-csv-metrics").replaceChildren(
+    ...metrics.map(([value, label]) => {
+      const card = document.createElement("div");
+      const strong = document.createElement("strong");
+      const span = document.createElement("span");
+      strong.textContent = String(value);
+      span.textContent = label;
+      card.append(strong, span);
+      return card;
+    }),
+  );
+  const warnings = document.querySelector("#tttc-csv-warnings");
+  warnings.hidden = merged.warnings.length === 0;
+  warnings.replaceChildren(
+    ...merged.warnings.slice(0, 20).map((message) => {
+      const item = document.createElement("p");
+      item.textContent = message;
+      return item;
+    }),
+  );
+  document.querySelector("#tttc-csv-preview").replaceChildren(
+    ...merged.rows.slice(0, 5).map((row) => {
+      const item = document.createElement("li");
+      item.textContent = `${row.interview || "（無 interview）"}：${row.comment}`;
+      return item;
+    }),
+  );
+}
 form.addEventListener("input", invalidateResult);
 form.addEventListener("change", invalidateResult);
 consent.addEventListener("change", syncDownloadState);
@@ -117,7 +210,7 @@ async function readCsvFile(file, label) {
   return {
     text,
     evidence: {
-      role: label === "意見清單" ? "statements" : "votes",
+      role: label === "意見清單" ? "statements" : label === "投票紀錄" ? "votes" : "tttc",
       name: file.name,
       size: file.size,
       sha256: await sha256(bytes),

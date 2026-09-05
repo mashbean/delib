@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex,nofollow" />
-    <meta name="description" content="在瀏覽器本機檢查 Pocket Polis CSV，準備可攜 JSON、Talk to the City、Agora 匯入檔與分層成果收據。" />
+    <meta name="description" content="在瀏覽器本機檢查 Pocket Polis CSV 或合併多份 TTTC CSV，準備可攜 JSON、Talk to the City、Agora 匯入檔與分層成果收據。" />
     <title>Pocket Polis 資料工作台 · Delib 審議拼圖</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/styles.css" />
@@ -91,6 +91,49 @@
           <p id="pocket-polis-data-status" class="action-status" role="status" aria-live="polite"></p>
         </form>
 
+        <form id="tttc-csv-form" class="data-import-card">
+          <div class="data-step-heading">
+            <span>或</span>
+            <div>
+              <h2>直接放入已是 TTTC 格式的 CSV</h2>
+              <p>口袋審議報告頁、Call-in 或本工作台輸出的 <code>tttc.csv</code>（<code>id, interview, comment</code>）都可以；放入多份會合併成一個檔，讓 Talk to the City 一次分析整場審議。</p>
+            </div>
+          </div>
+          <label class="file-drop">
+            <strong>TTTC CSV（可多選）</strong>
+            <span>每份上限 20 MiB，最多 20 份</span>
+            <input id="tttc-csv-files" type="file" accept=".csv,text/csv" multiple required />
+          </label>
+          <p class="field-note">只檢查文字欄位：欄位名稱、空白 comment、跨檔案重複的 id，以及疑似 email、電話或身分證字號。不會上傳或保存。</p>
+          <button id="check-tttc-csv" class="button button-primary" type="submit">檢查並合併</button>
+          <p id="tttc-csv-status" class="action-status" role="status" aria-live="polite"></p>
+        </form>
+
+        <section id="tttc-csv-result" class="data-result" hidden aria-live="polite">
+          <div class="data-step-heading">
+            <span>✓</span>
+            <div>
+              <p class="section-kicker">Checked locally</p>
+              <h2>合併後的 TTTC CSV</h2>
+              <p id="tttc-csv-summary"></p>
+            </div>
+          </div>
+          <div id="tttc-csv-metrics" class="receipt-metrics data-metrics"></div>
+          <div id="tttc-csv-warnings" class="data-warning" hidden></div>
+          <details class="data-preview">
+            <summary>先看幾列</summary>
+            <ol id="tttc-csv-preview"></ol>
+          </details>
+          <label class="consent-row data-export-consent">
+            <input id="tttc-csv-consent" type="checkbox" />
+            <span>我理解這份檔包含參與者的自由文字，會在公開或送交分析前人工檢查，並依原活動告知的用途處理。</span>
+          </label>
+          <div class="data-download-row">
+            <button id="tttc-csv-download" class="button button-primary" type="button" disabled>下載合併後的 tttc.csv</button>
+            <a class="button button-ghost" href="/integrations/tttc">接著到 TTTC 工作區 →</a>
+          </div>
+        </section>
+
         <section id="pocket-polis-data-result" class="data-result" hidden aria-live="polite">
           <div class="data-step-heading">
             <span>3</span>
@@ -134,7 +177,7 @@
             <article>
               <span class="receipt-layer-label receipt-layer-human">文字聚類</span>
               <h3>Talk to the City</h3>
-              <p>輸出目前支援的 <code>id, interview, comment</code> CSV，只包含已核准意見；不帶匿名投票。</p>
+              <p>輸出目前支援的 <code>id, interview, comment</code> CSV，只包含已核准意見；不帶匿名投票。已經有 tttc.csv 的話，用上面的「直接放入」即可。</p>
               <button class="button button-ghost data-download" type="button" data-download="tttc" disabled>下載 TTTC CSV</button>
               <a href="/integrations/tttc">接著到 TTTC 工作區 →</a>
             </article>
