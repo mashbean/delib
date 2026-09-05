@@ -1,6 +1,6 @@
 {
   "schema": "delib-integrations/v1",
-  "updatedAt": "2026-09-01",
+  "updatedAt": "2026-09-05",
   "principles": [
     "A tool is marked available only when the in-app path was implemented and tested.",
     "Credentials remain in the browser tab unless the upstream API requires a single pass-through request.",
@@ -50,9 +50,17 @@
       "inAppEndpoint": "/api/integrations/pocket-polis",
       "dataHandoff": {
         "endpoint": "/integrations/pocket-polis-data",
-        "input": ["statements.csv", "votes.csv"],
+        "input": [
+          "statements.csv",
+          "votes.csv"
+        ],
         "portableSchema": "/schemas/delib-pocket-polis/v1.json",
-        "outputs": ["delib-pocket-polis/v1 JSON", "Talk to the City CSV", "Agora Pol.is summary/comments/votes CSV", "delib-pocket-polis-receipt/v1 public receipt"],
+        "outputs": [
+          "delib-pocket-polis/v1 JSON",
+          "Talk to the City CSV",
+          "Agora Pol.is summary/comments/votes CSV",
+          "delib-pocket-polis-receipt/v1 public receipt"
+        ],
         "storage": "browser-memory-only",
         "humanGate": "下載前確認參與資料用途、權限與保存方式。公開收據另要求至少 3 位實際投票者、每句入選陳述至少 3 份回應，並由主辦者逐句確認自由文字與補上解讀、缺席聲音、權責和下一步。"
       },
@@ -82,6 +90,50 @@
         "https://polis.mashbean.net/",
         "https://github.com/mashbean/pocket-polis",
         "https://github.com/mashbean/pocket-polis/blob/main/AGENT.md"
+      ]
+    },
+    {
+      "toolId": "pocket-tttc",
+      "readiness": "available",
+      "activation": "managed-create",
+      "label": "免登入直接建立",
+      "summary": "把 id,interview,comment 的 CSV（口袋審議報告頁、Call-in 或資料工作台輸出的 tttc.csv）交給 ttt-city.mashbean.net，產生主題 → 子主題 → 主張 → 引述的議題樹；不需要 Talk to the City 帳號。",
+      "accountRequired": false,
+      "credentialRequired": false,
+      "freePath": "使用 mashbean 維運的 Pocket TTTC 共用主機（Workers AI 免費額度、每日 9,000 神經元），或按 Deploy to Cloudflare 建立自己的獨立服務。",
+      "writesExternalState": "按下確認後，本站伺服器會呼叫 Pocket TTTC 的建立 API，立即建立報告並排入模型處理。",
+      "retention": "報告與輸入留在 Pocket TTTC 的 Durable Object，直到用管理連結刪除；Delib 不保存 CSV、報告或管理權杖。",
+      "inAppEndpoint": "/api/integrations/pocket-tttc",
+      "dataHandoff": {
+        "endpoint": "/integrations/pocket-polis-data",
+        "input": [
+          "tttc.csv（可多份合併）"
+        ],
+        "outputs": [
+          "Pocket TTTC 報告（report.json、claims.csv）"
+        ],
+        "storage": "browser-memory-only",
+        "humanGate": "送出前確認資料沒有直接識別資訊、有權交給模型分析；報告網址與管理連結只顯示一次。"
+      },
+      "selfHost": {
+        "supported": true,
+        "platform": "Cloudflare Workers + Durable Objects SQLite + Workers AI",
+        "cloudflareNative": true,
+        "freeTier": "一鍵部署到自己的 Cloudflare 帳號；每份報告與全部署每日的神經元上限可在 wrangler.jsonc 調整。",
+        "deployUrl": "https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/tttc-serverless"
+      },
+      "agent": {
+        "canCreate": true,
+        "humanGate": "Agent 可準備 CSV 與標題；建立前由人確認資料邊界與分析目的。"
+      },
+      "knownLimitations": [
+        "Pocket TTTC 是 MIT 輕量重寫，管線順序與 Talk to the City 相同，但沒有爭點（cruxes）與影片來源功能。",
+        "免費額度下每份最多 600 則發言；額度用完會等隔日自動續跑。",
+        "主張與摘要由模型產生，可能有誤；引述來自原始發言，公開前應人工檢查。"
+      ],
+      "evidence": [
+        "https://ttt-city.mashbean.net/",
+        "https://github.com/mashbean/tttc-serverless"
       ]
     },
     {

@@ -35,6 +35,7 @@ type WorkerEnv = Omit<
   RECEIPT_INDEX: DurableObjectNamespace<ReceiptIndex>;
   CALL_IN_ORIGIN?: string;
   POCKET_POLIS_ORIGIN?: string;
+  POCKET_TTTC_ORIGIN?: string;
   POLIS_SITE_ID?: string;
   /** SHA-256 hex of an operator secret that may take down abusive public receipts. */
   OPERATOR_TOKEN_SHA256?: string;
@@ -74,6 +75,9 @@ const PUBLIC_RECEIPT_SCHEMA = new Map<string, PublicReceiptKind>([
 const DEFAULT_MODEL = "gpt-5.6";
 const DEFAULT_CALL_IN_ORIGIN = "https://call-in.mashbean.net";
 const DEFAULT_POCKET_POLIS_ORIGIN = "https://polis.mashbean.net";
+const DEFAULT_POCKET_TTTC_ORIGIN = "https://ttt-city.mashbean.net";
+/** Pocket TTTC 接受最多 3 MiB 的 CSV；這個端點的上限跟著它，而非一般整合的 12 KB。 */
+const MAX_POCKET_TTTC_BODY_BYTES = 3 * 1024 * 1024 + 64 * 1024;
 /** Upstream creators answer in a few seconds; the BYOK model call may take longer. */
 const UPSTREAM_TIMEOUT_MS = 12_000;
 const AGENT_TIMEOUT_MS = 45_000;
@@ -170,6 +174,10 @@ async function route(request: Request, env: WorkerEnv, url: URL): Promise<Respon
         fetch,
         env.POCKET_POLIS_ORIGIN || DEFAULT_POCKET_POLIS_ORIGIN,
       );
+    }
+
+    if (url.pathname === "/api/integrations/pocket-tttc" && request.method === "POST") {
+      return handlePocketTttcRequest(request, fetch, env.POCKET_TTTC_ORIGIN || DEFAULT_POCKET_TTTC_ORIGIN);
     }
 
     if (url.pathname === "/api/integrations/pocket-polis/synthesis" && request.method === "GET") {
@@ -717,6 +725,112 @@ export async function handlePolisRequest(request: Request, defaultSiteId?: strin
   }
 
   return json({ error: "請選擇已有對話或建立新對話" }, 400);
+}
+
+type PocketTttcRequest = {
+  title?: unknown;
+  description?: unknown;
+  language?: unknown;
+  csv?: unknown;
+  confirmed?: unknown;
+};
+
+/**
+ * 把一份 id,interview,comment 的 CSV 交給 Pocket TTTC（ttt-city.mashbean.net）建立議題樹報告。
+ * Delib 不保存 CSV、報告或管理權杖；回應裡的 manageUrl 只出現這一次。
+ */
+export async function handlePocketTttcRequest(
+  request: Request,
+  upstreamFetch: typeof fetch = fetch,
+  configuredOrigin = DEFAULT_POCKET_TTTC_ORIGIN,
+): Promise<Response> {
+  if (!isSameOriginRequest(request)) return json({ error: "origin not allowed" }, 403);
+  const body = await readJsonRequest<PocketTttcRequest>(request, MAX_POCKET_TTTC_BODY_BYTES);
+  if (body instanceof Response) return body;
+  if (body.confirmed !== true) return json({ error: "建立前請先確認資料沒有直接識別資訊，且有權交給模型分析" }, 400);
+  const title = cleanRequiredString(body.title, 120);
+  if (!title) return json({ error: "先幫這份分析取一個名字" }, 400);
+  const description = cleanOptionalString(body.description, 2_000);
+  const language = body.language === "en" ? "en" : "zh-Hant";
+  const csv = typeof body.csv === "string" ? body.csv.replace(/^\uFEFF/, "") : "";
+  const header = (csv.split(/\r?\n/, 1)[0] ?? "").toLowerCase();
+  const headerCells = header.split(",").map((cell) => cell.trim().replace(/^"|"$/g, ""));
+  if (!csv.trim() || !headerCells.includes("id") || !headerCells.includes("comment")) {
+    return json({ error: "CSV 需要 id 與 comment 兩欄（interview 可選）；先到資料工作台檢查或合併" }, 400);
+  }
+  if (csv.length > 3 * 1024 * 1024) return json({ error: "CSV 超過 3 MiB" }, 413);
+
+  const origin = normalizeServiceOrigin(configuredOrigin);
+  if (!origin) return json({ error: "Pocket TTTC 主機設定不完整" }, 503);
+
+  let upstream: Response;
+  try {
+    upstream = await upstreamFetch(`${origin}/api/reports`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title, description, language, csv, confirmed: true }),
+      signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
+    });
+  } catch (error) {
+    return upstreamFailure(error, "Pocket TTTC");
+  }
+
+  if (!upstream.ok) {
+    let detail = "";
+    try {
+      const failed = (await upstream.json()) as { error?: unknown };
+      detail = cleanOptionalString(failed.error, 300);
+    } catch {
+      detail = "";
+    }
+    if (upstream.status === 400 || upstream.status === 413) {
+      return json({ error: detail || "Pocket TTTC 沒有接受這份 CSV" }, upstream.status);
+    }
+    return json(
+      {
+        error:
+          upstream.status === 429
+            ? "Pocket TTTC 目前建立報告的次數已達上限，請稍後再試"
+            : "Pocket TTTC 沒有完成建立，請稍後再試",
+      },
+      upstream.status === 429 ? 429 : 502,
+    );
+  }
+
+  let payload: unknown;
+  try {
+    payload = await upstream.json();
+  } catch {
+    return json({ error: "Pocket TTTC 回應格式不完整" }, 502);
+  }
+  if (!isRecord(payload)) return json({ error: "Pocket TTTC 回應格式不完整" }, 502);
+  const reportId = cleanMatchingString(payload.reportId, /^[a-z0-9]{10}$/, 10);
+  const adminToken = cleanMatchingString(payload.adminToken, /^[a-f0-9]{32}$/i, 32);
+  if (!reportId || !adminToken) return json({ error: "Pocket TTTC 回應缺少必要資訊" }, 502);
+  const rows = typeof payload.rows === "number" && Number.isFinite(payload.rows) ? Math.max(0, Math.floor(payload.rows)) : null;
+
+  return json(
+    {
+      integration: "pocket-tttc",
+      status: "queued",
+      serviceOrigin: origin,
+      reportId,
+      title,
+      rows,
+      reportUrl: `${origin}/r/${reportId}`,
+      apiUrl: `${origin}/api/reports/${reportId}`,
+      manageUrl: `${origin}/r/${reportId}#admin=${adminToken}`,
+      storedByDelib: false,
+      credentialStoredByDelib: false,
+      writesExternalState: true,
+      privacy: {
+        privateUrls: ["manageUrl"],
+        participantDataOwner: origin,
+        retention: "報告與輸入留在 Pocket TTTC，直到用管理連結刪除。",
+      },
+    },
+    201,
+  );
 }
 
 export async function handlePocketPolisRequest(

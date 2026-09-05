@@ -87,6 +87,65 @@ async function checkTttcFiles(event) {
   }
 }
 
+// ---- 直接送到 Pocket TTTC ----
+const tttcSendButton = document.querySelector("#tttc-send");
+const tttcSendTitle = document.querySelector("#tttc-send-title");
+const tttcSendConfirm = document.querySelector("#tttc-send-confirm");
+const tttcSendStatus = document.querySelector("#tttc-send-status");
+const tttcSendResult = document.querySelector("#tttc-send-result");
+function syncTttcSend() {
+  tttcSendButton.disabled = !currentTttc || !tttcConsent.checked || !tttcSendConfirm.checked || !tttcSendTitle.value.trim();
+}
+tttcSendTitle.addEventListener("input", syncTttcSend);
+tttcSendConfirm.addEventListener("change", syncTttcSend);
+tttcConsent.addEventListener("change", syncTttcSend);
+tttcForm.addEventListener("change", () => {
+  tttcSendResult.hidden = true;
+  syncTttcSend();
+});
+tttcSendButton.addEventListener("click", async () => {
+  if (!currentTttc || !tttcConsent.checked || !tttcSendConfirm.checked) return;
+  tttcSendButton.disabled = true;
+  tttcSendStatus.textContent = "正在請 Pocket TTTC 建立報告…";
+  try {
+    const response = await fetch("/api/integrations/pocket-tttc", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: tttcSendTitle.value,
+        description: "",
+        language: "zh-Hant",
+        csv: tttcRowsToCsv(currentTttc.rows),
+        confirmed: true,
+      }),
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.error || `Pocket TTTC 沒有完成建立（${response.status}）`);
+    tttcSendResult.replaceChildren();
+    const report = document.createElement("a");
+    report.href = payload.reportUrl;
+    report.target = "_blank";
+    report.rel = "noopener";
+    report.textContent = payload.reportUrl;
+    const manage = document.createElement("a");
+    manage.href = payload.manageUrl;
+    manage.target = "_blank";
+    manage.rel = "noopener";
+    manage.textContent = payload.manageUrl;
+    const publicLine = document.createElement("span");
+    publicLine.append("公開報告：", report, document.createElement("br"));
+    const privateLine = document.createElement("strong");
+    privateLine.append("管理連結（只顯示這一次，可刪除報告）：", manage);
+    tttcSendResult.append(publicLine, privateLine);
+    tttcSendResult.hidden = false;
+    tttcSendStatus.textContent = `已建立，共 ${payload.rows ?? currentTttc.summary.rows} 則發言；模型會分幾步處理，報告頁會自動更新。`;
+  } catch (error) {
+    tttcSendStatus.textContent = error instanceof Error ? error.message : "Pocket TTTC 沒有完成建立。";
+  } finally {
+    syncTttcSend();
+  }
+});
+
 function renderTttcResult(merged) {
   document.querySelector("#tttc-csv-summary").textContent = merged.summary.perFile
     .map((entry) => `${entry.file}：${entry.rows} 列`)

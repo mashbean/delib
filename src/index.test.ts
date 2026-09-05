@@ -10,6 +10,7 @@ import {
   handleHarmonicaRequest,
   handlePolisRequest,
   handlePocketPolisRequest,
+  handlePocketTttcRequest,
   handlePublicReceiptRequest,
   handleRankingRoomRequest,
   handleTttcRequest,
@@ -229,6 +230,54 @@ describe("direct integrations", () => {
       storedByDelib: false,
       credentialStoredByDelib: false,
     });
+  });
+
+  it("hands a tttc.csv to Pocket TTTC and returns the report and one-time manage links", async () => {
+    const upstream = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      expect(String(input)).toBe("https://ttt-city.mashbean.net/api/reports");
+      const sent = JSON.parse(String(init?.body));
+      expect(sent).toMatchObject({ title: "核電審議發言", language: "zh-Hant", confirmed: true });
+      expect(sent.csv).toContain("id,interview,comment");
+      return new Response(JSON.stringify({ reportId: "abc123def4", adminToken: "b".repeat(32), rows: 2 }), { status: 201 });
+    });
+    const response = await handlePocketTttcRequest(
+      new Request("https://delib.example/api/integrations/pocket-tttc", {
+        method: "POST",
+        headers: { Origin: "https://delib.example", "Content-Type": "application/json" },
+        body: JSON.stringify({ title: "核電審議發言", csv: "id,interview,comment\n1,阿德,演習從來沒真的演過\n2,,電價漲了\n", confirmed: true }),
+      }),
+      upstream as typeof fetch,
+    );
+    expect(response.status).toBe(201);
+    await expect(response.json()).resolves.toMatchObject({
+      integration: "pocket-tttc",
+      status: "queued",
+      reportId: "abc123def4",
+      rows: 2,
+      reportUrl: "https://ttt-city.mashbean.net/r/abc123def4",
+      manageUrl: `https://ttt-city.mashbean.net/r/abc123def4#admin=${"b".repeat(32)}`,
+      storedByDelib: false,
+      credentialStoredByDelib: false,
+    });
+  });
+
+  it("rejects Pocket TTTC requests without confirmation or the id/comment header, and maps upstream limits", async () => {
+    const make = (body: Record<string, unknown>) =>
+      new Request("https://delib.example/api/integrations/pocket-tttc", {
+        method: "POST",
+        headers: { Origin: "https://delib.example", "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+    const never = vi.fn();
+    expect((await handlePocketTttcRequest(make({ title: "x", csv: "id,comment\n1,a\n" }), never as typeof fetch)).status).toBe(400);
+    expect((await handlePocketTttcRequest(make({ title: "x", csv: "statement_id,text\n1,a\n", confirmed: true }), never as typeof fetch)).status).toBe(400);
+    expect(never).not.toHaveBeenCalled();
+    const limited = vi.fn(async () => new Response(JSON.stringify({ error: "creation rate limit reached" }), { status: 429 }));
+    expect((await handlePocketTttcRequest(make({ title: "x", csv: "id,comment\n1,a\n", confirmed: true }), limited as typeof fetch)).status).toBe(429);
+    const rejected = vi.fn(async () => new Response(JSON.stringify({ error: "這個部署每份報告最多 600 則發言" }), { status: 400 }));
+    const bad = await handlePocketTttcRequest(make({ title: "x", csv: "id,comment\n1,a\n", confirmed: true }), rejected as typeof fetch);
+    expect(bad.status).toBe(400);
+    await expect(bad.json()).resolves.toMatchObject({ error: "這個部署每份報告最多 600 則發言" });
   });
 
   it("requires confirmation and 5–15 unique Pocket Polis seed statements", async () => {

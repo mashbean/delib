@@ -1,6 +1,6 @@
 {
   "schema": "delib-tools/v1",
-  "updatedAt": "2026-09-01",
+  "updatedAt": "2026-09-05",
   "sources": [
     "https://metagov.org/delib-tools",
     "https://github.com/metagov/interop",
@@ -17,12 +17,34 @@
       "url": "https://call-in.mashbean.net/",
       "source": "https://github.com/mashbean/call-in",
       "status": "integrated",
-      "stages": ["evaluating", "eliciting", "deliberating"],
-      "goals": ["listen", "understand", "followup"],
-      "formats": ["hybrid", "online", "offline"],
-      "scales": ["small", "medium"],
-      "privacy": ["public", "pseudonymous"],
-      "outputs": ["questions", "insights", "receipt"],
+      "stages": [
+        "evaluating",
+        "eliciting",
+        "deliberating"
+      ],
+      "goals": [
+        "listen",
+        "understand",
+        "followup"
+      ],
+      "formats": [
+        "hybrid",
+        "online",
+        "offline"
+      ],
+      "scales": [
+        "small",
+        "medium"
+      ],
+      "privacy": [
+        "public",
+        "pseudonymous"
+      ],
+      "outputs": [
+        "questions",
+        "insights",
+        "receipt"
+      ],
       "hosting": "hosted-or-cloudflare",
       "deploy": "https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/call-in",
       "handoff": "管理者 JSON export；下一步是 delib-bundle 轉換器。"
@@ -34,12 +56,35 @@
       "url": "https://mashbean.github.io/Open-Book/",
       "source": "https://github.com/mashbean/Open-Book",
       "status": "integrated",
-      "stages": ["evaluating", "agenda-setting", "learning", "actuating"],
-      "goals": ["evidence", "propose", "decide"],
-      "formats": ["hybrid", "online", "offline"],
-      "scales": ["small", "medium", "large"],
-      "privacy": ["public"],
-      "outputs": ["evidence", "proposals", "receipt"],
+      "stages": [
+        "evaluating",
+        "agenda-setting",
+        "learning",
+        "actuating"
+      ],
+      "goals": [
+        "evidence",
+        "propose",
+        "decide"
+      ],
+      "formats": [
+        "hybrid",
+        "online",
+        "offline"
+      ],
+      "scales": [
+        "small",
+        "medium",
+        "large"
+      ],
+      "privacy": [
+        "public"
+      ],
+      "outputs": [
+        "evidence",
+        "proposals",
+        "receipt"
+      ],
       "hosting": "static-publication",
       "handoff": "CSV/XLSX 匯入、CSV 與靜態資料輸出；適合作為證據來源而非參與者資料庫。"
     },
@@ -50,12 +95,36 @@
       "url": "https://github.com/audreyt/uncommon-ground",
       "source": "https://github.com/audreyt/uncommon-ground",
       "status": "integrated",
-      "stages": ["learning", "deliberating", "actuating", "reflecting"],
-      "goals": ["understand", "followup", "listen"],
-      "formats": ["hybrid", "online", "offline"],
-      "scales": ["medium", "large"],
-      "privacy": ["public", "pseudonymous", "sensitive"],
-      "outputs": ["questions", "insights", "receipt"],
+      "stages": [
+        "learning",
+        "deliberating",
+        "actuating",
+        "reflecting"
+      ],
+      "goals": [
+        "understand",
+        "followup",
+        "listen"
+      ],
+      "formats": [
+        "hybrid",
+        "online",
+        "offline"
+      ],
+      "scales": [
+        "medium",
+        "large"
+      ],
+      "privacy": [
+        "public",
+        "pseudonymous",
+        "sensitive"
+      ],
+      "outputs": [
+        "questions",
+        "insights",
+        "receipt"
+      ],
       "hosting": "local-scripts-and-agent-skill",
       "handoff": "questions/clusters/arc/takes/loopbacks/meta JSON 與 verify.py。敏感資料必須在本機或核准環境處理。"
     },
@@ -66,15 +135,75 @@
       "url": "https://polis.mashbean.net/",
       "source": "https://github.com/mashbean/pocket-polis",
       "status": "integrated",
-      "stages": ["eliciting", "deliberating", "reflecting"],
-      "goals": ["listen", "understand", "propose", "followup"],
-      "formats": ["hybrid", "online"],
-      "scales": ["small", "medium", "large"],
-      "privacy": ["public", "pseudonymous"],
-      "outputs": ["insights", "proposals", "evidence", "receipt"],
+      "stages": [
+        "eliciting",
+        "deliberating",
+        "reflecting"
+      ],
+      "goals": [
+        "listen",
+        "understand",
+        "propose",
+        "followup"
+      ],
+      "formats": [
+        "hybrid",
+        "online"
+      ],
+      "scales": [
+        "small",
+        "medium",
+        "large"
+      ],
+      "privacy": [
+        "public",
+        "pseudonymous"
+      ],
+      "outputs": [
+        "insights",
+        "proposals",
+        "evidence",
+        "receipt"
+      ],
       "hosting": "cloudflare-worker",
       "deploy": "https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/pocket-polis",
       "handoff": "Delib 可免登入代建並交回參與、成果、私人管理三種連結；主辦者可在本機資料工作台驗證 statements.csv 與 votes.csv，再下載可攜 JSON、TTTC CSV 或 Agora 三檔匯入包。達到至少 3 位參與者與逐句 3 份回應門檻後，可挑選 1–8 句陳述、補上解讀與權責，發布不含代號和逐筆投票的成果收據，再接續 Call-in、Harmonica、TTTC 或 Pol.is。管理 token 只留在建立者分頁。"
+    },
+    {
+      "id": "pocket-tttc",
+      "name": "Pocket TTTC · 口袋議題樹",
+      "summary": "把 id,interview,comment 的 CSV 變成主題 → 子主題 → 可辯論的主張 → 原句引述的議題樹；Talk to the City 的單一 Cloudflare Worker 重寫，免登入、免費額度內可用。",
+      "url": "https://ttt-city.mashbean.net/",
+      "source": "https://github.com/mashbean/tttc-serverless",
+      "status": "integrated",
+      "stages": [
+        "reflecting",
+        "deliberating"
+      ],
+      "goals": [
+        "understand",
+        "followup"
+      ],
+      "formats": [
+        "online",
+        "hybrid"
+      ],
+      "scales": [
+        "small",
+        "medium",
+        "large"
+      ],
+      "privacy": [
+        "pseudonymous",
+        "public"
+      ],
+      "outputs": [
+        "insights",
+        "evidence"
+      ],
+      "hosting": "cloudflare-worker",
+      "deploy": "https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/tttc-serverless",
+      "handoff": "Delib 可免登入代建並交回公開報告與一次性管理連結；資料工作台可把口袋審議報告頁、Call-in 或既有的 tttc.csv 合併後直接送出。報告、輸入與管理權杖都留在 Pocket TTTC，Delib 不保存。"
     },
     {
       "id": "polis",
@@ -83,12 +212,33 @@
       "url": "https://pol.is/",
       "source": "https://github.com/compdemocracy/polis",
       "status": "integrated",
-      "stages": ["eliciting", "deliberating", "reflecting"],
-      "goals": ["listen", "understand", "propose"],
-      "formats": ["hybrid", "online"],
-      "scales": ["medium", "large"],
-      "privacy": ["public", "pseudonymous"],
-      "outputs": ["insights", "proposals", "receipt"],
+      "stages": [
+        "eliciting",
+        "deliberating",
+        "reflecting"
+      ],
+      "goals": [
+        "listen",
+        "understand",
+        "propose"
+      ],
+      "formats": [
+        "hybrid",
+        "online"
+      ],
+      "scales": [
+        "medium",
+        "large"
+      ],
+      "privacy": [
+        "public",
+        "pseudonymous"
+      ],
+      "outputs": [
+        "insights",
+        "proposals",
+        "receipt"
+      ],
       "hosting": "hosted-or-docker",
       "handoff": "既有對話可嵌入；連接 Pol.is 帳號的 Site ID 後可第一次載入自動建立。完整自架需要 Docker 與 PostgreSQL。"
     },
@@ -99,12 +249,32 @@
       "url": "https://www.agoracitizen.app/",
       "source": "https://github.com/zkorum/agora",
       "status": "integrated",
-      "stages": ["eliciting", "deliberating", "reflecting"],
-      "goals": ["listen", "understand", "propose"],
-      "formats": ["hybrid", "online"],
-      "scales": ["medium", "large"],
-      "privacy": ["public", "pseudonymous"],
-      "outputs": ["insights", "proposals"],
+      "stages": [
+        "eliciting",
+        "deliberating",
+        "reflecting"
+      ],
+      "goals": [
+        "listen",
+        "understand",
+        "propose"
+      ],
+      "formats": [
+        "hybrid",
+        "online"
+      ],
+      "scales": [
+        "medium",
+        "large"
+      ],
+      "privacy": [
+        "public",
+        "pseudonymous"
+      ],
+      "outputs": [
+        "insights",
+        "proposals"
+      ],
       "hosting": "hosted-or-multi-service",
       "handoff": "既有公開對話可在 Delib 內嵌入；Agora 另有 Pol.is／CSV 匯入 worker，但建立、匯入與匯出權限仍留在上游。"
     },
@@ -115,12 +285,35 @@
       "url": "https://talktothe.city/",
       "source": "https://github.com/AIObjectives/tttc-light-js",
       "status": "integrated",
-      "stages": ["agenda-setting", "eliciting", "learning"],
-      "goals": ["listen", "understand", "evidence", "followup"],
-      "formats": ["hybrid", "online", "offline"],
-      "scales": ["medium", "large"],
-      "privacy": ["public", "pseudonymous"],
-      "outputs": ["insights", "evidence", "receipt"],
+      "stages": [
+        "agenda-setting",
+        "eliciting",
+        "learning"
+      ],
+      "goals": [
+        "listen",
+        "understand",
+        "evidence",
+        "followup"
+      ],
+      "formats": [
+        "hybrid",
+        "online",
+        "offline"
+      ],
+      "scales": [
+        "medium",
+        "large"
+      ],
+      "privacy": [
+        "public",
+        "pseudonymous"
+      ],
+      "outputs": [
+        "insights",
+        "evidence",
+        "receipt"
+      ],
       "hosting": "hosted-api",
       "handoff": "現行官方建立頁可留在 Delib 開啟；登入與資料上傳仍只交給 TTTC，AI 整理必須保留引文與人工複核。"
     },
@@ -131,12 +324,36 @@
       "url": "https://metagov.org/delib-tools/decidim",
       "source": "https://github.com/decidim/decidim",
       "status": "catalog",
-      "stages": ["agenda-setting", "eliciting", "deliberating", "proposing", "deciding"],
-      "goals": ["listen", "propose", "decide", "followup"],
-      "formats": ["hybrid", "online"],
-      "scales": ["medium", "large"],
-      "privacy": ["public", "pseudonymous"],
-      "outputs": ["proposals", "decision", "receipt"],
+      "stages": [
+        "agenda-setting",
+        "eliciting",
+        "deliberating",
+        "proposing",
+        "deciding"
+      ],
+      "goals": [
+        "listen",
+        "propose",
+        "decide",
+        "followup"
+      ],
+      "formats": [
+        "hybrid",
+        "online"
+      ],
+      "scales": [
+        "medium",
+        "large"
+      ],
+      "privacy": [
+        "public",
+        "pseudonymous"
+      ],
+      "outputs": [
+        "proposals",
+        "decision",
+        "receipt"
+      ],
       "hosting": "rails-application",
       "handoff": "適合長期制度化參與；不是 Cloudflare 單一 Worker 應用。"
     },
@@ -147,12 +364,37 @@
       "url": "https://100-democracy.parti.coop/en/07-builder.html",
       "source": "https://github.com/parti-coop/demosx",
       "status": "catalog",
-      "stages": ["agenda-setting", "eliciting", "deliberating", "proposing", "deciding"],
-      "goals": ["listen", "propose", "decide", "followup"],
-      "formats": ["hybrid", "online"],
-      "scales": ["medium", "large"],
-      "privacy": ["public", "pseudonymous"],
-      "outputs": ["insights", "proposals", "decision", "receipt"],
+      "stages": [
+        "agenda-setting",
+        "eliciting",
+        "deliberating",
+        "proposing",
+        "deciding"
+      ],
+      "goals": [
+        "listen",
+        "propose",
+        "decide",
+        "followup"
+      ],
+      "formats": [
+        "hybrid",
+        "online"
+      ],
+      "scales": [
+        "medium",
+        "large"
+      ],
+      "privacy": [
+        "public",
+        "pseudonymous"
+      ],
+      "outputs": [
+        "insights",
+        "proposals",
+        "decision",
+        "receipt"
+      ],
       "hosting": "java-docker-application",
       "handoff": "MIT 原始碼可自架，但目前是 Java／Maven WAR、Tomcat、MySQL、Nginx 的完整平台；repository 最後更新於 2022，導入前需做維護與安全評估。"
     },
@@ -163,12 +405,32 @@
       "url": "https://metagov.org/delib-tools/deliberative-canvas",
       "source": "https://github.com/uppy01/deliberative-canvas-app",
       "status": "catalog",
-      "stages": ["learning", "reflecting"],
-      "goals": ["understand", "evidence"],
-      "formats": ["hybrid", "online", "offline"],
-      "scales": ["small", "medium"],
-      "privacy": ["public", "pseudonymous", "sensitive"],
-      "outputs": ["insights", "evidence"],
+      "stages": [
+        "learning",
+        "reflecting"
+      ],
+      "goals": [
+        "understand",
+        "evidence"
+      ],
+      "formats": [
+        "hybrid",
+        "online",
+        "offline"
+      ],
+      "scales": [
+        "small",
+        "medium"
+      ],
+      "privacy": [
+        "public",
+        "pseudonymous",
+        "sensitive"
+      ],
+      "outputs": [
+        "insights",
+        "evidence"
+      ],
       "hosting": "verify-with-maintainer",
       "handoff": "先核對目前版本與匯入／匯出格式。"
     },
@@ -179,12 +441,29 @@
       "url": "https://metagov.org/delib-tools/ethelo",
       "source": "https://metagov.org/delib-tools/ethelo",
       "status": "catalog",
-      "stages": ["deliberating", "deciding"],
-      "goals": ["understand", "propose", "decide"],
-      "formats": ["online"],
-      "scales": ["medium", "large"],
-      "privacy": ["public"],
-      "outputs": ["proposals", "decision"],
+      "stages": [
+        "deliberating",
+        "deciding"
+      ],
+      "goals": [
+        "understand",
+        "propose",
+        "decide"
+      ],
+      "formats": [
+        "online"
+      ],
+      "scales": [
+        "medium",
+        "large"
+      ],
+      "privacy": [
+        "public"
+      ],
+      "outputs": [
+        "proposals",
+        "decision"
+      ],
       "hosting": "verify-with-maintainer"
     },
     {
@@ -194,12 +473,27 @@
       "url": "https://metagov.org/delib-tools/evocracy",
       "source": "https://metagov.org/delib-tools/evocracy",
       "status": "catalog",
-      "stages": ["deliberating", "deciding"],
-      "goals": ["propose", "decide"],
-      "formats": ["online"],
-      "scales": ["large"],
-      "privacy": ["public"],
-      "outputs": ["proposals", "decision"],
+      "stages": [
+        "deliberating",
+        "deciding"
+      ],
+      "goals": [
+        "propose",
+        "decide"
+      ],
+      "formats": [
+        "online"
+      ],
+      "scales": [
+        "large"
+      ],
+      "privacy": [
+        "public"
+      ],
+      "outputs": [
+        "proposals",
+        "decision"
+      ],
       "hosting": "verify-with-maintainer"
     },
     {
@@ -209,12 +503,28 @@
       "url": "https://metagov.org/delib-tools/global-brain-algorithm",
       "source": "https://github.com/social-protocols/GlobalBrain.jl",
       "status": "catalog",
-      "stages": ["learning", "deliberating"],
-      "goals": ["evidence", "understand"],
-      "formats": ["online"],
-      "scales": ["medium", "large"],
-      "privacy": ["public"],
-      "outputs": ["evidence", "insights"],
+      "stages": [
+        "learning",
+        "deliberating"
+      ],
+      "goals": [
+        "evidence",
+        "understand"
+      ],
+      "formats": [
+        "online"
+      ],
+      "scales": [
+        "medium",
+        "large"
+      ],
+      "privacy": [
+        "public"
+      ],
+      "outputs": [
+        "evidence",
+        "insights"
+      ],
       "hosting": "verify-with-maintainer"
     },
     {
@@ -224,12 +534,33 @@
       "url": "https://metagov.org/delib-tools/go-vocal",
       "source": "https://github.com/CitizenLabDotCo/citizenlab-oss",
       "status": "catalog",
-      "stages": ["eliciting", "deliberating", "proposing"],
-      "goals": ["listen", "propose", "followup"],
-      "formats": ["hybrid", "online"],
-      "scales": ["medium", "large"],
-      "privacy": ["public", "pseudonymous"],
-      "outputs": ["insights", "proposals", "receipt"],
+      "stages": [
+        "eliciting",
+        "deliberating",
+        "proposing"
+      ],
+      "goals": [
+        "listen",
+        "propose",
+        "followup"
+      ],
+      "formats": [
+        "hybrid",
+        "online"
+      ],
+      "scales": [
+        "medium",
+        "large"
+      ],
+      "privacy": [
+        "public",
+        "pseudonymous"
+      ],
+      "outputs": [
+        "insights",
+        "proposals",
+        "receipt"
+      ],
       "hosting": "hosted-platform"
     },
     {
@@ -239,12 +570,31 @@
       "url": "https://metagov.org/delib-tools/harmonica",
       "source": "https://github.com/harmonicabot/harmonica-web-app",
       "status": "integrated",
-      "stages": ["agenda-setting", "eliciting", "deliberating"],
-      "goals": ["listen", "understand", "propose"],
-      "formats": ["online"],
-      "scales": ["medium", "large"],
-      "privacy": ["public", "pseudonymous"],
-      "outputs": ["insights", "proposals"],
+      "stages": [
+        "agenda-setting",
+        "eliciting",
+        "deliberating"
+      ],
+      "goals": [
+        "listen",
+        "understand",
+        "propose"
+      ],
+      "formats": [
+        "online"
+      ],
+      "scales": [
+        "medium",
+        "large"
+      ],
+      "privacy": [
+        "public",
+        "pseudonymous"
+      ],
+      "outputs": [
+        "insights",
+        "proposals"
+      ],
       "hosting": "hosted-ai",
       "handoff": "需明確揭露 AI 處理、資料保存與人工複核。"
     },
@@ -255,12 +605,34 @@
       "url": "https://metagov.org/delib-tools/interoperable-co-operative-governance",
       "source": "https://metagov.org/delib-tools/interoperable-co-operative-governance",
       "status": "catalog",
-      "stages": ["agenda-setting", "deliberating", "deciding", "actuating"],
-      "goals": ["propose", "decide", "followup"],
-      "formats": ["hybrid", "online"],
-      "scales": ["small", "medium"],
-      "privacy": ["public", "pseudonymous"],
-      "outputs": ["proposals", "decision", "receipt"],
+      "stages": [
+        "agenda-setting",
+        "deliberating",
+        "deciding",
+        "actuating"
+      ],
+      "goals": [
+        "propose",
+        "decide",
+        "followup"
+      ],
+      "formats": [
+        "hybrid",
+        "online"
+      ],
+      "scales": [
+        "small",
+        "medium"
+      ],
+      "privacy": [
+        "public",
+        "pseudonymous"
+      ],
+      "outputs": [
+        "proposals",
+        "decision",
+        "receipt"
+      ],
       "hosting": "toolkit"
     },
     {
@@ -270,12 +642,29 @@
       "url": "https://metagov.org/delib-tools/iswe-foundation",
       "source": "https://metagov.org/delib-tools/iswe-foundation",
       "status": "catalog",
-      "stages": ["agenda-setting", "eliciting"],
-      "goals": ["listen", "understand"],
-      "formats": ["hybrid", "online"],
-      "scales": ["large"],
-      "privacy": ["public", "pseudonymous"],
-      "outputs": ["insights", "receipt"],
+      "stages": [
+        "agenda-setting",
+        "eliciting"
+      ],
+      "goals": [
+        "listen",
+        "understand"
+      ],
+      "formats": [
+        "hybrid",
+        "online"
+      ],
+      "scales": [
+        "large"
+      ],
+      "privacy": [
+        "public",
+        "pseudonymous"
+      ],
+      "outputs": [
+        "insights",
+        "receipt"
+      ],
       "hosting": "verify-with-maintainer"
     },
     {
@@ -285,12 +674,30 @@
       "url": "https://metagov.org/delib-tools/ize",
       "source": "https://metagov.org/delib-tools/ize",
       "status": "catalog",
-      "stages": ["eliciting", "actuating"],
-      "goals": ["listen", "followup"],
-      "formats": ["online"],
-      "scales": ["small", "medium", "large"],
-      "privacy": ["public", "pseudonymous"],
-      "outputs": ["questions", "receipt"],
+      "stages": [
+        "eliciting",
+        "actuating"
+      ],
+      "goals": [
+        "listen",
+        "followup"
+      ],
+      "formats": [
+        "online"
+      ],
+      "scales": [
+        "small",
+        "medium",
+        "large"
+      ],
+      "privacy": [
+        "public",
+        "pseudonymous"
+      ],
+      "outputs": [
+        "questions",
+        "receipt"
+      ],
       "hosting": "hosted-platform"
     },
     {
@@ -300,12 +707,32 @@
       "url": "https://metagov.org/delib-tools/maple",
       "source": "https://github.com/codeforboston/maple",
       "status": "catalog",
-      "stages": ["eliciting", "learning", "deliberating"],
-      "goals": ["listen", "evidence", "followup"],
-      "formats": ["hybrid", "online", "offline"],
-      "scales": ["medium", "large"],
-      "privacy": ["public"],
-      "outputs": ["evidence", "receipt"],
+      "stages": [
+        "eliciting",
+        "learning",
+        "deliberating"
+      ],
+      "goals": [
+        "listen",
+        "evidence",
+        "followup"
+      ],
+      "formats": [
+        "hybrid",
+        "online",
+        "offline"
+      ],
+      "scales": [
+        "medium",
+        "large"
+      ],
+      "privacy": [
+        "public"
+      ],
+      "outputs": [
+        "evidence",
+        "receipt"
+      ],
       "hosting": "verify-with-maintainer"
     },
     {
@@ -315,12 +742,27 @@
       "url": "https://metagov.org/delib-tools/micropublishing",
       "source": "https://github.com/oasisresearchlab/dg-social-media",
       "status": "catalog",
-      "stages": ["learning"],
-      "goals": ["evidence"],
-      "formats": ["online", "offline"],
-      "scales": ["small", "medium", "large"],
-      "privacy": ["public"],
-      "outputs": ["evidence"],
+      "stages": [
+        "learning"
+      ],
+      "goals": [
+        "evidence"
+      ],
+      "formats": [
+        "online",
+        "offline"
+      ],
+      "scales": [
+        "small",
+        "medium",
+        "large"
+      ],
+      "privacy": [
+        "public"
+      ],
+      "outputs": [
+        "evidence"
+      ],
       "hosting": "verify-with-maintainer"
     },
     {
@@ -330,12 +772,28 @@
       "url": "https://metagov.org/delib-tools/moral-graph",
       "source": "https://github.com/meaningalignment/moral-graph-elicitation",
       "status": "catalog",
-      "stages": ["eliciting", "reflecting"],
-      "goals": ["listen", "understand"],
-      "formats": ["online"],
-      "scales": ["medium", "large"],
-      "privacy": ["public", "pseudonymous"],
-      "outputs": ["insights"],
+      "stages": [
+        "eliciting",
+        "reflecting"
+      ],
+      "goals": [
+        "listen",
+        "understand"
+      ],
+      "formats": [
+        "online"
+      ],
+      "scales": [
+        "medium",
+        "large"
+      ],
+      "privacy": [
+        "public",
+        "pseudonymous"
+      ],
+      "outputs": [
+        "insights"
+      ],
       "hosting": "verify-with-maintainer"
     },
     {
@@ -345,12 +803,27 @@
       "url": "https://metagov.org/delib-tools/pairwise",
       "source": "https://github.com/GeneralMagicio/pairwise-rf4",
       "status": "catalog",
-      "stages": ["deciding"],
-      "goals": ["decide"],
-      "formats": ["hybrid", "online"],
-      "scales": ["medium", "large"],
-      "privacy": ["public", "pseudonymous"],
-      "outputs": ["decision"],
+      "stages": [
+        "deciding"
+      ],
+      "goals": [
+        "decide"
+      ],
+      "formats": [
+        "hybrid",
+        "online"
+      ],
+      "scales": [
+        "medium",
+        "large"
+      ],
+      "privacy": [
+        "public",
+        "pseudonymous"
+      ],
+      "outputs": [
+        "decision"
+      ],
       "hosting": "hosted-or-open-source"
     },
     {
@@ -360,12 +833,32 @@
       "url": "https://metagov.org/delib-tools/policycraft",
       "source": "https://github.com/tskuo/PolicyCraft",
       "status": "catalog",
-      "stages": ["eliciting", "deliberating", "proposing", "reflecting"],
-      "goals": ["understand", "propose"],
-      "formats": ["hybrid", "online"],
-      "scales": ["small", "medium"],
-      "privacy": ["public", "pseudonymous"],
-      "outputs": ["insights", "proposals"],
+      "stages": [
+        "eliciting",
+        "deliberating",
+        "proposing",
+        "reflecting"
+      ],
+      "goals": [
+        "understand",
+        "propose"
+      ],
+      "formats": [
+        "hybrid",
+        "online"
+      ],
+      "scales": [
+        "small",
+        "medium"
+      ],
+      "privacy": [
+        "public",
+        "pseudonymous"
+      ],
+      "outputs": [
+        "insights",
+        "proposals"
+      ],
       "hosting": "research-prototype"
     },
     {
@@ -375,12 +868,31 @@
       "url": "https://metagov.org/delib-tools/power-ranker",
       "source": "https://github.com/zaratanDotWorld/powerRanker",
       "status": "integrated",
-      "stages": ["eliciting", "reflecting", "deciding"],
-      "goals": ["propose", "decide"],
-      "formats": ["hybrid", "online"],
-      "scales": ["medium", "large"],
-      "privacy": ["public", "pseudonymous"],
-      "outputs": ["decision", "receipt"],
+      "stages": [
+        "eliciting",
+        "reflecting",
+        "deciding"
+      ],
+      "goals": [
+        "propose",
+        "decide"
+      ],
+      "formats": [
+        "hybrid",
+        "online"
+      ],
+      "scales": [
+        "medium",
+        "large"
+      ],
+      "privacy": [
+        "public",
+        "pseudonymous"
+      ],
+      "outputs": [
+        "decision",
+        "receipt"
+      ],
       "hosting": "open-source"
     },
     {
@@ -390,12 +902,28 @@
       "url": "https://metagov.org/delib-tools/stanford-participatory-budgeting-platform",
       "source": "https://github.com/StanfordCDT/pb",
       "status": "catalog",
-      "stages": ["deciding"],
-      "goals": ["decide"],
-      "formats": ["hybrid", "online"],
-      "scales": ["medium", "large"],
-      "privacy": ["public", "pseudonymous"],
-      "outputs": ["decision", "receipt"],
+      "stages": [
+        "deciding"
+      ],
+      "goals": [
+        "decide"
+      ],
+      "formats": [
+        "hybrid",
+        "online"
+      ],
+      "scales": [
+        "medium",
+        "large"
+      ],
+      "privacy": [
+        "public",
+        "pseudonymous"
+      ],
+      "outputs": [
+        "decision",
+        "receipt"
+      ],
       "hosting": "verify-with-maintainer"
     },
     {
@@ -405,12 +933,34 @@
       "url": "https://metagov.org/delib-tools/swarmcheck",
       "source": "https://metagov.org/delib-tools/swarmcheck",
       "status": "catalog",
-      "stages": ["agenda-setting", "learning", "deliberating", "deciding"],
-      "goals": ["evidence", "understand", "decide"],
-      "formats": ["hybrid", "online"],
-      "scales": ["small", "medium"],
-      "privacy": ["public", "pseudonymous"],
-      "outputs": ["evidence", "insights", "decision"],
+      "stages": [
+        "agenda-setting",
+        "learning",
+        "deliberating",
+        "deciding"
+      ],
+      "goals": [
+        "evidence",
+        "understand",
+        "decide"
+      ],
+      "formats": [
+        "hybrid",
+        "online"
+      ],
+      "scales": [
+        "small",
+        "medium"
+      ],
+      "privacy": [
+        "public",
+        "pseudonymous"
+      ],
+      "outputs": [
+        "evidence",
+        "insights",
+        "decision"
+      ],
       "hosting": "verify-with-maintainer"
     },
     {
@@ -420,12 +970,33 @@
       "url": "https://metagov.org/delib-tools/voice-to-vision",
       "source": "https://metagov.org/delib-tools/voice-to-vision",
       "status": "catalog",
-      "stages": ["eliciting", "reflecting", "actuating"],
-      "goals": ["listen", "understand", "followup"],
-      "formats": ["hybrid", "online", "offline"],
-      "scales": ["medium", "large"],
-      "privacy": ["public", "pseudonymous"],
-      "outputs": ["insights", "receipt"],
+      "stages": [
+        "eliciting",
+        "reflecting",
+        "actuating"
+      ],
+      "goals": [
+        "listen",
+        "understand",
+        "followup"
+      ],
+      "formats": [
+        "hybrid",
+        "online",
+        "offline"
+      ],
+      "scales": [
+        "medium",
+        "large"
+      ],
+      "privacy": [
+        "public",
+        "pseudonymous"
+      ],
+      "outputs": [
+        "insights",
+        "receipt"
+      ],
       "hosting": "verify-with-maintainer"
     },
     {
@@ -435,12 +1006,33 @@
       "url": "https://heyform.net/",
       "source": "https://github.com/heyform/heyform",
       "status": "integrated",
-      "stages": ["evaluating", "agenda-setting", "eliciting"],
-      "goals": ["listen", "evidence"],
-      "formats": ["hybrid", "online", "offline"],
-      "scales": ["small", "medium", "large"],
-      "privacy": ["public", "pseudonymous"],
-      "outputs": ["questions", "evidence"],
+      "stages": [
+        "evaluating",
+        "agenda-setting",
+        "eliciting"
+      ],
+      "goals": [
+        "listen",
+        "evidence"
+      ],
+      "formats": [
+        "hybrid",
+        "online",
+        "offline"
+      ],
+      "scales": [
+        "small",
+        "medium",
+        "large"
+      ],
+      "privacy": [
+        "public",
+        "pseudonymous"
+      ],
+      "outputs": [
+        "questions",
+        "evidence"
+      ],
       "hosting": "hosted-or-open-source",
       "handoff": "已發布表單可在 Delib 內嵌入；建立與管理仍留在 HeyForm，表單個資需與審議意見分開保存。"
     }

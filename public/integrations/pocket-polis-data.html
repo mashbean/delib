@@ -132,6 +132,23 @@
             <button id="tttc-csv-download" class="button button-primary" type="button" disabled>下載合併後的 tttc.csv</button>
             <a class="button button-ghost" href="/integrations/tttc">接著到 TTTC 工作區 →</a>
           </div>
+          <div class="data-card-notice" id="tttc-send-card">
+            <strong>或直接送到 Pocket TTTC</strong>
+            <p>Delib 伺服器會把合併後的 CSV 交給 <a href="https://ttt-city.mashbean.net" target="_blank" rel="noopener">ttt-city.mashbean.net</a> 建立議題樹報告（主題 → 子主題 → 主張 → 引述）。報告網址與管理連結只顯示一次，Delib 不保存。</p>
+            <label>
+              分析名稱
+              <input id="tttc-send-title" maxlength="120" placeholder="例如：核電重啟五十人審議的全部發言" />
+            </label>
+            <label class="consent-row">
+              <input id="tttc-send-confirm" type="checkbox" />
+              <span>我確認這份資料沒有直接識別資訊、有權交給模型分析，並同意在 Pocket TTTC 建立報告。</span>
+            </label>
+            <div class="data-download-row">
+              <button id="tttc-send" class="button button-primary" type="button" disabled>建立 Pocket TTTC 報告</button>
+            </div>
+            <p id="tttc-send-status" class="action-status" role="status" aria-live="polite"></p>
+            <p id="tttc-send-result" hidden></p>
+          </div>
         </section>
 
         <section id="pocket-polis-data-result" class="data-result" hidden aria-live="polite">
