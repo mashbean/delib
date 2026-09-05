@@ -154,6 +154,7 @@ function renderHandoffPreview(handoff) {
     }),
   );
   document.querySelector("#receipt-handoff-boundary").textContent = target.omitted;
+  document.querySelector("#receipt-handoff-data").hidden = handoff.target !== "talk-to-the-city";
   const preview = document.querySelector("#receipt-handoff-preview");
   preview.hidden = false;
   preview.querySelector("button").focus();

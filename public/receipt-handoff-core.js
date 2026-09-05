@@ -26,7 +26,9 @@ export const RECEIPT_HANDOFF_TARGETS = Object.freeze({
     label: "整理下一輪文字 · TTTC",
     hash: "launch-talk-to-the-city",
     carried: Object.freeze(["分析名稱", "要補充理解的問題"]),
-    omitted: "不帶任何 CSV 或原始意見；成果收據不是文字分析資料。",
+    omitted:
+      "不帶任何 CSV 或原始意見；成果收據不是文字分析資料。文字資料另外取得：口袋審議報告頁的「資料與其他工具」可直接下載 tttc.csv（id,interview,comment），或下載 statements.csv 與 votes.csv 到 Delib 資料工作台轉換；排序收據沒有自由文字。",
+    dataPath: "/integrations/pocket-polis-data",
   }),
   polis: Object.freeze({
     label: "開放新陳述 · Pol.is",
@@ -175,7 +177,7 @@ function buildDraft(sourceReceipt, target) {
       title: limitLine(`${title}：下一輪文字意見`, 120),
       description: limitText(
         tool === "pocket-polis"
-          ? `延續前一輪口袋審議，這次要補充理解：${missingVoices}請回資料工作台下載已核准意見 CSV；公開成果收據不是 Talk to the City 的分析資料。`
+          ? `延續前一輪口袋審議，這次要補充理解：${missingVoices}請到口袋審議報告頁下載 tttc.csv，或把 statements.csv 與 votes.csv 交給 Delib 資料工作台轉成已去識別的原始文字意見；公開成果收據不是 Talk to the City 的分析資料。`
           : `延續前一輪排序，這次要補充理解：${missingVoices}請只上傳已去識別的原始文字意見；排序成果收據不是 Talk to the City 的分析資料。`,
         500,
       ),
