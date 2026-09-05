@@ -73,7 +73,7 @@
       "cloudflareNative": true,
       "nextAction": "綁正式網域；用真實活動比對它與 Uncommon Ground 腳本版的回覆品質，決定是否補 reception-test 與雙語。",
       "evidence": [
-        "https://pocket-reply.mashbean.workers.dev/",
+        "https://reply.mashbean.net/",
         "https://github.com/mashbean/pocket-reply",
         "https://github.com/audreyt/uncommon-ground"
       ]

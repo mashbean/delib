@@ -132,7 +132,7 @@
       "id": "pocket-reply",
       "name": "Pocket Reply · 口袋回覆",
       "summary": "把提問池變成一條演講弧線、每段一句落地的立場、每位提問者一則親筆回覆與公開收據；Uncommon Ground 的方法做成單一 Cloudflare Worker，不用跑腳本。",
-      "url": "https://pocket-reply.mashbean.workers.dev/",
+      "url": "https://reply.mashbean.net/",
       "source": "https://github.com/mashbean/pocket-reply",
       "status": "integrated",
       "stages": [

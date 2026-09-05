@@ -237,7 +237,7 @@ describe("direct integrations", () => {
 
   it("hands a question pool to Pocket Reply and returns the receipt and one-time manage links", async () => {
     const upstream = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
-      expect(String(input)).toBe("https://pocket-reply.mashbean.workers.dev/api/loops");
+      expect(String(input)).toBe("https://reply.mashbean.net/api/loops");
       const sent = JSON.parse(String(init?.body));
       expect(sent).toMatchObject({ title: "叩應閉環", speaker: "主持人", confirmed: true });
       expect(sent.csv).toContain("id,interview,comment");
@@ -256,8 +256,8 @@ describe("direct integrations", () => {
       integration: "pocket-reply",
       loopId: "abc123def4",
       questions: 2,
-      receiptUrl: "https://pocket-reply.mashbean.workers.dev/r/abc123def4",
-      manageUrl: `https://pocket-reply.mashbean.workers.dev/r/abc123def4#admin=${"e".repeat(32)}`,
+      receiptUrl: "https://reply.mashbean.net/r/abc123def4",
+      manageUrl: `https://reply.mashbean.net/r/abc123def4#admin=${"e".repeat(32)}`,
       storedByDelib: false,
     });
     const never = vi.fn();

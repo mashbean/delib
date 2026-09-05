@@ -81,7 +81,7 @@ const DEFAULT_POCKET_POLIS_ORIGIN = "https://polis.mashbean.net";
 const DEFAULT_POCKET_TTTC_ORIGIN = "https://ttt-city.mashbean.net";
 const DEFAULT_POCKET_FORM_ORIGIN = "https://form.mashbean.net";
 const DEFAULT_POCKET_HARMONICA_ORIGIN = "https://harmonica.mashbean.net";
-const DEFAULT_POCKET_REPLY_ORIGIN = "https://pocket-reply.mashbean.workers.dev";
+const DEFAULT_POCKET_REPLY_ORIGIN = "https://reply.mashbean.net";
 /** Pocket TTTC 接受最多 3 MiB 的 CSV；這個端點的上限跟著它，而非一般整合的 12 KB。 */
 const MAX_POCKET_TTTC_BODY_BYTES = 3 * 1024 * 1024 + 64 * 1024;
 /** Upstream creators answer in a few seconds; the BYOK model call may take longer. */
