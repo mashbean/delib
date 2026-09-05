@@ -11,6 +11,7 @@ import {
   handlePolisRequest,
   handlePocketPolisRequest,
   handlePocketHarmonicaRequest,
+  handlePocketReplyRequest,
   handlePocketFormRequest,
   handlePocketTttcRequest,
   handlePublicReceiptRequest,
@@ -232,6 +233,37 @@ describe("direct integrations", () => {
       storedByDelib: false,
       credentialStoredByDelib: false,
     });
+  });
+
+  it("hands a question pool to Pocket Reply and returns the receipt and one-time manage links", async () => {
+    const upstream = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      expect(String(input)).toBe("https://pocket-reply.mashbean.workers.dev/api/loops");
+      const sent = JSON.parse(String(init?.body));
+      expect(sent).toMatchObject({ title: "叩應閉環", speaker: "主持人", confirmed: true });
+      expect(sent.csv).toContain("id,interview,comment");
+      return new Response(JSON.stringify({ loopId: "abc123def4", adminToken: "e".repeat(32), questions: 2 }), { status: 201 });
+    });
+    const response = await handlePocketReplyRequest(
+      new Request("https://delib.example/api/integrations/pocket-reply", {
+        method: "POST",
+        headers: { Origin: "https://delib.example", "Content-Type": "application/json" },
+        body: JSON.stringify({ title: "叩應閉環", speaker: "主持人", positions: "先審查。https://example.org/p", csv: "id,interview,comment\n1,阿德,演習從來沒真的演過\n2,,電價漲了\n", confirmed: true }),
+      }),
+      upstream as typeof fetch,
+    );
+    expect(response.status).toBe(201);
+    await expect(response.json()).resolves.toMatchObject({
+      integration: "pocket-reply",
+      loopId: "abc123def4",
+      questions: 2,
+      receiptUrl: "https://pocket-reply.mashbean.workers.dev/r/abc123def4",
+      manageUrl: `https://pocket-reply.mashbean.workers.dev/r/abc123def4#admin=${"e".repeat(32)}`,
+      storedByDelib: false,
+    });
+    const never = vi.fn();
+    const noSpeaker = await handlePocketReplyRequest(new Request("https://delib.example/api/integrations/pocket-reply", { method: "POST", headers: { Origin: "https://delib.example", "Content-Type": "application/json" }, body: JSON.stringify({ title: "x", csv: "id,comment\n1,a\n", confirmed: true }) }), never as typeof fetch);
+    expect(noSpeaker.status).toBe(400);
+    expect(never).not.toHaveBeenCalled();
   });
 
   it("creates a Pocket Harmonica interview from the Harmonica-shaped draft without any API key", async () => {

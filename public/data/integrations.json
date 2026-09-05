@@ -225,6 +225,51 @@
       ]
     },
     {
+      "toolId": "pocket-reply",
+      "readiness": "available",
+      "activation": "managed-create",
+      "label": "免登入直接建立",
+      "summary": "把 tttc.csv 提問池交給 Pocket Reply：4–10 段弧線、每段一句只引用回覆者公開立場的立場、每位提問者一則標記真實角色的回覆、公開收據與 N/N 驗證。",
+      "accountRequired": false,
+      "credentialRequired": false,
+      "freePath": "使用 mashbean 維運的 Pocket Reply 共用主機（Workers AI 免費額度、每日 9,000 神經元），或按 Deploy to Cloudflare 建立自己的獨立服務。",
+      "writesExternalState": "按下確認後，本站伺服器會呼叫 Pocket Reply 的建立 API，立即建立閉環並排入模型處理。",
+      "retention": "提問、回覆與收據留在 Pocket Reply 的 Durable Object，直到用管理連結刪除；Delib 不保存 CSV、回覆或管理權杖。",
+      "inAppEndpoint": "/api/integrations/pocket-reply",
+      "dataHandoff": {
+        "endpoint": "/integrations/pocket-polis-data",
+        "input": [
+          "tttc.csv（可多份合併；Call-in 匯出含 upvotes 與 lens 更好）"
+        ],
+        "outputs": [
+          "Pocket Reply 收據（receipt.json、replies.csv）"
+        ],
+        "storage": "browser-memory-only",
+        "humanGate": "確認有權以回覆者名義公開回覆；提供回覆者真實的公開立場；公開收據前逐則檢查回覆。"
+      },
+      "selfHost": {
+        "supported": true,
+        "platform": "Cloudflare Workers + Durable Objects SQLite + Workers AI",
+        "cloudflareNative": true,
+        "freeTier": "一鍵部署到自己的 Cloudflare 帳號；每池與每日的神經元上限可在 wrangler.jsonc 調整。",
+        "deployUrl": "https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/pocket-reply"
+      },
+      "agent": {
+        "canCreate": true,
+        "humanGate": "Agent 可準備 CSV、開場說明與公開立場；建立前由人確認名義與資料邊界。"
+      },
+      "knownLimitations": [
+        "沒有 reception-test（模擬提問者施壓）與雙語翻譯；沒有 askit-hono 自動 grounding，改由回覆者自己貼公開立場。",
+        "回覆由模型起草，可能誤讀提問；角色由結構決定但段落分群是模型做的。",
+        "免費額度下每池約 400 則提問；額度用完會等隔日自動續跑。"
+      ],
+      "evidence": [
+        "https://pocket-reply.mashbean.workers.dev/",
+        "https://github.com/mashbean/pocket-reply",
+        "https://github.com/audreyt/uncommon-ground"
+      ]
+    },
+    {
       "toolId": "polis",
       "readiness": "available-with-connection",
       "activation": "embedded-workspace",

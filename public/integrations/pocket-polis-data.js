@@ -93,9 +93,50 @@ const tttcSendTitle = document.querySelector("#tttc-send-title");
 const tttcSendConfirm = document.querySelector("#tttc-send-confirm");
 const tttcSendStatus = document.querySelector("#tttc-send-status");
 const tttcSendResult = document.querySelector("#tttc-send-result");
+const replySendButton = document.querySelector("#reply-send");
+const replySpeaker = document.querySelector("#reply-speaker");
 function syncTttcSend() {
-  tttcSendButton.disabled = !currentTttc || !tttcConsent.checked || !tttcSendConfirm.checked || !tttcSendTitle.value.trim();
+  const ready = currentTttc && tttcConsent.checked && tttcSendConfirm.checked && tttcSendTitle.value.trim();
+  tttcSendButton.disabled = !ready;
+  replySendButton.disabled = !ready || !replySpeaker.value.trim();
 }
+replySpeaker.addEventListener("input", syncTttcSend);
+replySendButton.addEventListener("click", async () => {
+  if (!currentTttc || !tttcConsent.checked || !tttcSendConfirm.checked) return;
+  replySendButton.disabled = true;
+  tttcSendStatus.textContent = "正在請 Pocket Reply 建立閉環…";
+  try {
+    const response = await fetch("/api/integrations/pocket-reply", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: tttcSendTitle.value, speaker: replySpeaker.value, language: "zh-Hant", csv: tttcRowsToCsv(currentTttc.rows), confirmed: true }),
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.error || `Pocket Reply 沒有完成建立（${response.status}）`);
+    tttcSendResult.replaceChildren();
+    const receipt = document.createElement("a");
+    receipt.href = payload.receiptUrl;
+    receipt.target = "_blank";
+    receipt.rel = "noopener";
+    receipt.textContent = payload.receiptUrl;
+    const manage = document.createElement("a");
+    manage.href = payload.manageUrl;
+    manage.target = "_blank";
+    manage.rel = "noopener";
+    manage.textContent = payload.manageUrl;
+    const publicLine = document.createElement("span");
+    publicLine.append("公開收據：", receipt, document.createElement("br"));
+    const privateLine = document.createElement("strong");
+    privateLine.append("管理連結（只顯示這一次）：", manage);
+    tttcSendResult.append(publicLine, privateLine);
+    tttcSendResult.hidden = false;
+    tttcSendStatus.textContent = `已建立，共 ${payload.questions ?? currentTttc.summary.rows} 則提問；收據頁會自動更新，公開前請逐則檢查回覆。`;
+  } catch (error) {
+    tttcSendStatus.textContent = error instanceof Error ? error.message : "Pocket Reply 沒有完成建立。";
+  } finally {
+    syncTttcSend();
+  }
+});
 tttcSendTitle.addEventListener("input", syncTttcSend);
 tttcSendConfirm.addEventListener("change", syncTttcSend);
 tttcConsent.addEventListener("change", syncTttcSend);

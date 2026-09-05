@@ -12,11 +12,11 @@ describe("public contracts", () => {
     expect(local).toContain("bounded local steward");
   });
 
-  it("ships a source-linked registry with 31 unique tools", async () => {
+  it("ships a source-linked registry with 32 unique tools", async () => {
     const registry = JSON.parse(await readFile(new URL("public/data/tools.json", root), "utf8"));
     expect(registry.schema).toBe("delib-tools/v1");
-    expect(registry.tools).toHaveLength(31);
-    expect(new Set(registry.tools.map((tool) => tool.id)).size).toBe(31);
+    expect(registry.tools).toHaveLength(32);
+    expect(new Set(registry.tools.map((tool) => tool.id)).size).toBe(32);
     for (const tool of registry.tools) {
       expect(tool.url).toMatch(/^https:\/\//);
       expect(tool.source).toMatch(/^https:\/\//);
@@ -137,8 +137,8 @@ describe("public contracts", () => {
       ...audit.integrations.map((item) => item.toolId),
       ...audit.catalogOnly,
     ];
-    expect(auditedIds).toHaveLength(31);
-    expect(new Set(auditedIds).size).toBe(31);
+    expect(auditedIds).toHaveLength(32);
+    expect(new Set(auditedIds).size).toBe(32);
     expect(new Set(auditedIds)).toEqual(new Set(tools.tools.map((tool) => tool.id)));
     expect(audit.integrations.find((item) => item.toolId === "call-in").readiness).toBe("available");
     expect(audit.integrations.find((item) => item.toolId === "polis").readiness).toBe(
@@ -166,14 +166,14 @@ describe("public contracts", () => {
     expect(audit.integrations.filter((item) => item.activation === "embedded-workspace")).toHaveLength(4);
     expect(audit.integrations.filter((item) => item.activation === "credentialed-create")).toHaveLength(1);
     expect(audit.integrations.filter((item) => item.activation === "local-or-ephemeral-room")).toHaveLength(1);
-    expect(audit.integrations.filter((item) => item.activation === "managed-create")).toHaveLength(5);
+    expect(audit.integrations.filter((item) => item.activation === "managed-create")).toHaveLength(6);
   });
 
   it("publishes one source and hosting decision for every tool", async () => {
     const tools = JSON.parse(await readFile(new URL("public/data/tools.json", root), "utf8"));
     const hosting = JSON.parse(await readFile(new URL("public/data/hosting.json", root), "utf8"));
     expect(hosting.schema).toBe("delib-hosting/v1");
-    expect(hosting.tools).toHaveLength(31);
+    expect(hosting.tools).toHaveLength(32);
     expect(new Set(hosting.tools.map((item) => item.toolId))).toEqual(
       new Set(tools.tools.map((tool) => tool.id)),
     );

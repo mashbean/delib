@@ -38,6 +38,7 @@ type WorkerEnv = Omit<
   POCKET_TTTC_ORIGIN?: string;
   POCKET_FORM_ORIGIN?: string;
   POCKET_HARMONICA_ORIGIN?: string;
+  POCKET_REPLY_ORIGIN?: string;
   POLIS_SITE_ID?: string;
   /** SHA-256 hex of an operator secret that may take down abusive public receipts. */
   OPERATOR_TOKEN_SHA256?: string;
@@ -80,6 +81,7 @@ const DEFAULT_POCKET_POLIS_ORIGIN = "https://polis.mashbean.net";
 const DEFAULT_POCKET_TTTC_ORIGIN = "https://ttt-city.mashbean.net";
 const DEFAULT_POCKET_FORM_ORIGIN = "https://form.mashbean.net";
 const DEFAULT_POCKET_HARMONICA_ORIGIN = "https://harmonica.mashbean.net";
+const DEFAULT_POCKET_REPLY_ORIGIN = "https://pocket-reply.mashbean.workers.dev";
 /** Pocket TTTC 接受最多 3 MiB 的 CSV；這個端點的上限跟著它，而非一般整合的 12 KB。 */
 const MAX_POCKET_TTTC_BODY_BYTES = 3 * 1024 * 1024 + 64 * 1024;
 /** Upstream creators answer in a few seconds; the BYOK model call may take longer. */
@@ -178,6 +180,10 @@ async function route(request: Request, env: WorkerEnv, url: URL): Promise<Respon
         fetch,
         env.POCKET_POLIS_ORIGIN || DEFAULT_POCKET_POLIS_ORIGIN,
       );
+    }
+
+    if (url.pathname === "/api/integrations/pocket-reply" && request.method === "POST") {
+      return handlePocketReplyRequest(request, fetch, env.POCKET_REPLY_ORIGIN || DEFAULT_POCKET_REPLY_ORIGIN);
     }
 
     if (url.pathname === "/api/integrations/pocket-harmonica" && request.method === "POST") {
@@ -737,6 +743,112 @@ export async function handlePolisRequest(request: Request, defaultSiteId?: strin
   }
 
   return json({ error: "請選擇已有對話或建立新對話" }, 400);
+}
+
+type PocketReplyRequest = {
+  title?: unknown;
+  speaker?: unknown;
+  standfirst?: unknown;
+  positions?: unknown;
+  language?: unknown;
+  csv?: unknown;
+  confirmed?: unknown;
+};
+
+/**
+ * 把一池提問（id,interview,comment CSV）交給 Pocket Reply 做閉環：弧線、每段立場、每位提問者一則回覆、公開收據。
+ * Delib 不保存 CSV、回覆或管理權杖；manageUrl 只出現這一次。
+ */
+export async function handlePocketReplyRequest(
+  request: Request,
+  upstreamFetch: typeof fetch = fetch,
+  configuredOrigin = DEFAULT_POCKET_REPLY_ORIGIN,
+): Promise<Response> {
+  if (!isSameOriginRequest(request)) return json({ error: "origin not allowed" }, 403);
+  const body = await readJsonRequest<PocketReplyRequest>(request, MAX_POCKET_TTTC_BODY_BYTES);
+  if (body instanceof Response) return body;
+  if (body.confirmed !== true) return json({ error: "建立前請先確認有權以回覆者名義公開回覆，並會在公開前逐則檢查" }, 400);
+  const title = cleanRequiredString(body.title, 120);
+  const speaker = cleanRequiredString(body.speaker, 80);
+  if (!title) return json({ error: "先幫這場閉環取一個名字" }, 400);
+  if (!speaker) return json({ error: "請填誰以自己的名義回覆" }, 400);
+  const csv = typeof body.csv === "string" ? body.csv.replace(/^\uFEFF/, "") : "";
+  const headerCells = ((csv.split(/\r?\n/, 1)[0] ?? "").toLowerCase()).split(",").map((cell) => cell.trim().replace(/^"|"$/g, "").replace(/-/g, "_"));
+  if (!csv.trim() || !headerCells.includes("id") || !["comment", "text", "question"].some((name) => headerCells.includes(name))) {
+    return json({ error: "CSV 需要 id 與 comment 兩欄（interview、upvotes 可選）；先到資料工作台檢查或合併" }, 400);
+  }
+  if (csv.length > 3 * 1024 * 1024) return json({ error: "CSV 超過 3 MiB" }, 413);
+  const origin = normalizeServiceOrigin(configuredOrigin);
+  if (!origin) return json({ error: "Pocket Reply 主機設定不完整" }, 503);
+
+  let upstream: Response;
+  try {
+    upstream = await upstreamFetch(`${origin}/api/loops`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title,
+        speaker,
+        standfirst: cleanOptionalString(body.standfirst, 1_000),
+        positions: cleanOptionalString(body.positions, 6_000),
+        language: body.language === "en" ? "en" : "zh-Hant",
+        csv,
+        confirmed: true,
+      }),
+      signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
+    });
+  } catch (error) {
+    return upstreamFailure(error, "Pocket Reply");
+  }
+
+  if (!upstream.ok) {
+    let detail = "";
+    try {
+      detail = cleanOptionalString(((await upstream.json()) as { error?: unknown }).error, 300);
+    } catch {
+      detail = "";
+    }
+    if (upstream.status === 400 || upstream.status === 413) return json({ error: detail || "Pocket Reply 沒有接受這份 CSV" }, upstream.status);
+    return json(
+      { error: upstream.status === 429 ? "Pocket Reply 目前建立的次數已達上限，請稍後再試" : "Pocket Reply 沒有完成建立，請稍後再試" },
+      upstream.status === 429 ? 429 : 502,
+    );
+  }
+
+  let payload: unknown;
+  try {
+    payload = await upstream.json();
+  } catch {
+    return json({ error: "Pocket Reply 回應格式不完整" }, 502);
+  }
+  if (!isRecord(payload)) return json({ error: "Pocket Reply 回應格式不完整" }, 502);
+  const loopId = cleanMatchingString(payload.loopId, /^[a-z0-9]{10}$/, 10);
+  const adminToken = cleanMatchingString(payload.adminToken, /^[a-f0-9]{32}$/i, 32);
+  if (!loopId || !adminToken) return json({ error: "Pocket Reply 回應缺少必要資訊" }, 502);
+
+  return json(
+    {
+      integration: "pocket-reply",
+      status: "queued",
+      serviceOrigin: origin,
+      loopId,
+      title,
+      speaker,
+      questions: typeof payload.questions === "number" ? payload.questions : null,
+      receiptUrl: `${origin}/r/${loopId}`,
+      apiUrl: `${origin}/api/loops/${loopId}`,
+      manageUrl: `${origin}/r/${loopId}#admin=${adminToken}`,
+      storedByDelib: false,
+      credentialStoredByDelib: false,
+      writesExternalState: true,
+      privacy: {
+        privateUrls: ["manageUrl"],
+        participantDataOwner: origin,
+        retention: "提問、回覆與收據留在 Pocket Reply，直到用管理連結刪除。",
+      },
+    },
+    201,
+  );
 }
 
 type PocketHarmonicaRequest = {

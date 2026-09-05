@@ -129,6 +129,47 @@
       "handoff": "questions/clusters/arc/takes/loopbacks/meta JSON 與 verify.py。敏感資料必須在本機或核准環境處理。"
     },
     {
+      "id": "pocket-reply",
+      "name": "Pocket Reply · 口袋回覆",
+      "summary": "把提問池變成一條演講弧線、每段一句落地的立場、每位提問者一則親筆回覆與公開收據；Uncommon Ground 的方法做成單一 Cloudflare Worker，不用跑腳本。",
+      "url": "https://pocket-reply.mashbean.workers.dev/",
+      "source": "https://github.com/mashbean/pocket-reply",
+      "status": "integrated",
+      "stages": [
+        "learning",
+        "deliberating",
+        "actuating",
+        "reflecting"
+      ],
+      "goals": [
+        "understand",
+        "followup",
+        "listen"
+      ],
+      "formats": [
+        "hybrid",
+        "online",
+        "offline"
+      ],
+      "scales": [
+        "small",
+        "medium",
+        "large"
+      ],
+      "privacy": [
+        "public",
+        "pseudonymous"
+      ],
+      "outputs": [
+        "questions",
+        "insights",
+        "receipt"
+      ],
+      "hosting": "cloudflare-worker",
+      "deploy": "https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/pocket-reply",
+      "handoff": "Delib 可免登入代建並交回收據與一次性管理連結；輸入是 Call-in、Pocket Polis、Pocket Form 或資料工作台輸出的 tttc.csv；角色由結構決定、立場只引用回覆者提供的公開立場、收據自帶 N/N 驗證。回覆以回覆者名義發出，公開前請逐則檢查。"
+    },
+    {
       "id": "pocket-polis",
       "name": "Pocket Polis · 口袋審議",
       "summary": "免登入建立陳述、同意／不同意投票與意見群組分析，直接由 polis.mashbean.net 託管活動；收完可發布分層成果收據並接續下一輪。",

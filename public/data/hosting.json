@@ -60,6 +60,25 @@
       "nextAction": "把 Delib bundle 轉成可驗證的分析 job，發布前保留人工關卡。"
     },
     {
+      "toolId": "pocket-reply",
+      "route": "direct",
+      "label": "本站代建＋Cloudflare 一鍵部署",
+      "summary": "MIT 的單一 Cloudflare Worker + Durable Objects SQLite + Workers AI 服務，把 Uncommon Ground（CC0）的八段流程做成不用跑腳本的閉環；沒有 reception-test 與雙語翻譯。",
+      "source": {
+        "url": "https://github.com/mashbean/pocket-reply",
+        "license": "MIT",
+        "reusable": true
+      },
+      "embed": "direct-create-links",
+      "cloudflareNative": true,
+      "nextAction": "綁正式網域；用真實活動比對它與 Uncommon Ground 腳本版的回覆品質，決定是否補 reception-test 與雙語。",
+      "evidence": [
+        "https://pocket-reply.mashbean.workers.dev/",
+        "https://github.com/mashbean/pocket-reply",
+        "https://github.com/audreyt/uncommon-ground"
+      ]
+    },
+    {
       "toolId": "pocket-polis",
       "route": "direct",
       "label": "本站代建＋Cloudflare 一鍵部署",

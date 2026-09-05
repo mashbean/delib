@@ -145,7 +145,12 @@
             </label>
             <div class="data-download-row">
               <button id="tttc-send" class="button button-primary" type="button" disabled>建立 Pocket TTTC 報告</button>
+              <button id="reply-send" class="button button-ghost" type="button" disabled>或送到 Pocket Reply 逐一回覆</button>
             </div>
+            <label>
+              以誰的名義回覆（送 Pocket Reply 時必填）
+              <input id="reply-speaker" maxlength="80" placeholder="例如：主持人、講者姓名" />
+            </label>
             <p id="tttc-send-status" class="action-status" role="status" aria-live="polite"></p>
             <p id="tttc-send-result" hidden></p>
           </div>
