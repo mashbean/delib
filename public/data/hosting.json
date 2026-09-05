@@ -196,6 +196,24 @@
       ]
     },
     {
+      "toolId": "pocket-harmonica",
+      "route": "direct",
+      "label": "本站代建＋Cloudflare 一鍵部署",
+      "summary": "MIT 的單一 Cloudflare Worker + Durable Objects SQLite + Workers AI 訪談服務，Harmonica 流程的 clean-room 重寫；不需要 API key。",
+      "source": {
+        "url": "https://github.com/mashbean/pocket-harmonica",
+        "license": "MIT",
+        "reusable": true
+      },
+      "embed": "direct-create-links",
+      "cloudflareNative": true,
+      "nextAction": "把成果收據的「補訪缺席聲音」交接改指向 Pocket Harmonica，並以真實受訪者評估訪談者的追問品質。",
+      "evidence": [
+        "https://pocket-harmonica.mashbean.workers.dev/",
+        "https://github.com/mashbean/pocket-harmonica"
+      ]
+    },
+    {
       "toolId": "decidim",
       "route": "shared-host",
       "label": "成熟但不是小工具",

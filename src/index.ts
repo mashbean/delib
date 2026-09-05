@@ -37,6 +37,7 @@ type WorkerEnv = Omit<
   POCKET_POLIS_ORIGIN?: string;
   POCKET_TTTC_ORIGIN?: string;
   POCKET_INTAKE_ORIGIN?: string;
+  POCKET_HARMONICA_ORIGIN?: string;
   POLIS_SITE_ID?: string;
   /** SHA-256 hex of an operator secret that may take down abusive public receipts. */
   OPERATOR_TOKEN_SHA256?: string;
@@ -78,6 +79,7 @@ const DEFAULT_CALL_IN_ORIGIN = "https://call-in.mashbean.net";
 const DEFAULT_POCKET_POLIS_ORIGIN = "https://polis.mashbean.net";
 const DEFAULT_POCKET_TTTC_ORIGIN = "https://ttt-city.mashbean.net";
 const DEFAULT_POCKET_INTAKE_ORIGIN = "https://pocket-intake.mashbean.workers.dev";
+const DEFAULT_POCKET_HARMONICA_ORIGIN = "https://pocket-harmonica.mashbean.workers.dev";
 /** Pocket TTTC 接受最多 3 MiB 的 CSV；這個端點的上限跟著它，而非一般整合的 12 KB。 */
 const MAX_POCKET_TTTC_BODY_BYTES = 3 * 1024 * 1024 + 64 * 1024;
 /** Upstream creators answer in a few seconds; the BYOK model call may take longer. */
@@ -176,6 +178,10 @@ async function route(request: Request, env: WorkerEnv, url: URL): Promise<Respon
         fetch,
         env.POCKET_POLIS_ORIGIN || DEFAULT_POCKET_POLIS_ORIGIN,
       );
+    }
+
+    if (url.pathname === "/api/integrations/pocket-harmonica" && request.method === "POST") {
+      return handlePocketHarmonicaRequest(request, fetch, env.POCKET_HARMONICA_ORIGIN || DEFAULT_POCKET_HARMONICA_ORIGIN);
     }
 
     if (url.pathname === "/api/integrations/pocket-intake" && request.method === "POST") {
@@ -731,6 +737,115 @@ export async function handlePolisRequest(request: Request, defaultSiteId?: strin
   }
 
   return json({ error: "請選擇已有對話或建立新對話" }, 400);
+}
+
+type PocketHarmonicaRequest = {
+  topic?: unknown;
+  goal?: unknown;
+  context?: unknown;
+  critical?: unknown;
+  questions?: unknown;
+  language?: unknown;
+  maxTurns?: unknown;
+  maxParticipants?: unknown;
+  askAlias?: unknown;
+  confirmed?: unknown;
+};
+
+/**
+ * 在 Pocket Harmonica 建立一輪 AI 一對一訪談。輸入與 Harmonica 交接草稿同形（topic、goal、context、
+ * critical、questions），不需要 API key；Delib 不保存逐字稿或主辦者權杖，hostUrl 只出現這一次。
+ */
+export async function handlePocketHarmonicaRequest(
+  request: Request,
+  upstreamFetch: typeof fetch = fetch,
+  configuredOrigin = DEFAULT_POCKET_HARMONICA_ORIGIN,
+): Promise<Response> {
+  if (!isSameOriginRequest(request)) return json({ error: "origin not allowed" }, 403);
+  const body = await readJsonRequest<PocketHarmonicaRequest>(request, MAX_INTEGRATION_BODY_BYTES);
+  if (body instanceof Response) return body;
+  if (body.confirmed !== true) return json({ error: "建立前請先確認會告知參與者這是 AI 訪談、逐字稿的用途與可隨時停止" }, 400);
+  const topic = cleanRequiredString(body.topic, 120);
+  const goal = cleanRequiredString(body.goal, 500);
+  if (!topic) return json({ error: "先幫這輪訪談取一個名字" }, 400);
+  if (!goal) return json({ error: "請說明希望這輪訪談理解什麼" }, 400);
+  const questions = (Array.isArray(body.questions) ? body.questions : []).map((item) => cleanOptionalString(item, 240)).filter(Boolean).slice(0, 8);
+  if (questions.length === 0) return json({ error: "至少給一個起始問題" }, 400);
+  const origin = normalizeServiceOrigin(configuredOrigin);
+  if (!origin) return json({ error: "Pocket Harmonica 主機設定不完整" }, 503);
+
+  let upstream: Response;
+  try {
+    upstream = await upstreamFetch(`${origin}/api/sessions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        topic,
+        goal,
+        context: cleanOptionalString(body.context, 1_000),
+        critical: cleanOptionalString(body.critical, 500),
+        questions,
+        language: body.language === "en" ? "en" : "zh-Hant",
+        maxTurns: typeof body.maxTurns === "number" ? body.maxTurns : undefined,
+        maxParticipants: typeof body.maxParticipants === "number" ? body.maxParticipants : undefined,
+        askAlias: body.askAlias !== false,
+        confirmed: true,
+      }),
+      signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
+    });
+  } catch (error) {
+    return upstreamFailure(error, "Pocket Harmonica");
+  }
+
+  if (!upstream.ok) {
+    let detail = "";
+    try {
+      detail = cleanOptionalString(((await upstream.json()) as { error?: unknown }).error, 300);
+    } catch {
+      detail = "";
+    }
+    if (upstream.status === 400) return json({ error: detail || "Pocket Harmonica 沒有接受這些設定" }, 400);
+    return json(
+      { error: upstream.status === 429 ? "Pocket Harmonica 目前建立訪談的次數已達上限，請稍後再試" : "Pocket Harmonica 沒有完成建立，請稍後再試" },
+      upstream.status === 429 ? 429 : 502,
+    );
+  }
+
+  let payload: unknown;
+  try {
+    payload = await upstream.json();
+  } catch {
+    return json({ error: "Pocket Harmonica 回應格式不完整" }, 502);
+  }
+  if (!isRecord(payload)) return json({ error: "Pocket Harmonica 回應格式不完整" }, 502);
+  const sessionId = cleanMatchingString(payload.sessionId, /^[a-z0-9]{10}$/, 10);
+  const adminToken = cleanMatchingString(payload.adminToken, /^[a-f0-9]{32}$/i, 32);
+  if (!sessionId || !adminToken) return json({ error: "Pocket Harmonica 回應缺少必要資訊" }, 502);
+  const budget = isRecord(payload.budget) ? payload.budget : null;
+
+  return json(
+    {
+      integration: "pocket-harmonica",
+      status: "ready",
+      serviceOrigin: origin,
+      sessionId,
+      topic,
+      participateUrl: `${origin}/s/${sessionId}`,
+      apiUrl: `${origin}/api/sessions/${sessionId}`,
+      hostUrl: `${origin}/h/${sessionId}#admin=${adminToken}`,
+      exports: { tttcCsv: `${origin}/api/sessions/${sessionId}/export/tttc.csv` },
+      budget: budget ? { worstCaseNeuronsPerReply: budget.worstCaseNeuronsPerReply, worstCaseNeuronsPerSession: budget.worstCaseNeuronsPerSession } : null,
+      storedByDelib: false,
+      credentialStoredByDelib: false,
+      writesExternalState: true,
+      privacy: {
+        privateUrls: ["hostUrl"],
+        participantDataOwner: origin,
+        retention: "設定與逐字稿留在 Pocket Harmonica，直到主辦者用管理連結刪除。",
+      },
+    },
+    201,
+  );
 }
 
 type PocketIntakeRequest = {

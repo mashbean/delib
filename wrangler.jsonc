@@ -55,7 +55,8 @@
     "CALL_IN_ORIGIN": "https://call-in.mashbean.net",
     "POCKET_POLIS_ORIGIN": "https://polis.mashbean.net",
     "POCKET_TTTC_ORIGIN": "https://ttt-city.mashbean.net",
-    "POCKET_INTAKE_ORIGIN": "https://pocket-intake.mashbean.workers.dev"
+    "POCKET_INTAKE_ORIGIN": "https://pocket-intake.mashbean.workers.dev",
+    "POCKET_HARMONICA_ORIGIN": "https://pocket-harmonica.mashbean.workers.dev"
   },
   // `production` is the only environment bound to delib.mashbean.net, so the
   // Deploy button (default environment) never claims the official domain.
@@ -101,7 +102,8 @@
         "CALL_IN_ORIGIN": "https://call-in.mashbean.net",
         "POCKET_POLIS_ORIGIN": "https://polis.mashbean.net",
     "POCKET_TTTC_ORIGIN": "https://ttt-city.mashbean.net",
-    "POCKET_INTAKE_ORIGIN": "https://pocket-intake.mashbean.workers.dev"
+    "POCKET_INTAKE_ORIGIN": "https://pocket-intake.mashbean.workers.dev",
+    "POCKET_HARMONICA_ORIGIN": "https://pocket-harmonica.mashbean.workers.dev"
       },
       "routes": [
         {

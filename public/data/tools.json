@@ -599,6 +599,42 @@
       "handoff": "需明確揭露 AI 處理、資料保存與人工複核。"
     },
     {
+      "id": "pocket-harmonica",
+      "name": "Pocket Harmonica · 口袋訪談",
+      "summary": "一對一 AI 訪談補訪缺席的聲音：主辦者給主題、想理解什麼與起始問題，訪談者依回答追問；逐字稿匯出 tttc.csv 並一鍵送進 Pocket TTTC。免帳號、免 API 金鑰。",
+      "url": "https://pocket-harmonica.mashbean.workers.dev/",
+      "source": "https://github.com/mashbean/pocket-harmonica",
+      "status": "integrated",
+      "stages": [
+        "agenda-setting",
+        "eliciting",
+        "deliberating"
+      ],
+      "goals": [
+        "listen",
+        "understand",
+        "propose"
+      ],
+      "formats": [
+        "online",
+        "hybrid"
+      ],
+      "scales": [
+        "small",
+        "medium"
+      ],
+      "privacy": [
+        "pseudonymous"
+      ],
+      "outputs": [
+        "insights",
+        "evidence"
+      ],
+      "hosting": "cloudflare-worker",
+      "deploy": "https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/pocket-harmonica",
+      "handoff": "Delib 可免登入代建並交回參與、主辦者兩種連結；主辦者頁能匯出 tttc.csv 與逐字稿 JSON，並把逐字稿直接交給 Pocket TTTC 建議題樹。逐字稿與管理權杖都留在 Pocket Harmonica。免費額度下每日約 130 輪回覆，額度用完參與者會被請隔天再來、進度保留。"
+    },
+    {
       "id": "interoperable-cooperative-governance",
       "name": "Interoperable Co-operative Governance",
       "summary": "把常見協作與開發工具串成小型組織的民主決策流程。",

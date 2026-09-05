@@ -10,6 +10,7 @@ import {
   handleHarmonicaRequest,
   handlePolisRequest,
   handlePocketPolisRequest,
+  handlePocketHarmonicaRequest,
   handlePocketIntakeRequest,
   handlePocketTttcRequest,
   handlePublicReceiptRequest,
@@ -231,6 +232,37 @@ describe("direct integrations", () => {
       storedByDelib: false,
       credentialStoredByDelib: false,
     });
+  });
+
+  it("creates a Pocket Harmonica interview from the Harmonica-shaped draft without any API key", async () => {
+    const upstream = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      expect(String(input)).toBe("https://pocket-harmonica.mashbean.workers.dev/api/sessions");
+      const sent = JSON.parse(String(init?.body));
+      expect(sent).toMatchObject({ topic: "核電重啟：補訪", goal: "理解北海岸居民的顧慮", confirmed: true, askAlias: true });
+      expect(sent.questions).toEqual(["你住哪裡？", "要先做到什麼？"]);
+      return new Response(JSON.stringify({ sessionId: "abc123def4", adminToken: "d".repeat(32), budget: { worstCaseNeuronsPerReply: 70, worstCaseNeuronsPerSession: 8400 } }), { status: 201 });
+    });
+    const response = await handlePocketHarmonicaRequest(
+      new Request("https://delib.example/api/integrations/pocket-harmonica", {
+        method: "POST",
+        headers: { Origin: "https://delib.example", "Content-Type": "application/json" },
+        body: JSON.stringify({ topic: "核電重啟：補訪", goal: "理解北海岸居民的顧慮", critical: "蘭嶼", questions: ["你住哪裡？", "要先做到什麼？", ""], confirmed: true }),
+      }),
+      upstream as typeof fetch,
+    );
+    expect(response.status).toBe(201);
+    await expect(response.json()).resolves.toMatchObject({
+      integration: "pocket-harmonica",
+      sessionId: "abc123def4",
+      participateUrl: "https://pocket-harmonica.mashbean.workers.dev/s/abc123def4",
+      hostUrl: `https://pocket-harmonica.mashbean.workers.dev/h/abc123def4#admin=${"d".repeat(32)}`,
+      budget: { worstCaseNeuronsPerSession: 8400 },
+      credentialStoredByDelib: false,
+    });
+    const never = vi.fn();
+    const noQuestions = await handlePocketHarmonicaRequest(new Request("https://delib.example/api/integrations/pocket-harmonica", { method: "POST", headers: { Origin: "https://delib.example", "Content-Type": "application/json" }, body: JSON.stringify({ topic: "x", goal: "y", questions: [], confirmed: true }) }), never as typeof fetch);
+    expect(noQuestions.status).toBe(400);
+    expect(never).not.toHaveBeenCalled();
   });
 
   it("creates a Pocket Intake form and returns participate, host and export links", async () => {

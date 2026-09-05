@@ -181,6 +181,50 @@
       ]
     },
     {
+      "toolId": "pocket-harmonica",
+      "readiness": "available",
+      "activation": "managed-create",
+      "label": "免登入免金鑰直接建立",
+      "summary": "用與 Harmonica 交接草稿相同的欄位（主題、想理解什麼、背景、不能漏的聲音、起始問題）直接建立 AI 訪談；逐字稿可匯出 tttc.csv 或一鍵送進 Pocket TTTC。",
+      "accountRequired": false,
+      "credentialRequired": false,
+      "freePath": "使用 mashbean 維運的 Pocket Harmonica 共用主機（Workers AI 免費額度、每日 9,000 神經元），或按 Deploy to Cloudflare 建立自己的獨立服務。",
+      "writesExternalState": "按下確認後，本站伺服器會呼叫 Pocket Harmonica 的建立 API，立即建立訪談。",
+      "retention": "設定與逐字稿留在 Pocket Harmonica 的 Durable Object，直到主辦者用管理連結刪除；Delib 不保存逐字稿或管理權杖。",
+      "inAppEndpoint": "/api/integrations/pocket-harmonica",
+      "dataHandoff": {
+        "endpoint": "/integrations/pocket-polis-data",
+        "input": [
+          "tttc.csv（主辦者頁匯出）"
+        ],
+        "outputs": [
+          "Pocket TTTC 報告"
+        ],
+        "storage": "browser-memory-only",
+        "humanGate": "邀請參與者時必須告知這是 AI 訪談、逐字稿會被主辦者看到並用於整理，且可以隨時停止。"
+      },
+      "selfHost": {
+        "supported": true,
+        "platform": "Cloudflare Workers + Durable Objects SQLite + Workers AI",
+        "cloudflareNative": true,
+        "freeTier": "一鍵部署到自己的 Cloudflare 帳號；每輪與每日的神經元上限可在 wrangler.jsonc 調整。",
+        "deployUrl": "https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/pocket-harmonica"
+      },
+      "agent": {
+        "canCreate": true,
+        "humanGate": "Agent 可草擬主題與起始問題；建立前由人確認告知內容與資料用途。"
+      },
+      "knownLimitations": [
+        "訪談者是模型，會誤解或問得不好；沒有語音、沒有多人交叉授粉（cross-pollination）。",
+        "免費額度下每日約 130 輪回覆（每輪最壞情況約 70 神經元）；額度用完參與者要隔天再來。",
+        "每台裝置一段對話，靠瀏覽器儲存的代碼辨識。"
+      ],
+      "evidence": [
+        "https://pocket-harmonica.mashbean.workers.dev/",
+        "https://github.com/mashbean/pocket-harmonica"
+      ]
+    },
+    {
       "toolId": "polis",
       "readiness": "available-with-connection",
       "activation": "embedded-workspace",
