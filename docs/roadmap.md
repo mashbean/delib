@@ -1,6 +1,6 @@
 # Roadmap and completion boundary
 
-Updated: 2026-09-03
+Updated: 2026-09-05
 
 ## Completed in the current release
 
@@ -69,6 +69,48 @@ Updated: 2026-09-03
   account's free neuron budget is already reserved by Pocket Polis
   (9,000 of 10,000 per day); a Delib-side model call needs its own ledger
   and a deterministic fallback before it is worth adding.
+
+## Pocket-native rewrite roadmap (2026-09-05)
+
+Pocket TTTC (ttt-city.mashbean.net) proved the pattern: one Cloudflare Worker,
+one SQLite Durable Object per activity, alarm-driven pipelines that survive
+restarts, Workers AI behind a two-level neuron ledger, tests that drive the
+whole pipeline with `AI_MODE=fake`, a Deploy button with no secrets, and a
+managed-create endpoint in Delib. Four catalog tools are now native
+(Call-in, Pocket Polis, Pocket TTTC, Power Ranker). The remaining 24 were
+assessed on three questions: is the algorithm or interaction small enough
+for one Worker, can it be reimplemented clean-room under a permissive
+license, and does it close a gap in the deliberation flow.
+
+### Worth rewriting, in order
+
+| # | Catalog tool | Native service | Why | Status |
+|---|---|---|---|---|
+| 1 | HeyForm | **Pocket Intake**: sign-up, background survey and question intake forms whose exports are already `tttc.csv` and Pocket Polis seeds | The front of the flow still lacks a first-party entry; HeyForm needs MongoDB and Redis and Delib can only embed published forms. Scope is one form → one Durable Object → CSV, not a HeyForm clone. | in progress |
+| 2 | Harmonica | **Pocket Harmonica**: one-to-one AI interviews (Workers AI as interviewer) whose transcripts feed Pocket TTTC | The last step that still needs a third-party credential, and the target of the receipt handoff "reach missing voices". AGPL upstream, so clean-room. One Durable Object per conversation; synthesis reuses the Pocket TTTC pipeline. Neuron budget is the hard limit: cap turns per participant and participants per day on the free tier, reuse `waiting-budget`. | planned |
+| 3 | Uncommon Ground | **Pocket Reply**: takes a Call-in export, drafts a reply for every questioner, publishes the bilingual closed-loop receipt | Already CC0 and first-party as a CLI plus skill; as a Worker the Call-in → reply → receipt loop needs no terminal. | planned |
+| 4 | Agora Citizen Network | Not a new service: add **bridging rank** (statements acceptable across opinion groups first) to Pocket Polis | Agora is a full platform (PostgreSQL, Valkey, several services); the reusable part is the ranking, and Pocket Polis already holds the vote matrix. | planned |
+| 5 | Ethelo + Stanford PB | **Pocket Budget**: cost-constrained multi-option voting with support and inequality scores | Both are "decide" tools; Ethelo ships only an engine and Stanford PB is a Rails site. One small tool covers both. Build when a participatory-budgeting case appears. | when needed |
+| 6 | Moral Graph Elicitation | **Pocket Values**: value-elicitation dialogue → moral graph | Method is published; code has no license, so clean-room only. Shares the dialogue infrastructure with Pocket Harmonica, so it follows it. | after 2 |
+
+Shared step first: extract a `pocket-worker-template` from Pocket TTTC
+(Durable Object SQLite, alarm pipeline, neuron ledger, fake-AI tests, Deploy
+button, Delib activation endpoint) so each item above is roughly a day.
+
+### Not worth rewriting (or already covered)
+
+- Pol.is and Talk to the City: cores are covered by Pocket Polis and Pocket
+  TTTC; the official apps stay as shared-host options for full features.
+- Pairwise: Power Ranker is the native pairwise tool; mark as covered.
+- Decidim, Go Vocal, Parti DemosX: whole participation platforms (accounts,
+  proposals, meetings, votes), not an algorithm; keep as shared-host.
+- Deliberative Canvas (alpha, needs a Deno sync server), PolicyCraft (research
+  prototype without a license), Open Micropublishing (a data model, not a
+  service), MAPLE (US legislative testimony specific), Global Brain Algorithm
+  (Julia library tied to feed ranking): value below cost.
+- OpenBook: data, not a service; keep as an evidence source.
+- Evocracy, Iswe, Ize, Swarmcheck, Voice to Vision, Interoperable Co-op
+  Governance: no verifiable source or site to reimplement from.
 
 ## Still intentionally incomplete
 
