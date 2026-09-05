@@ -317,6 +317,53 @@
       ]
     },
     {
+      "toolId": "pocket-budget",
+      "readiness": "available",
+      "activation": "managed-create",
+      "label": "免登入直接建立",
+      "summary": "給選項清單（名稱、成本）與總額，建立一場參與式預算投票：背包（總額內勾選）或核准（最多 k 項）；結果頁即時給最多票方案、公平方案與每個選項的支持度。",
+      "accountRequired": false,
+      "credentialRequired": false,
+      "freePath": "使用 mashbean 維運的 Pocket Budget 共用主機（不用模型，沒有神經元限制；每場最多 2,000 張票），或按 Deploy to Cloudflare 建立自己的獨立服務。",
+      "writesExternalState": "按下確認後，本站伺服器會呼叫 Pocket Budget 的建立 API，立即建立一場並取得投票、結果與主辦者連結。",
+      "retention": "設定與選票留在 Pocket Budget 的 Durable Object，直到主辦者用管理連結刪除；結果頁公開；Delib 不保存選票或主辦者權杖。",
+      "inAppEndpoint": "/api/integrations/pocket-budget",
+      "dataHandoff": {
+        "endpoint": "/integrations/pocket-polis-data",
+        "input": [
+          "選項清單（每行「名稱, 成本, 說明, 類別」或 JSON 陣列）與總額"
+        ],
+        "outputs": [
+          "results.json（最多票方案、公平方案、每個選項的票數／支持度）",
+          "options.csv、ballots.csv",
+          "tttc.csv（投票理由，可接 Pocket TTTC）"
+        ],
+        "storage": "browser-memory-only",
+        "humanGate": "告知參與者結果怎麼用、一台裝置一張票；成本與總額要對得上真實預算。"
+      },
+      "selfHost": {
+        "supported": true,
+        "platform": "Cloudflare Workers + Durable Objects SQLite",
+        "cloudflareNative": true,
+        "freeTier": "一鍵部署到自己的 Cloudflare 帳號；不用 Workers AI。",
+        "deployUrl": "https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/pocket-budget"
+      },
+      "agent": {
+        "canCreate": true,
+        "humanGate": "Agent 可整理選項與成本；建立前由人確認總額與告知義務。"
+      },
+      "knownLimitations": [
+        "沒有身分驗證：一台裝置一張票，不適合有法律效力的投票。",
+        "公平方案是局部搜尋，不保證全域最佳；不平等用滿意度標準差近似。",
+        "沒有 Ethelo 的多準則加權與情境分支、Stanford PB 的選民名冊。"
+      ],
+      "evidence": [
+        "https://budget.mashbean.net/",
+        "https://github.com/mashbean/pocket-budget",
+        "https://github.com/StanfordCDT/pb"
+      ]
+    },
+    {
       "toolId": "polis",
       "readiness": "available-with-connection",
       "activation": "embedded-workspace",

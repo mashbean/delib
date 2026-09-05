@@ -58,7 +58,8 @@
     "POCKET_FORM_ORIGIN": "https://form.mashbean.net",
     "POCKET_HARMONICA_ORIGIN": "https://harmonica.mashbean.net",
     "POCKET_REPLY_ORIGIN": "https://reply.mashbean.net",
-    "POCKET_VALUES_ORIGIN": "https://values.mashbean.net"
+    "POCKET_VALUES_ORIGIN": "https://values.mashbean.net",
+    "POCKET_BUDGET_ORIGIN": "https://budget.mashbean.net"
   },
   // `production` is the only environment bound to delib.mashbean.net, so the
   // Deploy button (default environment) never claims the official domain.
@@ -107,7 +108,8 @@
     "POCKET_FORM_ORIGIN": "https://form.mashbean.net",
     "POCKET_HARMONICA_ORIGIN": "https://harmonica.mashbean.net",
     "POCKET_REPLY_ORIGIN": "https://reply.mashbean.net",
-    "POCKET_VALUES_ORIGIN": "https://values.mashbean.net"
+    "POCKET_VALUES_ORIGIN": "https://values.mashbean.net",
+    "POCKET_BUDGET_ORIGIN": "https://budget.mashbean.net"
       },
       "routes": [
         {

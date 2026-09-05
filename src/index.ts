@@ -40,6 +40,7 @@ type WorkerEnv = Omit<
   POCKET_HARMONICA_ORIGIN?: string;
   POCKET_REPLY_ORIGIN?: string;
   POCKET_VALUES_ORIGIN?: string;
+  POCKET_BUDGET_ORIGIN?: string;
   POLIS_SITE_ID?: string;
   /** SHA-256 hex of an operator secret that may take down abusive public receipts. */
   OPERATOR_TOKEN_SHA256?: string;
@@ -84,6 +85,7 @@ const DEFAULT_POCKET_FORM_ORIGIN = "https://form.mashbean.net";
 const DEFAULT_POCKET_HARMONICA_ORIGIN = "https://harmonica.mashbean.net";
 const DEFAULT_POCKET_REPLY_ORIGIN = "https://reply.mashbean.net";
 const DEFAULT_POCKET_VALUES_ORIGIN = "https://values.mashbean.net";
+const DEFAULT_POCKET_BUDGET_ORIGIN = "https://budget.mashbean.net";
 /** Pocket TTTC 接受最多 3 MiB 的 CSV；這個端點的上限跟著它，而非一般整合的 12 KB。 */
 const MAX_POCKET_TTTC_BODY_BYTES = 3 * 1024 * 1024 + 64 * 1024;
 /** Upstream creators answer in a few seconds; the BYOK model call may take longer. */
@@ -189,6 +191,9 @@ async function route(request: Request, env: WorkerEnv, url: URL): Promise<Respon
     }
     if (url.pathname === "/api/integrations/pocket-values" && request.method === "POST") {
       return handlePocketValuesRequest(request, fetch, env.POCKET_VALUES_ORIGIN || DEFAULT_POCKET_VALUES_ORIGIN);
+    }
+    if (url.pathname === "/api/integrations/pocket-budget" && request.method === "POST") {
+      return handlePocketBudgetRequest(request, fetch, env.POCKET_BUDGET_ORIGIN || DEFAULT_POCKET_BUDGET_ORIGIN);
     }
 
     if (url.pathname === "/api/integrations/pocket-harmonica" && request.method === "POST") {
@@ -1065,6 +1070,119 @@ export async function handlePocketValuesRequest(
         privateUrls: ["hostUrl"],
         participantDataOwner: origin,
         retention: "對話、價值卡與判斷留在 Pocket Values，直到主辦者用管理連結刪除；道德圖與價值卡（化名）公開。",
+      },
+    },
+    201,
+  );
+}
+
+type PocketBudgetRequest = {
+  title?: unknown;
+  description?: unknown;
+  unit?: unknown;
+  total?: unknown;
+  mode?: unknown;
+  maxPicks?: unknown;
+  options?: unknown;
+  askReason?: unknown;
+  askAlias?: unknown;
+  confirmed?: unknown;
+};
+
+/**
+ * 在 Pocket Budget 建立一場參與式預算投票：選項（名稱、成本）與總額，背包或核准投票；
+ * 結果同時給最多票方案與公平方案。Delib 不保存選票或主辦者權杖。
+ */
+export async function handlePocketBudgetRequest(
+  request: Request,
+  upstreamFetch: typeof fetch = fetch,
+  configuredOrigin = DEFAULT_POCKET_BUDGET_ORIGIN,
+): Promise<Response> {
+  if (!isSameOriginRequest(request)) return json({ error: "origin not allowed" }, 403);
+  const body = await readJsonRequest<PocketBudgetRequest>(request, MAX_INTEGRATION_BODY_BYTES);
+  if (body instanceof Response) return body;
+  if (body.confirmed !== true) return json({ error: "建立前請先確認會告知參與者結果怎麼用，以及一台裝置一張票" }, 400);
+  const title = cleanRequiredString(body.title, 120);
+  if (!title) return json({ error: "先幫這場預算取一個名字" }, 400);
+  const total = Number(body.total);
+  if (!Number.isFinite(total) || total <= 0) return json({ error: "總額要是大於 0 的數字" }, 400);
+  const options = Array.isArray(body.options)
+    ? body.options.filter(isRecord).map((option) => ({ name: cleanOptionalString(option.name, 80), cost: Number(option.cost), description: cleanOptionalString(option.description, 300), category: cleanOptionalString(option.category, 40) })).filter((option) => option.name && Number.isFinite(option.cost) && option.cost > 0)
+    : cleanOptionalString(body.options, 8_000);
+  if ((Array.isArray(options) ? options.length : options.split(/\r?\n/).filter((line) => line.trim()).length) < 2) return json({ error: "至少要有 2 個有名稱與成本的選項" }, 400);
+  const origin = normalizeServiceOrigin(configuredOrigin);
+  if (!origin) return json({ error: "Pocket Budget 主機設定不完整" }, 503);
+
+  let upstream: Response;
+  try {
+    upstream = await upstreamFetch(`${origin}/api/budgets`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title,
+        description: cleanOptionalString(body.description, 1_000),
+        unit: cleanOptionalString(body.unit, 12),
+        total,
+        mode: body.mode === "approval" ? "approval" : "knapsack",
+        maxPicks: typeof body.maxPicks === "number" ? body.maxPicks : undefined,
+        options,
+        askReason: body.askReason !== false,
+        askAlias: body.askAlias === true,
+        confirmed: true,
+      }),
+      signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
+    });
+  } catch (error) {
+    return upstreamFailure(error, "Pocket Budget");
+  }
+
+  if (!upstream.ok) {
+    let detail = "";
+    try {
+      detail = cleanOptionalString(((await upstream.json()) as { error?: unknown }).error, 300);
+    } catch {
+      detail = "";
+    }
+    if (upstream.status === 400) return json({ error: detail || "Pocket Budget 沒有接受這些設定" }, 400);
+    return json(
+      { error: upstream.status === 429 ? "Pocket Budget 目前建立的次數已達上限，請稍後再試" : "Pocket Budget 沒有完成建立，請稍後再試" },
+      upstream.status === 429 ? 429 : 502,
+    );
+  }
+
+  let payload: unknown;
+  try {
+    payload = await upstream.json();
+  } catch {
+    return json({ error: "Pocket Budget 回應格式不完整" }, 502);
+  }
+  if (!isRecord(payload)) return json({ error: "Pocket Budget 回應格式不完整" }, 502);
+  const budgetId = cleanMatchingString(payload.budgetId, /^[a-z0-9]{10}$/, 10);
+  const adminToken = cleanMatchingString(payload.adminToken, /^[a-f0-9]{32}$/i, 32);
+  if (!budgetId || !adminToken) return json({ error: "Pocket Budget 回應缺少必要資訊" }, 502);
+
+  return json(
+    {
+      integration: "pocket-budget",
+      status: "ready",
+      serviceOrigin: origin,
+      budgetId,
+      title,
+      mode: payload.mode === "approval" ? "approval" : "knapsack",
+      total,
+      options: typeof payload.options === "number" ? payload.options : null,
+      voteUrl: `${origin}/b/${budgetId}`,
+      resultsUrl: `${origin}/r/${budgetId}`,
+      apiUrl: `${origin}/api/budgets/${budgetId}`,
+      hostUrl: `${origin}/h/${budgetId}#admin=${adminToken}`,
+      exports: { optionsCsv: `${origin}/api/budgets/${budgetId}/export/options.csv`, ballotsCsv: `${origin}/api/budgets/${budgetId}/export/ballots.csv`, tttcCsv: `${origin}/api/budgets/${budgetId}/export/tttc.csv`, resultsJson: `${origin}/api/budgets/${budgetId}/export/results.json` },
+      storedByDelib: false,
+      credentialStoredByDelib: false,
+      writesExternalState: true,
+      privacy: {
+        privateUrls: ["hostUrl"],
+        participantDataOwner: origin,
+        retention: "設定與選票留在 Pocket Budget，直到主辦者用管理連結刪除；結果頁公開。",
       },
     },
     201,

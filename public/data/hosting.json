@@ -98,6 +98,25 @@
       ]
     },
     {
+      "toolId": "pocket-budget",
+      "route": "direct",
+      "label": "本站代建＋Cloudflare 一鍵部署",
+      "summary": "MIT 的單一 Cloudflare Worker + Durable Objects SQLite 服務，不用模型；背包／核准投票，最多票方案沿用 Stanford PB 的計票，公平方案借 Ethelo 的「支持度乘以公平度」做局部搜尋。",
+      "source": {
+        "url": "https://github.com/mashbean/pocket-budget",
+        "license": "MIT",
+        "reusable": true
+      },
+      "embed": "direct-create-links",
+      "cloudflareNative": true,
+      "nextAction": "用真實參與式預算案比對兩種方案的差異；需要時補多準則加權與選民名冊。",
+      "evidence": [
+        "https://budget.mashbean.net/",
+        "https://github.com/mashbean/pocket-budget",
+        "https://github.com/StanfordCDT/pb"
+      ]
+    },
+    {
       "toolId": "pocket-polis",
       "route": "direct",
       "label": "本站代建＋Cloudflare 一鍵部署",
@@ -313,7 +332,7 @@
       },
       "embed": "none",
       "cloudflareNative": false,
-      "nextAction": "若要使用，需另做題目建構、參與 UI、身份與匯出層。"
+      "nextAction": "若要使用，需另做題目建構、參與 UI、身份與匯出層。 免帳號的輕量版見 Pocket Budget。"
     },
     {
       "toolId": "evocracy",
@@ -502,7 +521,7 @@
       },
       "embed": "not-generic",
       "cloudflareNative": false,
-      "nextAction": "只在真的要做參與式預算時部署共用 instance。"
+      "nextAction": "只在真的要做參與式預算時部署共用 instance。 免帳號的輕量版見 Pocket Budget。"
     },
     {
       "toolId": "swarmcheck",

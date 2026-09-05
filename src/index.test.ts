@@ -13,6 +13,7 @@ import {
   handlePocketHarmonicaRequest,
   handlePocketReplyRequest,
   handlePocketValuesRequest,
+  handlePocketBudgetRequest,
   handlePocketFormRequest,
   handlePocketTttcRequest,
   handlePublicReceiptRequest,
@@ -326,6 +327,38 @@ describe("direct integrations", () => {
     const never = vi.fn();
     const noSituation = await handlePocketValuesRequest(new Request("https://delib.example/api/integrations/pocket-values", { method: "POST", headers: { Origin: "https://delib.example", "Content-Type": "application/json" }, body: JSON.stringify({ topic: "x", confirmed: true }) }), never as typeof fetch);
     expect(noSituation.status).toBe(400);
+    expect(never).not.toHaveBeenCalled();
+  });
+
+  it("creates a Pocket Budget vote from options and a total and returns vote, results and host links", async () => {
+    const upstream = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      expect(String(input)).toBe("https://budget.mashbean.net/api/budgets");
+      const sent = JSON.parse(String(init?.body));
+      expect(sent).toMatchObject({ title: "回饋金分配", total: 600, mode: "knapsack", confirmed: true });
+      expect(sent.options).toEqual([{ name: "便道", cost: 250, description: "", category: "安全" }, { name: "送餐", cost: 120, description: "一年", category: "" }]);
+      return new Response(JSON.stringify({ budgetId: "abc123def4", adminToken: "a".repeat(32), mode: "knapsack", total: 600, options: 2 }), { status: 201 });
+    });
+    const response = await handlePocketBudgetRequest(
+      new Request("https://delib.example/api/integrations/pocket-budget", {
+        method: "POST",
+        headers: { Origin: "https://delib.example", "Content-Type": "application/json" },
+        body: JSON.stringify({ title: "回饋金分配", total: 600, options: [{ name: "便道", cost: 250, category: "安全" }, { name: "送餐", cost: "120", description: "一年" }, { name: "壞的", cost: 0 }], confirmed: true }),
+      }),
+      upstream as typeof fetch,
+    );
+    expect(response.status).toBe(201);
+    await expect(response.json()).resolves.toMatchObject({
+      integration: "pocket-budget",
+      budgetId: "abc123def4",
+      options: 2,
+      voteUrl: "https://budget.mashbean.net/b/abc123def4",
+      resultsUrl: "https://budget.mashbean.net/r/abc123def4",
+      hostUrl: `https://budget.mashbean.net/h/abc123def4#admin=${"a".repeat(32)}`,
+      credentialStoredByDelib: false,
+    });
+    const never = vi.fn();
+    const oneOption = await handlePocketBudgetRequest(new Request("https://delib.example/api/integrations/pocket-budget", { method: "POST", headers: { Origin: "https://delib.example", "Content-Type": "application/json" }, body: JSON.stringify({ title: "x", total: 10, options: "只有一個, 5", confirmed: true }) }), never as typeof fetch);
+    expect(oneOption.status).toBe(400);
     expect(never).not.toHaveBeenCalled();
   });
 

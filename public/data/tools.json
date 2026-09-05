@@ -205,6 +205,43 @@
       "handoff": "Delib 可免登入代建並交回參與、道德圖與一次性主辦者連結；輸入是一個具體的選擇情境；輸出 graph.json、cards.csv 與 tttc.csv（故事）可接 Pocket TTTC。價值卡由模型草擬、本人確認；對話不公開。"
     },
     {
+      "id": "pocket-budget",
+      "name": "Pocket Budget · 口袋預算",
+      "summary": "參與式預算投票：列出選項與成本、給總額，參與者在總額內勾選（或最多勾 k 項）並留理由；結果同時給最多票方案（Stanford PB 背包計票）與公平方案（平均滿意度 × (1 − 不平等)），並列每個選項的支持度。單一 Cloudflare Worker，不用模型。",
+      "url": "https://budget.mashbean.net/",
+      "source": "https://github.com/mashbean/pocket-budget",
+      "status": "integrated",
+      "stages": [
+        "deciding",
+        "reflecting"
+      ],
+      "goals": [
+        "decide",
+        "understand"
+      ],
+      "formats": [
+        "online",
+        "hybrid",
+        "offline"
+      ],
+      "scales": [
+        "small",
+        "medium",
+        "large"
+      ],
+      "privacy": [
+        "public",
+        "pseudonymous"
+      ],
+      "outputs": [
+        "decisions",
+        "insights"
+      ],
+      "hosting": "cloudflare-worker",
+      "deploy": "https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/pocket-budget",
+      "handoff": "Delib 可免登入代建並交回投票、結果與一次性主辦者連結；輸入是選項清單（名稱、成本、說明、類別）與總額；輸出 options.csv、ballots.csv、results.json 與 tttc.csv（理由）。一台裝置一張票、無身分驗證，供審議參考。"
+    },
+    {
       "id": "pocket-polis",
       "name": "Pocket Polis · 口袋審議",
       "summary": "免登入建立陳述、同意／不同意投票與意見群組分析，直接由 polis.mashbean.net 託管活動；收完可發布分層成果收據並接續下一輪。",
