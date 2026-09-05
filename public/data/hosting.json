@@ -160,6 +160,24 @@
       "nextAction": "安全公告修補且 create API 穩定後，再做 API 代建。"
     },
     {
+      "toolId": "pocket-intake",
+      "route": "direct",
+      "label": "本站代建＋Cloudflare 一鍵部署",
+      "summary": "MIT 的單一 Cloudflare Worker + Durable Objects SQLite 表單服務，為審議收件而寫；Delib 可免登入代建，主辦者也能部署自己的 instance。",
+      "source": {
+        "url": "https://github.com/mashbean/pocket-intake",
+        "license": "MIT",
+        "reusable": true
+      },
+      "embed": "direct-create-links",
+      "cloudflareNative": true,
+      "nextAction": "綁正式網域，並在規劃器加入從題目草稿一鍵建表的介面。",
+      "evidence": [
+        "https://pocket-intake.mashbean.workers.dev/",
+        "https://github.com/mashbean/pocket-intake"
+      ]
+    },
+    {
       "toolId": "harmonica",
       "route": "connected",
       "label": "API／MCP 可代建",

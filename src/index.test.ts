@@ -10,6 +10,7 @@ import {
   handleHarmonicaRequest,
   handlePolisRequest,
   handlePocketPolisRequest,
+  handlePocketIntakeRequest,
   handlePocketTttcRequest,
   handlePublicReceiptRequest,
   handleRankingRoomRequest,
@@ -230,6 +231,37 @@ describe("direct integrations", () => {
       storedByDelib: false,
       credentialStoredByDelib: false,
     });
+  });
+
+  it("creates a Pocket Intake form and returns participate, host and export links", async () => {
+    const upstream = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      expect(String(input)).toBe("https://pocket-intake.mashbean.workers.dev/api/forms");
+      const sent = JSON.parse(String(init?.body));
+      expect(sent).toMatchObject({ title: "核電審議報名", askAlias: true, confirmed: true });
+      expect(sent.questions).toHaveLength(2);
+      return new Response(JSON.stringify({ formId: "abc123def4", adminToken: "c".repeat(32), questions: 2 }), { status: 201 });
+    });
+    const response = await handlePocketIntakeRequest(
+      new Request("https://delib.example/api/integrations/pocket-intake", {
+        method: "POST",
+        headers: { Origin: "https://delib.example", "Content-Type": "application/json" },
+        body: JSON.stringify({ title: "核電審議報名", askAlias: true, questions: [{ type: "long", label: "一句話", required: true }, { type: "consent", label: "同意" }], confirmed: true }),
+      }),
+      upstream as typeof fetch,
+    );
+    expect(response.status).toBe(201);
+    await expect(response.json()).resolves.toMatchObject({
+      integration: "pocket-intake",
+      formId: "abc123def4",
+      participateUrl: "https://pocket-intake.mashbean.workers.dev/f/abc123def4",
+      hostUrl: `https://pocket-intake.mashbean.workers.dev/h/abc123def4#admin=${"c".repeat(32)}`,
+      exports: { tttcCsv: "https://pocket-intake.mashbean.workers.dev/api/forms/abc123def4/export/tttc.csv" },
+      storedByDelib: false,
+    });
+    const never = vi.fn();
+    const unconfirmed = await handlePocketIntakeRequest(new Request("https://delib.example/api/integrations/pocket-intake", { method: "POST", headers: { Origin: "https://delib.example", "Content-Type": "application/json" }, body: JSON.stringify({ title: "x", questions: [{ type: "long", label: "y" }] }) }), never as typeof fetch);
+    expect(unconfirmed.status).toBe(400);
+    expect(never).not.toHaveBeenCalled();
   });
 
   it("hands a tttc.csv to Pocket TTTC and returns the report and one-time manage links", async () => {
