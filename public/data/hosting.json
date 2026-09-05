@@ -92,7 +92,7 @@
       "cloudflareNative": true,
       "nextAction": "綁正式網域；相近價值卡的去重（典型價值）與跨情境的圖留待下一版。",
       "evidence": [
-        "https://pocket-values.mashbean.workers.dev/",
+        "https://values.mashbean.net/",
         "https://github.com/mashbean/pocket-values",
         "https://github.com/meaningalignment/moral-graph-elicitation"
       ]

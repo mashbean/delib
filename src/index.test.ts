@@ -300,7 +300,7 @@ describe("direct integrations", () => {
 
   it("creates a Pocket Values elicitation from a situation and returns participate, graph and host links", async () => {
     const upstream = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
-      expect(String(input)).toBe("https://pocket-values.mashbean.workers.dev/api/sessions");
+      expect(String(input)).toBe("https://values.mashbean.net/api/sessions");
       const sent = JSON.parse(String(init?.body));
       expect(sent).toMatchObject({ topic: "核三延役：部長會注意什麼", situation: "假設你是經濟部長", confirmed: true, askAlias: true });
       return new Response(JSON.stringify({ sessionId: "abc123def4", adminToken: "f".repeat(32), budget: { worstCaseNeuronsPerParticipant: 300, worstCaseNeuronsPerSession: 6000 } }), { status: 201 });
@@ -317,9 +317,9 @@ describe("direct integrations", () => {
     await expect(response.json()).resolves.toMatchObject({
       integration: "pocket-values",
       sessionId: "abc123def4",
-      participateUrl: "https://pocket-values.mashbean.workers.dev/v/abc123def4",
-      graphUrl: "https://pocket-values.mashbean.workers.dev/g/abc123def4",
-      hostUrl: `https://pocket-values.mashbean.workers.dev/h/abc123def4#admin=${"f".repeat(32)}`,
+      participateUrl: "https://values.mashbean.net/v/abc123def4",
+      graphUrl: "https://values.mashbean.net/g/abc123def4",
+      hostUrl: `https://values.mashbean.net/h/abc123def4#admin=${"f".repeat(32)}`,
       budget: { worstCaseNeuronsPerSession: 6000 },
       credentialStoredByDelib: false,
     });

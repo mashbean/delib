@@ -173,7 +173,7 @@
       "id": "pocket-values",
       "name": "Pocket Values · 口袋價值圖",
       "summary": "參與者跟 AI 對話幾輪，用自己的話凝成一張價值卡（在這個情境下注意什麼、為什麼），再兩兩判斷別人的卡哪張更明智；判斷累積成公開的道德圖。Moral Graph Elicitation 的方法做成單一 Cloudflare Worker。",
-      "url": "https://pocket-values.mashbean.workers.dev/",
+      "url": "https://values.mashbean.net/",
       "source": "https://github.com/mashbean/pocket-values",
       "status": "integrated",
       "stages": [
