@@ -79,6 +79,25 @@
       ]
     },
     {
+      "toolId": "pocket-values",
+      "route": "direct",
+      "label": "本站代建＋Cloudflare 一鍵部署",
+      "summary": "MIT 的單一 Cloudflare Worker + Durable Objects SQLite + Workers AI 服務，把 Moral Graph Elicitation（對話→價值卡→「更明智」判斷→道德圖）做成免帳號的流程；上游程式碼無授權，這是依論文方法的獨立實作。",
+      "source": {
+        "url": "https://github.com/mashbean/pocket-values",
+        "license": "MIT",
+        "reusable": true
+      },
+      "embed": "direct-create-links",
+      "cloudflareNative": true,
+      "nextAction": "綁正式網域；相近價值卡的去重（典型價值）與跨情境的圖留待下一版。",
+      "evidence": [
+        "https://pocket-values.mashbean.workers.dev/",
+        "https://github.com/mashbean/pocket-values",
+        "https://github.com/meaningalignment/moral-graph-elicitation"
+      ]
+    },
+    {
       "toolId": "pocket-polis",
       "route": "direct",
       "label": "本站代建＋Cloudflare 一鍵部署",
@@ -420,7 +439,7 @@
       },
       "embed": "existing-data-only",
       "cloudflareNative": false,
-      "nextAction": "先取得授權；現在只能把公開 graph JSON 當資料來源。",
+      "nextAction": "先取得授權；現在只能把公開 graph JSON 當資料來源。免帳號的重寫見 Pocket Values。",
       "evidence": [
         "https://dft.meaningalignment.org/data/edges"
       ]

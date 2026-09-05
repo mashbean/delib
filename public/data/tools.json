@@ -170,6 +170,41 @@
       "handoff": "Delib 可免登入代建並交回收據與一次性管理連結；輸入是 Call-in、Pocket Polis、Pocket Form 或資料工作台輸出的 tttc.csv；角色由結構決定、立場只引用回覆者提供的公開立場、收據自帶 N/N 驗證。回覆以回覆者名義發出，公開前請逐則檢查。"
     },
     {
+      "id": "pocket-values",
+      "name": "Pocket Values · 口袋價值圖",
+      "summary": "參與者跟 AI 對話幾輪，用自己的話凝成一張價值卡（在這個情境下注意什麼、為什麼），再兩兩判斷別人的卡哪張更明智；判斷累積成公開的道德圖。Moral Graph Elicitation 的方法做成單一 Cloudflare Worker。",
+      "url": "https://pocket-values.mashbean.workers.dev/",
+      "source": "https://github.com/mashbean/pocket-values",
+      "status": "integrated",
+      "stages": [
+        "eliciting",
+        "deliberating",
+        "reflecting"
+      ],
+      "goals": [
+        "listen",
+        "understand"
+      ],
+      "formats": [
+        "online",
+        "hybrid"
+      ],
+      "scales": [
+        "small",
+        "medium"
+      ],
+      "privacy": [
+        "public",
+        "pseudonymous"
+      ],
+      "outputs": [
+        "insights"
+      ],
+      "hosting": "cloudflare-worker",
+      "deploy": "https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/pocket-values",
+      "handoff": "Delib 可免登入代建並交回參與、道德圖與一次性主辦者連結；輸入是一個具體的選擇情境；輸出 graph.json、cards.csv 與 tttc.csv（故事）可接 Pocket TTTC。價值卡由模型草擬、本人確認；對話不公開。"
+    },
+    {
       "id": "pocket-polis",
       "name": "Pocket Polis · 口袋審議",
       "summary": "免登入建立陳述、同意／不同意投票與意見群組分析，直接由 polis.mashbean.net 託管活動；收完可發布分層成果收據並接續下一輪。",

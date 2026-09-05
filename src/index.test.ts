@@ -12,6 +12,7 @@ import {
   handlePocketPolisRequest,
   handlePocketHarmonicaRequest,
   handlePocketReplyRequest,
+  handlePocketValuesRequest,
   handlePocketFormRequest,
   handlePocketTttcRequest,
   handlePublicReceiptRequest,
@@ -294,6 +295,37 @@ describe("direct integrations", () => {
     const never = vi.fn();
     const noQuestions = await handlePocketHarmonicaRequest(new Request("https://delib.example/api/integrations/pocket-harmonica", { method: "POST", headers: { Origin: "https://delib.example", "Content-Type": "application/json" }, body: JSON.stringify({ topic: "x", goal: "y", questions: [], confirmed: true }) }), never as typeof fetch);
     expect(noQuestions.status).toBe(400);
+    expect(never).not.toHaveBeenCalled();
+  });
+
+  it("creates a Pocket Values elicitation from a situation and returns participate, graph and host links", async () => {
+    const upstream = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      expect(String(input)).toBe("https://pocket-values.mashbean.workers.dev/api/sessions");
+      const sent = JSON.parse(String(init?.body));
+      expect(sent).toMatchObject({ topic: "核三延役：部長會注意什麼", situation: "假設你是經濟部長", confirmed: true, askAlias: true });
+      return new Response(JSON.stringify({ sessionId: "abc123def4", adminToken: "f".repeat(32), budget: { worstCaseNeuronsPerParticipant: 300, worstCaseNeuronsPerSession: 6000 } }), { status: 201 });
+    });
+    const response = await handlePocketValuesRequest(
+      new Request("https://delib.example/api/integrations/pocket-values", {
+        method: "POST",
+        headers: { Origin: "https://delib.example", "Content-Type": "application/json" },
+        body: JSON.stringify({ topic: "核三延役：部長會注意什麼", situation: "假設你是經濟部長", confirmed: true }),
+      }),
+      upstream as typeof fetch,
+    );
+    expect(response.status).toBe(201);
+    await expect(response.json()).resolves.toMatchObject({
+      integration: "pocket-values",
+      sessionId: "abc123def4",
+      participateUrl: "https://pocket-values.mashbean.workers.dev/v/abc123def4",
+      graphUrl: "https://pocket-values.mashbean.workers.dev/g/abc123def4",
+      hostUrl: `https://pocket-values.mashbean.workers.dev/h/abc123def4#admin=${"f".repeat(32)}`,
+      budget: { worstCaseNeuronsPerSession: 6000 },
+      credentialStoredByDelib: false,
+    });
+    const never = vi.fn();
+    const noSituation = await handlePocketValuesRequest(new Request("https://delib.example/api/integrations/pocket-values", { method: "POST", headers: { Origin: "https://delib.example", "Content-Type": "application/json" }, body: JSON.stringify({ topic: "x", confirmed: true }) }), never as typeof fetch);
+    expect(noSituation.status).toBe(400);
     expect(never).not.toHaveBeenCalled();
   });
 

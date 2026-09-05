@@ -270,6 +270,53 @@
       ]
     },
     {
+      "toolId": "pocket-values",
+      "readiness": "available",
+      "activation": "managed-create",
+      "label": "免登入直接建立",
+      "summary": "給一個具體的選擇情境，建立一場價值引導：參與者跟 AI 對話（預設 4 輪）、確認自己的價值卡、對別人的卡兩兩判斷哪張更明智；道德圖公開、隨判斷更新。",
+      "accountRequired": false,
+      "credentialRequired": false,
+      "freePath": "使用 mashbean 維運的 Pocket Values 共用主機（Workers AI 免費額度、每日 9,000 神經元，約 30 位參與者），或按 Deploy to Cloudflare 建立自己的獨立服務。",
+      "writesExternalState": "按下確認後，本站伺服器會呼叫 Pocket Values 的建立 API，立即建立一場並取得參與、道德圖與主辦者連結。",
+      "retention": "對話、價值卡與判斷留在 Pocket Values 的 Durable Object，直到主辦者用管理連結刪除；道德圖與價值卡以化名公開；Delib 不保存對話、價值卡或主辦者權杖。",
+      "inAppEndpoint": "/api/integrations/pocket-values",
+      "dataHandoff": {
+        "endpoint": "/integrations/pocket-polis-data",
+        "input": [
+          "一個具體的選擇情境（例如「假設你是部長，明天要決定…」）"
+        ],
+        "outputs": [
+          "graph.json（節點＝價值卡、邊＝「更明智」轉移、Bradley–Terry 強度）",
+          "cards.csv",
+          "tttc.csv（每張卡的故事，可接 Pocket TTTC）"
+        ],
+        "storage": "browser-memory-only",
+        "humanGate": "告知參與者這是 AI 對話、價值卡會以化名公開、可隨時停止；情境要具體到能想像自己在做選擇。"
+      },
+      "selfHost": {
+        "supported": true,
+        "platform": "Cloudflare Workers + Durable Objects SQLite + Workers AI",
+        "cloudflareNative": true,
+        "freeTier": "一鍵部署到自己的 Cloudflare 帳號；每場與每日的神經元上限可在 wrangler.jsonc 調整。",
+        "deployUrl": "https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/pocket-values"
+      },
+      "agent": {
+        "canCreate": true,
+        "humanGate": "Agent 可準備情境與背景；建立前由人確認告知義務與參與者上限。"
+      },
+      "knownLimitations": [
+        "價值卡由模型從對話草擬，本人可改可重來，但仍可能漏掉沒說出口的考量。",
+        "沒有做相近價值卡的去重（原方法會合併成典型價值）；卡少時每人可比較的組合有限。",
+        "每張卡只在同一情境內比較；沒有跨情境的圖。"
+      ],
+      "evidence": [
+        "https://pocket-values.mashbean.workers.dev/",
+        "https://github.com/mashbean/pocket-values",
+        "https://github.com/meaningalignment/moral-graph-elicitation"
+      ]
+    },
+    {
       "toolId": "polis",
       "readiness": "available-with-connection",
       "activation": "embedded-workspace",

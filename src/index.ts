@@ -39,6 +39,7 @@ type WorkerEnv = Omit<
   POCKET_FORM_ORIGIN?: string;
   POCKET_HARMONICA_ORIGIN?: string;
   POCKET_REPLY_ORIGIN?: string;
+  POCKET_VALUES_ORIGIN?: string;
   POLIS_SITE_ID?: string;
   /** SHA-256 hex of an operator secret that may take down abusive public receipts. */
   OPERATOR_TOKEN_SHA256?: string;
@@ -82,6 +83,7 @@ const DEFAULT_POCKET_TTTC_ORIGIN = "https://ttt-city.mashbean.net";
 const DEFAULT_POCKET_FORM_ORIGIN = "https://form.mashbean.net";
 const DEFAULT_POCKET_HARMONICA_ORIGIN = "https://harmonica.mashbean.net";
 const DEFAULT_POCKET_REPLY_ORIGIN = "https://reply.mashbean.net";
+const DEFAULT_POCKET_VALUES_ORIGIN = "https://pocket-values.mashbean.workers.dev";
 /** Pocket TTTC 接受最多 3 MiB 的 CSV；這個端點的上限跟著它，而非一般整合的 12 KB。 */
 const MAX_POCKET_TTTC_BODY_BYTES = 3 * 1024 * 1024 + 64 * 1024;
 /** Upstream creators answer in a few seconds; the BYOK model call may take longer. */
@@ -184,6 +186,9 @@ async function route(request: Request, env: WorkerEnv, url: URL): Promise<Respon
 
     if (url.pathname === "/api/integrations/pocket-reply" && request.method === "POST") {
       return handlePocketReplyRequest(request, fetch, env.POCKET_REPLY_ORIGIN || DEFAULT_POCKET_REPLY_ORIGIN);
+    }
+    if (url.pathname === "/api/integrations/pocket-values" && request.method === "POST") {
+      return handlePocketValuesRequest(request, fetch, env.POCKET_VALUES_ORIGIN || DEFAULT_POCKET_VALUES_ORIGIN);
     }
 
     if (url.pathname === "/api/integrations/pocket-harmonica" && request.method === "POST") {
@@ -954,6 +959,112 @@ export async function handlePocketHarmonicaRequest(
         privateUrls: ["hostUrl"],
         participantDataOwner: origin,
         retention: "設定與逐字稿留在 Pocket Harmonica，直到主辦者用管理連結刪除。",
+      },
+    },
+    201,
+  );
+}
+
+type PocketValuesRequest = {
+  topic?: unknown;
+  situation?: unknown;
+  context?: unknown;
+  language?: unknown;
+  maxTurns?: unknown;
+  maxParticipants?: unknown;
+  judgmentsPerParticipant?: unknown;
+  askAlias?: unknown;
+  confirmed?: unknown;
+};
+
+/**
+ * 在 Pocket Values 建立一場價值引導（Moral Graph Elicitation）：參與者跟 AI 對話後確認一張價值卡，
+ * 再兩兩判斷別人的卡在這個情境下哪張更明智，累積成公開道德圖。Delib 不保存對話、價值卡或主辦者權杖。
+ */
+export async function handlePocketValuesRequest(
+  request: Request,
+  upstreamFetch: typeof fetch = fetch,
+  configuredOrigin = DEFAULT_POCKET_VALUES_ORIGIN,
+): Promise<Response> {
+  if (!isSameOriginRequest(request)) return json({ error: "origin not allowed" }, 403);
+  const body = await readJsonRequest<PocketValuesRequest>(request, MAX_INTEGRATION_BODY_BYTES);
+  if (body instanceof Response) return body;
+  if (body.confirmed !== true) return json({ error: "建立前請先確認會告知參與者這是 AI 對話、價值卡會以化名給其他參與者看、可隨時停止" }, 400);
+  const topic = cleanRequiredString(body.topic, 120);
+  const situation = cleanRequiredString(body.situation, 500);
+  if (!topic) return json({ error: "先幫這場取一個名字" }, 400);
+  if (!situation) return json({ error: "請描述參與者要想像自己在做的選擇（情境）" }, 400);
+  const origin = normalizeServiceOrigin(configuredOrigin);
+  if (!origin) return json({ error: "Pocket Values 主機設定不完整" }, 503);
+
+  let upstream: Response;
+  try {
+    upstream = await upstreamFetch(`${origin}/api/sessions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        topic,
+        situation,
+        context: cleanOptionalString(body.context, 1_000),
+        language: body.language === "en" ? "en" : "zh-Hant",
+        maxTurns: typeof body.maxTurns === "number" ? body.maxTurns : undefined,
+        maxParticipants: typeof body.maxParticipants === "number" ? body.maxParticipants : undefined,
+        judgmentsPerParticipant: typeof body.judgmentsPerParticipant === "number" ? body.judgmentsPerParticipant : undefined,
+        askAlias: body.askAlias !== false,
+        confirmed: true,
+      }),
+      signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
+    });
+  } catch (error) {
+    return upstreamFailure(error, "Pocket Values");
+  }
+
+  if (!upstream.ok) {
+    let detail = "";
+    try {
+      detail = cleanOptionalString(((await upstream.json()) as { error?: unknown }).error, 300);
+    } catch {
+      detail = "";
+    }
+    if (upstream.status === 400) return json({ error: detail || "Pocket Values 沒有接受這些設定" }, 400);
+    return json(
+      { error: upstream.status === 429 ? "Pocket Values 目前建立的次數已達上限，請稍後再試" : "Pocket Values 沒有完成建立，請稍後再試" },
+      upstream.status === 429 ? 429 : 502,
+    );
+  }
+
+  let payload: unknown;
+  try {
+    payload = await upstream.json();
+  } catch {
+    return json({ error: "Pocket Values 回應格式不完整" }, 502);
+  }
+  if (!isRecord(payload)) return json({ error: "Pocket Values 回應格式不完整" }, 502);
+  const sessionId = cleanMatchingString(payload.sessionId, /^[a-z0-9]{10}$/, 10);
+  const adminToken = cleanMatchingString(payload.adminToken, /^[a-f0-9]{32}$/i, 32);
+  if (!sessionId || !adminToken) return json({ error: "Pocket Values 回應缺少必要資訊" }, 502);
+  const budget = isRecord(payload.budget) ? payload.budget : null;
+
+  return json(
+    {
+      integration: "pocket-values",
+      status: "ready",
+      serviceOrigin: origin,
+      sessionId,
+      topic,
+      participateUrl: `${origin}/v/${sessionId}`,
+      graphUrl: `${origin}/g/${sessionId}`,
+      apiUrl: `${origin}/api/sessions/${sessionId}`,
+      hostUrl: `${origin}/h/${sessionId}#admin=${adminToken}`,
+      exports: { tttcCsv: `${origin}/api/sessions/${sessionId}/export/tttc.csv`, cardsCsv: `${origin}/api/sessions/${sessionId}/export/cards.csv`, graphJson: `${origin}/api/sessions/${sessionId}/export/graph.json` },
+      budget: budget ? { worstCaseNeuronsPerParticipant: budget.worstCaseNeuronsPerParticipant, worstCaseNeuronsPerSession: budget.worstCaseNeuronsPerSession } : null,
+      storedByDelib: false,
+      credentialStoredByDelib: false,
+      writesExternalState: true,
+      privacy: {
+        privateUrls: ["hostUrl"],
+        participantDataOwner: origin,
+        retention: "對話、價值卡與判斷留在 Pocket Values，直到主辦者用管理連結刪除；道德圖與價值卡（化名）公開。",
       },
     },
     201,
