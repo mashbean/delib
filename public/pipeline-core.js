@@ -20,7 +20,10 @@ export function participationAt(round, phaseIndex) {
 }
 export function participationChange(bundle, roundIndex, phaseIndex) {
   const round=bundle.rounds[roundIndex],current=participationAt(round,phaseIndex);
-  const previous=phaseIndex>0?participationAt(round,phaseIndex-1):roundIndex>0?participationAt(bundle.rounds[roundIndex-1],7):[];
+  // A new round may resume at recruitment or learning. Compare its entry with
+  // the preceding round's actual ending, not an earlier context-only step.
+  const entry=roundIndex>0?PHASE_IDS.indexOf(bundle.rounds[roundIndex-1].next.phaseId):0;
+  const previous=roundIndex>0&&(phaseIndex===entry||phaseIndex===0)?participationAt(bundle.rounds[roundIndex-1],7):phaseIndex>0?participationAt(round,phaseIndex-1):[];
   return {current,entered:current.filter(p=>!previous.some(x=>x.id===p.id)),left:previous.filter(p=>!current.some(x=>x.id===p.id)),switched:current.filter(p=>previous.some(x=>x.id===p.id&&x.mode!==p.mode)).map(p=>({...p,from:previous.find(x=>x.id===p.id).mode}))};
 }
 export function personJourney(bundle, roundIndex, id) {
