@@ -97,6 +97,16 @@ Shared step first: extract a `pocket-worker-template` from Pocket TTTC
 (Durable Object SQLite, alarm pipeline, neuron ledger, fake-AI tests, Deploy
 button, Delib activation endpoint) so each item above is roughly a day.
 
+### Round 2 (2026-09-06): stage gaps rather than tool clones
+
+| # | Source idea | Native service | Status |
+|---|---|---|---|
+| 7 | SwarmCheck's understanding checks | **Pocket Check**: sourced questions, pass mark, next link only on a pass, per-question accuracy and common misconceptions | done 2026-09-06 (checks.mashbean.net; check.mashbean.net already carried an external DNS record) |
+| 8 | Decidim / Go Vocal / PolicyCraft proposal modules | **Pocket Proposals**: proposals, endorsements, responses, amendments with line diffs the author accepts; Polis seeds + tttc.csv | done 2026-09-06 (proposals.mashbean.net); fills the only stage (proposing) that had no native tool |
+| 9 | SwarmCheck's structured argumentation | **Pocket Argument**: pro/con argument tree with per-argument votes and propagated strength | done 2026-09-06 (argument.mashbean.net) |
+| 10 | Deliberative Canvas | Not a service: **canvas view** inside Pocket TTTC (`/r/:id/canvas`, pure SVG) | done 2026-09-06 |
+| 11 | MAPLE | **Pocket Testimony**: written positions on an agenda item with a public archive; Taiwan bill data from the token-free ly.govapi.tw v2 API | assessed 2026-09-06, not started |
+
 ### Not worth rewriting (or already covered)
 
 - Pol.is and Talk to the City: cores are covered by Pocket Polis and Pocket

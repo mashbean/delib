@@ -41,6 +41,9 @@ type WorkerEnv = Omit<
   POCKET_REPLY_ORIGIN?: string;
   POCKET_VALUES_ORIGIN?: string;
   POCKET_BUDGET_ORIGIN?: string;
+  POCKET_CHECK_ORIGIN?: string;
+  POCKET_PROPOSALS_ORIGIN?: string;
+  POCKET_ARGUMENT_ORIGIN?: string;
   POLIS_SITE_ID?: string;
   /** SHA-256 hex of an operator secret that may take down abusive public receipts. */
   OPERATOR_TOKEN_SHA256?: string;
@@ -86,6 +89,9 @@ const DEFAULT_POCKET_HARMONICA_ORIGIN = "https://harmonica.mashbean.net";
 const DEFAULT_POCKET_REPLY_ORIGIN = "https://reply.mashbean.net";
 const DEFAULT_POCKET_VALUES_ORIGIN = "https://values.mashbean.net";
 const DEFAULT_POCKET_BUDGET_ORIGIN = "https://budget.mashbean.net";
+const DEFAULT_POCKET_CHECK_ORIGIN = "https://checks.mashbean.net";
+const DEFAULT_POCKET_PROPOSALS_ORIGIN = "https://proposals.mashbean.net";
+const DEFAULT_POCKET_ARGUMENT_ORIGIN = "https://argument.mashbean.net";
 /** Pocket TTTC 接受最多 3 MiB 的 CSV；這個端點的上限跟著它，而非一般整合的 12 KB。 */
 const MAX_POCKET_TTTC_BODY_BYTES = 3 * 1024 * 1024 + 64 * 1024;
 /** Upstream creators answer in a few seconds; the BYOK model call may take longer. */
@@ -194,6 +200,15 @@ async function route(request: Request, env: WorkerEnv, url: URL): Promise<Respon
     }
     if (url.pathname === "/api/integrations/pocket-budget" && request.method === "POST") {
       return handlePocketBudgetRequest(request, fetch, env.POCKET_BUDGET_ORIGIN || DEFAULT_POCKET_BUDGET_ORIGIN);
+    }
+    if (url.pathname === "/api/integrations/pocket-check" && request.method === "POST") {
+      return handlePocketCheckRequest(request, fetch, env.POCKET_CHECK_ORIGIN || DEFAULT_POCKET_CHECK_ORIGIN);
+    }
+    if (url.pathname === "/api/integrations/pocket-proposals" && request.method === "POST") {
+      return handlePocketProposalsRequest(request, fetch, env.POCKET_PROPOSALS_ORIGIN || DEFAULT_POCKET_PROPOSALS_ORIGIN);
+    }
+    if (url.pathname === "/api/integrations/pocket-argument" && request.method === "POST") {
+      return handlePocketArgumentRequest(request, fetch, env.POCKET_ARGUMENT_ORIGIN || DEFAULT_POCKET_ARGUMENT_ORIGIN);
     }
 
     if (url.pathname === "/api/integrations/pocket-harmonica" && request.method === "POST") {
@@ -1183,6 +1198,299 @@ export async function handlePocketBudgetRequest(
         privateUrls: ["hostUrl"],
         participantDataOwner: origin,
         retention: "設定與選票留在 Pocket Budget，直到主辦者用管理連結刪除；結果頁公開。",
+      },
+    },
+    201,
+  );
+}
+
+type PocketCheckRequest = {
+  title?: unknown;
+  intro?: unknown;
+  questions?: unknown;
+  passMark?: unknown;
+  nextUrl?: unknown;
+  nextLabel?: unknown;
+  askFeedback?: unknown;
+  confirmed?: unknown;
+};
+
+/** 在 Pocket Check（口袋理解關卡）建立一場；Delib 不保存內容或主辦者權杖，hostUrl 只出現這一次。 */
+export async function handlePocketCheckRequest(
+  request: Request,
+  upstreamFetch: typeof fetch = fetch,
+  configuredOrigin = DEFAULT_POCKET_CHECK_ORIGIN,
+): Promise<Response> {
+  if (!isSameOriginRequest(request)) return json({ error: "origin not allowed" }, 403);
+  const body = await readJsonRequest<PocketCheckRequest>(request, MAX_INTEGRATION_BODY_BYTES);
+  if (body instanceof Response) return body;
+  if (body.confirmed !== true) return json({ error: "建立前請先確認每題答案都對過出處" }, 400);
+  const title = cleanRequiredString(body.title, 120);
+  if (!title) return json({ error: "先幫這個關卡取一個名字" }, 400);
+  const questions = (Array.isArray(body.questions) ? body.questions : []).filter(isRecord).map((question) => ({
+    prompt: cleanOptionalString(question.prompt, 500),
+    choices: (Array.isArray(question.choices) ? question.choices : []).map((choice) => cleanOptionalString(choice, 200)).filter(Boolean).slice(0, 6),
+    answer: Number(question.answer),
+    source: cleanOptionalString(question.source, 300),
+    explanation: cleanOptionalString(question.explanation, 500),
+  })).filter((question) => question.prompt && question.choices.length >= 2 && Number.isInteger(question.answer) && question.answer >= 0 && question.answer < question.choices.length).slice(0, 10);
+  if (questions.length === 0) return json({ error: "至少要有一題：題目、2–6 個選項、正確答案的索引" }, 400);
+  const origin = normalizeServiceOrigin(configuredOrigin);
+  if (!origin) return json({ error: "Pocket Check 主機設定不完整" }, 503);
+
+  let upstream: Response;
+  try {
+    upstream = await upstreamFetch(`${origin}/api/checks`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title,
+        intro: cleanOptionalString(body.intro, 1_000),
+        questions,
+        passMark: typeof body.passMark === "number" ? body.passMark : undefined,
+        nextUrl: cleanOptionalString(body.nextUrl, 2_048),
+        nextLabel: cleanOptionalString(body.nextLabel, 60),
+        askFeedback: body.askFeedback !== false,
+        confirmed: true,
+      }),
+      signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
+    });
+  } catch (error) {
+    return upstreamFailure(error, "Pocket Check");
+  }
+
+  if (!upstream.ok) {
+    let detail = "";
+    try {
+      detail = cleanOptionalString(((await upstream.json()) as { error?: unknown }).error, 300);
+    } catch {
+      detail = "";
+    }
+    if (upstream.status === 400) return json({ error: detail || "Pocket Check 沒有接受這些設定" }, 400);
+    return json(
+      { error: upstream.status === 429 ? "Pocket Check 目前建立的次數已達上限，請稍後再試" : "Pocket Check 沒有完成建立，請稍後再試" },
+      upstream.status === 429 ? 429 : 502,
+    );
+  }
+
+  let payload: unknown;
+  try {
+    payload = await upstream.json();
+  } catch {
+    return json({ error: "Pocket Check 回應格式不完整" }, 502);
+  }
+  if (!isRecord(payload)) return json({ error: "Pocket Check 回應格式不完整" }, 502);
+  const checkId = cleanMatchingString(payload.checkId, /^[a-z0-9]{10}$/, 10);
+  const adminToken = cleanMatchingString(payload.adminToken, /^[a-f0-9]{32}$/i, 32);
+  if (!checkId || !adminToken) return json({ error: "Pocket Check 回應缺少必要資訊" }, 502);
+
+  return json(
+    {
+      integration: "pocket-check",
+      status: "ready",
+      serviceOrigin: origin,
+      checkId: checkId,
+      title,
+      questions: typeof payload.questions === "number" ? payload.questions : questions.length,
+      passMark: typeof payload.passMark === "number" ? payload.passMark : null,
+      quizUrl: `${origin}/c/${checkId}`,
+      resultsUrl: `${origin}/r/${checkId}`,
+      apiUrl: `${origin}/api/checks/${checkId}`,
+      hostUrl: `${origin}/h/${checkId}#admin=${adminToken}`,
+      exports: { questionsCsv: `${origin}/api/checks/${checkId}/export/questions.csv`, attemptsCsv: `${origin}/api/checks/${checkId}/export/attempts.csv`, tttcCsv: `${origin}/api/checks/${checkId}/export/tttc.csv`, resultsJson: `${origin}/api/checks/${checkId}/export/results.json` },
+      storedByDelib: false,
+      credentialStoredByDelib: false,
+      writesExternalState: true,
+      privacy: {
+        privateUrls: ["hostUrl"],
+        participantDataOwner: origin,
+        retention: "題目與作答留在 Pocket Check，直到主辦者用管理連結刪除；結果頁公開但不含個別答案。",
+      },
+    },
+    201,
+  );
+}
+
+type PocketProposalsRequest = {
+  title?: unknown;
+  prompt?: unknown;
+  description?: unknown;
+  allowAmendments?: unknown;
+  allowResponses?: unknown;
+  askAlias?: unknown;
+  confirmed?: unknown;
+};
+
+/** 在 Pocket Proposals（口袋提案）建立一場；Delib 不保存內容或主辦者權杖，hostUrl 只出現這一次。 */
+export async function handlePocketProposalsRequest(
+  request: Request,
+  upstreamFetch: typeof fetch = fetch,
+  configuredOrigin = DEFAULT_POCKET_PROPOSALS_ORIGIN,
+): Promise<Response> {
+  if (!isSameOriginRequest(request)) return json({ error: "origin not allowed" }, 403);
+  const body = await readJsonRequest<PocketProposalsRequest>(request, MAX_INTEGRATION_BODY_BYTES);
+  if (body instanceof Response) return body;
+  if (body.confirmed !== true) return json({ error: "建立前請先確認會告知參與者提案是公開、化名的，以及會怎麼用" }, 400);
+  const title = cleanRequiredString(body.title, 120);
+  if (!title) return json({ error: "先幫這個提案空間取一個名字" }, 400);
+  const origin = normalizeServiceOrigin(configuredOrigin);
+  if (!origin) return json({ error: "Pocket Proposals 主機設定不完整" }, 503);
+
+  let upstream: Response;
+  try {
+    upstream = await upstreamFetch(`${origin}/api/spaces`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title,
+        prompt: cleanOptionalString(body.prompt, 500),
+        description: cleanOptionalString(body.description, 2_000),
+        allowAmendments: body.allowAmendments !== false,
+        allowResponses: body.allowResponses !== false,
+        askAlias: body.askAlias !== false,
+        confirmed: true,
+      }),
+      signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
+    });
+  } catch (error) {
+    return upstreamFailure(error, "Pocket Proposals");
+  }
+
+  if (!upstream.ok) {
+    let detail = "";
+    try {
+      detail = cleanOptionalString(((await upstream.json()) as { error?: unknown }).error, 300);
+    } catch {
+      detail = "";
+    }
+    if (upstream.status === 400) return json({ error: detail || "Pocket Proposals 沒有接受這些設定" }, 400);
+    return json(
+      { error: upstream.status === 429 ? "Pocket Proposals 目前建立的次數已達上限，請稍後再試" : "Pocket Proposals 沒有完成建立，請稍後再試" },
+      upstream.status === 429 ? 429 : 502,
+    );
+  }
+
+  let payload: unknown;
+  try {
+    payload = await upstream.json();
+  } catch {
+    return json({ error: "Pocket Proposals 回應格式不完整" }, 502);
+  }
+  if (!isRecord(payload)) return json({ error: "Pocket Proposals 回應格式不完整" }, 502);
+  const spaceId = cleanMatchingString(payload.spaceId, /^[a-z0-9]{10}$/, 10);
+  const adminToken = cleanMatchingString(payload.adminToken, /^[a-f0-9]{32}$/i, 32);
+  if (!spaceId || !adminToken) return json({ error: "Pocket Proposals 回應缺少必要資訊" }, 502);
+
+  return json(
+    {
+      integration: "pocket-proposals",
+      status: "ready",
+      serviceOrigin: origin,
+      spaceId: spaceId,
+      title,
+      spaceUrl: `${origin}/p/${spaceId}`,
+      resultsUrl: `${origin}/r/${spaceId}`,
+      apiUrl: `${origin}/api/spaces/${spaceId}`,
+      hostUrl: `${origin}/h/${spaceId}#admin=${adminToken}`,
+      exports: { proposalsCsv: `${origin}/api/spaces/${spaceId}/export/proposals.csv`, amendmentsCsv: `${origin}/api/spaces/${spaceId}/export/amendments.csv`, seedsJson: `${origin}/api/spaces/${spaceId}/export/seeds.json`, tttcCsv: `${origin}/api/spaces/${spaceId}/export/tttc.csv` },
+      storedByDelib: false,
+      credentialStoredByDelib: false,
+      writesExternalState: true,
+      privacy: {
+        privateUrls: ["hostUrl"],
+        participantDataOwner: origin,
+        retention: "提案、修正案、附議與回應留在 Pocket Proposals，直到主辦者用管理連結刪除；提案空間與結果頁公開（化名）。",
+      },
+    },
+    201,
+  );
+}
+
+type PocketArgumentRequest = {
+  claim?: unknown;
+  description?: unknown;
+  maxDepth?: unknown;
+  askAlias?: unknown;
+  confirmed?: unknown;
+};
+
+/** 在 Pocket Argument（口袋論證）建立一場；Delib 不保存內容或主辦者權杖，hostUrl 只出現這一次。 */
+export async function handlePocketArgumentRequest(
+  request: Request,
+  upstreamFetch: typeof fetch = fetch,
+  configuredOrigin = DEFAULT_POCKET_ARGUMENT_ORIGIN,
+): Promise<Response> {
+  if (!isSameOriginRequest(request)) return json({ error: "origin not allowed" }, 403);
+  const body = await readJsonRequest<PocketArgumentRequest>(request, MAX_INTEGRATION_BODY_BYTES);
+  if (body instanceof Response) return body;
+  if (body.confirmed !== true) return json({ error: "建立前請先確認會告知參與者論點樹是公開的，投票是在判斷論點、不是判斷人" }, 400);
+  const claim = cleanRequiredString(body.claim, 200);
+  if (!claim) return json({ error: "先寫出要辯論的主張，一句話" }, 400);
+  const origin = normalizeServiceOrigin(configuredOrigin);
+  if (!origin) return json({ error: "Pocket Argument 主機設定不完整" }, 503);
+
+  let upstream: Response;
+  try {
+    upstream = await upstreamFetch(`${origin}/api/debates`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        claim,
+        description: cleanOptionalString(body.description, 2_000),
+        maxDepth: typeof body.maxDepth === "number" ? body.maxDepth : undefined,
+        askAlias: body.askAlias === true,
+        confirmed: true,
+      }),
+      signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
+    });
+  } catch (error) {
+    return upstreamFailure(error, "Pocket Argument");
+  }
+
+  if (!upstream.ok) {
+    let detail = "";
+    try {
+      detail = cleanOptionalString(((await upstream.json()) as { error?: unknown }).error, 300);
+    } catch {
+      detail = "";
+    }
+    if (upstream.status === 400) return json({ error: detail || "Pocket Argument 沒有接受這些設定" }, 400);
+    return json(
+      { error: upstream.status === 429 ? "Pocket Argument 目前建立的次數已達上限，請稍後再試" : "Pocket Argument 沒有完成建立，請稍後再試" },
+      upstream.status === 429 ? 429 : 502,
+    );
+  }
+
+  let payload: unknown;
+  try {
+    payload = await upstream.json();
+  } catch {
+    return json({ error: "Pocket Argument 回應格式不完整" }, 502);
+  }
+  if (!isRecord(payload)) return json({ error: "Pocket Argument 回應格式不完整" }, 502);
+  const debateId = cleanMatchingString(payload.debateId, /^[a-z0-9]{10}$/, 10);
+  const adminToken = cleanMatchingString(payload.adminToken, /^[a-f0-9]{32}$/i, 32);
+  if (!debateId || !adminToken) return json({ error: "Pocket Argument 回應缺少必要資訊" }, 502);
+
+  return json(
+    {
+      integration: "pocket-argument",
+      status: "ready",
+      serviceOrigin: origin,
+      debateId: debateId,
+      claim,
+      debateUrl: `${origin}/a/${debateId}`,
+      resultsUrl: `${origin}/r/${debateId}`,
+      apiUrl: `${origin}/api/debates/${debateId}`,
+      hostUrl: `${origin}/h/${debateId}#admin=${adminToken}`,
+      exports: { argumentsCsv: `${origin}/api/debates/${debateId}/export/arguments.csv`, treeJson: `${origin}/api/debates/${debateId}/export/tree.json`, tttcCsv: `${origin}/api/debates/${debateId}/export/tttc.csv` },
+      storedByDelib: false,
+      credentialStoredByDelib: false,
+      writesExternalState: true,
+      privacy: {
+        privateUrls: ["hostUrl"],
+        participantDataOwner: origin,
+        retention: "主張、論點與票留在 Pocket Argument，直到主辦者用管理連結刪除；論點樹與結果頁公開。",
       },
     },
     201,

@@ -14,6 +14,9 @@ import {
   handlePocketReplyRequest,
   handlePocketValuesRequest,
   handlePocketBudgetRequest,
+  handlePocketCheckRequest,
+  handlePocketProposalsRequest,
+  handlePocketArgumentRequest,
   handlePocketFormRequest,
   handlePocketTttcRequest,
   handlePublicReceiptRequest,
@@ -365,6 +368,55 @@ describe("direct integrations", () => {
     const never = vi.fn();
     const oneOption = await handlePocketBudgetRequest(new Request("https://delib.example/api/integrations/pocket-budget", { method: "POST", headers: { Origin: "https://delib.example", "Content-Type": "application/json" }, body: JSON.stringify({ title: "x", total: 10, options: "只有一個, 5", confirmed: true }) }), never as typeof fetch);
     expect(oneOption.status).toBe(400);
+    expect(never).not.toHaveBeenCalled();
+  });
+
+it("creates a Pocket Check gate from sourced questions and drops malformed ones", async () => {
+    const upstream = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      expect(String(input)).toBe("https://checks.mashbean.net/api/checks");
+      const sent = JSON.parse(String(init?.body));
+      expect(sent).toMatchObject({ title: "理解關卡", passMark: 2, nextUrl: "https://polis.mashbean.net/c/x", confirmed: true });
+      expect(sent.questions).toEqual([{ prompt: "Q1", choices: ["a", "b"], answer: 1, source: "s", explanation: "" }]);
+      return new Response(JSON.stringify({ checkId: "abc123def4", adminToken: "b".repeat(32), questions: 1, passMark: 1 }), { status: 201 });
+    });
+    const response = await handlePocketCheckRequest(new Request("https://delib.example/api/integrations/pocket-check", { method: "POST", headers: { Origin: "https://delib.example", "Content-Type": "application/json" }, body: JSON.stringify({ title: "理解關卡", questions: [{ prompt: "Q1", choices: ["a", "b"], answer: 1, source: "s" }, { prompt: "壞題", choices: ["只有一個"], answer: 0 }], passMark: 2, nextUrl: "https://polis.mashbean.net/c/x", confirmed: true }) }), upstream as typeof fetch);
+    expect(response.status).toBe(201);
+    await expect(response.json()).resolves.toMatchObject({ integration: "pocket-check", checkId: "abc123def4", quizUrl: "https://checks.mashbean.net/c/abc123def4", hostUrl: `https://checks.mashbean.net/h/abc123def4#admin=${"b".repeat(32)}`, credentialStoredByDelib: false });
+    const never = vi.fn();
+    const bad = await handlePocketCheckRequest(new Request("https://delib.example/api/integrations/pocket-check", { method: "POST", headers: { Origin: "https://delib.example", "Content-Type": "application/json" }, body: JSON.stringify({ title: "x", questions: [], confirmed: true }) }), never as typeof fetch);
+    expect(bad.status).toBe(400);
+    expect(never).not.toHaveBeenCalled();
+  });
+
+  it("creates a Pocket Proposals space from a prompt and returns space, results and seed links", async () => {
+    const upstream = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      expect(String(input)).toBe("https://proposals.mashbean.net/api/spaces");
+      const sent = JSON.parse(String(init?.body));
+      expect(sent).toMatchObject({ title: "配套提案", prompt: "配套要有什麼？", allowAmendments: true, confirmed: true });
+      return new Response(JSON.stringify({ spaceId: "abc123def4", adminToken: "c".repeat(32) }), { status: 201 });
+    });
+    const response = await handlePocketProposalsRequest(new Request("https://delib.example/api/integrations/pocket-proposals", { method: "POST", headers: { Origin: "https://delib.example", "Content-Type": "application/json" }, body: JSON.stringify({ title: "配套提案", prompt: "配套要有什麼？", confirmed: true }) }), upstream as typeof fetch);
+    expect(response.status).toBe(201);
+    await expect(response.json()).resolves.toMatchObject({ integration: "pocket-proposals", spaceId: "abc123def4", spaceUrl: "https://proposals.mashbean.net/p/abc123def4", exports: { seedsJson: "https://proposals.mashbean.net/api/spaces/abc123def4/export/seeds.json" }, credentialStoredByDelib: false });
+    const never = vi.fn();
+    const bad = await handlePocketProposalsRequest(new Request("https://delib.example/api/integrations/pocket-proposals", { method: "POST", headers: { Origin: "https://delib.example", "Content-Type": "application/json" }, body: JSON.stringify({ prompt: "no title", confirmed: true }) }), never as typeof fetch);
+    expect(bad.status).toBe(400);
+    expect(never).not.toHaveBeenCalled();
+  });
+
+  it("creates a Pocket Argument debate from one claim and returns debate, results and tree links", async () => {
+    const upstream = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      expect(String(input)).toBe("https://argument.mashbean.net/api/debates");
+      const sent = JSON.parse(String(init?.body));
+      expect(sent).toMatchObject({ claim: "核三廠應該延役十年", maxDepth: 2, askAlias: false, confirmed: true });
+      return new Response(JSON.stringify({ debateId: "abc123def4", adminToken: "d".repeat(32) }), { status: 201 });
+    });
+    const response = await handlePocketArgumentRequest(new Request("https://delib.example/api/integrations/pocket-argument", { method: "POST", headers: { Origin: "https://delib.example", "Content-Type": "application/json" }, body: JSON.stringify({ claim: "核三廠應該延役十年", maxDepth: 2, confirmed: true }) }), upstream as typeof fetch);
+    expect(response.status).toBe(201);
+    await expect(response.json()).resolves.toMatchObject({ integration: "pocket-argument", debateId: "abc123def4", debateUrl: "https://argument.mashbean.net/a/abc123def4", exports: { treeJson: "https://argument.mashbean.net/api/debates/abc123def4/export/tree.json" }, credentialStoredByDelib: false });
+    const never = vi.fn();
+    const bad = await handlePocketArgumentRequest(new Request("https://delib.example/api/integrations/pocket-argument", { method: "POST", headers: { Origin: "https://delib.example", "Content-Type": "application/json" }, body: JSON.stringify({ description: "no claim", confirmed: true }) }), never as typeof fetch);
+    expect(bad.status).toBe(400);
     expect(never).not.toHaveBeenCalled();
   });
 

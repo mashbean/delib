@@ -364,6 +364,145 @@
       ]
     },
     {
+      "toolId": "pocket-check",
+      "readiness": "available",
+      "activation": "managed-create",
+      "label": "免登入直接建立",
+      "summary": "出 1–10 題附出處的單選題、設通過門檻與下一站連結，建立投票前的理解關卡；結果頁即時給通過率、每題答對率與常見錯誤。",
+      "accountRequired": false,
+      "credentialRequired": false,
+      "freePath": "使用 mashbean 維運的 Pocket Check 共用主機（不用模型），或按 Deploy to Cloudflare 建立自己的獨立服務。",
+      "writesExternalState": "按下確認後，本站伺服器會呼叫 Pocket Check 的建立 API，立即建立一場並取得參與、結果與主辦者連結。",
+      "retention": "內容留在 Pocket Check 的 Durable Object，直到主辦者用管理連結刪除；Delib 不保存內容或主辦者權杖。",
+      "inAppEndpoint": "/api/integrations/pocket-check",
+      "dataHandoff": {
+        "endpoint": "/integrations/pocket-polis-data",
+        "input": [
+          "題目、選項（含正確答案索引）、出處、解釋；下一站連結（https）"
+        ],
+        "outputs": [
+          "results.json（通過率、每題答對率、常見錯誤）",
+          "questions.csv、attempts.csv",
+          "tttc.csv（「哪裡不清楚」回饋）"
+        ],
+        "storage": "browser-memory-only",
+        "humanGate": "每題答案對過出處；下一站連結不是存取控制，是理解的邀請。"
+      },
+      "selfHost": {
+        "supported": true,
+        "platform": "Cloudflare Workers + Durable Objects SQLite",
+        "cloudflareNative": true,
+        "freeTier": "一鍵部署到自己的 Cloudflare 帳號；不用 Workers AI。",
+        "deployUrl": "https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/pocket-check"
+      },
+      "agent": {
+        "canCreate": true,
+        "humanGate": "Agent 可依審議資料草擬題目與出處；建立前由人逐題核對。"
+      },
+      "knownLimitations": [
+        "下一站連結拿到就能轉傳，不是安全機制。",
+        "不驗證身分；一台裝置一位參與者。",
+        "只有單選題。"
+      ],
+      "evidence": [
+        "https://checks.mashbean.net/",
+        "https://github.com/mashbean/pocket-check"
+      ]
+    },
+    {
+      "toolId": "pocket-proposals",
+      "readiness": "available",
+      "activation": "managed-create",
+      "label": "免登入直接建立",
+      "summary": "給題目與說明，建立一個提案空間：參與者提案、附議、回應、提修正案（改全文＋理由，逐行差異），提案人接受後換版；結果頁依附議數排序。",
+      "accountRequired": false,
+      "credentialRequired": false,
+      "freePath": "使用 mashbean 維運的 Pocket Proposals 共用主機（不用模型），或按 Deploy to Cloudflare 建立自己的獨立服務。",
+      "writesExternalState": "按下確認後，本站伺服器會呼叫 Pocket Proposals 的建立 API，立即建立一場並取得參與、結果與主辦者連結。",
+      "retention": "內容留在 Pocket Proposals 的 Durable Object，直到主辦者用管理連結刪除；Delib 不保存內容或主辦者權杖。",
+      "inAppEndpoint": "/api/integrations/pocket-proposals",
+      "dataHandoff": {
+        "endpoint": "/integrations/pocket-polis-data",
+        "input": [
+          "題目（提案要回答什麼）與說明"
+        ],
+        "outputs": [
+          "seeds.json（提案標題 → Pocket Polis 種子）",
+          "proposals.csv、amendments.csv",
+          "tttc.csv（提案摘要、修正理由、回應）"
+        ],
+        "storage": "browser-memory-only",
+        "humanGate": "告知參與者提案公開、化名，以及會怎麼用；主辦者可下架提案。"
+      },
+      "selfHost": {
+        "supported": true,
+        "platform": "Cloudflare Workers + Durable Objects SQLite",
+        "cloudflareNative": true,
+        "freeTier": "一鍵部署到自己的 Cloudflare 帳號；不用 Workers AI。",
+        "deployUrl": "https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/pocket-proposals"
+      },
+      "agent": {
+        "canCreate": true,
+        "humanGate": "Agent 可整理題目與說明、把結果送進 Pocket Polis；建立前由人確認告知義務。"
+      },
+      "knownLimitations": [
+        "提案人身分＝同一台裝置，換裝置就不能接受修正案。",
+        "沒有 Decidim 的支持門檻、階段流程、會議與投票。",
+        "修正案是全文取代，不是逐段建議。"
+      ],
+      "evidence": [
+        "https://proposals.mashbean.net/",
+        "https://github.com/mashbean/pocket-proposals",
+        "https://github.com/decidim/decidim"
+      ]
+    },
+    {
+      "toolId": "pocket-argument",
+      "readiness": "available",
+      "activation": "managed-create",
+      "label": "免登入直接建立",
+      "summary": "給一句主張，建立一棵正反論點樹：支持／反駁、最多 1–5 層、每個論點投站得住或站不住；結果頁給最強的支持與反駁論點與主張的平衡。",
+      "accountRequired": false,
+      "credentialRequired": false,
+      "freePath": "使用 mashbean 維運的 Pocket Argument 共用主機（不用模型），或按 Deploy to Cloudflare 建立自己的獨立服務。",
+      "writesExternalState": "按下確認後，本站伺服器會呼叫 Pocket Argument 的建立 API，立即建立一場並取得參與、結果與主辦者連結。",
+      "retention": "內容留在 Pocket Argument 的 Durable Object，直到主辦者用管理連結刪除；Delib 不保存內容或主辦者權杖。",
+      "inAppEndpoint": "/api/integrations/pocket-argument",
+      "dataHandoff": {
+        "endpoint": "/integrations/pocket-polis-data",
+        "input": [
+          "一句可被反駁的主張、說明、層數"
+        ],
+        "outputs": [
+          "tree.json（論點樹與強度）",
+          "arguments.csv",
+          "tttc.csv（每個論點一列）"
+        ],
+        "storage": "browser-memory-only",
+        "humanGate": "告知參與者論點樹公開、投票是判斷論點不是判斷人；主辦者可下架論點。"
+      },
+      "selfHost": {
+        "supported": true,
+        "platform": "Cloudflare Workers + Durable Objects SQLite",
+        "cloudflareNative": true,
+        "freeTier": "一鍵部署到自己的 Cloudflare 帳號；不用 Workers AI。",
+        "deployUrl": "https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/pocket-argument"
+      },
+      "agent": {
+        "canCreate": true,
+        "humanGate": "Agent 可把 Polis 的分歧陳述當主張建立辯論；建立前由人確認主張措辭。"
+      },
+      "knownLimitations": [
+        "強度公式是啟發式，不是形式論證語意。",
+        "不驗證身分；一台裝置一位參與者，不能投自己的論點。",
+        "沒有事實查核；出處由參與者自填。"
+      ],
+      "evidence": [
+        "https://argument.mashbean.net/",
+        "https://github.com/mashbean/pocket-argument"
+      ]
+    },
+    {
       "toolId": "polis",
       "readiness": "available-with-connection",
       "activation": "embedded-workspace",

@@ -117,6 +117,61 @@
       ]
     },
     {
+      "toolId": "pocket-check",
+      "route": "direct",
+      "label": "本站代建＋Cloudflare 一鍵部署",
+      "summary": "MIT 的單一 Cloudflare Worker + Durable Objects SQLite 服務，不用模型；概念借自 SwarmCheck 的理解檢查（無原始碼）。",
+      "source": {
+        "url": "https://github.com/mashbean/pocket-check",
+        "license": "MIT",
+        "reusable": true
+      },
+      "embed": "direct-create-links",
+      "cloudflareNative": true,
+      "nextAction": "接在 Polis／Budget／Values 投票前跑一次真實活動，看通過率與常見誤解是否改變會前補充。",
+      "evidence": [
+        "https://checks.mashbean.net/",
+        "https://github.com/mashbean/pocket-check"
+      ]
+    },
+    {
+      "toolId": "pocket-proposals",
+      "route": "direct",
+      "label": "本站代建＋Cloudflare 一鍵部署",
+      "summary": "MIT 的單一 Cloudflare Worker + Durable Objects SQLite 服務，不用模型；提案／修正案／附議的形狀來自 Decidim 與 Go Vocal 的提案模組（AGPL，未用其程式碼）。",
+      "source": {
+        "url": "https://github.com/mashbean/pocket-proposals",
+        "license": "MIT",
+        "reusable": true
+      },
+      "embed": "direct-create-links",
+      "cloudflareNative": true,
+      "nextAction": "用真實案子看修正案是否真的被接受；需要時補提案支持門檻與階段流程。",
+      "evidence": [
+        "https://proposals.mashbean.net/",
+        "https://github.com/mashbean/pocket-proposals",
+        "https://github.com/decidim/decidim"
+      ]
+    },
+    {
+      "toolId": "pocket-argument",
+      "route": "direct",
+      "label": "本站代建＋Cloudflare 一鍵部署",
+      "summary": "MIT 的單一 Cloudflare Worker + Durable Objects SQLite 服務，不用模型；結構化論證的概念來自 SwarmCheck 與論證圖工具（無可用原始碼），強度公式是啟發式並公開在 README。",
+      "source": {
+        "url": "https://github.com/mashbean/pocket-argument",
+        "license": "MIT",
+        "reusable": true
+      },
+      "embed": "direct-create-links",
+      "cloudflareNative": true,
+      "nextAction": "用真實辯題比對強度排序與現場感受；需要時把論點樹餵給 Pocket TTTC 做摘要。",
+      "evidence": [
+        "https://argument.mashbean.net/",
+        "https://github.com/mashbean/pocket-argument"
+      ]
+    },
+    {
       "toolId": "pocket-polis",
       "route": "direct",
       "label": "本站代建＋Cloudflare 一鍵部署",
@@ -282,7 +337,7 @@
       },
       "embed": "not-generic",
       "cloudflareNative": false,
-      "nextAction": "先評估共用租戶、管理責任與匯出 API，再提供建立流程。"
+      "nextAction": "先評估共用租戶、管理責任與匯出 API，再提供建立流程。 提案／修正案／附議的輕量版見 Pocket Proposals。"
     },
     {
       "toolId": "parti-demosx",
@@ -315,7 +370,7 @@
       },
       "embed": "prototype",
       "cloudflareNative": "frontend-only",
-      "nextAction": "先做資料格式與多人同步壓力測試，再考慮做成 Delib 內建 canvas。",
+      "nextAction": "先做資料格式與多人同步壓力測試，再考慮做成 Delib 內建 canvas。 Pocket TTTC 的 /r/:id/canvas 已提供純前端畫布視圖。",
       "evidence": [
         "https://github.com/uppy01/deliberative-canvas-server"
       ]
@@ -374,7 +429,7 @@
       },
       "embed": "blocked-by-upstream",
       "cloudflareNative": false,
-      "nextAction": "把它視為共用 civic participation instance，不做每案 fork。"
+      "nextAction": "把它視為共用 civic participation instance，不做每案 fork。 提案／修正案／附議的輕量版見 Pocket Proposals。"
     },
     {
       "toolId": "interoperable-cooperative-governance",
@@ -489,7 +544,7 @@
       },
       "embed": "prototype",
       "cloudflareNative": false,
-      "nextAction": "聯絡作者確認授權與可重現部署。"
+      "nextAction": "聯絡作者確認授權與可重現部署。 提案與修正的輕量版見 Pocket Proposals（未用其程式碼）。"
     },
     {
       "toolId": "power-ranker",
@@ -535,7 +590,7 @@
       },
       "embed": "unverified",
       "cloudflareNative": false,
-      "nextAction": "聯絡產品方確認 API、資料匯出、保存與授權。"
+      "nextAction": "聯絡產品方確認 API、資料匯出、保存與授權。 理解檢查與結構化論證的輕量版見 Pocket Check 與 Pocket Argument。"
     },
     {
       "toolId": "voice-to-vision",
