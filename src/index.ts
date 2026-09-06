@@ -15,6 +15,7 @@ import {
 import { ReceiptIndex } from "./receipt-index";
 import packageJson from "../package.json";
 import toolStations from "../public/data/tool-stations.json";
+import { handleWorkspaceRead } from "./workspace-read";
 
 export { PublicReceipt, RankingRoom, ReceiptIndex };
 
@@ -176,6 +177,14 @@ async function route(request: Request, env: WorkerEnv, url: URL): Promise<Respon
     if (url.pathname === "/api/integrations" && request.method === "GET") {
       const registryUrl = new URL("/data/integrations.json", url);
       return withSecurityHeaders(await env.ASSETS.fetch(new Request(registryUrl, request)), url.pathname);
+    }
+
+    if (url.pathname === "/api/workspace/read") {
+      return handleWorkspaceRead(request, {
+        form: env.POCKET_FORM_ORIGIN || DEFAULT_POCKET_FORM_ORIGIN,
+        tttc: env.POCKET_TTTC_ORIGIN || DEFAULT_POCKET_TTTC_ORIGIN,
+        reply: env.POCKET_REPLY_ORIGIN || DEFAULT_POCKET_REPLY_ORIGIN,
+      });
     }
 
     if (url.pathname.startsWith("/api/integrations/power-ranker/rooms")) {

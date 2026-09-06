@@ -46,6 +46,7 @@ document.querySelector(".skip").addEventListener("click", (event) => {
 });
 document.querySelectorAll("[data-text]").forEach((element) => { element.textContent = copy[element.dataset.text]; });
 document.querySelector("#hub-link").href = `/?lang=${language}#journey`;
+try { if (sessionStorage.getItem('delib:last-project')) { const link=document.querySelector('#hub-link');link.href=`/workspace?lang=${language}`;link.textContent=language==='en'?'Back to my issue':'回到我的議題'; } } catch {}
 document.querySelector("#reload-tool").addEventListener("click", () => { if (activeToolUrl) frame.src = activeToolUrl.href; });
 frame.addEventListener("load", () => { frameStatus.textContent = copy.loaded; });
 

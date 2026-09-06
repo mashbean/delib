@@ -7,7 +7,8 @@ export function createJourneyScene(canvas,{onSelect,labels,reducedMotion=false})
  let renderer;
  try { renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true,powerPreference:'low-power'}); }
  catch { canvas.hidden=true;const fallback=document.createElement('p');fallback.className='scene-fallback';fallback.textContent='3D 暫不可用 · Use the interactive pipeline and step buttons below.';canvas.after(fallback);return {update(){},reset(){},setTilt(){},zoom(){}}; }
- renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));renderer.setClearColor(0x090e14,0);renderer.outputColorSpace=THREE.SRGBColorSpace;
+ const compact=matchMedia('(max-width:760px)').matches;let quality=Math.min(devicePixelRatio,compact?1.15:1.7),slowFrames=0;
+ renderer.setPixelRatio(quality);renderer.setClearColor(0x090e14,0);renderer.outputColorSpace=THREE.SRGBColorSpace;
  const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x0a0e14,.015);
  const camera=new THREE.PerspectiveCamera(34,1,.1,120);camera.position.set(3,10,18);
  const controls=new OrbitControls(camera,canvas);controls.target.set(0,.5,0);controls.enableDamping=false;controls.dampingFactor=.08;controls.enablePan=false;controls.enableZoom=false;controls.minPolarAngle=.25;controls.maxPolarAngle=Math.PI*.52;controls.rotateSpeed=.6;
@@ -50,7 +51,7 @@ export function createJourneyScene(canvas,{onSelect,labels,reducedMotion=false})
  canvas.addEventListener('pointerup',e=>{if(!down||Math.hypot(e.clientX-down.x,e.clientY-down.y)>6)return;const r=canvas.getBoundingClientRect();cursor.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(cursor,camera);const hit=ray.intersectObjects(pickables)[0];if(hit)onSelect(hit.object.userData.step);});
  function resize(){const r=canvas.getBoundingClientRect();if(!r.width||!r.height)return;renderer.setSize(r.width,r.height,false);camera.aspect=r.width/r.height;camera.zoom=Math.min(1,camera.aspect/1.6);camera.updateProjectionMatrix();render();}
  function render(){if(!visible||document.hidden)return;controls.update();renderer.render(scene,camera);}
- function frame(now){raf=0;if(!visible||document.hidden)return;const dt=Math.min((now-last)/1000,.04)||0;last=now;if(!paused){clock+=dt;nodes.forEach((n,i)=>{n.form.rotation.y=clock*.13+i*.2;n.form.position.y=Math.sin(clock*.7+i)*.05;});packets.forEach((p,i)=>{const a=positions[Math.max(0,step-1)],b=positions[step],t=(clock*.18+i/18)%1;p.position.copy(a).lerp(b,t);p.position.z+=Math.sin(t*Math.PI)*.18;p.visible=step>0;});}render();if(!paused)raf=requestAnimationFrame(frame);}
+ function frame(now){raf=0;if(!visible||document.hidden)return;const elapsed=now-last;if(elapsed>45)slowFrames++;else slowFrames=Math.max(0,slowFrames-1);if(slowFrames>35&&quality>.8){quality=Math.max(.8,quality-.25);renderer.setPixelRatio(quality);slowFrames=0;}const dt=Math.min(elapsed/1000,.04)||0;last=now;if(!paused){clock+=dt;nodes.forEach((n,i)=>{n.form.rotation.y=clock*.13+i*.2;n.form.position.y=Math.sin(clock*.7+i)*.05;});packets.forEach((p,i)=>{const a=positions[Math.max(0,step-1)],b=positions[step],t=(clock*.18+i/18)%1;p.position.copy(a).lerp(b,t);p.position.z+=Math.sin(t*Math.PI)*.18;p.visible=step>0;});}render();if(!paused)raf=requestAnimationFrame(frame);}
  function start(){if(!raf&&visible&&!document.hidden){last=performance.now();raf=requestAnimationFrame(frame);}}
  // OrbitControls gets a render even with motion paused; no continuous idle loop.
  controls.addEventListener('change',()=>{renderer.render(scene,camera);});controls.addEventListener('start',start);

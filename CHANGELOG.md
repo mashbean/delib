@@ -2,6 +2,13 @@
 
 日期以正式站部署為準。每一版列出「使用者看得到的改變」與「營運者需要知道的改變」，資料邊界的變動另外標明。
 
+## 0.6.0 — 2026-09-06
+
+- Add a bilingual local issue workspace with Form → TTTC → Reply creation, reviewed handoff previews and bounded service readback.
+- Preserve source lineage, explicit revisions, facilitator reviews, speaker confirmation, voice trails and next-round commitments in private browser projects and backups.
+- Add three role-based entry points, six teaching choices, original labeled SVG icons, manual playback, speed controls, deferred 3D loading and a focused mobile view.
+- Keep the complete 38-tool inventory. No automatic public activity listing, identity matching, notification delivery or cross-service deletion synchronization.
+
 ## 0.5.0 — 2026-09-06
 
 - Replace parallel 2D-projected rings with an interactive Three.js route through alternating participation settings and distinct data forms.

@@ -870,5 +870,34 @@
   "participation": {
     "mode": "per-phase",
     "description": "Online and in-person settings can alternate. The displayed route is an adaptable example, not a required schedule."
+  },
+  "workspace": {
+    "url": "https://delib.mashbean.net/workspace",
+    "schema": "https://delib.mashbean.net/schemas/delib-workspace/v1.json",
+    "route": [
+      "form",
+      "tttc",
+      "reply"
+    ],
+    "storage": "local browser IndexedDB; private backups; no management credentials in projects",
+    "readback": {
+      "method": "POST",
+      "path": "/api/workspace/read",
+      "tools": [
+        "form",
+        "tttc",
+        "reply"
+      ],
+      "fields": [
+        "tool",
+        "id",
+        "token (Form only, sent in body)"
+      ]
+    },
+    "limits": [
+      "Preview and confirm each service write. Readback is bounded and may need manual retry.",
+      "Source references and revisions are preserved; no automatic identity matching, public sharing or deletion propagation.",
+      "Reply drafts are not treated as participant voices in subsequent rounds."
+    ]
   }
 }

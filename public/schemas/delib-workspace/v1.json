@@ -1,0 +1,287 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://delib.mashbean.net/schemas/delib-workspace/v1.json",
+  "title": "Delib local issue workspace v1",
+  "description": "Private local projects. Companion to delib-rounds; not an ecosystem standard. Management credentials are excluded. Imports also require graph and size validation in workspace-core.js.",
+  "type": "object",
+  "required": [
+    "schema",
+    "id",
+    "title",
+    "language",
+    "simulated",
+    "rounds",
+    "events",
+    "view"
+  ],
+  "properties": {
+    "schema": {
+      "const": "https://delib.mashbean.net/schemas/delib-workspace/v1.json"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "language": {
+      "enum": [
+        "zh",
+        "en"
+      ]
+    },
+    "simulated": {
+      "type": "boolean"
+    },
+    "rounds": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 30,
+      "items": {
+        "$ref": "#/$defs/round"
+      }
+    },
+    "events": {
+      "type": "array",
+      "maxItems": 2000,
+      "items": {
+        "type": "object",
+        "required": [
+          "type",
+          "recordId",
+          "by",
+          "at"
+        ]
+      }
+    },
+    "view": {
+      "type": "object",
+      "required": [
+        "roundId",
+        "tab",
+        "selected"
+      ],
+      "properties": {
+        "roundId": {
+          "type": "string"
+        },
+        "tab": {
+          "enum": [
+            "route",
+            "voices",
+            "changes"
+          ]
+        },
+        "selected": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "record": {
+      "type": "object",
+      "required": [
+        "id",
+        "kind",
+        "text",
+        "source",
+        "derivedFrom",
+        "relations",
+        "participantRef",
+        "supersedes",
+        "review"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "kind": {
+          "enum": [
+            "statement",
+            "question",
+            "theme",
+            "proposal",
+            "reply",
+            "decision",
+            "feedback",
+            "brief",
+            "inclusion-check"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 12000
+        },
+        "source": {
+          "type": "object",
+          "required": [
+            "tool",
+            "id"
+          ],
+          "properties": {
+            "tool": {
+              "type": "string"
+            },
+            "id": {
+              "type": "string"
+            }
+          }
+        },
+        "derivedFrom": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "relations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "ref",
+              "type"
+            ],
+            "properties": {
+              "ref": {
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "derived",
+                  "responds",
+                  "revises",
+                  "supports",
+                  "opposes",
+                  "context"
+                ]
+              }
+            }
+          }
+        },
+        "participantRef": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "supersedes": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "review": {
+          "type": "object",
+          "required": [
+            "checked",
+            "reviewer",
+            "at",
+            "quoteConfirmed"
+          ],
+          "properties": {
+            "checked": {
+              "type": "boolean"
+            },
+            "reviewer": {
+              "type": "string"
+            },
+            "at": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "quoteConfirmed": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
+    "round": {
+      "type": "object",
+      "required": [
+        "id",
+        "title",
+        "step",
+        "artifacts",
+        "inputs",
+        "connections",
+        "next"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "step": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/record"
+          }
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "connections": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "required": [
+              "id",
+              "status",
+              "inputRefs",
+              "contextRefs"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9]{10}$"
+              },
+              "status": {
+                "type": "string"
+              },
+              "inputRefs": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "contextRefs": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "next": {
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}

@@ -60,6 +60,24 @@ await check("GET / serves the homepage with a strict CSP", async () => {
   expect(html.includes("審議拼圖"), "homepage text missing");
 });
 
+await check("GET /workspace serves the local issue workbench", async () => {
+  const response = await get('/workspace');
+  expect(response.status === 200, `status ${response.status}`);
+  const html = await response.text();
+  expect(html.includes('/workspace.js') && html.includes('project-content'), 'workspace assets missing');
+});
+
+await check("Workspace contract is published", async () => {
+  const response = await get('/schemas/delib-workspace/v1.json');
+  expect(response.status === 200, `status ${response.status}`);
+  expect((await response.json()).$id === 'https://delib.mashbean.net/schemas/delib-workspace/v1.json', 'wrong contract');
+});
+
+await check("Workspace readback rejects cross-origin input before reading services", async () => {
+  const response = await get('/api/workspace/read', {method:'POST',headers:{'Content-Type':'application/json',Origin:'https://invalid.example'},body:JSON.stringify({tool:'form',id:'aaaaaaaaaa'})});
+  expect(response.status === 403, `status ${response.status}`);
+});
+
 await check("GET /integrations/polis allows only the Pol.is frame", async () => {
   const response = await get("/integrations/polis");
   expect(response.status === 200, `status ${response.status}`);

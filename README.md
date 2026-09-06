@@ -2,6 +2,8 @@
 
 **每一次對話，都有下一步。 / Every conversation. A next step.**
 
+第三輪提供 [議題工作台](https://delib.mashbean.net/workspace)：Form → TTTC → Reply 的預覽交接與結果讀回、本機進度、來源追蹤、修訂與下一輪。新增圖示與可選擇的教學故事，保留完整工具盤點。資料保存、合約與驗證邊界見 [第三輪說明](docs/iteration-three-2026-09-06.md)。
+
 [中文版](https://delib.mashbean.net/?lang=zh) · [English](https://delib.mashbean.net/?lang=en)
 
 Delib 把線上與實體參與、工具與資料，接成可以持續多輪的審議。新版入口提供
