@@ -503,6 +503,53 @@
       ]
     },
     {
+      "toolId": "pocket-maple",
+      "readiness": "available",
+      "activation": "managed-create",
+      "label": "免登入直接建立",
+      "summary": "給立法院議案編號或手動議程，建立一個公聽案：每人留立場、一句話重點與書面意見，公開檔案可依立場篩選；法案的提案人、狀態、案由與流程在建立時從立法院 API 抓成快照。",
+      "accountRequired": false,
+      "credentialRequired": false,
+      "freePath": "使用 mashbean 維運的 Pocket Maple 共用主機（不用模型、不用 token），或按 Deploy to Cloudflare 建立自己的獨立服務。",
+      "writesExternalState": "按下確認後，本站伺服器會呼叫 Pocket Maple 的建立 API；Pocket Maple 會再向立法院 API 取一次法案快照。",
+      "retention": "議程快照與證詞留在 Pocket Maple 的 Durable Object，直到主辦者用管理連結刪除；公開檔案以留言者自填的名字公開；Delib 不保存證詞或主辦者權杖。",
+      "inAppEndpoint": "/api/integrations/pocket-maple",
+      "dataHandoff": {
+        "endpoint": "/integrations/pocket-polis-data",
+        "input": [
+          "立法院議案編號（15 碼）或 ppg.ly.gov.tw 網址；或手動議程（名稱、提案單位、狀態、相關法律、連結、案由）"
+        ],
+        "outputs": [
+          "archive.json（議程快照、立場計數、全部證詞）",
+          "testimonies.csv",
+          "tttc.csv（一句話重點）"
+        ],
+        "storage": "browser-memory-only",
+        "humanGate": "告知參與者證詞會以留的名字公開、本站不驗證身分、意見會怎麼用；主辦者可下架。"
+      },
+      "selfHost": {
+        "supported": true,
+        "platform": "Cloudflare Workers + Durable Objects SQLite",
+        "cloudflareNative": true,
+        "freeTier": "一鍵部署到自己的 Cloudflare 帳號；不用 Workers AI，也不需要任何 API token。",
+        "deployUrl": "https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/pocket-maple"
+      },
+      "agent": {
+        "canCreate": true,
+        "humanGate": "Agent 可從立法院 API 找法案並草擬說明；建立前由人確認案號與告知義務。"
+      },
+      "knownLimitations": [
+        "不驗證身分；MAPLE 要求實名登入，這裡只標示「未驗證」。",
+        "法案快照在建立時抓一次，之後不自動更新；頁面提供立法院原始連結。",
+        "只做書面意見與公開檔案；沒有 MAPLE 的議員通知、進度追蹤與翻譯。"
+      ],
+      "evidence": [
+        "https://maple-tw.mashbean.net/",
+        "https://github.com/mashbean/pocket-maple",
+        "https://ly.govapi.tw"
+      ]
+    },
+    {
       "toolId": "polis",
       "readiness": "available-with-connection",
       "activation": "embedded-workspace",

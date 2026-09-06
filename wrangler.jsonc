@@ -62,7 +62,8 @@
     "POCKET_BUDGET_ORIGIN": "https://budget.mashbean.net",
     "POCKET_CHECK_ORIGIN": "https://checks.mashbean.net",
     "POCKET_PROPOSALS_ORIGIN": "https://proposals.mashbean.net",
-    "POCKET_ARGUMENT_ORIGIN": "https://argument.mashbean.net"
+    "POCKET_ARGUMENT_ORIGIN": "https://argument.mashbean.net",
+    "POCKET_MAPLE_ORIGIN": "https://maple-tw.mashbean.net"
   },
   // `production` is the only environment bound to delib.mashbean.net, so the
   // Deploy button (default environment) never claims the official domain.
@@ -115,7 +116,8 @@
     "POCKET_BUDGET_ORIGIN": "https://budget.mashbean.net",
     "POCKET_CHECK_ORIGIN": "https://checks.mashbean.net",
     "POCKET_PROPOSALS_ORIGIN": "https://proposals.mashbean.net",
-    "POCKET_ARGUMENT_ORIGIN": "https://argument.mashbean.net"
+    "POCKET_ARGUMENT_ORIGIN": "https://argument.mashbean.net",
+    "POCKET_MAPLE_ORIGIN": "https://maple-tw.mashbean.net"
       },
       "routes": [
         {

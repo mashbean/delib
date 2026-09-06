@@ -105,7 +105,7 @@ button, Delib activation endpoint) so each item above is roughly a day.
 | 8 | Decidim / Go Vocal / PolicyCraft proposal modules | **Pocket Proposals**: proposals, endorsements, responses, amendments with line diffs the author accepts; Polis seeds + tttc.csv | done 2026-09-06 (proposals.mashbean.net); fills the only stage (proposing) that had no native tool |
 | 9 | SwarmCheck's structured argumentation | **Pocket Argument**: pro/con argument tree with per-argument votes and propagated strength | done 2026-09-06 (argument.mashbean.net) |
 | 10 | Deliberative Canvas | Not a service: **canvas view** inside Pocket TTTC (`/r/:id/canvas`, pure SVG) | done 2026-09-06 |
-| 11 | MAPLE | **Pocket Testimony**: written positions on an agenda item with a public archive; Taiwan bill data from the token-free ly.govapi.tw v2 API | assessed 2026-09-06, not started |
+| 11 | MAPLE | **Pocket Testimony**: written positions on an agenda item with a public archive; Taiwan bill data from the token-free ly.govapi.tw v2 API | done 2026-09-06 (maple-tw.mashbean.net; law search, bills per law and bill snapshots all token-free, so no OpenFun secret is needed) |
 
 ### Not worth rewriting (or already covered)
 

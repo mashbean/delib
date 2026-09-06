@@ -17,6 +17,7 @@ import {
   handlePocketCheckRequest,
   handlePocketProposalsRequest,
   handlePocketArgumentRequest,
+  handlePocketMapleRequest,
   handlePocketFormRequest,
   handlePocketTttcRequest,
   handlePublicReceiptRequest,
@@ -417,6 +418,30 @@ it("creates a Pocket Check gate from sourced questions and drops malformed ones"
     const never = vi.fn();
     const bad = await handlePocketArgumentRequest(new Request("https://delib.example/api/integrations/pocket-argument", { method: "POST", headers: { Origin: "https://delib.example", "Content-Type": "application/json" }, body: JSON.stringify({ description: "no claim", confirmed: true }) }), never as typeof fetch);
     expect(bad.status).toBe(400);
+    expect(never).not.toHaveBeenCalled();
+  });
+
+  it("creates a Pocket Maple hearing from a bill number and returns testify, archive and host links", async () => {
+    const upstream = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      expect(String(input)).toBe("https://maple-tw.mashbean.net/api/hearings");
+      const sent = JSON.parse(String(init?.body));
+      expect(sent).toMatchObject({ billNo: "202110231310000", deadline: "2026-12-31", confirmed: true });
+      expect(sent.agenda).toBeUndefined();
+      return new Response(JSON.stringify({ hearingId: "abc123def4", adminToken: "e".repeat(32), title: "核管法修正", agenda: { kind: "bill", billNo: "202110231310000", name: "核管法修正", proposer: "陳菁徽等17人", status: "排入院會", url: "https://ppg.ly.gov.tw/ppg/bills/202110231310000/details" } }), { status: 201 });
+    });
+    const response = await handlePocketMapleRequest(new Request("https://delib.example/api/integrations/pocket-maple", { method: "POST", headers: { Origin: "https://delib.example", "Content-Type": "application/json" }, body: JSON.stringify({ billNo: "https://ppg.ly.gov.tw/ppg/bills/202110231310000/details", deadline: "2026-12-31", confirmed: true }) }), upstream as typeof fetch);
+    expect(response.status).toBe(201);
+    await expect(response.json()).resolves.toMatchObject({ integration: "pocket-maple", hearingId: "abc123def4", agenda: { kind: "bill", billNo: "202110231310000", proposer: "陳菁徽等17人" }, testifyUrl: "https://maple-tw.mashbean.net/t/abc123def4", archiveUrl: "https://maple-tw.mashbean.net/r/abc123def4", hostUrl: `https://maple-tw.mashbean.net/h/abc123def4#admin=${"e".repeat(32)}`, privacy: { identityVerified: false } });
+    const manual = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
+      const sent = JSON.parse(String(init?.body));
+      expect(sent.billNo).toBeUndefined();
+      expect(sent.agenda).toMatchObject({ name: "恆春鎮公聽會", laws: ["核子反應器設施管制法"] });
+      return new Response(JSON.stringify({ hearingId: "abc123def4", adminToken: "e".repeat(32), title: "恆春鎮公聽會", agenda: { kind: "manual", name: "恆春鎮公聽會" } }), { status: 201 });
+    });
+    expect((await handlePocketMapleRequest(new Request("https://delib.example/api/integrations/pocket-maple", { method: "POST", headers: { Origin: "https://delib.example", "Content-Type": "application/json" }, body: JSON.stringify({ agenda: { name: "恆春鎮公聽會", laws: ["核子反應器設施管制法", ""] }, confirmed: true }) }), manual as typeof fetch)).status).toBe(201);
+    const never = vi.fn();
+    const nothing = await handlePocketMapleRequest(new Request("https://delib.example/api/integrations/pocket-maple", { method: "POST", headers: { Origin: "https://delib.example", "Content-Type": "application/json" }, body: JSON.stringify({ title: "x", confirmed: true }) }), never as typeof fetch);
+    expect(nothing.status).toBe(400);
     expect(never).not.toHaveBeenCalled();
   });
 

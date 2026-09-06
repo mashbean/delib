@@ -44,6 +44,7 @@ type WorkerEnv = Omit<
   POCKET_CHECK_ORIGIN?: string;
   POCKET_PROPOSALS_ORIGIN?: string;
   POCKET_ARGUMENT_ORIGIN?: string;
+  POCKET_MAPLE_ORIGIN?: string;
   POLIS_SITE_ID?: string;
   /** SHA-256 hex of an operator secret that may take down abusive public receipts. */
   OPERATOR_TOKEN_SHA256?: string;
@@ -92,6 +93,7 @@ const DEFAULT_POCKET_BUDGET_ORIGIN = "https://budget.mashbean.net";
 const DEFAULT_POCKET_CHECK_ORIGIN = "https://checks.mashbean.net";
 const DEFAULT_POCKET_PROPOSALS_ORIGIN = "https://proposals.mashbean.net";
 const DEFAULT_POCKET_ARGUMENT_ORIGIN = "https://argument.mashbean.net";
+const DEFAULT_POCKET_MAPLE_ORIGIN = "https://maple-tw.mashbean.net";
 /** Pocket TTTC 接受最多 3 MiB 的 CSV；這個端點的上限跟著它，而非一般整合的 12 KB。 */
 const MAX_POCKET_TTTC_BODY_BYTES = 3 * 1024 * 1024 + 64 * 1024;
 /** Upstream creators answer in a few seconds; the BYOK model call may take longer. */
@@ -209,6 +211,9 @@ async function route(request: Request, env: WorkerEnv, url: URL): Promise<Respon
     }
     if (url.pathname === "/api/integrations/pocket-argument" && request.method === "POST") {
       return handlePocketArgumentRequest(request, fetch, env.POCKET_ARGUMENT_ORIGIN || DEFAULT_POCKET_ARGUMENT_ORIGIN);
+    }
+    if (url.pathname === "/api/integrations/pocket-maple" && request.method === "POST") {
+      return handlePocketMapleRequest(request, fetch, env.POCKET_MAPLE_ORIGIN || DEFAULT_POCKET_MAPLE_ORIGIN);
     }
 
     if (url.pathname === "/api/integrations/pocket-harmonica" && request.method === "POST") {
@@ -1491,6 +1496,114 @@ export async function handlePocketArgumentRequest(
         privateUrls: ["hostUrl"],
         participantDataOwner: origin,
         retention: "主張、論點與票留在 Pocket Argument，直到主辦者用管理連結刪除；論點樹與結果頁公開。",
+      },
+    },
+    201,
+  );
+}
+
+type PocketMapleRequest = {
+  billNo?: unknown;
+  agenda?: unknown;
+  title?: unknown;
+  description?: unknown;
+  deadline?: unknown;
+  askOrg?: unknown;
+  requireSummary?: unknown;
+  confirmed?: unknown;
+};
+
+/**
+ * 在 Pocket Maple（口袋公聽）建立一個公聽案：給立法院議案編號（Worker 會向免 token 的 ly.govapi.tw 取快照）
+ * 或手動議程；Delib 不保存證詞或主辦者權杖，hostUrl 只出現這一次。
+ */
+export async function handlePocketMapleRequest(
+  request: Request,
+  upstreamFetch: typeof fetch = fetch,
+  configuredOrigin = DEFAULT_POCKET_MAPLE_ORIGIN,
+): Promise<Response> {
+  if (!isSameOriginRequest(request)) return json({ error: "origin not allowed" }, 403);
+  const body = await readJsonRequest<PocketMapleRequest>(request, MAX_INTEGRATION_BODY_BYTES);
+  if (body instanceof Response) return body;
+  if (body.confirmed !== true) return json({ error: "建立前請先確認會告知參與者證詞會以留的名字公開、本站不驗證身分、以及意見會怎麼用" }, 400);
+  const billNo = cleanMatchingString(typeof body.billNo === "string" ? (body.billNo.match(/\d{15}/) ?? [""])[0] : "", /^\d{15}$/, 15);
+  const agendaRecord = isRecord(body.agenda) ? body.agenda : null;
+  const agenda = agendaRecord
+    ? { name: cleanOptionalString(agendaRecord.name, 200), proposer: cleanOptionalString(agendaRecord.proposer, 120), status: cleanOptionalString(agendaRecord.status, 60), laws: (Array.isArray(agendaRecord.laws) ? agendaRecord.laws : []).map((law) => cleanOptionalString(law, 80)).filter(Boolean).slice(0, 10), url: cleanOptionalString(agendaRecord.url, 2_048), reason: cleanOptionalString(agendaRecord.reason, 2_000) }
+    : null;
+  if (!billNo && !agenda?.name) return json({ error: "給立法院議案編號（15 碼或 ppg.ly.gov.tw 網址），或手動輸入議程項目名稱" }, 400);
+  const deadline = cleanMatchingString(body.deadline, /^\d{4}-\d{2}-\d{2}$/, 10) ?? "";
+  const origin = normalizeServiceOrigin(configuredOrigin);
+  if (!origin) return json({ error: "Pocket Maple 主機設定不完整" }, 503);
+
+  let upstream: Response;
+  try {
+    upstream = await upstreamFetch(`${origin}/api/hearings`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        billNo: billNo || undefined,
+        agenda: billNo ? undefined : agenda,
+        title: cleanOptionalString(body.title, 120),
+        description: cleanOptionalString(body.description, 2_000),
+        deadline,
+        askOrg: body.askOrg !== false,
+        requireSummary: body.requireSummary !== false,
+        confirmed: true,
+      }),
+      signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
+    });
+  } catch (error) {
+    return upstreamFailure(error, "Pocket Maple");
+  }
+
+  if (!upstream.ok) {
+    let detail = "";
+    try {
+      detail = cleanOptionalString(((await upstream.json()) as { error?: unknown }).error, 300);
+    } catch {
+      detail = "";
+    }
+    if (upstream.status === 400 || upstream.status === 404) return json({ error: detail || "Pocket Maple 沒有接受這些設定" }, 400);
+    return json(
+      { error: upstream.status === 429 ? "Pocket Maple 目前建立的次數已達上限，請稍後再試" : detail || "Pocket Maple 沒有完成建立，請稍後再試" },
+      upstream.status === 429 ? 429 : 502,
+    );
+  }
+
+  let payload: unknown;
+  try {
+    payload = await upstream.json();
+  } catch {
+    return json({ error: "Pocket Maple 回應格式不完整" }, 502);
+  }
+  if (!isRecord(payload)) return json({ error: "Pocket Maple 回應格式不完整" }, 502);
+  const hearingId = cleanMatchingString(payload.hearingId, /^[a-z0-9]{10}$/, 10);
+  const adminToken = cleanMatchingString(payload.adminToken, /^[a-f0-9]{32}$/i, 32);
+  if (!hearingId || !adminToken) return json({ error: "Pocket Maple 回應缺少必要資訊" }, 502);
+  const snapshot = isRecord(payload.agenda) ? payload.agenda : null;
+
+  return json(
+    {
+      integration: "pocket-maple",
+      status: "ready",
+      serviceOrigin: origin,
+      hearingId,
+      title: cleanOptionalString(payload.title, 120),
+      agenda: snapshot ? { kind: snapshot.kind === "bill" ? "bill" : "manual", billNo: cleanOptionalString(snapshot.billNo, 15), name: cleanOptionalString(snapshot.name, 300), proposer: cleanOptionalString(snapshot.proposer, 120), status: cleanOptionalString(snapshot.status, 60), url: cleanOptionalString(snapshot.url, 2_048) } : null,
+      testifyUrl: `${origin}/t/${hearingId}`,
+      archiveUrl: `${origin}/r/${hearingId}`,
+      apiUrl: `${origin}/api/hearings/${hearingId}`,
+      hostUrl: `${origin}/h/${hearingId}#admin=${adminToken}`,
+      exports: { testimoniesCsv: `${origin}/api/hearings/${hearingId}/export/testimonies.csv`, tttcCsv: `${origin}/api/hearings/${hearingId}/export/tttc.csv`, archiveJson: `${origin}/api/hearings/${hearingId}/export/archive.json` },
+      storedByDelib: false,
+      credentialStoredByDelib: false,
+      writesExternalState: true,
+      privacy: {
+        privateUrls: ["hostUrl"],
+        participantDataOwner: origin,
+        identityVerified: false,
+        retention: "議程快照與證詞留在 Pocket Maple，直到主辦者用管理連結刪除；公開檔案以留言者自填的名字公開。",
       },
     },
     201,

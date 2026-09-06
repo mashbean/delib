@@ -172,6 +172,26 @@
       ]
     },
     {
+      "toolId": "pocket-maple",
+      "route": "direct",
+      "label": "本站代建＋Cloudflare 一鍵部署",
+      "summary": "MIT 的單一 Cloudflare Worker + Durable Objects SQLite 服務，不用模型、不用 token；形狀來自 MAPLE（MIT，未用其程式碼），法案資料來自 OpenFun 維護的 v2.ly.govapi.tw（/laws?q= 全文搜尋、/bills?法律編號=、/bills/:id）。",
+      "source": {
+        "url": "https://github.com/mashbean/pocket-maple",
+        "license": "MIT",
+        "reusable": true
+      },
+      "embed": "direct-create-links",
+      "cloudflareNative": true,
+      "nextAction": "用一個真實的委員會審查案跑一次；確認 OpenFun API 的使用條款允許在本站轉載快照；需要時補信箱確認以標示已驗證。",
+      "evidence": [
+        "https://maple-tw.mashbean.net/",
+        "https://github.com/mashbean/pocket-maple",
+        "https://ly.govapi.tw",
+        "https://github.com/codeforboston/maple"
+      ]
+    },
+    {
       "toolId": "pocket-polis",
       "route": "direct",
       "label": "本站代建＋Cloudflare 一鍵部署",
@@ -485,7 +505,7 @@
       },
       "embed": "not-generic",
       "cloudflareNative": false,
-      "nextAction": "先把 testimony 資料格式做成可匯入／匯出齒輪。"
+      "nextAction": "先把 testimony 資料格式做成可匯入／匯出齒輪。 台灣版見 Pocket Maple（maple-tw.mashbean.net）。"
     },
     {
       "toolId": "micropublishing",

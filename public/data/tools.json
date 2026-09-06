@@ -351,6 +351,42 @@
       "handoff": "Delib 可免登入代建並交回辯論頁、結果與一次性主辦者連結；輸入是一句可被反駁的主張；輸出 arguments.csv（含強度）、tree.json 與 tttc.csv。Pol.is 收「同不同意」，這裡收「為什麼」。"
     },
     {
+      "id": "pocket-maple",
+      "name": "Pocket Maple · 口袋公聽",
+      "summary": "對一個法案或公聽案留下立場（支持／反對／修正）、一句話重點與書面意見，公開存檔；法案資料從免 token 的立法院 API 帶入（搜法律→本屆法案→快照），也可手動輸入公聽會或地方議會案。MAPLE 的台灣版，單一 Cloudflare Worker，不用模型。",
+      "url": "https://maple-tw.mashbean.net/",
+      "source": "https://github.com/mashbean/pocket-maple",
+      "status": "integrated",
+      "stages": [
+        "eliciting",
+        "learning",
+        "deliberating"
+      ],
+      "goals": [
+        "listen",
+        "understand"
+      ],
+      "formats": [
+        "online",
+        "hybrid"
+      ],
+      "scales": [
+        "small",
+        "medium",
+        "large"
+      ],
+      "privacy": [
+        "public"
+      ],
+      "outputs": [
+        "insights",
+        "receipt"
+      ],
+      "hosting": "cloudflare-worker",
+      "deploy": "https://deploy.workers.cloudflare.com/?url=https://github.com/mashbean/pocket-maple",
+      "handoff": "Delib 可免登入代建並交回留言、公開檔案與一次性主辦者連結；輸入是立法院議案編號（或 ppg.ly.gov.tw 網址）或手動議程；輸出 testimonies.csv、archive.json 與 tttc.csv（一句話重點，可接 Pocket TTTC 或 Pocket Reply）。不驗證身分，證詞旁標示「未驗證」。"
+    },
+    {
       "id": "pocket-polis",
       "name": "Pocket Polis · 口袋審議",
       "summary": "免登入建立陳述、同意／不同意投票與意見群組分析，直接由 polis.mashbean.net 託管活動；收完可發布分層成果收據並接續下一輪。",
