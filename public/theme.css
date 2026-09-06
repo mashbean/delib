@@ -1,0 +1,124 @@
+/* Shared appearance for the hub, local workbenches and tool navigation. */
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #090d13; --paper: #101720; --panel: #131d27; --ink: #edf2ec;
+  --muted: #a0acb9; --line: #394652; --green: #b9fa57; --cyan: #63dcec;
+  --pink: #f291c8; --violet: #c3a0ff; --white: #131d27; --red: #f4a18c;
+  --action: #b9fa57; --action-ink: #142007; --hover: #202d38;
+  --input-bg: #10232c; --output-bg: #1b2919;
+}
+html[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f4f6ef; --paper: #ffffff; --panel: #edf2e8; --ink: #1c2c30;
+  --muted: #52636c; --line: #becbbd; --green: #3c681c; --cyan: #09687b;
+  --pink: #962b63; --violet: #7051a4; --white: #ffffff; --red: #9e321e;
+  --action: #b9fa57; --action-ink: #142007; --hover: #e4ecdf;
+  --input-bg: #e9f4f7; --output-bg: #eaf2d9;
+}
+.theme-toggle {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  min-height: 44px; min-width: 44px; padding: 8px 10px; flex-shrink: 0;
+  font: inherit; font-size: 12px; color: var(--ink); background: transparent;
+  border: 1px solid var(--line); border-radius: 7px; cursor: pointer;
+}
+.theme-toggle:hover { background: var(--hover); color: var(--ink); }
+.theme-toggle:focus-visible { outline: 2px solid var(--green); outline-offset: 4px; }
+.theme-toggle svg { flex-shrink: 0; }
+.skip { clip-path: inset(50%); background: var(--action); color: var(--action-ink); }
+.skip:focus { clip-path: none; }
+.site-head { border-color: var(--line); }
+.station-bar nav { align-items: center; }
+.btn, .segments button[aria-pressed=true], .demo-rounds button[aria-pressed=true],
+.demo-phases button[aria-pressed=true], .story-tabs button[aria-pressed=true], .toast {
+  background: var(--action); color: var(--action-ink); border-color: var(--green);
+}
+.demo-case-title { font-size: clamp(20px, 2.3vw, 30px); font-weight: 500; line-height: 1.4; margin: 0; color: var(--muted); letter-spacing: -.025em; }
+.demo-section .section-heading h2 { margin-bottom: 16px; }
+.demo-section .section-heading .section-description { margin-bottom: 0; }
+.handoff-flow { display: grid; grid-template-columns: minmax(0,1fr) 60px minmax(0,1fr); align-items: stretch; margin: 24px 0; }
+.handoff-port { border: 1px solid; border-radius: 10px; padding: 22px 24px; min-width: 0; }
+.handoff-input { background: var(--input-bg); border-color: var(--cyan); }
+.handoff-output { background: var(--output-bg); border-color: var(--green); }
+.handoff-label { display: flex; align-items: center; gap: 10px; color: var(--cyan); }
+.handoff-output .handoff-label { color: var(--green); }
+.handoff-label strong { font: 700 25px/1.1 monospace; letter-spacing: -.04em; }
+.handoff-label span { font-size: 12px; font-weight: 600; }
+.handoff-port p { font-size: 17px; line-height: 1.6; margin: 15px 0 0; color: var(--ink); overflow-wrap: anywhere; }
+.handoff-connector { display: grid; place-items: center; color: var(--green); }
+.handoff-connector .icon { width: 40px; height: 40px; stroke-width: 2; }
+.step-columns { grid-template-columns: .7fr 1.15fr 1.15fr; padding-top: 0; }
+.step-columns small { display: flex; align-items: center; gap: 8px; }
+.step-columns small .icon { width: 16px; height: 16px; }
+.step-detail > .handoff-flow + .step-columns { border-top: 1px solid var(--line); padding-top: 24px; }
+.demo-main .handoff-flow { grid-template-columns: minmax(0,1fr) 42px minmax(0,1fr); }
+.demo-main .handoff-port { padding: 18px; }
+.demo-main .handoff-port p { font-size: 15px; }
+/* The 3D theatre and prompt editor use a stable dark canvas in both appearances. */
+.scene-wrap, .prompt-window { --green: #b9fa57; --pink: #f291c8; color: #edf2ec; color-scheme: dark; }
+.agent-panel { background: #b9fa57; }
+.agent-panel .btn { background: #192514; color: #d6f5b0; border-color: #192514; }
+/* Light surfaces and readable secondary text for components predating theme tokens. */
+[data-theme=light] .site-head { background: #f4f6eff2; }
+[data-theme=light] :is(.hero-description,.section-description,.muted,.hero-note,.hero-aside>.mono,.loop-caption,.hero-bottom,.edition,.phase-route,.flow-footnote,.step-badge,.step-columns small,.method-source,.tool-tag,.tool-purpose,.tool-card>p,.tool-bottom .mono,.tool-card details,.alternatives>summary,.alternatives>p,.full-catalog p,.full-catalog .mono,.external-grid p,.trace-focus p,.trace-focus code,.trace-relations small,.demo-rounds small,.artifact-row p,.demo-evidence,.person-chip,.demo-stats span,.export-row,.data-cards p,.data-details,.site-footer>p,.site-footer>div,.site-footer>.mono,.storage-note,.privacy-inline) { color: var(--muted); }
+[data-theme=light] :is(.step-columns p,.step-columns .gate,.trace-relations button span,.demo-stats b,.story-panel>p) { color: var(--ink); }
+[data-theme=light] :is(#plan-result p,#demo-step>p,#person-route p,#person-route button small,.stage-buttons button span) { color: var(--muted); }
+[data-theme=light] :is(.artifact-row span,.trace-relations button small) { color: var(--cyan); }
+[data-theme=light] :is(.tool-card details a,.data-cards .mono,.phase-route b) { color: var(--green); }
+[data-theme=light] .journey { background: radial-gradient(ellipse at 65% 15%,#dfeacb70,transparent 60%); }
+[data-theme=light] .demo-section { background: radial-gradient(ellipse at 0 0,#e1eccd90,transparent 65%),var(--bg); border-color: var(--line); }
+[data-theme=light] .tools-section { background: #eaf0e5; }
+[data-theme=light] :is(.step-detail,.tool-card,.trace-detail,.demo-main,.work-rail button,.voice-trail>article,.connection,.mobile-menu>div) { background: var(--paper); border-color: var(--line); }
+[data-theme=light] :is(.segments,.demo-side,.trace-relations button,.demo-rounds button,.record-facts span,.stage-tool-links a,.playback-tools select) { background: var(--panel); border-color: var(--line); color: var(--ink); }
+[data-theme=light] :is(select,input[type=search],.workbench input:not([type=checkbox]),.workbench textarea,.workbench select) { background: var(--paper); color: var(--ink); border-color: var(--line); }
+[data-theme=light] .segments button { color: var(--muted); }
+[data-theme=light] :is(.segments button[aria-pressed=true],.demo-rounds button[aria-pressed=true]) { background: var(--action); color: var(--action-ink); }
+[data-theme=light] .demo-rounds button[aria-pressed=true] small { color: #384b20; }
+[data-theme=light] :is(.tool-card details,.trace-relations button,.person-chip,.data-details th,.data-details td) { border-color: var(--line); }
+[data-theme=light] .subtle:hover { background: var(--hover); }
+[data-theme=light] .role-entry { background: linear-gradient(120deg,#eaf3e3,#fff); }
+[data-theme=light] .story-panel { background: radial-gradient(ellipse at 100% 0,#dbe9c9,transparent 60%),#fff; border-color: var(--line); }
+[data-theme=light] .story-options button { background: var(--paper); border-color: var(--line); }
+[data-theme=light] :is(.story-options button[aria-pressed=true],.story-outcome,.work-rail button[aria-current=step],.record-detail) { background: var(--output-bg); border-color: var(--green); }
+[data-theme=light] .gate-panel { background: linear-gradient(135deg,#eaf2d9,#e9f4f7); border-color: var(--line); }
+[data-theme=light] .work-record { background: var(--paper)!important; }
+[data-theme=light] .work-record[aria-pressed=true] { background: var(--output-bg)!important; }
+[data-theme=light] :is(#mobile-step-summary,#work-notice:not(:empty)) { background: var(--input-bg); border-color: var(--cyan); }
+[data-theme=light] .status-chip { border-color: var(--cyan); }
+[data-theme=light] .project-badge.synthetic { color: var(--pink); }
+[data-theme=light] .danger { color: #a03636!important; }
+[data-theme=light] dialog { background: var(--paper); border-color: var(--line); }
+[data-theme=light] .send-data { background: var(--panel); }
+[data-theme=light] .pipeline-scroll { background: #fff; border-color: var(--line); scrollbar-color: #658d48 #edf2e8; }
+[data-theme=light] .pipe-node:hover rect { fill: #dfedcf; }
+[data-theme=light] .pipe-node:focus-visible rect { stroke: #1c2c30; }
+[data-theme=light] .voxel { background: #8aba4445; border-color: #689331; box-shadow: 10px 10px 0 #89ad3112; }
+[data-theme=light] .hero-sculpture { filter: saturate(.8); }
+[data-theme=light] .sculpture-core i { border-color: #689331; background: #91b85320; }
+/* The older CSV workbench and station shell share the appearance preference. */
+.handoff-page, .tool-shell-page { background: var(--bg); color: var(--ink); }
+.handoff-page button.primary, .tool-shell-page button.primary { background: var(--green); color: var(--paper); }
+[data-theme=dark] :is(.handoff-page,.tool-shell-page) button.primary { background: var(--action); color: var(--action-ink); }
+.tool-shell-page :is(.tool-strip,.rank-setup input,.rank-setup textarea,.rank-setup select,.activity-link input) { background: var(--panel); color: var(--ink); border-color: var(--line); }
+.tool-shell-page .station-footer { color: var(--muted); }
+[data-theme=dark] .handoff-page :is(.file-area,button.secondary,.badge,.destinations a:hover) { background: var(--panel); }
+[data-theme=dark] .handoff-page :is(.file-list li,td) { border-color: var(--line); }
+[data-theme=dark] .handoff-page .notice { background: #272135; color: #d2bae9; }
+[data-theme=dark] .handoff-page .notice.error { background: #372421; color: #f4aa97; }
+[data-theme=dark] .handoff-page .preview-empty { color: var(--muted); }
+[data-theme=dark] .handoff-page .skip:focus { background: var(--paper); color: var(--ink); }
+@media(max-width:1050px) { .head-actions { gap: 14px; } #nav { gap: 18px; } }
+@media(max-width:760px) {
+  .theme-toggle { font-size: 11px; gap: 5px; padding-inline: 8px; }
+  .head-actions { gap: 10px; }
+  .workbench .site-head { gap: 10px; padding-inline: 16px; }
+  .workbench #home-link { font-size: 11px; }
+  .handoff-flow,.demo-main .handoff-flow { grid-template-columns: 1fr; margin: 20px 0; }
+  .handoff-port,.demo-main .handoff-port { padding: 18px; }
+  .handoff-port p,.demo-main .handoff-port p { font-size: 15px; margin-top: 12px; }
+  .handoff-connector { height: 44px; }
+  .handoff-connector .icon { width: 28px; height: 28px; transform: rotate(90deg); }
+  .handoff-label strong { font-size: 23px; }
+  .demo-case-title { font-size: 21px; margin-bottom: 20px; }
+  .demo-section .section-description { margin-top: 4px; }
+  .demo-badge { margin-bottom: 8px; }
+}
