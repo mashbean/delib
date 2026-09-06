@@ -2,9 +2,16 @@ import {describe,it,expect} from 'vitest';
 import fs from 'node:fs';
 import {createProject,validateProject,projectFromDemo,currentRound,allRecords,activeRecords,addSources,roundSources,sourcesCsv,acceptTttc,acceptReply,reviewRecord,reviseRecord,nextRound,traceVoice,compareRounds} from '../public/workspace-core.js';
 import {parseTttcCsv} from '../public/tttc-csv-core.js';
+import {participationUrl} from '../public/experience.js';
 const setup=()=>createProject({title:'School street',audience:'Residents and caregivers',goal:'Test accessible drop-off',deadline:'2026-12-01',language:'en'});
 const csv='id,interview,comment\na,p1,Wheelchair drop-off must remain accessible\nb,p2,Please keep deliveries possible';
 describe('a complete repeatable workspace handoff',()=>{
+ it('accepts native and in-site participation links while retaining safe activity queries',()=>{
+  const stations=JSON.parse(fs.readFileSync('public/data/tool-stations.json','utf8'));
+  expect(participationUrl('https://form.mashbean.net/f/abcdefghij',stations,'https://delib.mashbean.net','en')).toBe('https://delib.mashbean.net/form/f/abcdefghij?lang=en');
+  expect(participationUrl('https://delib.mashbean.net/form/f/abcdefghij?from=invite',stations,'https://delib.mashbean.net','zh')).toBe('https://delib.mashbean.net/form/f/abcdefghij?from=invite&lang=zh');
+  for(const url of ['https://form.mashbean.net/h/abcdefghij','https://form.mashbean.net/f/abcdefghij#admin=secret','https://form.mashbean.net/f/abcdefghij?adminToken=secret','https://unknown.example/f/abcdefghij'])expect(()=>participationUrl(url,stations,'https://delib.mashbean.net','en')).toThrow();
+ });
  it('preserves exact source IDs through Form → TTTC → Reply → next round, with human review',()=>{
   const p=setup();addSources(p,csv,'form-abcdefghij');const refs=roundSources(p).map(a=>a.id),sent=parseTttcCsv({text:sourcesCsv(p,refs),label:'handoff'}).rows;
   expect(sent.map(x=>x.id)).toEqual(refs);expect(sent.every(x=>x.interview==='')).toBe(true);
