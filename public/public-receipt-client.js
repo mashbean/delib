@@ -78,7 +78,7 @@ export async function deleteStoredReceipt() {
   return payload;
 }
 
-export function bindPublicationControls({ receipt, stored, prefix, status }) {
+export function bindPublicationControls({ receipt, stored, prefix, status, translate = (value) => value, translateTemplate = (parts, ...values) => parts.reduce((text, part, index) => text + (index ? values[index - 1] : "") + part, ""), localizeUrl = (value) => value, locale = "zh-Hant-TW" }) {
   const panel = document.querySelector(`#${prefix}-publication`);
   const publish = document.querySelector(`#${prefix}-publish`);
   const confirmation = document.querySelector(`#${prefix}-publish-confirm`);
@@ -94,66 +94,66 @@ export function bindPublicationControls({ receipt, stored, prefix, status }) {
   if (stored) {
     panel.querySelector("[data-publication-create]").hidden = true;
     result.hidden = false;
-    publicUrl.value = stored.publicUrl;
+    publicUrl.value = localizeUrl(stored.publicUrl);
     const hasDeleteToken = Boolean(receiptDeleteTokenFromHash());
     manageUrl.closest("label").hidden = !hasDeleteToken;
     copyManage.hidden = !hasDeleteToken;
     if (hasDeleteToken) manageUrl.value = location.href;
     remove.hidden = !hasDeleteToken;
-    stamp.textContent = `公開摘要保存至 ${formatDate(stored.expiresAt)}`;
+    stamp.textContent = translateTemplate`公開摘要保存至 ${formatDate(stored.expiresAt, locale)}`;
   }
 
   publish.addEventListener("click", async () => {
     if (!confirmation.checked) {
-      status.textContent = "請先確認公開範圍。";
+      status.textContent = translate("請先確認公開範圍。");
       confirmation.focus();
       return;
     }
     publish.disabled = true;
-    status.textContent = "正在建立短網址…";
+    status.textContent = translate("正在建立短網址…");
     try {
       const created = await publishReceipt(receipt, retention.value);
       result.hidden = false;
-      publicUrl.value = created.publicUrl;
-      manageUrl.value = created.manageUrl;
+      publicUrl.value = localizeUrl(created.publicUrl);
+      manageUrl.value = localizeUrl(created.manageUrl);
       manageUrl.closest("label").hidden = false;
       remove.hidden = true;
-      status.textContent = "短網址已建立。請另外保存私人刪除網址；Delib 無法替你找回。";
+      status.textContent = translate("短網址已建立。請另外保存私人刪除網址；Delib 無法替你找回。");
     } catch (error) {
-      status.textContent = error instanceof Error ? error.message : "短網址建立失敗。";
+      status.textContent = error instanceof Error ? translate(error.message) : translate("短網址建立失敗。");
     } finally {
       publish.disabled = false;
     }
   });
 
-  copyPublic.addEventListener("click", () => copyValue(publicUrl, status, "公開短網址已複製。"));
-  copyManage.addEventListener("click", () => copyValue(manageUrl, status, "私人刪除網址已複製，請妥善保存。"));
+  copyPublic.addEventListener("click", () => copyValue(publicUrl, status, translate("公開短網址已複製。"), translate));
+  copyManage.addEventListener("click", () => copyValue(manageUrl, status, translate("私人刪除網址已複製，請妥善保存。"), translate));
   remove.addEventListener("click", async () => {
     remove.disabled = true;
-    status.textContent = "正在刪除公開成果…";
+    status.textContent = translate("正在刪除公開成果…");
     try {
       await deleteStoredReceipt();
-      status.textContent = "公開成果與到期排程已刪除；這個短網址不再可用。";
+      status.textContent = translate("公開成果與到期排程已刪除；這個短網址不再可用。");
       result.hidden = true;
-      stamp.textContent = "公開摘要已刪除";
+      stamp.textContent = translate("公開摘要已刪除");
     } catch (error) {
-      status.textContent = error instanceof Error ? error.message : "成果刪除失敗。";
+      status.textContent = error instanceof Error ? translate(error.message) : translate("成果刪除失敗。");
       remove.disabled = false;
     }
   });
 }
 
-async function copyValue(input, status, message) {
+async function copyValue(input, status, message, translate = (value) => value) {
   if (!input.value) return;
   try {
     await navigator.clipboard.writeText(input.value);
     status.textContent = message;
   } catch {
     input.select();
-    status.textContent = "瀏覽器未允許自動複製；網址已選取。";
+    status.textContent = translate("瀏覽器未允許自動複製；網址已選取。");
   }
 }
 
-function formatDate(value) {
-  return new Intl.DateTimeFormat("zh-Hant-TW", { dateStyle: "long" }).format(new Date(value));
+function formatDate(value, locale = "zh-Hant-TW") {
+  return new Intl.DateTimeFormat(locale, { dateStyle: "long" }).format(new Date(value));
 }

@@ -1,6 +1,6 @@
 # Operations runbook
 
-Updated: 2026-09-03
+Updated: 2026-09-06
 
 這份文件給維運 `delib.mashbean.net` 的人。使用者看得到的邊界在
 [data-boundaries.md](data-boundaries.md)，工具接入狀態在
@@ -17,7 +17,7 @@ Updated: 2026-09-03
 | 監測 | `uptime.yml` 每 30 分鐘跑 `scripts/smoke.mjs` 並探測 polis／call-in；失敗會寄信給 repo owner |
 | 日誌 | `observability.enabled: true`、全量取樣；只記錄路徑、方法與錯誤訊息，不記錄 body 或 header |
 | 限流 | production 才有：`WRITE_LIMIT` 每 IP 20 次／分鐘（所有 POST）；`SUBMIT_LIMIT` 每 IP 120 次／分鐘（排序提交）。限流服務故障時放行 |
-| 依賴的上游 | `polis.mashbean.net`（Pocket Polis 建立與綜整代理）、`call-in.mashbean.net`（Call-in）、`app.harmonica.chat`、`api.openai.com`；全部有 12 秒逾時（OpenAI 45 秒） |
+| 依賴的上游 | `public/data/tool-stations.json` 列出 12 個上游原生工具（另加站內 Power Ranker）；舊官方服務連接仍保留。`/api/agent` 已停用，不再呼叫 OpenAI |
 
 ## 日常指令
 

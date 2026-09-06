@@ -133,9 +133,34 @@ export function receiptHandoffTargetUrl(
 ) {
   const handoff = normalizeReceiptHandoff(value, { now });
   if (!handoff) throw new Error("成果草稿已過期或格式不完整");
-  const url = new URL("/", baseUrl);
-  url.hash = RECEIPT_HANDOFF_TARGETS[handoff.target].hash;
+  const url = new URL("/receipt-draft.html", baseUrl);
+  url.searchParams.set("target", handoff.target);
   return url.toString();
+}
+
+/** Read only the dedicated same-tab draft; never inspect unrelated storage. */
+export function readReceiptHandoff(storage, { target, now = Date.now() } = {}) {
+  if (!Object.hasOwn(RECEIPT_HANDOFF_TARGETS, target)) return { status: "invalid-target", handoff: null };
+  try {
+    const raw = storage.getItem(RECEIPT_HANDOFF_STORAGE_KEY);
+    if (!raw) return { status: "missing", handoff: null };
+    let handoff = null;
+    if (raw.length <= 16_384) {
+      try { handoff = normalizeReceiptHandoff(JSON.parse(raw), { now }); } catch { /* Invalid JSON is not a draft. */ }
+    }
+    if (!handoff) {
+      storage.removeItem(RECEIPT_HANDOFF_STORAGE_KEY);
+      return { status: "expired-or-invalid", handoff: null };
+    }
+    if (handoff.target !== target) return { status: "target-mismatch", handoff: null };
+    return { status: "ready", handoff };
+  } catch {
+    return { status: "unavailable", handoff: null };
+  }
+}
+
+export function clearReceiptHandoff(storage) {
+  try { storage.removeItem(RECEIPT_HANDOFF_STORAGE_KEY); return true; } catch { return false; }
 }
 
 function buildDraft(sourceReceipt, target) {

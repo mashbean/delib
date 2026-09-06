@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>工具工作區 · Delib</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/tool-shell.css" />
+  <script type="module" src="/tool-shell.js"></script>
+</head>
+<body>
+  <a class="skip" href="#tool-frame" data-text="skip">跳到工具</a>
+  <header class="station-bar">
+    <a class="brand" id="hub-link" href="/">⿻ <strong>Delib</strong><span data-text="back">回到流程地圖</span></a>
+    <nav aria-label="Workspace navigation">
+      <a id="language-switch" href="?lang=en" lang="en">English</a>
+      <a id="original-link" href="/" target="_blank" rel="noopener noreferrer" data-text="original">獨立開啟 ↗</a>
+    </nav>
+  </header>
+  <main>
+    <section class="station-intro" aria-labelledby="station-heading">
+      <div class="intro-copy">
+        <p class="eyebrow"><span id="station-step">DELIB TOOL STATION</span> <span aria-hidden="true">/</span> <span id="station-name">Delib</span></p>
+        <h1 id="station-heading">工具工作區</h1>
+        <p id="station-summary"></p>
+      </div>
+      <details class="handoff">
+        <summary data-text="handoff">這一步完成後，資料去哪裡？</summary>
+        <p id="station-handoff"></p>
+        <a id="next-link" href="/" data-text="next">前往下一個工具 →</a>
+      </details>
+    </section>
+    <details class="activity-link" id="activity-link-panel">
+      <summary data-text="existing">已經有活動連結？在這裡接著用</summary>
+      <form id="activity-link-form">
+        <label for="activity-url" data-text="activityLabel">貼上這個工具的活動或報告網址</label>
+        <div><input id="activity-url" type="url" required autocomplete="off" spellcheck="false" /><button type="submit" data-text="openActivity">在站內開啟</button></div>
+        <p id="activity-error" role="status"></p>
+      </form>
+    </details>
+    <section id="rank-setup" class="rank-setup" hidden aria-labelledby="rank-setup-heading">
+      <div>
+        <p class="eyebrow" data-text="local">LOCAL FIRST</p>
+        <h2 id="rank-setup-heading" data-text="rankHeading">建立一輪成對排序</h2>
+        <p data-text="rankIntro">先填入題目與 3–10 個方案。排序在瀏覽器進行，題目放在連結中；答案不會自動上傳。</p>
+        <button type="button" id="rank-example" data-text="example">填入模擬公園案例</button>
+      </div>
+      <form id="rank-form">
+        <label for="rank-title" data-text="question">要比較的問題</label>
+        <input id="rank-title" required maxlength="120" />
+        <label for="rank-items" data-text="options">方案（每行一項，3–10 項）</label>
+        <textarea id="rank-items" required rows="5"></textarea>
+        <label for="rank-mode" data-text="rankMode">這一輪怎麼收件？</label>
+        <select id="rank-mode"><option value="local" data-text="localMode">只在本機，個別匯出結果</option><option value="24" data-text="dayMode">多人收件室 · 保存 24 小時</option><option value="168" data-text="weekMode">多人收件室 · 保存 7 天</option></select>
+        <label class="rank-consent" id="rank-consent-row" hidden><input id="rank-consent" type="checkbox" /><span data-text="roomConsent">我確認公開題目與保存期限。Delib 只保存題目、彙整計數與隨機參與代碼的雜湊，到期刪除。</span></label>
+        <button class="primary" type="submit" data-text="start">開始排序</button>
+        <p id="rank-error" role="status"></p>
+      </form>
+    </section>
+    <p id="room-participation" class="activity-link" hidden><a id="room-participant-link" href="/rank" target="_blank" rel="noopener noreferrer" data-text="participantLink">參與者連結（可分享，不含管理憑證）↗</a></p>
+    <section class="tool-container" id="tool-container" aria-label="Tool workspace">
+      <div class="tool-strip">
+        <span id="frame-status" role="status" data-text="loading">正在載入工具…</span>
+        <button id="reload-tool" type="button" data-text="reload">重新載入</button>
+      </div>
+      <iframe id="tool-frame" title="Delib tool workspace" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-forms allow-downloads allow-popups allow-popups-to-escape-sandbox allow-modals" allow="clipboard-write; fullscreen" allowfullscreen></iframe>
+    </section>
+    <footer class="station-footer">
+      <p data-text="boundary">工具在原服務中運作，原有活動與管理權限維持獨立。跨工具資料仍需匯出、審閱與匯入；站內導覽不會自動搬移資料。</p>
+      <p data-text="languageNote">導覽提供中英文；工具內文的語言依各工具支援。若畫面無法載入，可用上方「獨立開啟」。</p>
+    </footer>
+    <noscript>此工作區需要 JavaScript。請回到 <a href="/">Delib</a> 選擇工具，或直接開啟原服務。</noscript>
+  </main>
+</body>
+</html>

@@ -1,35 +1,41 @@
 # Delib · 審議拼圖
 
-**把一場審議，拼成下一輪。**
+**每一次對話，都有下一步。 / Every conversation. A next step.**
 
-[delib.mashbean.net](https://delib.mashbean.net) 是給非工程師審議工作者的流程
-組裝器。回答幾個白話問題後，它會產生線下齒輪、線上工具推薦、可分享的成果頁
-與 Markdown 執行手冊；也能直接在站內開起 Call-in、Pocket Polis、Power Ranker，
-或連接官方 Pol.is、Agora、HeyForm、Talk to the City 與 Harmonica。
+[中文版](https://delib.mashbean.net/?lang=zh) · [English](https://delib.mashbean.net/?lang=en)
 
-推薦由公開規則計算，不由 AI 黑箱決定。AI 只協助把已選定的流程整理成
-主持簡報，且不能替參與者製造共識或替主辦者作決策。
+Delib 把線上與實體參與、工具與資料，接成可以持續多輪的審議。新版入口提供
+可旋轉的 3D 八步流程、依缺口找起點、13 個站內工具工作區與完整中英引導。
+GSAP 負責進場與視角轉場；3D 圖以透視投影繪製，支援觸控、步驟按鈕、暫停與減少動態。
 
 ## 現在能做什麼
 
-- **規劃**：四步精靈、28 個工具目錄、deterministic recommendation、
-  `delib-bundle/v1` JSON 與 Markdown runbook。
-- **直接啟用**：免帳號代建 Call-in 與 Pocket Polis；本機或短期收件室的
-  Power Ranker；官方 Pol.is、Agora、HeyForm、TTTC、Harmonica 的站內工作區。
-- **資料交接**：Pocket Polis CSV 與 Power Ranker 結果只在瀏覽器處理，可輸出
-  `delib-data/v1`、TTTC CSV 與 Agora 三檔匯入包。
-- **成果收據**：`delib-pocket-polis-receipt/v1`、`delib-ranking-receipt/v1`
-  公開成果頁，預設只放在網址片段；可選建立會到期、可刪除的 `/r/<slug>` 短網址；
-  `delib-handoff/v1` 把下一步草稿帶回工具設定。Pocket Polis 收據可帶入該工具的
-  AI 綜整節錄，標明模型與時間，和主辦者解讀分開。
-- **迭代**：[/deploy](https://delib.mashbean.net/deploy) 部署中心、
-  [/feedback](https://delib.mashbean.net/feedback) 開發者回饋、
-  `npm run pilot:pocket-polis` 可重跑的虛構案例。
+- **規劃**：從缺席聲音、證據、選項或回覆責任決定本輪起點，下載行動單。
+- **直接使用**：`/form`、`/harmonica`、`/polis`、`/call-in`、`/tttc`、`/reply`、
+  `/proposals`、`/argument`、`/budget`、`/rank`、`/checks`、`/values`、`/maple`。
+  工作區保留工具原本的來源與資料儲存，並可將既有活動網址轉成站內入口。
+- **多輪模擬**：虛構校門口安全案例涵蓋 3 輪、14 個角色；人數與票數從 fixture
+  計算，可匯出輪次 JSON、TTTC CSV、人工審閱的 Polis 起始陳述。沒有實際招募或投票。
+- **資料交接**：`/handoff` 在本機瀏覽器檢查、預覽與合併來源 CSV，保留來源映射、
+  避免 ID 碰撞與跨來源錯認參與者；匯入目標工具前由主辦者確認。
+- **Agent**：複製帶入目前規劃選擇的 prompt，或下載 `/.well-known/delib/SKILL.md`。
+  此頁不收 API 金鑰；`POST /api/agent` 已回傳 410。Agent 不替人製造共識或發布決定。
+- **成果**：既有 Pocket Polis 與 Power Ranker 成果收據、可到期的 `/r/<slug>`、
+  管理者刪除能力與 `/feedback` 回饋流程持續保留。
 
-逐項的完成清單在 [CHANGELOG.md](CHANGELOG.md)；工具接入狀態與判斷依據在
-[docs/integration-audit.md](docs/integration-audit.md)；每個工具的資料邊界在
-[docs/data-boundaries.md](docs/data-boundaries.md)；當前完成／未完成邊界在
-[docs/roadmap.md](docs/roadmap.md)。
+Native versions focus on specific deliberative tasks, not feature parity with their
+upstream inspirations. Station navigation, planning, simulation and handoffs are
+bilingual; individual upstream tools retain their own localization coverage.
+
+`delib-data/v1` currently has live-data adapters for Polis and Power Ranker, plus a
+round-simulation adapter. `delib-rounds/v1` adds versioned rounds, provenance,
+participation modes and explicit return points. These are Delib contracts, not an
+established universal standard or automatic data synchronization across all tools.
+
+- [Methodology and source audit](docs/methodology-research-2026-09-06.md)
+- [Actual import/export contract audit](docs/data-flow-audit-2026-09-06.md)
+- [Release changes](CHANGELOG.md) · [Operations](docs/operations.md)
+- [Machine-readable bilingual workflow](public/data/workflow-guide.json)
 
 ## 本機開發
 
@@ -52,7 +58,7 @@ npm run check      # 語法、型別、單元與 Worker 測試、dry-run
 - 部署後 `npm run smoke` 做唯讀煙霧測試；`/api/health` 會回報版本與 Git SHA。
 
 Delib 本體可在 Workers Free 的額度內運作；靜態頁面不經 Worker，只有
-`/api/*` 與 `/r/*` 會消耗 Worker 與 Durable Object 額度。監測、限流、下架與
+`/api/*`、`/r/*` 與工具工作區路徑會執行 Worker；需要狀態的操作另使用 Durable Objects。監測、限流、下架與
 回滾方式見 [docs/operations.md](docs/operations.md)。
 
 ## Skill

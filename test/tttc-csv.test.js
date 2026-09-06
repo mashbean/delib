@@ -47,5 +47,29 @@ describe("TTTC csv workbench input", () => {
     ]);
     expect(csv).toBe('id,interview,comment\n1,\'=host,\'+1 給照明\n2,,"含 ""引號"", 逗號"\n');
     expect(() => tttcRowsToCsv([])).toThrow();
+    expect(tttcRowsToCsv([{ id: '=IMPORTXML("x")', interview: "", comment: "text" }])).toContain("'=IMPORTXML");
+  });
+
+  it("never collides with a generated prefix or a later original ID and stays within the native ID limit", () => {
+    const longId = "a".repeat(120);
+    const merged = mergeTttcFiles([
+      parseTttcCsv({ text: `id,interview,comment\nx,p1,one\nf2-x,p1,two\n${longId},p1,long one\n`, label: "first" }),
+      parseTttcCsv({ text: `id,interview,comment\nx,p1,three\nf2-x-2,p1,four\n${longId},p1,long two\n`, label: "second" }),
+    ]);
+    expect(merged.rows[3].id).toBe("f2-x-3");
+    expect(merged.rows.every((row) => row.id.length <= 120)).toBe(true);
+    expect(new Set(merged.rows.map((row) => row.id)).size).toBe(6);
+    expect(() => parseTttcCsv({ text: tttcRowsToCsv(merged.rows), label: "merged" })).not.toThrow();
+    expect(merged.rows[3].originalId).toBe("x");
+  });
+
+  it("optionally namespaces each source and replaces aliases without inventing cross-source identity matches", () => {
+    const files = ["one", "two"].map((label) => parseTttcCsv({ text: "id,interview,comment\n1,Same name,first\n2,Same name,second\n3,,unknown\n", label }));
+    const merged = mergeTttcFiles(files, { scopeInterviews: true, namespaceIds: true });
+    expect(merged.rows.map((r) => r.id)).toEqual(["f1-1", "f1-2", "f1-3", "f2-1", "f2-2", "f2-3"]);
+    expect(merged.rows.map((r) => r.interview)).toEqual(["source-1:group-1", "source-1:group-1", "", "source-2:group-1", "source-2:group-1", ""]);
+    expect(merged.summary).toMatchObject({ interviews: 2, blankInterviews: 2, scopedInterviews: true });
+    expect(tttcRowsToCsv(merged.rows)).not.toContain("Same name");
+    expect(merged.rows[0].originalInterview).toBe("Same name");
   });
 });

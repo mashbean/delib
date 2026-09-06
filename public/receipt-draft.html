@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>下一輪交接草稿 · Delib</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/receipt-draft.css" />
+  <script type="module" src="/receipt-draft.js"></script>
+</head>
+<body>
+  <header><a id="draft-home" class="brand" href="/">⿻ <strong>Delib</strong></a><button id="draft-language" type="button">English</button></header>
+  <main>
+    <p class="eyebrow">DELIB / NEXT ROUND</p>
+    <h1 data-copy="heading">下一輪的交接草稿</h1>
+    <p class="lede" data-copy="intro">先檢查這份草稿，再到下一個工具逐欄貼上、修改與確認。這一頁不會建立活動或自動上傳資料。</p>
+    <p id="draft-status" class="status" role="status"></p>
+    <section id="draft-content" hidden>
+      <div class="draft-meta"><p><span data-copy="source">來源</span> <strong id="draft-source"></strong></p><p><span data-copy="expires">暫存到期</span> <time id="draft-expiry"></time></p></div>
+      <h2 id="draft-tool"></h2>
+      <p class="boundary" data-copy="boundary">草稿保留原文，僅存在此分頁的暫存空間，最長兩小時。下載的檔案由你自行保管；切換工具不會自動搬移內容。</p>
+      <dl id="draft-fields"></dl>
+      <div class="actions"><button id="draft-copy" type="button" data-copy="copy">複製草稿 JSON</button><button id="draft-download" type="button" data-copy="download">下載草稿 JSON</button><a id="draft-open-tool" class="primary" href="/" target="_blank" rel="noopener noreferrer" data-copy="open">開啟工具並人工填入 ↗</a></div>
+      <details><summary data-copy="technical">查看完整交接資料</summary><pre id="draft-json"></pre></details>
+    </section>
+    <button id="draft-clear" class="clear" type="button" data-copy="clear">清除此分頁的交接草稿</button>
+    <noscript>此頁需要 JavaScript 讀取同分頁草稿。請回到成果頁重新準備交接。</noscript>
+  </main>
+</body>
+</html>

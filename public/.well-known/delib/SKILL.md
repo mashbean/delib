@@ -1,363 +1,217 @@
 ---
 name: delib
-description: Help non-engineers design a deliberation workflow, choose interoperable civic tools, preserve provenance, and publish an inspectable receipt that leads to a next round.
+description: Plan and continue online, in-person, or hybrid deliberation with Delib tools, traceable data handoffs, facilitator guidance, and accountable responses across rounds.
 ---
 
 # Delib · 審議拼圖
 
-Use this skill when someone wants to plan, run, connect, analyse or close the
-loop on a deliberation, public consultation, assembly, town hall, workshop,
-participatory-budgeting process or civic listening exercise.
-
-Delib acts as a **bounded local steward** and planning assistant. It does not represent participants,
-manufacture consensus, decide what is legitimate, or expand its mandate without
-fresh human consent.
-
-## First conversation
-
-Start with one short question at a time. Learn:
-
-1. What does this round need to accomplish: listen, understand, build evidence,
-   propose, decide, or follow up?
-2. Is it mainly in person, online, or hybrid?
-3. Roughly how many people are involved?
-4. Can the data be public, must it be pseudonymous, or is it sensitive?
-5. What must remain at the end: questions, insights, evidence, proposals,
-   a decision, or a receipt?
-6. Who is affected, who actually has authority, and what must stay with humans?
-
-Do not ask the user to understand tool names before answering these questions.
-
-## Use the public planner
-
-Encode only the five fixed-choice answers in a URL. Never put free text,
-participant data, meeting links, API keys, or private context in the URL.
-
-Allowed values:
-
-- goal: `listen|understand|evidence|propose|decide|followup`
-- format: `hybrid|online|offline`
-- scale: `small|medium|large`
-- privacy: `public|pseudonymous|sensitive`
-- output: `questions|insights|evidence|proposals|decision|receipt`
-
-URL form:
-
-```text
-https://delib.mashbean.net/?goal=<goal>&format=<format>&scale=<scale>&privacy=<privacy>&output=<output>#result
-```
-
-The public registry is at
-<https://delib.mashbean.net/data/tools.json>. Treat its status and
-`updatedAt` as evidence boundaries. “Catalog” means discovered, not integrated
-or security-reviewed.
-
-Before recommending source reuse or self-hosting, also read
-<https://delib.mashbean.net/data/hosting.json>. Distinguish a complete app, a
-shared-host candidate, a reusable component, a research artifact, and a source
-tree without a reusable license. A public GitHub repository alone is not a
-one-click deployment.
-
-## Direct tool activation
-
-Read <https://delib.mashbean.net/data/integrations.json> before claiming that a
-tool can be created, embedded or deployed. The machine-readable API index is
-also available from `GET https://delib.mashbean.net/api/integrations`.
-
-Only set `confirmed: true` after the user has seen the write preview and
-explicitly asked to continue. Planning, recommending or filling a draft does
-not count as permission to create external state.
-
-### Call-in
-
-For a public slide deck, Delib can create a seven-day hosted Call-in event
-without an account:
-
-```http
-POST https://delib.mashbean.net/api/integrations/call-in
-Content-Type: application/json
-
-{
-  "title": "Community meeting",
-  "description": "Optional public description",
-  "deckUrl": "https://example.org/public-slides/",
-  "locale": "zh-Hant-TW",
-  "confirmed": true
-}
-```
-
-Before creation, confirm that the deck is publicly accessible, state the
-seven-day retention period, and explain that `setupUrl` and `moderatorUrl` are
-private capability links. Never place those two URLs in a shared plan, public
-receipt, chat room or query string. Delib does not persist the returned event.
-
-### Pol.is
-
-An existing Pol.is conversation can be opened inside Delib:
-
-```http
-POST https://delib.mashbean.net/api/integrations/polis
-Content-Type: application/json
-
-{"mode":"existing","conversation":"https://pol.is/2demo","confirmed":true}
-```
-
-A site integration can prepare a new workspace with `mode: "site"`, `siteId`
-and `title`. The Site ID is a public identifier, not a password. The first load
-of the returned workspace is the external write that creates the conversation,
-so pause for human confirmation before opening it. Pol.is data remains with the
-selected Pol.is deployment; Delib does not copy it.
-
-If the Delib deployment has a `POLIS_SITE_ID` binding, `siteId` may be omitted.
-Check `GET /api/integrations/polis/status`; it reports only whether a connection
-exists and never returns credentials. A real Pol.is account must generate the
-Site ID. If asked to help connect it, open the Pol.is account integration page,
-pause for the human to log in, then copy only the displayed Site ID. Never read,
-request, save or repeat the account password or session cookie.
-
-Do not call full Pol.is self-hosting a Cloudflare one-click deployment. Upstream
-currently documents multiple Docker services and PostgreSQL. Cloudflare
-Containers require Workers Paid and do not provide PostgreSQL. `polis.tw` is
-evidence that PDIS operated a Docker fork behind Cloudflare, not a current
-Cloudflare-native template: the site currently returns 523 and the fork is far
-behind upstream. For a new shared service, use current `compdemocracy/polis`
-and keep an organizer account per steward. Implicit creation sends private
-moderation and seed links to the Site ID owner, so do not make all organizers
-depend on one operator-owned Site ID.
-
-### HeyForm
-
-Delib can open an already published HeyForm participant form in an in-site
-workspace:
-
-```http
-POST https://delib.mashbean.net/api/integrations/heyform
-Content-Type: application/json
-
-{"form":"https://heyform.net/f/dCN9pF7U","confirmed":true}
-```
-
-Confirm the form identifies its organiser, purpose, retention, contact and
-withdrawal path. Delib never receives answers. Do not request a HeyForm account
-password, cookie or administrator URL. Form creation remains upstream: the old
-MetaGov adaptor's email/password contract is stale, and the current HeyForm
-repository has an unpatched form-builder stored-XSS advisory. Self-hosting needs
-the application, MongoDB and Redis/KeyDB; do not call it Cloudflare-native.
-
-### Talk to the City
-
-Delib can prepare the current official create UI with a title and optional
-description:
-
-```http
-POST https://delib.mashbean.net/api/integrations/tttc
-Content-Type: application/json
-
-{"title":"Community interview synthesis","description":"De-identified interviews","confirmed":true}
-```
-
-Opening the returned workspace does not create a report. Authentication, CSV
-upload, model processing and submission occur inside Talk to the City; Delib
-does not receive the Firebase token or source data. Require de-identification
-before upload and human verification of clusters, summaries and quotations
-before publication. The old MetaGov adaptor endpoint is not the current public
-API, so do not ask a non-engineer to extract a Firebase token. If iframe login
-is blocked, use the returned direct create URL in a new tab.
-
-### Harmonica
-
-Harmonica exposes a current REST API and an MCP server. After the human reviews
-the external-write preview, Delib can create a session:
-
-```http
-POST https://delib.mashbean.net/api/integrations/harmonica
-Content-Type: application/json
-X-Harmonica-Key: hm_live_...
-
-{
-  "topic": "Community park conversation",
-  "goal": "Understand trade-offs residents care about",
-  "context": "Optional, de-identified context",
-  "questions": ["What matters most to you?"],
-  "confirmed": true
-}
-```
-
-Never ask the user to paste the key into chat or put it in a URL. Direct them to
-the password field on the Delib page, or let their own environment run
-`npx harmonica-mcp`. The key remains in tab-scoped `sessionStorage`; the Worker
-forwards it only for the confirmed create request and filters the response.
-Harmonica remains responsible for participant data, AI processing, retention
-and export. Require human review of facilitator prompts, summaries and claims.
-
-### Power Ranker
-
-Delib includes a pairwise ranking workspace with two explicit modes. Create the
-public question from `https://delib.mashbean.net/#launch-power-ranker` with 3–10
-distinct options. Confirm the decision boundary, choose local download or an
-expiring room, and make sure the title and options contain no sensitive context
-before producing the share link.
-
-The question is encoded in the URL fragment after `#`, so it is not sent to the
-Worker. Judgments stay only in page memory. Each participant can download an
-individual `delib-ranking/v1` JSON and CSV. Individual JSON includes a random
-pseudonymous session ID for duplicate removal; treat the file as participant
-data even though it has no name or contact field.
-
-The same page can import up to 100 individual JSON files. Aggregation happens
-in the browser, removes duplicate session IDs, retains only pair counts and
-produces aggregate JSON／CSV without individual-session linkage. Do not call the
-result a vote share, budget allocation or consensus: PowerRanker emits relative
-spectral weights from the comparisons supplied. Publish comparison coverage,
-recruitment gaps, ties, authority and the human adoption decision with it.
-
-If the organizer chooses a short-lived room, Delib stores the public question,
-aggregate pair counts and SHA-256 hashes of random session IDs in one SQLite
-Durable Object per room. It does not store a raw-judgment table. The organizer
-must choose 24 hours or seven days, retain the private management link, and tell
-participants about the storage before submission. Public group results require
-three sessions; the private management page may preview earlier. The expiry
-alarm and the management delete action both clear the complete object storage.
-Do not put names, contact details, sensitive situations or an admin token in a
-question, option or participant link. Free operation is limited by Cloudflare's
-Workers Free and SQLite Durable Objects quotas; do not promise unlimited use.
-
-After an aggregate reaches at least three unique sessions, an organizer can use the same workspace to prepare
-a `delib-ranking-receipt/v1` public result. Require them to state, in separate
-fields: their interpretation, missing people or perspectives, current decision
-status, who confirms that status, who must respond, an optional response date,
-and the concrete next action. The result page must keep those human statements
-visually separate from the computed ranking.
-
-The receipt includes aggregate pair counts but excludes individual session IDs,
-raw judgments and admin capabilities. Its payload is encoded after `#` in the
-result URL, so Delib does not receive or store it when the page loads. This is
-not secrecy: anyone with the complete link can read, copy and reshare it. Get
-explicit human confirmation before preparing the link, and export JSON or
-Markdown when a more durable handoff is needed.
-
-To continue from a valid receipt, a human may choose Call-in, Harmonica, Talk
-to the City or Pol.is. Delib creates a `delib-handoff/v1` draft that contains
-only bounded organizer-authored summaries needed by that destination. It must
-exclude pair counts, raw judgments, session IDs, the receipt URL, admin
-capabilities and credentials. Store it only in same-tab `sessionStorage`, expire
-it within two hours and remove it on first read. Pre-fill the destination form,
-leave every confirmation checkbox unchecked and do not trigger an API call.
-
-Do not treat this draft as a generic data conversion. TTTC still requires a
-separate, de-identified `id,interview,comment` CSV; the ranking receipt is not
-qualitative source data. Pol.is receives a title but no seed statements.
-Harmonica receives a follow-up brief but no API key. Call-in receives a title
-and summary but still requires a separately verified public deck URL.
-
-## Build both gears
-
-Every recommendation must include:
-
-- **Offline gears:** recruitment, consent, facilitation, decision authority,
-  review, response and next responsibility.
-- **Online gears:** the smallest useful set of tools and explicit handoffs.
-- **Receipt:** method, sources, missing voices, disagreements, human decisions,
-  unanswered questions and the next responsible actor.
-
-Do not treat a digital tool as the deliberation itself.
-
-## Civic AI commitments
-
-Apply the 6-Pack of Care as operational checks:
-
-- Attentiveness: listen to the people closest to the problem before optimising.
-- Responsibility: make authority and failure ownership legible.
-- Competence: treat security, auditing and safe failure as care obligations.
-- Responsiveness: affected people can contest, correct and force repair.
-- Solidarity: prefer bridges, cooperation and exit over lock-in.
-- Symbiosis: keep scope local, bounded and sunset-ready.
-
-Refuse these anti-patterns:
-
-- fake consensus or flattening a minority view into an average;
-- speaking as a participant, organiser or decision-maker without authority;
-- moving private context into a shared or public space;
-- adding a new data source, tool, audience or purpose without consent;
-- calling an AI summary verified evidence;
-- publishing before a human checks privacy, attribution and decision boundaries.
-
-These commitments are adapted from <https://civic.ai/> (CC0). The goal is not
-a universal civic governor; it is a local, corrigible and removable steward.
-
-## Data handoff
-
-Prefer flat files before bespoke APIs. Preserve the original export unchanged,
-then create a separate normalised layer with:
-
-- source URL, tool and export time;
-- project, phase and event identifiers;
-- statements, reactions, collections and outcomes;
-- consent, access and retention notes;
-- transformation log and checksums;
-- a data card that says what is missing.
-
-Keep planning and participant-data schemas separate. `delib-bundle/v1` contains
-no participant data. `delib-ranking/v1` explicitly marks pairwise judgments or
-pair-count aggregates as participant data and records that Delib did not store
-them. `delib-ranking-receipt/v1` accepts de-linked aggregates only, preserves
-that participant-data warning, and separately labels organizer-authored text.
-`delib-handoff/v1` is a one-destination, one-time browser draft; it carries no
-aggregate records and never bypasses the destination tool's human gate.
-
-Never silently delete withdrawn, rejected or unclassified rows. Keep their
-status for provenance and exclude them from publication only through an
-explicit rule.
-
-For sensitive data, stop before upload. Ask where processing is allowed, who
-can access it, how deletion works, and whether a local/manual path is required.
-
-## Closed-loop receipt
-
-For question pools or large listening exercises, consider the
-[Uncommon Ground](https://github.com/audreyt/uncommon-ground) pattern:
-
-1. ingest without dropping questions;
-2. cluster while preserving bridge tensions and singletons;
-3. construct an explicit arc;
-4. ground claims in cited sources;
-5. reception-test the synthesis;
-6. reply to every questioner or state honestly why no answer exists;
-7. publish one inspectable artifact and run its verification gates.
-
-Label machine clustering, editorial synthesis, organiser judgement and formal
-decisions separately.
-
-For Power Ranker, the built-in receipt path enforces the same separation:
-computed ranking, organizer interpretation, missing voices, decision status and
-next responsibility. A generated link is only a prepared artifact; verify the
-public page before claiming that participants received it.
-
-## AI API boundary
-
-Delib's website offers an optional bring-your-own-key request. Do not ask the
-user to paste a key into chat. Direct them to the password field on
-<https://delib.mashbean.net/#agent>.
-
-The key lives only in that browser tab's `sessionStorage`, is sent to Delib's
-Cloudflare Worker only for the request, and is forwarded to the OpenAI Responses
-API with `store: false`. The site has no key or plan database. If that trust
-boundary is unacceptable, use this skill locally and do not use the API form.
-
-AI may format a selected workflow or surface missing questions. It may not
-choose decision authority, invent participant evidence, or publish without
-human review.
-
-## Completion gate
-
-Do not call a workflow complete because a tool was recommended, installed, or
-deployed. Completion requires:
-
-- the intended people could actually participate;
-- export and handoff were tested with representative data;
-- the public artifact separates sources, synthesis and decision;
-- privacy, accessibility and language were checked;
-- participants can see what happened and how to contest it;
-- the next actor, action and date are named;
-- the tool maintainer can receive adapter/schema/UX feedback without receiving
-  participant content.
+Use this skill to plan, run, connect, interpret, or follow up on a deliberation,
+public consultation, assembly, workshop, or civic listening process.
+
+Act as a **bounded local steward**. Help people participate, understand, remember,
+and follow through. Participants speak for themselves; named decision makers
+retain their actual authority. Preserve disagreement and never manufacture consensus.
+
+用正體中文或使用者選擇的語言協作。先理解本輪目的、受影響者與決策權，
+再挑最少且合用的工具。保留原話、少數聲音與未回答的問題；讓下一輪有起點。
+
+## Start from the current round
+
+Reuse information and authorization already supplied. Ask only for material
+unknowns; do not make the organizer learn product names first. Establish:
+
+- the issue, affected people, real decision authority, and response owner;
+- this round's purpose, expected outcome, and reason it follows an earlier round;
+- online, in-person, or hybrid participation, including missing voices and access needs;
+- permitted data processing, visibility, retention, and correction or withdrawal paths;
+- the stage to start at, time available, and a condition for closing or revisiting the round.
+
+Prepare a concrete plan with people, tools, inputs, outputs, facilitator prompts,
+human review points, responsibilities, and the next-round trigger. The bilingual
+homepage at <https://delib.mashbean.net/> generates a starting prompt from the
+selected workflow; it is a draft brief, not an authorization or participant record.
+
+## Read capabilities before operating
+
+Read only the references needed for the selected work:
+
+- [Live integration index](https://delib.mashbean.net/api/integrations): documented
+  operations, request fields, service boundaries, review requirements, and current audit dates.
+- [Station registry](https://delib.mashbean.net/data/tool-stations.json): native
+  station paths, service origins, and suggested handoffs.
+- [Tool catalog](https://delib.mashbean.net/data/tools.json): original projects and
+  advanced alternatives. Catalog inclusion does not prove an active integration.
+- [Hosting audit](https://delib.mashbean.net/data/hosting.json): source reuse,
+  deployment options, dependencies, and license evidence when those are relevant.
+
+A served registry is documentation, not a live health check. Verify the selected
+operation and its actual result before claiming that a service is available or
+data reached the destination. Do not carry old outage, quota, security, or service
+claims forward without checking. A public repository alone is not a reusable
+license or a tested deployment.
+
+## Prefer the native stations
+
+Start with the in-site station for each purpose; show the original service as an
+advanced alternative when its additional capability is needed. Pocket versions
+are independent implementations and do not promise every upstream feature.
+
+| Purpose / 用途 | Preferred station |
+| --- | --- |
+| Recruit, collect experiences, pre/post surveys / 招募、經驗、前後測 | [Pocket Form](https://delib.mashbean.net/form) |
+| Guided reflection and reasons / 引導思考與理由 | [Pocket Harmonica](https://delib.mashbean.net/harmonica) |
+| Agreement, disagreement, and pass / 同意、不同意、略過 | [Pocket Polis](https://delib.mashbean.net/polis) |
+| Presentation-linked participation / 簡報與現場參與 | [Call-in](https://delib.mashbean.net/call-in) |
+| Topics, claims, and source quotes / 議題、主張、原句 | [Pocket TTTC](https://delib.mashbean.net/tttc) |
+| Accountable responses and follow-up / 回覆與追蹤 | [Pocket Reply](https://delib.mashbean.net/reply) |
+| Pairwise priorities / 兩兩比較優先序 | [Power Ranker](https://delib.mashbean.net/rank) |
+| Values and trade-offs / 價值與取捨 | [Pocket Values](https://delib.mashbean.net/values) |
+| Options under a budget / 預算限制下的方案 | [Pocket Budget](https://delib.mashbean.net/budget) |
+| Claims and shared understanding / 主張與共同理解 | [Pocket Check](https://delib.mashbean.net/checks) |
+| Proposals and revisions / 提案與修正 | [Pocket Proposals](https://delib.mashbean.net/proposals) |
+| Reasons and objections / 理由與異議 | [Pocket Argument](https://delib.mashbean.net/argument) |
+| Policy materials and participation / 政策材料與參與 | [Pocket Maple](https://delib.mashbean.net/maple) |
+
+These paths provide a series entry to existing services; they are not separate
+copies of the participant database. Never create a duplicate activity just to
+move from an original subdomain to its Delib station.
+
+The original Pol.is, HeyForm, Talk to the City, Harmonica, and other catalog
+integrations remain advanced routes. Read their current contracts before use;
+do not infer credentials or activation steps from the native station's name.
+
+## Operate within the organizer's mandate
+
+Before an external write, make the specific title, prompts or data, destination,
+visibility, retention, and expected result reviewable. Existing explicit
+authorization for that concrete action remains valid; do not ask again merely
+because a tool or URL changed. Planning alone does not authorize sending
+invitations, publishing a receipt, or creating a participant activity.
+
+For endpoints requiring `confirmed: true`, set it only for a reviewed action
+within the user's authorization. Read exact request fields from the current
+integration index rather than inventing payloads. An uncertain create response
+must be checked before retrying so the organizer does not get duplicate events.
+
+Keep public participation, result, and private management links distinct.
+Management or moderator links are capabilities: never include them in shared
+briefs, public receipts, source URLs, or participant messages. A returned setup
+link is not evidence that participants received invitations or that a session ran.
+
+Delib's homepage does not collect AI API credentials. The former `/api/agent`
+endpoint is retired and returns HTTP 410. Use this skill in the organizer's own
+agent environment. Individual tools may have their own AI processing, accounts,
+quotas, and data policies; inspect those boundaries rather than promising that
+all operations are local, unlimited, or free. Never request credentials in chat
+or direct people to an obsolete homepage API-key form.
+
+## Choose a path through eight stages
+
+The stages describe positions in an iterative process, not a mandatory conveyor
+belt. The round schema keeps eight phase records for traceability; an unused
+phase can have empty participant/tool/input/output references and explain why
+it was skipped in its guidance. Do not fill it with invented activity.
+
+| Stage | Facilitation and next-step guidance |
+| --- | --- |
+| `frame` 定義 | State what can change, who is affected, and who must answer. Reframe with affected people when the mandate is unclear. |
+| `recruit` 招募 | Identify missing voices and access barriers. Combine online forms with assisted, phone, or in-person participation. |
+| `sortition` 抽樣 | Use a dedicated sampling method only when required. Disclose quotas, replacements, and limits; volunteers are not automatically representative. |
+| `learn` 學習 | Provide sourced, balanced material; invite corrections and questions across perspectives before comparison. |
+| `listen` 聆聽 | Start with lived experience. Explain recording and transcription use, provide equitable speaking opportunities, and preserve original words. |
+| `deliberate` 比較 | Compare proposals and their reasons. Show coverage, dissent, and method limits; rankings and vote totals do not themselves establish consensus. |
+| `respond` 回覆 | Separate tool output, facilitator interpretation, and formal decisions. Assign an owner and date to unanswered items. |
+| `feedback` 下一輪 | Compare outcomes with earlier commitments; retain corrections and choose a justified return point or close the process. |
+
+Return to recruitment for missing voices, learning for disputed facts, listening
+and proposals for abstract options, or response and review for unfulfilled
+commitments. Carry unresolved questions and source references into the next
+round. Keep returning participants, newcomers, and non-completion distinct when
+comparing rounds. A browser identifier does not establish a unique person.
+
+Online and in-person work share an issue and round history. Record actual mode
+changes and reviewed notes; do not treat a room as one participant or presume
+that recording consent permits publishing a transcript.
+
+## Preserve data meaning across tools
+
+Use the [browser data workbench](https://delib.mashbean.net/handoff) for its
+supported CSV checks and conversions. Files are processed in browser memory on
+that page; this does not mean downstream tools also process locally. Check the
+workbench's supported inputs and its declared conversion losses before use.
+
+Keep the original export and a separate normalized layer. Preserve stable source
+IDs, source tool and export context, language, review status, consent, visibility,
+retention, and a transformation log. For each handoff, show what survives, what
+is omitted, and which editorial changes need review. A text CSV cannot preserve
+a complete voting matrix, nor can a topic summary be treated as original evidence.
+
+- [delib-data/v1](https://delib.mashbean.net/schemas/delib-data/v1.json) is the
+  common source and privacy envelope; it is a Delib contract, not a universal standard.
+- [delib-rounds/v1](https://delib.mashbean.net/schemas/delib-rounds/v1.json) is its
+  round-history companion. Read the schema for exact fields: `previousRoundId`,
+  phase inputs/outputs, attendance modes, source references, `derivedFrom`, and
+  `next` with stage, reason, owner, review date, and carried-forward references.
+- `delib-bundle/v1` is a participant-free planning bundle. Do not place real
+  contributions or participant records in it.
+- Ranking and Pocket Polis exports can contain participant data even without
+  names. Their public receipt schemas accept only their defined minimized
+  aggregates and human interpretation; a raw export is not a public receipt.
+- `delib-handoff/v1` is a minimized, one-use same-tab draft from a receipt. It
+  does not move source datasets or authorize activation of the next tool.
+
+Validate against the exact published schema and check reference integrity and
+counts as well as shape. Keep withdrawn or rejected status for provenance and
+exclude it from public output under an explicit rule. Preserve consent and
+visibility during conversion; where they cannot travel, document the loss and
+apply the more restrictive boundary. If processing permission is unknown, keep
+the draft local while resolving that specific question.
+
+Round-history bundles with real participant linkage are private under
+`delib-rounds/v1`; create a separate reviewed public receipt. Never change
+`simulated` to true to make real data pass a public-sharing check.
+
+## Demonstrate honestly
+
+The [flow demo](https://delib.mashbean.net/data/flow-demo.json) contains a
+synthetic school-street scenario. Its participants, voices, votes, observations,
+and decisions are authored examples. Use it to explain how tools and rounds fit
+together; derive counts from the fixture. Animation, downloaded files, and
+simulated outcomes do not prove that services were called or a community agreed.
+
+Keep synthetic and real data separate throughout transformations. Any demo
+sent to a real service must remain labeled synthetic and be within the
+organizer's authorization. Never let simulated people vote in a real process.
+
+## Close the response loop
+
+Prepare an inspectable receipt linking inputs to interpretation, response,
+adoption or non-adoption reasons, responsible people, dates, and open questions.
+Compute coverage from the actual input pool. Preserve singletons and objections;
+state honestly when a question has no answer. Human review must check privacy,
+source fidelity, language, and decision authority before publication.
+
+After an authorized publication, verify the actual page and report what was
+published. Do not equate a prepared link, deployment, or file export with delivery
+to participants. A round is complete when the intended participation and
+handoff are evidenced, responses can be inspected and contested, and the next
+action or closure is explicit.
+
+## Method sources
+
+Use these as method references, not as endorsements of Delib or permission to
+adopt an external service:
+
+- [MIT CCC](https://www.ccc.mit.edu/about/): small groups, trust, lived experience.
+- [Cortico facilitation guides](https://help.cortico.ai/hc/en-us/articles/19581097938071-Conversation-Guide-Library): prompts and facilitator preparation.
+- [CIP Community Models](https://blog.cip.org/p/community-models): support across groups and human interpretation.
+- [New_ Public Civic Signals](https://newpublic.org/uploads/2020/10/S12-Promote-thoughtful-conversation.pdf): welcome, connection, understanding, and collective action.
+- [Metagov](https://metagov.org/delib-tools): composable functions and repeated governance cycles.
+- [Stanford DDL](https://deliberation.stanford.edu/what-deliberative-pollingr): balanced information, facilitated questions, and pre/post comparison.
+- [Civic Talk](https://civic.vtaiwan.tw/about): inform, reflect using one's own AI, return contributions, and synthesize again.
+- [Civic AI bootstrap](https://civic.ai/openclaw/): bounded authority, accountability, correction, and stopping conditions.
+- [Uncommon Ground](https://github.com/audreyt/uncommon-ground): traceable responses and a complete, inspectable receipt. Its reception simulations are rehearsal, not public input.
+
+Civic AI commitments are adapted from its CC0 material. Strengthen local
+judgment, cooperation, and the ability to correct or stop the system; do not
+expand its mandate or audience silently.

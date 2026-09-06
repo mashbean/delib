@@ -1,6 +1,25 @@
 # Roadmap and completion boundary
 
-Updated: 2026-09-05
+Updated: 2026-09-06
+
+## Current release: 0.4.0
+
+The bilingual homepage now presents eight repeatable stages in a two-plane 3D
+map, native-first workspaces, a gap-based planner, and a three-round synthetic
+school-street case. `/form`, `/polis`, `/harmonica`, `/call-in`, `/reply`, `/tttc`
+and the seven other native tools have same-site station routes. Upstream origins
+and storage stay separate; this is not a reverse proxy or automatic synchronization.
+
+The API-key UI has been replaced by a contextual skill prompt. POST `/api/agent`
+is retired. `delib-rounds/v1` retains cross-round provenance and explicit next-stage
+recommendations; `/handoff` checks source CSVs locally before export. Actual parser
+compatibility and remaining limits are recorded in `data-flow-audit-2026-09-06.md`.
+
+English covers hub navigation, stage guidance, simulation and handoff workspace;
+individual upstream apps retain their own language support. The synthetic fixture
+does not establish a real participant pilot or live cross-service import success.
+
+The dated entries below preserve earlier implementation and validation history.
 
 ## Completed in the current release
 
@@ -124,7 +143,7 @@ button, Delib activation endpoint) so each item above is roughly a day.
 
 ## Still intentionally incomplete
 
-- `delib-data/v1` has two adapters, not coverage for all 28 catalog tools.
+- `delib-data/v1` has two live-data adapters plus the new round simulation adapter, not coverage for all catalog tools.
 - TTTC and Agora outputs are format-tested but have not been declared imported
   until a real upstream login, upload, preview and export succeeds.
 - Full official Pol.is, Agora, HeyForm, Decidim and Parti DemosX remain shared

@@ -41,9 +41,17 @@
   "assets": {
     "directory": "./public",
     "binding": "ASSETS",
-    // Only API routes and public receipt slugs go through the Worker. Static
-    // pages are served directly (no Worker invocation) with public/_headers.
-    "run_worker_first": ["/api/*", "/r/*"]
+    // Station routes render an origin-isolated tool workspace in the Worker.
+    // Other static pages retain direct asset delivery with public/_headers.
+    "run_worker_first": [
+      "/api/*", "/r/*",
+      "/form", "/form/*", "/harmonica", "/harmonica/*", "/polis", "/polis/*",
+      "/call-in", "/call-in/*", "/reply", "/reply/*", "/tttc", "/tttc/*", "/ttt-city", "/ttt-city/*",
+      "/values", "/values/*", "/budget", "/budget/*", "/checks", "/checks/*", "/check", "/check/*",
+      "/proposals", "/proposals/*", "/argument", "/argument/*", "/maple", "/maple/*", "/maple-tw", "/maple-tw/*",
+      "/rank", "/rank/*", "/power-ranker", "/power-ranker/*",
+      "/integrations/power-ranker", "/integrations/power-ranker.html"
+    ]
   },
   "observability": {
     "enabled": true,

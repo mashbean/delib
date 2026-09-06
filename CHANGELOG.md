@@ -2,6 +2,22 @@
 
 日期以正式站部署為準。每一版列出「使用者看得到的改變」與「營運者需要知道的改變」，資料邊界的變動另外標明。
 
+## 0.4.0 — 2026-09-06
+
+- Rebuild the homepage in Traditional Chinese and English around iterative
+  deliberation: a perspective 3D process map, people/data movement, eight
+  accessible stage controls, gap-based starting points and native-first tools.
+- Add 13 same-site tool stations, aliases and an activity-link converter;
+  retain upstream storage and separate private capability links.
+- Replace the API-key interface with contextual Agent skill prompts;
+  retire POST `/api/agent` with HTTP 410 and publish an OpenClaw skill alias.
+- Add a fully synthetic, source-linked three-round school-street simulation,
+  participant/mode counts, counts derived from synthetic vote rows and portable exports.
+- Publish `delib-rounds/v1`, a bilingual workflow guide and a local CSV handoff
+  workbench; prevent merge ID collisions and cross-source identity merging.
+- Apply source-linked facilitation guidance from MIT CCC, Cortico, CIP,
+  New_ Public, Metagov, Stanford DDL, vTaiwan and civic.ai.
+
 ## 0.3.0 — 2026-09-03
 
 接手後第二輪：把 Pocket Polis 的 AI 綜整接成收據的「工具整理」層，並完成

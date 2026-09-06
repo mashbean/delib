@@ -67,6 +67,13 @@ projects, but does not imply endorsement by their maintainers.
   [DemosX](https://github.com/parti-coop/demosx) source as a self-host candidate.
   Delib does not bundle or run its Java, Tomcat, MySQL or Nginx services.
 
+- The interactive homepage distributes GSAP and ScrollTrigger 3.14.2 from the
+  official `gsap` npm package, with original copyright headers intact. These
+  assets are governed by the [GSAP Standard License](https://gsap.com/standard-license),
+  not Delib's MIT license. See `public/vendor/GSAP-NOTICE.txt`.
+- Delib's methodology guidance is an independent synthesis of cited public
+  sources. It does not imply a partnership or endorsement by those organizations.
+
 Tool names and trademarks belong to their respective owners. The tool registry
 stores links and factual interoperability metadata; no third-party source code
 is bundled unless explicitly noted above.

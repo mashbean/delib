@@ -46,34 +46,49 @@ export function parseTttcCsv({ text, label }) {
  * 合併多份已解析的 tttc.csv。同一份檔案內 id 重複視為錯誤；跨檔案重複則加上檔案序號前綴，
  * 讓 TTTC 仍能把每一列當成獨立發言。完全相同的 comment 會提醒但保留。
  */
-export function mergeTttcFiles(files) {
+export function mergeTttcFiles(files, { scopeInterviews = false, namespaceIds = false } = {}) {
   if (!Array.isArray(files) || files.length === 0) throw new Error("請至少放入一份 TTTC CSV");
   if (files.length > MAX_FILES) throw new Error(`一次最多合併 ${MAX_FILES} 份`);
   const warnings = [];
   const merged = [];
   const seenIds = new Map();
+  // Reserve later original IDs too: generating f2-x must not collide with an original f2-x.
+  const originalIds = new Set(files.flatMap((file) => file.rows.map((row) => row.id)));
   let renamed = 0;
   files.forEach((file, fileIndex) => {
     const local = new Set();
+    const interviewGroups = new Map();
     for (const row of file.rows) {
       if (local.has(row.id)) throw new Error(`${file.file}有重複的 id：${row.id}`);
       local.add(row.id);
       let id = row.id;
-      if (seenIds.has(id)) {
-        id = `f${fileIndex + 1}-${row.id}`;
+      if (namespaceIds || seenIds.has(id)) {
+        const base = `f${fileIndex + 1}-${row.id}`;
+        id = base.slice(0, MAX_ID_CHARS);
+        let suffix = 1;
+        while (seenIds.has(id) || originalIds.has(id)) {
+          const tail = `-${++suffix}`;
+          id = `${base.slice(0, MAX_ID_CHARS - tail.length)}${tail}`;
+        }
         renamed += 1;
       }
       seenIds.set(id, true);
-      merged.push({ ...row, id });
+      let interview = row.interview;
+      if (scopeInterviews && interview) {
+        if (!interviewGroups.has(interview)) interviewGroups.set(interview, `source-${fileIndex + 1}:group-${interviewGroups.size + 1}`);
+        interview = interviewGroups.get(interview);
+      }
+      merged.push({ ...row, id, interview, originalId: row.id, originalInterview: row.interview, sourceFileIndex: fileIndex });
     }
     warnings.push(...file.warnings);
   });
   if (merged.length > MAX_ROWS_TOTAL) throw new Error(`合併後超過 ${MAX_ROWS_TOTAL} 列安全上限`);
-  if (renamed > 0) warnings.unshift(`${renamed} 列的 id 與其他檔案重複，已加上檔案序號前綴。`);
+  if (renamed > 0) warnings.unshift(namespaceIds ? `${renamed} 列已加上來源檔案前綴；來源對照表保留原始 id。` : `${renamed} 列的 id 與其他檔案重複，已加上檔案序號前綴。`);
   const commentCounts = new Map();
   for (const row of merged) commentCounts.set(row.comment, (commentCounts.get(row.comment) ?? 0) + 1);
   const duplicateComments = [...commentCounts.values()].filter((count) => count > 1).length;
-  if (duplicateComments > 0) warnings.push(`${duplicateComments} 句 comment 在合併後完全相同，TTTC 會把它們當成不同人的發言。`);
+  if (duplicateComments > 0) warnings.push(`${duplicateComments} 句 comment 在合併後完全相同，已保留為不同資料列；不代表不同人。`);
+  if (scopeInterviews) warnings.push("interview 已改為各來源內的代碼，不依暱稱推定跨工具同一人。代碼群組數不等於不重複參與人數。");
   const interviews = new Set(merged.map((row) => row.interview).filter(Boolean));
   return {
     rows: merged,
@@ -83,6 +98,9 @@ export function mergeTttcFiles(files) {
       rows: merged.length,
       interviews: interviews.size,
       blankInterviews: merged.filter((row) => !row.interview).length,
+      renamedIds: renamed,
+      duplicateComments,
+      scopedInterviews: scopeInterviews,
       perFile: files.map((file) => ({ file: file.file, rows: file.rows.length })),
     },
   };
@@ -93,7 +111,7 @@ export function tttcRowsToCsv(rows) {
   if (!Array.isArray(rows) || rows.length === 0) throw new Error("沒有可輸出的列");
   return csvTable(
     [...TTTC_HEADERS],
-    rows.map((row) => [row.id, formulaSafeCell(row.interview), formulaSafeCell(row.comment)]),
+    rows.map((row) => [formulaSafeCell(row.id), formulaSafeCell(row.interview), formulaSafeCell(row.comment)]),
   );
 }
 

@@ -1,0 +1,283 @@
+[
+  {
+    "slug": "form",
+    "aliases": [],
+    "name": "Pocket Form",
+    "origin": "https://form.mashbean.net",
+    "binding": "POCKET_FORM_ORIGIN",
+    "stage": 2,
+    "title": {
+      "zh": "收集經驗與招募",
+      "en": "Collect experiences and recruit"
+    },
+    "summary": {
+      "zh": "開放題、報名、前後測；先決定要收什麼與保留多久。",
+      "en": "Open questions, registration and surveys. Decide what to collect and how long to keep it."
+    },
+    "handoff": {
+      "zh": "匯出 responses.csv 或 tttc.csv，帶到 TTTC；審閱 seeds.json 後帶到 Polis。",
+      "en": "Export responses.csv or tttc.csv to TTTC. Review seeds.json before starting Polis."
+    },
+    "next": "tttc"
+  },
+  {
+    "slug": "harmonica",
+    "aliases": [],
+    "name": "Pocket Harmonica",
+    "origin": "https://harmonica.mashbean.net",
+    "binding": "POCKET_HARMONICA_ORIGIN",
+    "stage": 5,
+    "title": {
+      "zh": "引導個別訪談",
+      "en": "Guide individual interviews"
+    },
+    "summary": {
+      "zh": "以一組問題逐一引導參與者說明經驗與理由，整理個別訪談後再比較觀點。",
+      "en": "Guide each participant through questions about experiences and reasons, then compare perspectives across individual interviews."
+    },
+    "handoff": {
+      "zh": "審閱逐字內容與摘要，匯出 tttc.csv 整理議題，再挑選可討論的陳述。",
+      "en": "Review transcripts and summaries. Export tttc.csv for synthesis, then select statements for deliberation."
+    },
+    "next": "tttc"
+  },
+  {
+    "slug": "polis",
+    "aliases": [],
+    "name": "Pocket Polis",
+    "origin": "https://polis.mashbean.net",
+    "binding": "POCKET_POLIS_ORIGIN",
+    "stage": 6,
+    "title": {
+      "zh": "看見意見分布",
+      "en": "Map agreement and disagreement"
+    },
+    "summary": {
+      "zh": "投下同意、不同意或略過；觀察群體之間可以一起前進的陳述。",
+      "en": "Agree, disagree or pass. Explore statements that can connect different opinion groups."
+    },
+    "handoff": {
+      "zh": "下載原始 CSV 後在資料工作台驗證、轉檔；保留歧見，再把方案送去排序。",
+      "en": "Validate and convert exported CSV in the data workbench. Preserve disagreement before ranking proposals."
+    },
+    "next": "rank"
+  },
+  {
+    "slug": "call-in",
+    "aliases": [],
+    "name": "Call-in",
+    "origin": "https://call-in.mashbean.net",
+    "binding": "CALL_IN_ORIGIN",
+    "stage": 4,
+    "title": {
+      "zh": "讓現場與線上一起發言",
+      "en": "Connect in-person and online voices"
+    },
+    "summary": {
+      "zh": "以簡報同步收件、主持問答與現場討論。",
+      "en": "Collect contributions alongside a presentation and facilitate questions and discussion."
+    },
+    "handoff": {
+      "zh": "匯出文字與逐字稿後審閱，整理成 tttc.csv，讓現場意見進入下一輪。",
+      "en": "Review exported text and transcripts, then prepare tttc.csv so in-person contributions enter the next round."
+    },
+    "next": "tttc"
+  },
+  {
+    "slug": "reply",
+    "aliases": [],
+    "name": "Pocket Reply",
+    "origin": "https://reply.mashbean.net",
+    "binding": "POCKET_REPLY_ORIGIN",
+    "stage": 8,
+    "title": {
+      "zh": "回覆與開啟下一輪",
+      "en": "Respond and start the next round"
+    },
+    "summary": {
+      "zh": "留下主辦者回應、責任人、時間與可追蹤的下一步。",
+      "en": "Record the organizer response, responsible person, deadline and next action."
+    },
+    "handoff": {
+      "zh": "把回覆與未解問題納入下一輪前測；再邀請原參與者與缺席的聲音。",
+      "en": "Carry responses and unresolved questions into the next survey. Invite returning participants and missing voices."
+    },
+    "next": "form"
+  },
+  {
+    "slug": "tttc",
+    "aliases": [
+      "ttt-city"
+    ],
+    "name": "Pocket TTTC",
+    "origin": "https://ttt-city.mashbean.net",
+    "binding": "POCKET_TTTC_ORIGIN",
+    "stage": 7,
+    "title": {
+      "zh": "把聲音整理成議題",
+      "en": "Turn contributions into a topic map"
+    },
+    "summary": {
+      "zh": "將文字整理成主題、主張與可回查的引述；由人確認解讀。",
+      "en": "Organize text into topics, claims and traceable quotes. People review the interpretation."
+    },
+    "handoff": {
+      "zh": "讀回原始引述，保留不同觀點；審閱後把短陳述帶到 Polis。",
+      "en": "Check source quotes and preserve contrasting views. Take reviewed short statements into Polis."
+    },
+    "next": "polis"
+  },
+  {
+    "slug": "values",
+    "aliases": [],
+    "name": "Pocket Values",
+    "origin": "https://values.mashbean.net",
+    "binding": "POCKET_VALUES_ORIGIN",
+    "stage": 1,
+    "title": {
+      "zh": "釐清價值與取捨",
+      "en": "Clarify values and trade-offs"
+    },
+    "summary": {
+      "zh": "以引導對話整理本人確認的價值卡，再成對比較哪些價值值得注意；保留個人故事的脈絡。",
+      "en": "Turn guided conversations into participant-reviewed value cards, then compare what deserves attention while preserving the context of each story."
+    },
+    "handoff": {
+      "zh": "把價值與尚未解決的張力寫回議題說明，帶入小組對話。",
+      "en": "Carry values and unresolved tensions into the issue brief and small-group dialogue."
+    },
+    "next": "harmonica"
+  },
+  {
+    "slug": "budget",
+    "aliases": [],
+    "name": "Pocket Budget",
+    "origin": "https://budget.mashbean.net",
+    "binding": "POCKET_BUDGET_ORIGIN",
+    "stage": 6,
+    "title": {
+      "zh": "比較有限資源的配置",
+      "en": "Compare resource allocations"
+    },
+    "summary": {
+      "zh": "在有限預算下比較方案，公開限制、成本與選擇理由。",
+      "en": "Compare proposals under a budget, showing constraints, costs and reasons."
+    },
+    "handoff": {
+      "zh": "把配置结果、限制與歧見交給主辦者回應；不直接當成正式預算承諾。",
+      "en": "Send allocations, constraints and disagreement for an organizer response; they are not a formal budget commitment."
+    },
+    "next": "reply"
+  },
+  {
+    "slug": "checks",
+    "aliases": [
+      "check"
+    ],
+    "name": "Pocket Check",
+    "origin": "https://checks.mashbean.net",
+    "binding": "POCKET_CHECK_ORIGIN",
+    "stage": 4,
+    "title": {
+      "zh": "確認共同理解",
+      "en": "Check shared understanding"
+    },
+    "summary": {
+      "zh": "用附出處的單選題檢查理解，指出需補充說明的地方。",
+      "en": "Use sourced multiple-choice questions to check understanding and identify material that needs clarification."
+    },
+    "handoff": {
+      "zh": "依答對率與常見錯誤補充材料，再開啟討論；協助需要更多說明的參與者。",
+      "en": "Use answer patterns to improve learning materials, then begin discussion with support for people who need clarification."
+    },
+    "next": "harmonica"
+  },
+  {
+    "slug": "proposals",
+    "aliases": [],
+    "name": "Pocket Proposals",
+    "origin": "https://proposals.mashbean.net",
+    "binding": "POCKET_PROPOSALS_ORIGIN",
+    "stage": 6,
+    "title": {
+      "zh": "把觀點寫成可行方案",
+      "en": "Develop actionable proposals"
+    },
+    "summary": {
+      "zh": "一起補足方案的目的、做法、資源需求與評估方式。",
+      "en": "Develop a proposal’s purpose, actions, resource needs and evaluation."
+    },
+    "handoff": {
+      "zh": "將候選方案與評估標準帶入排序或預算配置；保留修訂脈絡。",
+      "en": "Take proposals and criteria into ranking or budgeting and retain revision history."
+    },
+    "next": "rank"
+  },
+  {
+    "slug": "argument",
+    "aliases": [],
+    "name": "Pocket Argument",
+    "origin": "https://argument.mashbean.net",
+    "binding": "POCKET_ARGUMENT_ORIGIN",
+    "stage": 6,
+    "title": {
+      "zh": "梳理理由與反對理由",
+      "en": "Map reasons and objections"
+    },
+    "summary": {
+      "zh": "看清主張、支持理由、質疑與證據之間的關係。",
+      "en": "Explore how claims, supporting reasons, objections and evidence relate."
+    },
+    "handoff": {
+      "zh": "把仍缺證據的問題帶回共同學習，把可調整的設計帶往方案討論。",
+      "en": "Return gaps in evidence to shared learning and possible design changes to proposal development."
+    },
+    "next": "proposals"
+  },
+  {
+    "slug": "maple",
+    "aliases": [
+      "maple-tw"
+    ],
+    "name": "Pocket Maple",
+    "origin": "https://maple-tw.mashbean.net",
+    "binding": "POCKET_MAPLE_ORIGIN",
+    "stage": 7,
+    "title": {
+      "zh": "收集公開書面意見",
+      "en": "Collect public written testimony"
+    },
+    "summary": {
+      "zh": "圍繞法案或議程收集支持、反對、修正理由與書面意見；送出前確認公開範圍。",
+      "en": "Collect positions, reasons for amendments and written testimony about a bill or agenda item. Review what will be public before submitting."
+    },
+    "handoff": {
+      "zh": "匯出 tttc.csv，整理書面意見與原文引述，再請有權回應者逐項說明。",
+      "en": "Export tttc.csv, synthesize testimony with source quotations, then request a response from the responsible authority."
+    },
+    "next": "tttc"
+  },
+  {
+    "slug": "rank",
+    "aliases": [
+      "power-ranker"
+    ],
+    "name": "Power Ranker",
+    "origin": null,
+    "binding": null,
+    "stage": 6,
+    "title": {
+      "zh": "比較方案的優先序",
+      "en": "Compare proposal priorities"
+    },
+    "summary": {
+      "zh": "每次比較兩個方案，累積相對優先序；可本機操作或建立短期多人收件室。",
+      "en": "Compare two proposals at a time to build relative priorities, locally or in a temporary shared room."
+    },
+    "handoff": {
+      "zh": "匯出通用 JSON 或群體成果，附上涵蓋率、歧見與解讀，再交付回應。",
+      "en": "Export portable JSON or aggregate results with coverage, disagreement and interpretation, then request a response."
+    },
+    "next": "reply"
+  }
+]

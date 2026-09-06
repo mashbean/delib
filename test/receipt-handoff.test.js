@@ -2,9 +2,12 @@ import { describe, expect, it } from "vitest";
 import {
   RECEIPT_HANDOFF_SCHEMA,
   RECEIPT_HANDOFF_TARGETS,
+  RECEIPT_HANDOFF_STORAGE_KEY,
+  clearReceiptHandoff,
   createReceiptHandoff,
   normalizeReceiptHandoff,
   receiptHandoffTargetUrl,
+  readReceiptHandoff,
 } from "../public/receipt-handoff-core.js";
 import { createRankingReceipt } from "../public/ranking-receipt-core.js";
 import { buildAggregateRankingBundleFromPairs, normalizeRankingConfig } from "../public/power-ranker-core.js";
@@ -71,7 +74,7 @@ describe("result receipt handoff", () => {
         receiptHandoffTargetUrl(handoff, "https://delib.mashbean.net/", {
           now: Date.parse(handoff.createdAt),
         }),
-      ).toContain(`#${RECEIPT_HANDOFF_TARGETS[target].hash}`);
+      ).toBe(`https://delib.mashbean.net/receipt-draft.html?target=${target}`);
     },
   );
 
@@ -114,5 +117,29 @@ describe("result receipt handoff", () => {
         { now: Date.parse(handoff.createdAt) },
       ),
     ).toBeNull();
+  });
+
+  it("reads only the dedicated key and rejects a different target without consuming it", () => {
+    const handoff = createReceiptHandoff({ receipt, target: "harmonica" });
+    const reads = [];
+    const removed = [];
+    const storage = { getItem(key) { reads.push(key); return JSON.stringify(handoff); }, removeItem(key) { removed.push(key); } };
+    expect(readReceiptHandoff(storage, { target: "harmonica" })).toMatchObject({ status: "ready", handoff: { target: "harmonica" } });
+    expect(readReceiptHandoff(storage, { target: "polis" })).toEqual({ status: "target-mismatch", handoff: null });
+    expect(reads).toEqual([RECEIPT_HANDOFF_STORAGE_KEY, RECEIPT_HANDOFF_STORAGE_KEY]);
+    expect(removed).toEqual([]);
+    expect(clearReceiptHandoff(storage)).toBe(true);
+    expect(removed).toEqual([RECEIPT_HANDOFF_STORAGE_KEY]);
+  });
+
+  it("clears expired or invalid data and handles blocked storage", () => {
+    const handoff = createReceiptHandoff({ receipt, target: "polis", createdAt: "2026-09-01T05:00:00.000Z" });
+    let removed = "";
+    const storage = { getItem() { return JSON.stringify(handoff); }, removeItem(key) { removed = key; } };
+    expect(readReceiptHandoff(storage, { target: "polis", now: Date.parse(handoff.expiresAt) }).status).toBe("expired-or-invalid");
+    expect(removed).toBe(RECEIPT_HANDOFF_STORAGE_KEY);
+    const blocked = { getItem() { throw new Error("blocked"); }, removeItem() { throw new Error("blocked"); } };
+    expect(readReceiptHandoff(blocked, { target: "polis" })).toEqual({ status: "unavailable", handoff: null });
+    expect(clearReceiptHandoff(blocked)).toBe(false);
   });
 });

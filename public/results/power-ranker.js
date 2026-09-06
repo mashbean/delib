@@ -1,10 +1,9 @@
+import { tr, rt, rankingLanguage, rankingLanguageUrl, initializeRankingLanguage, rankReceiptSummary, rankReceiptMarkdown } from "/ranking-i18n.js";
 import {
   decisionStatusLabel,
   nextRoundRankingUrl,
   normalizeRankingReceipt,
   rankingReceiptFromHash,
-  rankingReceiptSummary,
-  rankingReceiptToMarkdown,
 } from "/ranking-receipt-core.js";
 import {
   bindPublicationControls,
@@ -17,6 +16,8 @@ import {
   receiptHandoffTargetUrl,
 } from "/receipt-handoff-core.js";
 
+initializeRankingLanguage();
+
 let receipt = rankingReceiptFromHash(location.hash);
 const error = document.querySelector("#receipt-page-error");
 const content = document.querySelector("#receipt-page-content");
@@ -27,7 +28,7 @@ if (!receipt) {
   const loading = document.createElement("p");
   loading.className = "loading-note";
   loading.setAttribute("role", "status");
-  loading.textContent = "正在讀取公開成果…";
+  loading.textContent = tr("正在讀取公開成果…");
   document.querySelector("#receipt-main")?.prepend(loading);
   try {
     storedReceipt = await loadStoredReceipt(normalizeRankingReceipt, "ranking-receipt");
@@ -41,8 +42,8 @@ if (!receipt) {
 if (!receipt) {
   if (loadFailure) {
     const detail = document.createElement("p");
-    detail.textContent = loadFailure instanceof Error ? loadFailure.message : "公開成果暫時無法讀取。";
-    error.querySelector("h1").textContent = "這份公開成果現在看不到";
+    detail.textContent = loadFailure instanceof Error ? tr(loadFailure.message) : tr("公開成果暫時無法讀取。");
+    error.querySelector("h1").textContent = tr("這份公開成果現在看不到");
     error.querySelector("h1").after(detail);
   }
   error.hidden = false;
@@ -54,23 +55,27 @@ if (!receipt) {
     stored: storedReceipt,
     prefix: "receipt",
     status: actionStatus,
+    translate: tr,
+    translateTemplate: rt,
+    localizeUrl: rankingLanguageUrl,
+    locale: rankingLanguage() === "en" ? "en" : "zh-Hant-TW",
   });
   content.hidden = false;
 }
 
 function renderReceipt(value) {
-  const status = decisionStatusLabel(value.organizer.decisionStatus);
-  document.title = `${value.question.title} · 成果收據 · Delib`;
+  const status = tr(decisionStatusLabel(value.organizer.decisionStatus));
+  document.title = rt`${value.question.title} · 成果收據 · Delib`;
   document.querySelector("#receipt-page-title").textContent = value.question.title;
   document.querySelector("#receipt-decision-chip").textContent = status;
-  document.querySelector("#receipt-prepared-at").textContent = `準備於 ${formatDateTime(value.preparedAt)}`;
+  document.querySelector("#receipt-prepared-at").textContent = rt`準備於 ${formatDateTime(value.preparedAt)}`;
   document.querySelector("#receipt-session-count").textContent = String(value.aggregate.sessions);
   document.querySelector("#receipt-judgment-count").textContent = String(value.aggregate.judgments);
   document.querySelector("#receipt-coverage-count").textContent =
     `${value.coverage.comparedPairs}/${value.coverage.totalPairs}`;
   document.querySelector("#receipt-coverage-label").textContent =
-    `比較涵蓋 · ${Math.round(value.coverage.ratio * 100)}%`;
-  document.querySelector("#receipt-aggregate-source").href = value.source.aggregateUrl;
+    rt`比較涵蓋 · ${Math.round(value.coverage.ratio * 100)}%`;
+  document.querySelector("#receipt-aggregate-source").href = rankingLanguageUrl(value.source.aggregateUrl, { station: true });
   renderRankingList(document.querySelector("#receipt-ranking-list"), value.result);
 
   document.querySelector("#receipt-interpretation").textContent = value.organizer.interpretation;
@@ -80,7 +85,7 @@ function renderReceipt(value) {
   document.querySelector("#receipt-responsible-actor").textContent = value.organizer.responsibleActor;
   document.querySelector("#receipt-response-by").textContent = value.organizer.responseBy
     ? formatDate(value.organizer.responseBy)
-    : "尚未設定日期";
+    : tr("尚未設定日期");
   document.querySelector("#receipt-next-action-copy").textContent = value.organizer.nextAction;
 
   const evidence = document.querySelector("#receipt-evidence-link");
@@ -92,11 +97,17 @@ function renderReceipt(value) {
   const expiry = document.querySelector("#receipt-source-expiry");
   expiry.textContent = value.source.aggregateStorage === "ephemeral-room"
     ? value.source.aggregateExpiresAt
-      ? `原始短期收件室預計於 ${formatDateTime(value.source.aggregateExpiresAt)} 清除；這張收據是另行分享的自足副本。`
-      : "原始彙整來自短期收件室；這張收據是另行分享的自足副本。"
-    : "原始彙整在主辦者瀏覽器中完成；Delib 沒有收到個人結果檔或保存這張收據。";
+      ? rt`原始短期收件室預計於 ${formatDateTime(value.source.aggregateExpiresAt)} 清除；這張收據是另行分享的自足副本。`
+      : tr("原始彙整來自短期收件室；這張收據是另行分享的自足副本。")
+    : tr("原始彙整在主辦者瀏覽器中完成；Delib 沒有收到個人結果檔或保存這張收據。");
 
-  document.querySelector("#receipt-next-round").href = nextRoundRankingUrl(value, location.origin);
+  const nextRoundUrl = new URL(nextRoundRankingUrl(value, location.origin));
+  if (rankingLanguage() === "en") {
+    const question = new URLSearchParams(nextRoundUrl.hash.slice(1));
+    question.set("title", `${value.question.title} (next round)`.slice(0, 120));
+    nextRoundUrl.hash = question.toString();
+  }
+  document.querySelector("#receipt-next-round").href = rankingLanguageUrl(nextRoundUrl, { station: true });
 }
 
 function bindReceiptActions(value) {
@@ -116,24 +127,24 @@ function bindReceiptActions(value) {
     if (!selectedHandoff) return;
     try {
       sessionStorage.setItem(RECEIPT_HANDOFF_STORAGE_KEY, JSON.stringify(selectedHandoff));
-      location.assign(receiptHandoffTargetUrl(selectedHandoff, location.origin));
+      location.assign(rankingLanguageUrl(receiptHandoffTargetUrl(selectedHandoff, location.origin)));
     } catch {
-      actionStatus.textContent = "瀏覽器無法暫存這份草稿；請改用複製成果摘要。";
+      actionStatus.textContent = tr("瀏覽器無法暫存這份草稿；請改用複製成果摘要。");
     }
   });
   document.querySelector("#receipt-copy-summary").addEventListener("click", async () => {
     try {
-      await navigator.clipboard.writeText(`${rankingReceiptSummary(value)}\n${publicPageUrl()}`);
-      actionStatus.textContent = "成果摘要與公開連結已複製。";
+      await navigator.clipboard.writeText(`${rankReceiptSummary(value)}\n${publicPageUrl()}`);
+      actionStatus.textContent = tr("成果摘要與公開連結已複製。");
     } catch {
-      actionStatus.textContent = "瀏覽器沒有允許複製；請改下載 Markdown。";
+      actionStatus.textContent = tr("瀏覽器沒有允許複製；請改下載 Markdown。");
     }
   });
   document.querySelector("#receipt-download-json").addEventListener("click", () =>
     downloadFile(value, "delib-power-ranker-receipt.json", "application/json"),
   );
   document.querySelector("#receipt-download-md").addEventListener("click", () =>
-    downloadFile(rankingReceiptToMarkdown(value), "delib-power-ranker-receipt.md", "text/markdown"),
+    downloadFile(rankReceiptMarkdown(value), "delib-power-ranker-receipt.md", "text/markdown"),
   );
 }
 
@@ -145,15 +156,15 @@ function publicPageUrl() {
 
 function renderHandoffPreview(handoff) {
   const target = RECEIPT_HANDOFF_TARGETS[handoff.target];
-  document.querySelector("#receipt-handoff-target-label").textContent = target.label;
+  document.querySelector("#receipt-handoff-target-label").textContent = tr(target.label);
   document.querySelector("#receipt-handoff-fields").replaceChildren(
     ...target.carried.map((field) => {
       const item = document.createElement("li");
-      item.textContent = field;
+      item.textContent = tr(field);
       return item;
     }),
   );
-  document.querySelector("#receipt-handoff-boundary").textContent = target.omitted;
+  document.querySelector("#receipt-handoff-boundary").textContent = tr(target.omitted);
   document.querySelector("#receipt-handoff-data").hidden = handoff.target !== "talk-to-the-city";
   const preview = document.querySelector("#receipt-handoff-preview");
   preview.hidden = false;
@@ -171,7 +182,7 @@ function renderRankingList(root, ranking) {
       const bar = document.createElement("span");
       rank.textContent = String(item.rank).padStart(2, "0");
       label.textContent = item.label;
-      score.textContent = `權重 ${item.score.toFixed(3)} · ${item.observations} 次比較`;
+      score.textContent = rt`權重 ${item.score.toFixed(3)} · ${item.observations} 次比較`;
       bar.className = "ranking-bar";
       bar.style.width = `${Math.max(2, item.score * 100)}%`;
       heading.append(rank, label, score);
@@ -190,17 +201,17 @@ function downloadFile(value, filename, type) {
   anchor.download = filename;
   anchor.click();
   URL.revokeObjectURL(url);
-  actionStatus.textContent = `已下載 ${filename}。`;
+  actionStatus.textContent = rt`已下載 ${filename}。`;
 }
 
 function formatDateTime(value) {
-  return new Intl.DateTimeFormat("zh-Hant-TW", { dateStyle: "long", timeStyle: "short" }).format(
+  return new Intl.DateTimeFormat(rankingLanguage() === "en" ? "en" : "zh-Hant-TW", { dateStyle: "long", timeStyle: "short" }).format(
     new Date(value),
   );
 }
 
 function formatDate(value) {
-  return new Intl.DateTimeFormat("zh-Hant-TW", { dateStyle: "long", timeZone: "UTC" }).format(
+  return new Intl.DateTimeFormat(rankingLanguage() === "en" ? "en" : "zh-Hant-TW", { dateStyle: "long", timeZone: "UTC" }).format(
     new Date(`${value}T00:00:00.000Z`),
   );
 }

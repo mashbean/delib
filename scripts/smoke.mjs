@@ -68,6 +68,30 @@ await check("GET /integrations/polis allows only the Pol.is frame", async () => 
   expect(!csp.includes("frame-src 'none'"), "workspace CSP still blocks frames");
 });
 
+await check("Native tool stations serve a bilingual shell with a fixed frame allowlist", async () => {
+  const slugs = ["form", "harmonica", "polis", "call-in", "tttc", "reply", "proposals", "argument", "budget", "rank", "checks", "values", "maple"];
+  for (const slug of slugs) {
+    const response = await get(`/${slug}?lang=en`);
+    expect(response.status === 200, `/${slug}: ${response.status}`);
+    const html = await response.text();
+    expect(html.includes("tool-shell.js"), `/${slug}: missing shell`);
+    const csp = response.headers.get("content-security-policy") || "";
+    expect(csp.includes("frame-src ") && !csp.includes("frame-src *"), `/${slug}: missing frame restriction`);
+  }
+  return `${slugs.length} stations`;
+});
+
+await check("Round fixture, contract and Agent skill are published", async () => {
+  const fixture = await get("/data/flow-demo.json");
+  expect(fixture.status === 200, "fixture missing");
+  const data = await fixture.json();
+  expect(data.simulated === true && data.rounds.length === 3, "invalid synthetic fixture");
+  const schema = await get("/schemas/delib-rounds/v1.json");
+  expect(schema.status === 200, "round schema missing");
+  const skill = await get("/.well-known/openclaw/SKILL.md");
+  expect(skill.status === 200 && (await skill.text()).includes("bounded local steward"), "agent skill missing");
+});
+
 await check("GET /data/tools.json is readable", async () => {
   const response = await get("/data/tools.json");
   expect(response.status === 200, `status ${response.status}`);

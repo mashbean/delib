@@ -1,0 +1,4754 @@
+{
+  "schema": "https://delib.mashbean.net/schemas/delib-rounds/v1.json",
+  "kind": "delib-rounds-bundle",
+  "id": "demo:school-street",
+  "generatedAt": "2026-09-06T00:00:00.000Z",
+  "simulated": true,
+  "issue": {
+    "title": {
+      "zh": "如果校門前，早上二十分鐘沒有車？",
+      "en": "What if the school gate had twenty car-free minutes?"
+    },
+    "description": {
+      "zh": "虛構的青溪社區，用三輪審議討論學校周邊徒步街。人物、發言、觀察、票數與決定皆為示範編寫。",
+      "en": "The fictional Qingxi neighborhood explores a school street over three deliberative rounds. People, statements, observations, votes and decisions are all authored for this demo."
+    }
+  },
+  "disclaimer": {
+    "zh": "全部資料皆為模擬。沒有建立真實活動、呼叫 AI 生成、送出通知或代表任何居民意見。",
+    "en": "All data are synthetic. No real activities were created, AI generation called, notifications sent or residents represented."
+  },
+  "participants": [
+    {
+      "id": "p01",
+      "label": {
+        "zh": "模擬參與者 01",
+        "en": "Synthetic participant 01"
+      },
+      "perspective": {
+        "zh": "照顧者",
+        "en": "Caregiver"
+      },
+      "simulated": true
+    },
+    {
+      "id": "p02",
+      "label": {
+        "zh": "模擬參與者 02",
+        "en": "Synthetic participant 02"
+      },
+      "perspective": {
+        "zh": "步行通勤者",
+        "en": "Walking commuter"
+      },
+      "simulated": true
+    },
+    {
+      "id": "p03",
+      "label": {
+        "zh": "模擬參與者 03",
+        "en": "Synthetic participant 03"
+      },
+      "perspective": {
+        "zh": "店家",
+        "en": "Shopkeeper"
+      },
+      "simulated": true
+    },
+    {
+      "id": "p04",
+      "label": {
+        "zh": "模擬參與者 04",
+        "en": "Synthetic participant 04"
+      },
+      "perspective": {
+        "zh": "輪椅使用者",
+        "en": "Wheelchair user"
+      },
+      "simulated": true
+    },
+    {
+      "id": "p05",
+      "label": {
+        "zh": "模擬參與者 05",
+        "en": "Synthetic participant 05"
+      },
+      "perspective": {
+        "zh": "居民",
+        "en": "Resident"
+      },
+      "simulated": true
+    },
+    {
+      "id": "p06",
+      "label": {
+        "zh": "模擬參與者 06",
+        "en": "Synthetic participant 06"
+      },
+      "perspective": {
+        "zh": "配送員",
+        "en": "Delivery worker"
+      },
+      "simulated": true
+    },
+    {
+      "id": "p07",
+      "label": {
+        "zh": "模擬參與者 07",
+        "en": "Synthetic participant 07"
+      },
+      "perspective": {
+        "zh": "教師",
+        "en": "Teacher"
+      },
+      "simulated": true
+    },
+    {
+      "id": "p08",
+      "label": {
+        "zh": "模擬參與者 08",
+        "en": "Synthetic participant 08"
+      },
+      "perspective": {
+        "zh": "自行車使用者",
+        "en": "Cyclist"
+      },
+      "simulated": true
+    },
+    {
+      "id": "p09",
+      "label": {
+        "zh": "模擬參與者 09",
+        "en": "Synthetic participant 09"
+      },
+      "perspective": {
+        "zh": "市場工作者",
+        "en": "Market worker"
+      },
+      "simulated": true
+    },
+    {
+      "id": "p10",
+      "label": {
+        "zh": "模擬參與者 10",
+        "en": "Synthetic participant 10"
+      },
+      "perspective": {
+        "zh": "夜班工作者",
+        "en": "Night-shift worker"
+      },
+      "simulated": true
+    },
+    {
+      "id": "p11",
+      "label": {
+        "zh": "模擬參與者 11",
+        "en": "Synthetic participant 11"
+      },
+      "perspective": {
+        "zh": "公車使用者",
+        "en": "Bus rider"
+      },
+      "simulated": true
+    },
+    {
+      "id": "p12",
+      "label": {
+        "zh": "模擬參與者 12",
+        "en": "Synthetic participant 12"
+      },
+      "perspective": {
+        "zh": "家長",
+        "en": "Parent"
+      },
+      "simulated": true
+    },
+    {
+      "id": "p13",
+      "label": {
+        "zh": "模擬參與者 13",
+        "en": "Synthetic participant 13"
+      },
+      "perspective": {
+        "zh": "到宅照顧者",
+        "en": "Home-care worker"
+      },
+      "simulated": true
+    },
+    {
+      "id": "p14",
+      "label": {
+        "zh": "模擬參與者 14",
+        "en": "Synthetic participant 14"
+      },
+      "perspective": {
+        "zh": "巷弄居民",
+        "en": "Side-street resident"
+      },
+      "simulated": true
+    }
+  ],
+  "rounds": [
+    {
+      "id": "r1",
+      "sequence": 1,
+      "previousRoundId": null,
+      "title": {
+        "zh": "第 1 輪：先聽懂，找出分歧",
+        "en": "Round 1: Listen and surface tensions"
+      },
+      "goal": {
+        "zh": "學校周邊是否適合在上下學時段試辦徒步街？先釐清安全、通行與生計。",
+        "en": "Could a school street work at arrival and dismissal? Clarify safety, access and livelihoods first."
+      },
+      "focus": {
+        "zh": "遺漏的接送與配送需求",
+        "en": "Missing access and delivery needs"
+      },
+      "attendance": [
+        {
+          "participantRef": "p01",
+          "mode": "online"
+        },
+        {
+          "participantRef": "p02",
+          "mode": "online"
+        },
+        {
+          "participantRef": "p03",
+          "mode": "online"
+        },
+        {
+          "participantRef": "p04",
+          "mode": "online"
+        },
+        {
+          "participantRef": "p05",
+          "mode": "online"
+        },
+        {
+          "participantRef": "p06",
+          "mode": "online"
+        },
+        {
+          "participantRef": "p07",
+          "mode": "online"
+        },
+        {
+          "participantRef": "p08",
+          "mode": "online"
+        },
+        {
+          "participantRef": "p09",
+          "mode": "in-person"
+        },
+        {
+          "participantRef": "p10",
+          "mode": "in-person"
+        },
+        {
+          "participantRef": "p11",
+          "mode": "in-person"
+        },
+        {
+          "participantRef": "p12",
+          "mode": "in-person"
+        }
+      ],
+      "phases": [
+        {
+          "id": "frame",
+          "mode": "hybrid",
+          "participantRefs": [
+            "p01",
+            "p02",
+            "p03",
+            "p04"
+          ],
+          "tools": [
+            "facilitation"
+          ],
+          "inputRefs": [],
+          "outputRefs": [
+            "demo:school-street:r1:brief"
+          ],
+          "input": {
+            "zh": "社區對校門口安全、通行與生計的初始關切，以及決策權限與本輪範圍。",
+            "en": "Initial community concerns about school-gate safety, access and livelihoods, together with decision authority and the scope of this round."
+          },
+          "output": {
+            "zh": "學校周邊是否適合在上下學時段試辦徒步街？先釐清安全、通行與生計。",
+            "en": "Could a school street work at arrival and dismissal? Clarify safety, access and livelihoods first."
+          },
+          "guidance": {
+            "zh": "先確認能改什麼、由誰回覆；本案例全部是虛構示範。",
+            "en": "Clarify what can change and who must respond; this entire case is fictional."
+          }
+        },
+        {
+          "id": "recruit",
+          "mode": "hybrid",
+          "participantRefs": [
+            "p01",
+            "p02",
+            "p03",
+            "p04",
+            "p05",
+            "p06",
+            "p07",
+            "p08",
+            "p09",
+            "p10",
+            "p11",
+            "p12"
+          ],
+          "tools": [
+            "form"
+          ],
+          "inputRefs": [
+            "demo:school-street:r1:brief"
+          ],
+          "outputRefs": [
+            "demo:school-street:r1:form:p01-q1",
+            "demo:school-street:r1:form:p02-q1",
+            "demo:school-street:r1:form:p03-q1",
+            "demo:school-street:r1:form:p04-q1",
+            "demo:school-street:r1:form:p05-q1",
+            "demo:school-street:r1:form:p06-q1",
+            "demo:school-street:r1:form:p07-q1",
+            "demo:school-street:r1:form:p08-q1"
+          ],
+          "input": {
+            "zh": "初始議題簡介、可近用需求，以及需要主動接觸的受影響社群。",
+            "en": "The initial issue brief, access needs and affected communities that need active outreach."
+          },
+          "output": {
+            "zh": "8 則表單意見；聯絡方式與意見分開保管。",
+            "en": "8 form comments; keep contact details separate from views."
+          },
+          "guidance": {
+            "zh": "線上表單搭配電話或現場邀請，讓夜班、照顧者與無網路者能進來。",
+            "en": "Pair the online form with calls or in-person invitations so shifts, caring duties and internet access do not exclude people."
+          }
+        },
+        {
+          "id": "sortition",
+          "mode": "hybrid",
+          "participantRefs": [
+            "p01",
+            "p02",
+            "p03",
+            "p04",
+            "p05",
+            "p06",
+            "p07",
+            "p08",
+            "p09",
+            "p10",
+            "p11",
+            "p12"
+          ],
+          "tools": [
+            "facilitation"
+          ],
+          "inputRefs": [
+            "demo:school-street:r1:form:p01-q1",
+            "demo:school-street:r1:form:p02-q1",
+            "demo:school-street:r1:form:p03-q1",
+            "demo:school-street:r1:form:p04-q1",
+            "demo:school-street:r1:form:p05-q1",
+            "demo:school-street:r1:form:p06-q1",
+            "demo:school-street:r1:form:p07-q1",
+            "demo:school-street:r1:form:p08-q1"
+          ],
+          "outputRefs": [
+            "demo:school-street:r1:inclusion-check"
+          ],
+          "input": {
+            "zh": "本輪 12 位虛構參與者的觀點分布。",
+            "en": "The perspectives of 12 fictional participants this round."
+          },
+          "output": {
+            "zh": "涵蓋缺口紀錄；本示範採定向邀請，未做抽樣。",
+            "en": "An inclusion-gap record; this demo uses purposive invitation, not a random sample."
+          },
+          "guidance": {
+            "zh": "大型公民會議可另用可稽核抽樣；小型工作坊也必須說清楚誰缺席。",
+            "en": "For a citizens’ assembly consider auditable selection; a small workshop must still explain who is missing."
+          }
+        },
+        {
+          "id": "learn",
+          "mode": "hybrid",
+          "participantRefs": [
+            "p01",
+            "p02",
+            "p03",
+            "p04",
+            "p05",
+            "p06",
+            "p07",
+            "p08",
+            "p09",
+            "p10",
+            "p11",
+            "p12"
+          ],
+          "tools": [
+            "call-in"
+          ],
+          "inputRefs": [
+            "demo:school-street:r1:inclusion-check",
+            "demo:school-street:r1:form:p01-q1",
+            "demo:school-street:r1:form:p02-q1"
+          ],
+          "outputRefs": [
+            "demo:school-street:r1:call-in:q1",
+            "demo:school-street:r1:call-in:q2",
+            "demo:school-street:r1:call-in:q3",
+            "demo:school-street:r1:call-in:q4"
+          ],
+          "input": {
+            "zh": "原始意見、背景材料與可查證的問題。",
+            "en": "Source comments, background materials and questions that can be checked."
+          },
+          "output": {
+            "zh": "4 則 Call-in 提問，作為後續回覆的來源。",
+            "en": "4 Call-in questions, retained as sources for later responses."
+          },
+          "guidance": {
+            "zh": "共同讀資料、現地走讀或線上問答；保留更正與不同立場的證據。",
+            "en": "Use shared reading, a site walk or online Q&A; retain corrections and evidence from different positions."
+          }
+        },
+        {
+          "id": "listen",
+          "mode": "hybrid",
+          "participantRefs": [
+            "p01",
+            "p02",
+            "p03",
+            "p04",
+            "p05",
+            "p06",
+            "p07",
+            "p08",
+            "p09",
+            "p10",
+            "p11",
+            "p12"
+          ],
+          "tools": [
+            "harmonica",
+            "tttc"
+          ],
+          "inputRefs": [
+            "demo:school-street:r1:form:p01-q1",
+            "demo:school-street:r1:form:p02-q1",
+            "demo:school-street:r1:form:p03-q1",
+            "demo:school-street:r1:form:p04-q1",
+            "demo:school-street:r1:form:p05-q1",
+            "demo:school-street:r1:form:p06-q1",
+            "demo:school-street:r1:form:p07-q1",
+            "demo:school-street:r1:form:p08-q1",
+            "demo:school-street:r1:call-in:q1",
+            "demo:school-street:r1:call-in:q2",
+            "demo:school-street:r1:call-in:q3",
+            "demo:school-street:r1:call-in:q4"
+          ],
+          "outputRefs": [
+            "demo:school-street:r1:harmonica:p09-m1",
+            "demo:school-street:r1:harmonica:p10-m1",
+            "demo:school-street:r1:harmonica:p11-m1",
+            "demo:school-street:r1:harmonica:p12-m1",
+            "demo:school-street:r1:tttc:theme1",
+            "demo:school-street:r1:tttc:theme2",
+            "demo:school-street:r1:tttc:theme3",
+            "demo:school-street:r1:tttc:theme4"
+          ],
+          "input": {
+            "zh": "8 則表單意見、4 則問題及補訪。",
+            "en": "8 form comments, 4 questions and follow-up interviews."
+          },
+          "output": {
+            "zh": "4 則訪談意見與 4 個附來源主題。",
+            "en": "4 interview comments and 4 source-linked themes."
+          },
+          "guidance": {
+            "zh": "Harmonica 補訪缺席聲音，TTTC 協助整理；此處主題是預先編寫的模擬，需主持人覆核。",
+            "en": "Harmonica reaches missing voices and TTTC organizes material; these themes are pre-authored simulation and require facilitator review."
+          }
+        },
+        {
+          "id": "deliberate",
+          "mode": "hybrid",
+          "participantRefs": [
+            "p01",
+            "p02",
+            "p03",
+            "p04",
+            "p05",
+            "p06",
+            "p07",
+            "p08",
+            "p09",
+            "p10",
+            "p11",
+            "p12"
+          ],
+          "tools": [
+            "polis"
+          ],
+          "inputRefs": [
+            "demo:school-street:r1:tttc:theme1",
+            "demo:school-street:r1:tttc:theme2",
+            "demo:school-street:r1:tttc:theme3",
+            "demo:school-street:r1:tttc:theme4",
+            "demo:school-street:r1:call-in:q1",
+            "demo:school-street:r1:call-in:q2",
+            "demo:school-street:r1:call-in:q3",
+            "demo:school-street:r1:call-in:q4"
+          ],
+          "outputRefs": [
+            "demo:school-street:r1:polis:statement1",
+            "demo:school-street:r1:polis:statement2",
+            "demo:school-street:r1:polis:statement3",
+            "demo:school-street:r1:polis:statement4"
+          ],
+          "input": {
+            "zh": "附來源的主題、提問與 4 項可修訂方案。",
+            "en": "Source-linked themes, questions and 4 revisable proposals."
+          },
+          "output": {
+            "zh": "12 位模擬參與者 × 4 題，共 48 筆同意／不同意／略過。",
+            "en": "12 simulated participants × 4 statements: 48 agree/disagree/pass responses."
+          },
+          "guidance": {
+            "zh": "先討論理由再比較陳述；計數不等於共識、代表性民意或授權。少數理由仍要留下。",
+            "en": "Discuss reasons, then compare statements. Counts are not consensus, representative opinion or a mandate; retain minority reasons."
+          }
+        },
+        {
+          "id": "respond",
+          "mode": "hybrid",
+          "participantRefs": [
+            "p01",
+            "p02",
+            "p03",
+            "p04"
+          ],
+          "tools": [
+            "reply"
+          ],
+          "inputRefs": [
+            "demo:school-street:r1:polis:statement1",
+            "demo:school-street:r1:polis:statement2",
+            "demo:school-street:r1:polis:statement3",
+            "demo:school-street:r1:polis:statement4",
+            "demo:school-street:r1:call-in:q1",
+            "demo:school-street:r1:call-in:q2",
+            "demo:school-street:r1:call-in:q3",
+            "demo:school-street:r1:call-in:q4"
+          ],
+          "outputRefs": [
+            "demo:school-street:r1:reply:q1",
+            "demo:school-street:r1:reply:q2",
+            "demo:school-street:r1:reply:q3",
+            "demo:school-street:r1:reply:q4",
+            "demo:school-street:r1:decision"
+          ],
+          "input": {
+            "zh": "4 項候選方案、模擬投票與原始提問。",
+            "en": "4 candidate proposals, simulated votes and source questions."
+          },
+          "output": {
+            "zh": "模擬主辦者同意把「四週試辦」列為候選；無障礙接送與配送安排未完成前不啟動。",
+            "en": "The fictional organizer keeps a four-week pilot as a candidate; it cannot start until accessible drop-off and deliveries are addressed."
+          },
+          "guidance": {
+            "zh": "Pocket Reply 草擬逐題回覆，主辦者覆核後才形成自己的承諾；模型不能代替有權決定者。",
+            "en": "Pocket Reply drafts question-linked replies; the organizer reviews before making commitments. A model cannot replace the authorized decision-maker."
+          }
+        },
+        {
+          "id": "feedback",
+          "mode": "hybrid",
+          "participantRefs": [
+            "p01",
+            "p02",
+            "p03",
+            "p04",
+            "p05",
+            "p06",
+            "p07",
+            "p08",
+            "p09",
+            "p10",
+            "p11",
+            "p12"
+          ],
+          "tools": [
+            "form",
+            "call-in"
+          ],
+          "inputRefs": [
+            "demo:school-street:r1:decision",
+            "demo:school-street:r1:reply:q1",
+            "demo:school-street:r1:reply:q2",
+            "demo:school-street:r1:reply:q3",
+            "demo:school-street:r1:reply:q4"
+          ],
+          "outputRefs": [
+            "demo:school-street:r1:unresolved",
+            "demo:school-street:r1:next-brief"
+          ],
+          "input": {
+            "zh": "本輪回覆、修正要求與仍未解決的問題。",
+            "en": "This round’s responses, correction requests and unresolved questions."
+          },
+          "output": {
+            "zh": "配送與到宅照顧者尚未充分參與；接送例外仍需共同設計。",
+            "en": "Delivery and home-care perspectives are under-covered; access exceptions still need joint design."
+          },
+          "guidance": {
+            "zh": "回到招募：補邀到宅照顧者與巷弄居民，再用訪談及現地走讀修訂方案。",
+            "en": "Return to invitation: include home-care workers and side-street residents, then revise through interviews and a site walk."
+          }
+        }
+      ],
+      "artifacts": [
+        {
+          "id": "demo:school-street:r1:brief",
+          "phaseId": "frame",
+          "kind": "brief",
+          "text": {
+            "zh": "學校周邊是否適合在上下學時段試辦徒步街？先釐清安全、通行與生計。",
+            "en": "Could a school street work at arrival and dismissal? Clarify safety, access and livelihoods first."
+          },
+          "source": {
+            "tool": "facilitation",
+            "sourceId": "synthetic-r1-facilitation",
+            "artifactId": "brief"
+          },
+          "participantRef": null,
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r1:form:p01-q1",
+          "phaseId": "recruit",
+          "kind": "statement",
+          "text": {
+            "zh": "校門口接送車遮住轉角視線，希望先改善過街安全。",
+            "en": "Cars at the school gate block sightlines; improve crossing safety first."
+          },
+          "source": {
+            "tool": "form",
+            "sourceId": "synthetic-r1-form",
+            "artifactId": "form:p01-q1"
+          },
+          "participantRef": "p01",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r1:form:p02-q1",
+          "phaseId": "recruit",
+          "kind": "statement",
+          "text": {
+            "zh": "我每天走路經過，不能只在校門前安全。",
+            "en": "I walk here daily; safety needs to extend beyond the school gate."
+          },
+          "source": {
+            "tool": "form",
+            "sourceId": "synthetic-r1-form",
+            "artifactId": "form:p02-q1"
+          },
+          "participantRef": "p02",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r1:form:p03-q1",
+          "phaseId": "recruit",
+          "kind": "statement",
+          "text": {
+            "zh": "店裡早上要進貨，整條路封閉會影響營業。",
+            "en": "Our shop receives morning deliveries; a full closure would affect business."
+          },
+          "source": {
+            "tool": "form",
+            "sourceId": "synthetic-r1-form",
+            "artifactId": "form:p03-q1"
+          },
+          "participantRef": "p03",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r1:form:p04-q1",
+          "phaseId": "recruit",
+          "kind": "statement",
+          "text": {
+            "zh": "輪椅上下車需要靠近入口，不能一律把車擋在外面。",
+            "en": "Wheelchair users need a drop-off near the entrance; a blanket ban would exclude us."
+          },
+          "source": {
+            "tool": "form",
+            "sourceId": "synthetic-r1-form",
+            "artifactId": "form:p04-q1"
+          },
+          "participantRef": "p04",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r1:form:p05-q1",
+          "phaseId": "recruit",
+          "kind": "statement",
+          "text": {
+            "zh": "希望先短期試辦，也看一下旁邊巷子會不會塞車。",
+            "en": "Try a short pilot and watch whether traffic moves into side streets."
+          },
+          "source": {
+            "tool": "form",
+            "sourceId": "synthetic-r1-form",
+            "artifactId": "form:p05-q1"
+          },
+          "participantRef": "p05",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r1:form:p06-q1",
+          "phaseId": "recruit",
+          "kind": "statement",
+          "text": {
+            "zh": "配送路線能配合，但要先說清楚時間與替代停靠區。",
+            "en": "I can adjust deliveries if the hours and alternative loading area are clear."
+          },
+          "source": {
+            "tool": "form",
+            "sourceId": "synthetic-r1-form",
+            "artifactId": "form:p06-q1"
+          },
+          "participantRef": "p06",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r1:form:p07-q1",
+          "phaseId": "recruit",
+          "kind": "statement",
+          "text": {
+            "zh": "早上老師要顧校門，需要有人協助引導路口。",
+            "en": "Teachers watch the gate in the morning; someone must help at crossings."
+          },
+          "source": {
+            "tool": "form",
+            "sourceId": "synthetic-r1-form",
+            "artifactId": "form:p07-q1"
+          },
+          "participantRef": "p07",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r1:form:p08-q1",
+          "phaseId": "recruit",
+          "kind": "statement",
+          "text": {
+            "zh": "自行車也可能和孩子衝突，徒步區內應該牽行。",
+            "en": "Bikes can also conflict with children; people should dismount inside the zone."
+          },
+          "source": {
+            "tool": "form",
+            "sourceId": "synthetic-r1-form",
+            "artifactId": "form:p08-q1"
+          },
+          "participantRef": "p08",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r1:inclusion-check",
+          "phaseId": "sortition",
+          "kind": "inclusion-check",
+          "text": {
+            "zh": "這是虛構的定向邀請小組，沒有執行隨機抽樣，也不代表全體居民。",
+            "en": "This is a fictional purposively invited group. No random selection was performed and it does not represent all residents."
+          },
+          "source": {
+            "tool": "facilitation",
+            "sourceId": "synthetic-r1-facilitation",
+            "artifactId": "inclusion-check"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r1:brief"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r1:call-in:q1",
+          "phaseId": "learn",
+          "kind": "question",
+          "text": {
+            "zh": "實際有權核准試辦的是誰？",
+            "en": "Who has actual authority to approve the pilot?"
+          },
+          "source": {
+            "tool": "call-in",
+            "sourceId": "synthetic-r1-call-in",
+            "artifactId": "call-in:q1"
+          },
+          "participantRef": "p01",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r1:call-in:q2",
+          "phaseId": "learn",
+          "kind": "question",
+          "text": {
+            "zh": "無障礙接送如何保留？",
+            "en": "How will accessible drop-off remain available?"
+          },
+          "source": {
+            "tool": "call-in",
+            "sourceId": "synthetic-r1-call-in",
+            "artifactId": "call-in:q2"
+          },
+          "participantRef": "p02",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r1:call-in:q3",
+          "phaseId": "learn",
+          "kind": "question",
+          "text": {
+            "zh": "誰承擔試辦成本與引導工作？",
+            "en": "Who pays for the pilot and coordinates crossing stewards?"
+          },
+          "source": {
+            "tool": "call-in",
+            "sourceId": "synthetic-r1-call-in",
+            "artifactId": "call-in:q3"
+          },
+          "participantRef": "p03",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r1:call-in:q4",
+          "phaseId": "learn",
+          "kind": "question",
+          "text": {
+            "zh": "若巷弄塞車或有人無法進出，要如何暫停？",
+            "en": "How can the pilot pause if side streets clog or someone loses access?"
+          },
+          "source": {
+            "tool": "call-in",
+            "sourceId": "synthetic-r1-call-in",
+            "artifactId": "call-in:q4"
+          },
+          "participantRef": "p04",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r1:harmonica:p09-m1",
+          "phaseId": "listen",
+          "kind": "statement",
+          "text": {
+            "zh": "市場收攤時間和放學接近，需要一起討論。",
+            "en": "Market closing overlaps with dismissal; include those schedules."
+          },
+          "source": {
+            "tool": "harmonica",
+            "sourceId": "synthetic-r1-harmonica",
+            "artifactId": "harmonica:p09-m1"
+          },
+          "participantRef": "p09",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r1:harmonica:p10-m1",
+          "phaseId": "listen",
+          "kind": "statement",
+          "text": {
+            "zh": "早上的會議我在補眠，希望能晚上留言。",
+            "en": "I sleep after a night shift; please let me contribute in the evening."
+          },
+          "source": {
+            "tool": "harmonica",
+            "sourceId": "synthetic-r1-harmonica",
+            "artifactId": "harmonica:p10-m1"
+          },
+          "participantRef": "p10",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r1:harmonica:p11-m1",
+          "phaseId": "listen",
+          "kind": "statement",
+          "text": {
+            "zh": "公車站離校門遠，如果換接送點，要有清楚指標。",
+            "en": "The bus stop is far from the gate; a new drop-off needs clear wayfinding."
+          },
+          "source": {
+            "tool": "harmonica",
+            "sourceId": "synthetic-r1-harmonica",
+            "artifactId": "harmonica:p11-m1"
+          },
+          "participantRef": "p11",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r1:harmonica:p12-m1",
+          "phaseId": "listen",
+          "kind": "statement",
+          "text": {
+            "zh": "我支持孩子走路，但下雨天與行動不便的情況怎麼辦？",
+            "en": "I support walking to school, but what happens in rain or for people with limited mobility?"
+          },
+          "source": {
+            "tool": "harmonica",
+            "sourceId": "synthetic-r1-harmonica",
+            "artifactId": "harmonica:p12-m1"
+          },
+          "participantRef": "p12",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r1:tttc:theme1",
+          "phaseId": "listen",
+          "kind": "theme",
+          "text": {
+            "zh": "過街安全與學習",
+            "en": "Crossing safety and learning"
+          },
+          "source": {
+            "tool": "tttc",
+            "sourceId": "synthetic-r1-tttc",
+            "artifactId": "tttc:theme1"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r1:form:p01-q1",
+            "demo:school-street:r1:form:p05-q1",
+            "demo:school-street:r1:harmonica:p09-m1"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r1:tttc:theme2",
+          "phaseId": "listen",
+          "kind": "theme",
+          "text": {
+            "zh": "無障礙與照顧通行",
+            "en": "Accessibility and care access"
+          },
+          "source": {
+            "tool": "tttc",
+            "sourceId": "synthetic-r1-tttc",
+            "artifactId": "tttc:theme2"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r1:form:p02-q1",
+            "demo:school-street:r1:form:p06-q1",
+            "demo:school-street:r1:harmonica:p10-m1"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r1:tttc:theme3",
+          "phaseId": "listen",
+          "kind": "theme",
+          "text": {
+            "zh": "配送、生計與執行成本",
+            "en": "Deliveries, livelihoods and implementation cost"
+          },
+          "source": {
+            "tool": "tttc",
+            "sourceId": "synthetic-r1-tttc",
+            "artifactId": "tttc:theme3"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r1:form:p03-q1",
+            "demo:school-street:r1:form:p07-q1",
+            "demo:school-street:r1:harmonica:p11-m1"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r1:tttc:theme4",
+          "phaseId": "listen",
+          "kind": "theme",
+          "text": {
+            "zh": "巷弄影響與檢討責任",
+            "en": "Side-street effects and review responsibility"
+          },
+          "source": {
+            "tool": "tttc",
+            "sourceId": "synthetic-r1-tttc",
+            "artifactId": "tttc:theme4"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r1:form:p04-q1",
+            "demo:school-street:r1:form:p08-q1",
+            "demo:school-street:r1:harmonica:p12-m1"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r1:polis:statement1",
+          "phaseId": "deliberate",
+          "kind": "proposal",
+          "text": {
+            "zh": "先試辦四週，上下學各封閉二十分鐘。",
+            "en": "Run a four-week pilot with twenty-minute closures at arrival and dismissal."
+          },
+          "source": {
+            "tool": "polis",
+            "sourceId": "synthetic-r1-polis",
+            "artifactId": "polis:statement1"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r1:tttc:theme1",
+            "demo:school-street:r1:call-in:q1"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r1:polis:statement2",
+          "phaseId": "deliberate",
+          "kind": "proposal",
+          "text": {
+            "zh": "保留近入口的無障礙接送及緊急通道。",
+            "en": "Keep accessible drop-off near the entrance and an emergency route."
+          },
+          "source": {
+            "tool": "polis",
+            "sourceId": "synthetic-r1-polis",
+            "artifactId": "polis:statement2"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r1:tttc:theme2",
+            "demo:school-street:r1:call-in:q2"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r1:polis:statement3",
+          "phaseId": "deliberate",
+          "kind": "proposal",
+          "text": {
+            "zh": "全面禁止上下學時段配送。",
+            "en": "Ban all deliveries during arrival and dismissal."
+          },
+          "source": {
+            "tool": "polis",
+            "sourceId": "synthetic-r1-polis",
+            "artifactId": "polis:statement3"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r1:tttc:theme3",
+            "demo:school-street:r1:call-in:q3"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r1:polis:statement4",
+          "phaseId": "deliberate",
+          "kind": "proposal",
+          "text": {
+            "zh": "共同量測路口安全與鄰近巷弄交通。",
+            "en": "Jointly measure crossing safety and traffic on neighboring streets."
+          },
+          "source": {
+            "tool": "polis",
+            "sourceId": "synthetic-r1-polis",
+            "artifactId": "polis:statement4"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r1:tttc:theme4",
+            "demo:school-street:r1:call-in:q4"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r1:reply:q1",
+          "phaseId": "respond",
+          "kind": "reply",
+          "text": {
+            "zh": "模擬回覆 1：本輪已連結原提問與方案；模擬主辦者同意把「四週試辦」列為候選；無障礙接送與配送安排未完成前不啟動。",
+            "en": "Fictional response 1: this round links the source question and proposal. The fictional organizer keeps a four-week pilot as a candidate; it cannot start until accessible drop-off and deliveries are addressed."
+          },
+          "source": {
+            "tool": "reply",
+            "sourceId": "synthetic-r1-reply",
+            "artifactId": "reply:q1"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r1:call-in:q1",
+            "demo:school-street:r1:polis:statement1"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r1:reply:q2",
+          "phaseId": "respond",
+          "kind": "reply",
+          "text": {
+            "zh": "模擬回覆 2：本輪已連結原提問與方案；模擬主辦者同意把「四週試辦」列為候選；無障礙接送與配送安排未完成前不啟動。",
+            "en": "Fictional response 2: this round links the source question and proposal. The fictional organizer keeps a four-week pilot as a candidate; it cannot start until accessible drop-off and deliveries are addressed."
+          },
+          "source": {
+            "tool": "reply",
+            "sourceId": "synthetic-r1-reply",
+            "artifactId": "reply:q2"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r1:call-in:q2",
+            "demo:school-street:r1:polis:statement2"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r1:reply:q3",
+          "phaseId": "respond",
+          "kind": "reply",
+          "text": {
+            "zh": "模擬回覆 3：本輪已連結原提問與方案；模擬主辦者同意把「四週試辦」列為候選；無障礙接送與配送安排未完成前不啟動。",
+            "en": "Fictional response 3: this round links the source question and proposal. The fictional organizer keeps a four-week pilot as a candidate; it cannot start until accessible drop-off and deliveries are addressed."
+          },
+          "source": {
+            "tool": "reply",
+            "sourceId": "synthetic-r1-reply",
+            "artifactId": "reply:q3"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r1:call-in:q3",
+            "demo:school-street:r1:polis:statement3"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r1:reply:q4",
+          "phaseId": "respond",
+          "kind": "reply",
+          "text": {
+            "zh": "模擬回覆 4：本輪已連結原提問與方案；模擬主辦者同意把「四週試辦」列為候選；無障礙接送與配送安排未完成前不啟動。",
+            "en": "Fictional response 4: this round links the source question and proposal. The fictional organizer keeps a four-week pilot as a candidate; it cannot start until accessible drop-off and deliveries are addressed."
+          },
+          "source": {
+            "tool": "reply",
+            "sourceId": "synthetic-r1-reply",
+            "artifactId": "reply:q4"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r1:call-in:q4",
+            "demo:school-street:r1:polis:statement4"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r1:decision",
+          "phaseId": "respond",
+          "kind": "decision",
+          "text": {
+            "zh": "模擬主辦者同意把「四週試辦」列為候選；無障礙接送與配送安排未完成前不啟動。",
+            "en": "The fictional organizer keeps a four-week pilot as a candidate; it cannot start until accessible drop-off and deliveries are addressed."
+          },
+          "source": {
+            "tool": "facilitation",
+            "sourceId": "synthetic-r1-facilitation",
+            "artifactId": "decision"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r1:reply:q1",
+            "demo:school-street:r1:reply:q2",
+            "demo:school-street:r1:reply:q3",
+            "demo:school-street:r1:reply:q4"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r1:unresolved",
+          "phaseId": "feedback",
+          "kind": "feedback",
+          "text": {
+            "zh": "配送與到宅照顧者尚未充分參與；接送例外仍需共同設計。",
+            "en": "Delivery and home-care perspectives are under-covered; access exceptions still need joint design."
+          },
+          "source": {
+            "tool": "facilitation",
+            "sourceId": "synthetic-r1-facilitation",
+            "artifactId": "unresolved"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r1:decision"
+          ],
+          "status": "needs-response",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r1:next-brief",
+          "phaseId": "feedback",
+          "kind": "feedback",
+          "text": {
+            "zh": "回到招募：補邀到宅照顧者與巷弄居民，再用訪談及現地走讀修訂方案。",
+            "en": "Return to invitation: include home-care workers and side-street residents, then revise through interviews and a site walk."
+          },
+          "source": {
+            "tool": "facilitation",
+            "sourceId": "synthetic-r1-facilitation",
+            "artifactId": "next-brief"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r1:unresolved"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        }
+      ],
+      "responses": [
+        {
+          "id": "demo:school-street:r1:vote:1:p01",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement1",
+          "participantRef": "p01",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:1:p02",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement1",
+          "participantRef": "p02",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:1:p03",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement1",
+          "participantRef": "p03",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:1:p04",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement1",
+          "participantRef": "p04",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:1:p05",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement1",
+          "participantRef": "p05",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:1:p06",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement1",
+          "participantRef": "p06",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:1:p07",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement1",
+          "participantRef": "p07",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:1:p08",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement1",
+          "participantRef": "p08",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:1:p09",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement1",
+          "participantRef": "p09",
+          "value": "disagree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:1:p10",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement1",
+          "participantRef": "p10",
+          "value": "disagree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:1:p11",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement1",
+          "participantRef": "p11",
+          "value": "disagree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:1:p12",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement1",
+          "participantRef": "p12",
+          "value": "pass",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:2:p01",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement2",
+          "participantRef": "p01",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:2:p02",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement2",
+          "participantRef": "p02",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:2:p03",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement2",
+          "participantRef": "p03",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:2:p04",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement2",
+          "participantRef": "p04",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:2:p05",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement2",
+          "participantRef": "p05",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:2:p06",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement2",
+          "participantRef": "p06",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:2:p07",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement2",
+          "participantRef": "p07",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:2:p08",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement2",
+          "participantRef": "p08",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:2:p09",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement2",
+          "participantRef": "p09",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:2:p10",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement2",
+          "participantRef": "p10",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:2:p11",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement2",
+          "participantRef": "p11",
+          "value": "pass",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:2:p12",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement2",
+          "participantRef": "p12",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:3:p01",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement3",
+          "participantRef": "p01",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:3:p02",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement3",
+          "participantRef": "p02",
+          "value": "disagree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:3:p03",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement3",
+          "participantRef": "p03",
+          "value": "disagree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:3:p04",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement3",
+          "participantRef": "p04",
+          "value": "disagree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:3:p05",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement3",
+          "participantRef": "p05",
+          "value": "disagree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:3:p06",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement3",
+          "participantRef": "p06",
+          "value": "disagree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:3:p07",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement3",
+          "participantRef": "p07",
+          "value": "disagree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:3:p08",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement3",
+          "participantRef": "p08",
+          "value": "disagree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:3:p09",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement3",
+          "participantRef": "p09",
+          "value": "disagree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:3:p10",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement3",
+          "participantRef": "p10",
+          "value": "pass",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:3:p11",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement3",
+          "participantRef": "p11",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:3:p12",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement3",
+          "participantRef": "p12",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:4:p01",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement4",
+          "participantRef": "p01",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:4:p02",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement4",
+          "participantRef": "p02",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:4:p03",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement4",
+          "participantRef": "p03",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:4:p04",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement4",
+          "participantRef": "p04",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:4:p05",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement4",
+          "participantRef": "p05",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:4:p06",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement4",
+          "participantRef": "p06",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:4:p07",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement4",
+          "participantRef": "p07",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:4:p08",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement4",
+          "participantRef": "p08",
+          "value": "disagree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:4:p09",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement4",
+          "participantRef": "p09",
+          "value": "pass",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:4:p10",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement4",
+          "participantRef": "p10",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:4:p11",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement4",
+          "participantRef": "p11",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r1:vote:4:p12",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r1:polis:statement4",
+          "participantRef": "p12",
+          "value": "agree",
+          "tool": "polis"
+        }
+      ],
+      "next": {
+        "phaseId": "recruit",
+        "reason": {
+          "zh": "回到招募：補邀到宅照顧者與巷弄居民，再用訪談及現地走讀修訂方案。",
+          "en": "Return to invitation: include home-care workers and side-street residents, then revise through interviews and a site walk."
+        },
+        "owner": {
+          "zh": "模擬主辦工作小組",
+          "en": "Fictional organizing group"
+        },
+        "reviewOn": "2026-10-15",
+        "carryForwardRefs": [
+          "demo:school-street:r1:unresolved",
+          "demo:school-street:r1:next-brief",
+          "demo:school-street:r1:decision"
+        ]
+      }
+    },
+    {
+      "id": "r2",
+      "sequence": 2,
+      "previousRoundId": "r1",
+      "title": {
+        "zh": "第 2 輪：補進缺席的人，修訂方案",
+        "en": "Round 2: Include missing voices and revise"
+      },
+      "goal": {
+        "zh": "納入接送、配送與巷弄觀點，將第一輪分歧改成可檢查的試辦條件。",
+        "en": "Include access, delivery and side-street perspectives; turn disagreements into checkable pilot conditions."
+      },
+      "focus": {
+        "zh": "試辦安全與責任分工",
+        "en": "Pilot safeguards and responsibilities"
+      },
+      "attendance": [
+        {
+          "participantRef": "p01",
+          "mode": "online"
+        },
+        {
+          "participantRef": "p02",
+          "mode": "online"
+        },
+        {
+          "participantRef": "p03",
+          "mode": "online"
+        },
+        {
+          "participantRef": "p04",
+          "mode": "online"
+        },
+        {
+          "participantRef": "p05",
+          "mode": "online"
+        },
+        {
+          "participantRef": "p06",
+          "mode": "in-person"
+        },
+        {
+          "participantRef": "p07",
+          "mode": "in-person"
+        },
+        {
+          "participantRef": "p08",
+          "mode": "in-person"
+        },
+        {
+          "participantRef": "p11",
+          "mode": "in-person"
+        },
+        {
+          "participantRef": "p12",
+          "mode": "in-person"
+        },
+        {
+          "participantRef": "p13",
+          "mode": "in-person"
+        },
+        {
+          "participantRef": "p14",
+          "mode": "in-person"
+        }
+      ],
+      "phases": [
+        {
+          "id": "frame",
+          "mode": "hybrid",
+          "participantRefs": [
+            "p01",
+            "p02",
+            "p03",
+            "p04"
+          ],
+          "tools": [
+            "facilitation"
+          ],
+          "inputRefs": [
+            "demo:school-street:r1:unresolved",
+            "demo:school-street:r1:next-brief",
+            "demo:school-street:r1:decision"
+          ],
+          "outputRefs": [
+            "demo:school-street:r2:brief"
+          ],
+          "input": {
+            "zh": "上一輪未回答的問題、決策權限與本輪範圍。",
+            "en": "Carry-over questions, decision authority and scope."
+          },
+          "output": {
+            "zh": "納入接送、配送與巷弄觀點，將第一輪分歧改成可檢查的試辦條件。",
+            "en": "Include access, delivery and side-street perspectives; turn disagreements into checkable pilot conditions."
+          },
+          "guidance": {
+            "zh": "先確認能改什麼、由誰回覆；本案例全部是虛構示範。",
+            "en": "Clarify what can change and who must respond; this entire case is fictional."
+          }
+        },
+        {
+          "id": "recruit",
+          "mode": "hybrid",
+          "participantRefs": [
+            "p01",
+            "p02",
+            "p03",
+            "p04",
+            "p05",
+            "p06",
+            "p07",
+            "p08",
+            "p11",
+            "p12",
+            "p13",
+            "p14"
+          ],
+          "tools": [
+            "form"
+          ],
+          "inputRefs": [
+            "demo:school-street:r2:brief"
+          ],
+          "outputRefs": [
+            "demo:school-street:r2:form:p01-q1",
+            "demo:school-street:r2:form:p02-q1",
+            "demo:school-street:r2:form:p03-q1",
+            "demo:school-street:r2:form:p04-q1",
+            "demo:school-street:r2:form:p05-q1",
+            "demo:school-street:r2:form:p06-q1",
+            "demo:school-street:r2:form:p07-q1",
+            "demo:school-street:r2:form:p08-q1"
+          ],
+          "input": {
+            "zh": "議題簡介、可近用需求與上一輪的缺席聲音。",
+            "en": "Issue brief, access needs and voices missing last round."
+          },
+          "output": {
+            "zh": "8 則表單意見；聯絡方式與意見分開保管。",
+            "en": "8 form comments; keep contact details separate from views."
+          },
+          "guidance": {
+            "zh": "線上表單搭配電話或現場邀請，讓夜班、照顧者與無網路者能進來。",
+            "en": "Pair the online form with calls or in-person invitations so shifts, caring duties and internet access do not exclude people."
+          }
+        },
+        {
+          "id": "sortition",
+          "mode": "hybrid",
+          "participantRefs": [
+            "p01",
+            "p02",
+            "p03",
+            "p04",
+            "p05",
+            "p06",
+            "p07",
+            "p08",
+            "p11",
+            "p12",
+            "p13",
+            "p14"
+          ],
+          "tools": [
+            "facilitation"
+          ],
+          "inputRefs": [
+            "demo:school-street:r2:form:p01-q1",
+            "demo:school-street:r2:form:p02-q1",
+            "demo:school-street:r2:form:p03-q1",
+            "demo:school-street:r2:form:p04-q1",
+            "demo:school-street:r2:form:p05-q1",
+            "demo:school-street:r2:form:p06-q1",
+            "demo:school-street:r2:form:p07-q1",
+            "demo:school-street:r2:form:p08-q1"
+          ],
+          "outputRefs": [
+            "demo:school-street:r2:inclusion-check"
+          ],
+          "input": {
+            "zh": "本輪 12 位虛構參與者的觀點分布。",
+            "en": "The perspectives of 12 fictional participants this round."
+          },
+          "output": {
+            "zh": "涵蓋缺口紀錄；本示範採定向邀請，未做抽樣。",
+            "en": "An inclusion-gap record; this demo uses purposive invitation, not a random sample."
+          },
+          "guidance": {
+            "zh": "大型公民會議可另用可稽核抽樣；小型工作坊也必須說清楚誰缺席。",
+            "en": "For a citizens’ assembly consider auditable selection; a small workshop must still explain who is missing."
+          }
+        },
+        {
+          "id": "learn",
+          "mode": "hybrid",
+          "participantRefs": [
+            "p01",
+            "p02",
+            "p03",
+            "p04",
+            "p05",
+            "p06",
+            "p07",
+            "p08",
+            "p11",
+            "p12",
+            "p13",
+            "p14"
+          ],
+          "tools": [
+            "call-in"
+          ],
+          "inputRefs": [
+            "demo:school-street:r2:inclusion-check",
+            "demo:school-street:r2:form:p01-q1",
+            "demo:school-street:r2:form:p02-q1"
+          ],
+          "outputRefs": [
+            "demo:school-street:r2:call-in:q1",
+            "demo:school-street:r2:call-in:q2",
+            "demo:school-street:r2:call-in:q3",
+            "demo:school-street:r2:call-in:q4"
+          ],
+          "input": {
+            "zh": "原始意見、背景材料與可查證的問題。",
+            "en": "Source comments, background materials and questions that can be checked."
+          },
+          "output": {
+            "zh": "4 則 Call-in 提問，作為後續回覆的來源。",
+            "en": "4 Call-in questions, retained as sources for later responses."
+          },
+          "guidance": {
+            "zh": "共同讀資料、現地走讀或線上問答；保留更正與不同立場的證據。",
+            "en": "Use shared reading, a site walk or online Q&A; retain corrections and evidence from different positions."
+          }
+        },
+        {
+          "id": "listen",
+          "mode": "hybrid",
+          "participantRefs": [
+            "p01",
+            "p02",
+            "p03",
+            "p04",
+            "p05",
+            "p06",
+            "p07",
+            "p08",
+            "p11",
+            "p12",
+            "p13",
+            "p14"
+          ],
+          "tools": [
+            "harmonica",
+            "tttc"
+          ],
+          "inputRefs": [
+            "demo:school-street:r2:form:p01-q1",
+            "demo:school-street:r2:form:p02-q1",
+            "demo:school-street:r2:form:p03-q1",
+            "demo:school-street:r2:form:p04-q1",
+            "demo:school-street:r2:form:p05-q1",
+            "demo:school-street:r2:form:p06-q1",
+            "demo:school-street:r2:form:p07-q1",
+            "demo:school-street:r2:form:p08-q1",
+            "demo:school-street:r2:call-in:q1",
+            "demo:school-street:r2:call-in:q2",
+            "demo:school-street:r2:call-in:q3",
+            "demo:school-street:r2:call-in:q4"
+          ],
+          "outputRefs": [
+            "demo:school-street:r2:harmonica:p11-m1",
+            "demo:school-street:r2:harmonica:p12-m1",
+            "demo:school-street:r2:harmonica:p13-m1",
+            "demo:school-street:r2:harmonica:p14-m1",
+            "demo:school-street:r2:tttc:theme1",
+            "demo:school-street:r2:tttc:theme2",
+            "demo:school-street:r2:tttc:theme3",
+            "demo:school-street:r2:tttc:theme4"
+          ],
+          "input": {
+            "zh": "8 則表單意見、4 則問題及補訪。",
+            "en": "8 form comments, 4 questions and follow-up interviews."
+          },
+          "output": {
+            "zh": "4 則訪談意見與 4 個附來源主題。",
+            "en": "4 interview comments and 4 source-linked themes."
+          },
+          "guidance": {
+            "zh": "Harmonica 補訪缺席聲音，TTTC 協助整理；此處主題是預先編寫的模擬，需主持人覆核。",
+            "en": "Harmonica reaches missing voices and TTTC organizes material; these themes are pre-authored simulation and require facilitator review."
+          }
+        },
+        {
+          "id": "deliberate",
+          "mode": "hybrid",
+          "participantRefs": [
+            "p01",
+            "p02",
+            "p03",
+            "p04",
+            "p05",
+            "p06",
+            "p07",
+            "p08",
+            "p11",
+            "p12",
+            "p13",
+            "p14"
+          ],
+          "tools": [
+            "polis"
+          ],
+          "inputRefs": [
+            "demo:school-street:r2:tttc:theme1",
+            "demo:school-street:r2:tttc:theme2",
+            "demo:school-street:r2:tttc:theme3",
+            "demo:school-street:r2:tttc:theme4",
+            "demo:school-street:r2:call-in:q1",
+            "demo:school-street:r2:call-in:q2",
+            "demo:school-street:r2:call-in:q3",
+            "demo:school-street:r2:call-in:q4"
+          ],
+          "outputRefs": [
+            "demo:school-street:r2:polis:statement1",
+            "demo:school-street:r2:polis:statement2",
+            "demo:school-street:r2:polis:statement3",
+            "demo:school-street:r2:polis:statement4"
+          ],
+          "input": {
+            "zh": "附來源的主題、提問與 4 項可修訂方案。",
+            "en": "Source-linked themes, questions and 4 revisable proposals."
+          },
+          "output": {
+            "zh": "12 位模擬參與者 × 4 題，共 48 筆同意／不同意／略過。",
+            "en": "12 simulated participants × 4 statements: 48 agree/disagree/pass responses."
+          },
+          "guidance": {
+            "zh": "先討論理由再比較陳述；計數不等於共識、代表性民意或授權。少數理由仍要留下。",
+            "en": "Discuss reasons, then compare statements. Counts are not consensus, representative opinion or a mandate; retain minority reasons."
+          }
+        },
+        {
+          "id": "respond",
+          "mode": "hybrid",
+          "participantRefs": [
+            "p01",
+            "p02",
+            "p03",
+            "p04"
+          ],
+          "tools": [
+            "reply"
+          ],
+          "inputRefs": [
+            "demo:school-street:r2:polis:statement1",
+            "demo:school-street:r2:polis:statement2",
+            "demo:school-street:r2:polis:statement3",
+            "demo:school-street:r2:polis:statement4",
+            "demo:school-street:r2:call-in:q1",
+            "demo:school-street:r2:call-in:q2",
+            "demo:school-street:r2:call-in:q3",
+            "demo:school-street:r2:call-in:q4"
+          ],
+          "outputRefs": [
+            "demo:school-street:r2:reply:q1",
+            "demo:school-street:r2:reply:q2",
+            "demo:school-street:r2:reply:q3",
+            "demo:school-street:r2:reply:q4",
+            "demo:school-street:r2:decision"
+          ],
+          "input": {
+            "zh": "4 項候選方案、模擬投票與原始提問。",
+            "en": "4 candidate proposals, simulated votes and source questions."
+          },
+          "output": {
+            "zh": "模擬主辦者提出附條件試辦草案：晨間二十分鐘、通行例外、每週檢討與明確暫停條件。經費方案未採納，需另作回覆。",
+            "en": "The fictional organizer drafts a conditional pilot: twenty morning minutes, access exceptions, weekly review and pause conditions. The cost-sharing proposal is not adopted and needs a reasoned response."
+          },
+          "guidance": {
+            "zh": "Pocket Reply 草擬逐題回覆，主辦者覆核後才形成自己的承諾；模型不能代替有權決定者。",
+            "en": "Pocket Reply drafts question-linked replies; the organizer reviews before making commitments. A model cannot replace the authorized decision-maker."
+          }
+        },
+        {
+          "id": "feedback",
+          "mode": "hybrid",
+          "participantRefs": [
+            "p01",
+            "p02",
+            "p03",
+            "p04",
+            "p05",
+            "p06",
+            "p07",
+            "p08",
+            "p11",
+            "p12",
+            "p13",
+            "p14"
+          ],
+          "tools": [
+            "form",
+            "call-in"
+          ],
+          "inputRefs": [
+            "demo:school-street:r2:decision",
+            "demo:school-street:r2:reply:q1",
+            "demo:school-street:r2:reply:q2",
+            "demo:school-street:r2:reply:q3",
+            "demo:school-street:r2:reply:q4"
+          ],
+          "outputRefs": [
+            "demo:school-street:r2:unresolved",
+            "demo:school-street:r2:next-brief"
+          ],
+          "input": {
+            "zh": "本輪回覆、修正要求與仍未解決的問題。",
+            "en": "This round’s responses, correction requests and unresolved questions."
+          },
+          "output": {
+            "zh": "試辦經費由誰負擔仍未解決；未採納的店家分攤方案要有理由。",
+            "en": "Funding remains unresolved; the rejected shop cost-sharing proposal needs an explanation."
+          },
+          "guidance": {
+            "zh": "回到共同學習：帶入模擬觀察紀錄、經費選項和參與者更正，再檢討是否延長試辦。",
+            "en": "Return to learning: bring simulated observations, funding options and participant corrections, then review whether the pilot should continue."
+          }
+        }
+      ],
+      "artifacts": [
+        {
+          "id": "demo:school-street:r2:brief",
+          "phaseId": "frame",
+          "kind": "brief",
+          "text": {
+            "zh": "納入接送、配送與巷弄觀點，將第一輪分歧改成可檢查的試辦條件。",
+            "en": "Include access, delivery and side-street perspectives; turn disagreements into checkable pilot conditions."
+          },
+          "source": {
+            "tool": "facilitation",
+            "sourceId": "synthetic-r2-facilitation",
+            "artifactId": "brief"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r1:unresolved",
+            "demo:school-street:r1:next-brief",
+            "demo:school-street:r1:decision"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r2:form:p01-q1",
+          "phaseId": "recruit",
+          "kind": "statement",
+          "text": {
+            "zh": "可先從早上做，放學時段等第一階段檢討後再決定。",
+            "en": "Start with mornings and review before adding dismissal hours."
+          },
+          "source": {
+            "tool": "form",
+            "sourceId": "synthetic-r2-form",
+            "artifactId": "form:p01-q1"
+          },
+          "participantRef": "p01",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r2:form:p02-q1",
+          "phaseId": "recruit",
+          "kind": "statement",
+          "text": {
+            "zh": "現地走讀才看到路口斜坡不平，需要先補平。",
+            "en": "The site walk revealed an uneven ramp that needs repair first."
+          },
+          "source": {
+            "tool": "form",
+            "sourceId": "synthetic-r2-form",
+            "artifactId": "form:p02-q1"
+          },
+          "participantRef": "p02",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r2:form:p03-q1",
+          "phaseId": "recruit",
+          "kind": "statement",
+          "text": {
+            "zh": "配送可以提前，但要有清楚的臨停告示。",
+            "en": "Deliveries can arrive earlier if the loading signs are clear."
+          },
+          "source": {
+            "tool": "form",
+            "sourceId": "synthetic-r2-form",
+            "artifactId": "form:p03-q1"
+          },
+          "participantRef": "p03",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r2:form:p04-q1",
+          "phaseId": "recruit",
+          "kind": "statement",
+          "text": {
+            "zh": "無障礙接送應設通行窗口，不應讓個人健康資訊公開。",
+            "en": "Accessible drop-off needs an access window without publishing personal health information."
+          },
+          "source": {
+            "tool": "form",
+            "sourceId": "synthetic-r2-form",
+            "artifactId": "form:p04-q1"
+          },
+          "participantRef": "p04",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r2:form:p05-q1",
+          "phaseId": "recruit",
+          "kind": "statement",
+          "text": {
+            "zh": "巷口應放觀察點，不能只量校門前。",
+            "en": "Place an observation point at the side street, not only at the gate."
+          },
+          "source": {
+            "tool": "form",
+            "sourceId": "synthetic-r2-form",
+            "artifactId": "form:p05-q1"
+          },
+          "participantRef": "p05",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r2:form:p06-q1",
+          "phaseId": "recruit",
+          "kind": "statement",
+          "text": {
+            "zh": "給配送一個前後緩衝時間，比全面禁止可行。",
+            "en": "A buffer before and after the closure works better than a blanket delivery ban."
+          },
+          "source": {
+            "tool": "form",
+            "sourceId": "synthetic-r2-form",
+            "artifactId": "form:p06-q1"
+          },
+          "participantRef": "p06",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r2:form:p07-q1",
+          "phaseId": "recruit",
+          "kind": "statement",
+          "text": {
+            "zh": "引導員輪值要有明確負責人，不能都算老師的工作。",
+            "en": "Name the crossing-steward coordinator instead of assuming teachers can do everything."
+          },
+          "source": {
+            "tool": "form",
+            "sourceId": "synthetic-r2-form",
+            "artifactId": "form:p07-q1"
+          },
+          "participantRef": "p07",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r2:form:p08-q1",
+          "phaseId": "recruit",
+          "kind": "statement",
+          "text": {
+            "zh": "可用活動式標誌，保留救護車緊急通行。",
+            "en": "Use movable signs to preserve emergency access."
+          },
+          "source": {
+            "tool": "form",
+            "sourceId": "synthetic-r2-form",
+            "artifactId": "form:p08-q1"
+          },
+          "participantRef": "p08",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r2:inclusion-check",
+          "phaseId": "sortition",
+          "kind": "inclusion-check",
+          "text": {
+            "zh": "這是虛構的定向邀請小組，沒有執行隨機抽樣，也不代表全體居民。",
+            "en": "This is a fictional purposively invited group. No random selection was performed and it does not represent all residents."
+          },
+          "source": {
+            "tool": "facilitation",
+            "sourceId": "synthetic-r2-facilitation",
+            "artifactId": "inclusion-check"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r2:brief"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r2:call-in:q1",
+          "phaseId": "learn",
+          "kind": "question",
+          "text": {
+            "zh": "實際有權核准試辦的是誰？",
+            "en": "Who has actual authority to approve the pilot?"
+          },
+          "source": {
+            "tool": "call-in",
+            "sourceId": "synthetic-r2-call-in",
+            "artifactId": "call-in:q1"
+          },
+          "participantRef": "p01",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r2:call-in:q2",
+          "phaseId": "learn",
+          "kind": "question",
+          "text": {
+            "zh": "無障礙接送如何保留？",
+            "en": "How will accessible drop-off remain available?"
+          },
+          "source": {
+            "tool": "call-in",
+            "sourceId": "synthetic-r2-call-in",
+            "artifactId": "call-in:q2"
+          },
+          "participantRef": "p02",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r2:call-in:q3",
+          "phaseId": "learn",
+          "kind": "question",
+          "text": {
+            "zh": "誰承擔試辦成本與引導工作？",
+            "en": "Who pays for the pilot and coordinates crossing stewards?"
+          },
+          "source": {
+            "tool": "call-in",
+            "sourceId": "synthetic-r2-call-in",
+            "artifactId": "call-in:q3"
+          },
+          "participantRef": "p03",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r2:call-in:q4",
+          "phaseId": "learn",
+          "kind": "question",
+          "text": {
+            "zh": "若巷弄塞車或有人無法進出，要如何暫停？",
+            "en": "How can the pilot pause if side streets clog or someone loses access?"
+          },
+          "source": {
+            "tool": "call-in",
+            "sourceId": "synthetic-r2-call-in",
+            "artifactId": "call-in:q4"
+          },
+          "participantRef": "p04",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r2:harmonica:p11-m1",
+          "phaseId": "listen",
+          "kind": "statement",
+          "text": {
+            "zh": "要把公車站到入口的替代路線畫在同一張圖。",
+            "en": "Show the route from the bus stop to the entrance on one map."
+          },
+          "source": {
+            "tool": "harmonica",
+            "sourceId": "synthetic-r2-harmonica",
+            "artifactId": "harmonica:p11-m1"
+          },
+          "participantRef": "p11",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r2:harmonica:p12-m1",
+          "phaseId": "listen",
+          "kind": "statement",
+          "text": {
+            "zh": "希望每週公開問題清單與修正方式。",
+            "en": "Publish a weekly issue list and explain corrections."
+          },
+          "source": {
+            "tool": "harmonica",
+            "sourceId": "synthetic-r2-harmonica",
+            "artifactId": "harmonica:p12-m1"
+          },
+          "participantRef": "p12",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r2:harmonica:p13-m1",
+          "phaseId": "listen",
+          "kind": "statement",
+          "text": {
+            "zh": "到宅照顧不能因封路延誤，希望保留預約通行。",
+            "en": "Home-care visits cannot be delayed by the closure; keep scheduled access."
+          },
+          "source": {
+            "tool": "harmonica",
+            "sourceId": "synthetic-r2-harmonica",
+            "artifactId": "harmonica:p13-m1"
+          },
+          "participantRef": "p13",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r2:harmonica:p14-m1",
+          "phaseId": "listen",
+          "kind": "statement",
+          "text": {
+            "zh": "我們住的小巷若車流增加，應有明確暫停條件。",
+            "en": "If traffic rises on our side street, there should be a clear pause condition."
+          },
+          "source": {
+            "tool": "harmonica",
+            "sourceId": "synthetic-r2-harmonica",
+            "artifactId": "harmonica:p14-m1"
+          },
+          "participantRef": "p14",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r2:tttc:theme1",
+          "phaseId": "listen",
+          "kind": "theme",
+          "text": {
+            "zh": "過街安全與學習",
+            "en": "Crossing safety and learning"
+          },
+          "source": {
+            "tool": "tttc",
+            "sourceId": "synthetic-r2-tttc",
+            "artifactId": "tttc:theme1"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r2:form:p01-q1",
+            "demo:school-street:r2:form:p05-q1",
+            "demo:school-street:r2:harmonica:p11-m1"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r2:tttc:theme2",
+          "phaseId": "listen",
+          "kind": "theme",
+          "text": {
+            "zh": "無障礙與照顧通行",
+            "en": "Accessibility and care access"
+          },
+          "source": {
+            "tool": "tttc",
+            "sourceId": "synthetic-r2-tttc",
+            "artifactId": "tttc:theme2"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r2:form:p02-q1",
+            "demo:school-street:r2:form:p06-q1",
+            "demo:school-street:r2:harmonica:p12-m1"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r2:tttc:theme3",
+          "phaseId": "listen",
+          "kind": "theme",
+          "text": {
+            "zh": "配送、生計與執行成本",
+            "en": "Deliveries, livelihoods and implementation cost"
+          },
+          "source": {
+            "tool": "tttc",
+            "sourceId": "synthetic-r2-tttc",
+            "artifactId": "tttc:theme3"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r2:form:p03-q1",
+            "demo:school-street:r2:form:p07-q1",
+            "demo:school-street:r2:harmonica:p13-m1"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r2:tttc:theme4",
+          "phaseId": "listen",
+          "kind": "theme",
+          "text": {
+            "zh": "巷弄影響與檢討責任",
+            "en": "Side-street effects and review responsibility"
+          },
+          "source": {
+            "tool": "tttc",
+            "sourceId": "synthetic-r2-tttc",
+            "artifactId": "tttc:theme4"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r2:form:p04-q1",
+            "demo:school-street:r2:form:p08-q1",
+            "demo:school-street:r2:harmonica:p14-m1"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r2:polis:statement1",
+          "phaseId": "deliberate",
+          "kind": "proposal",
+          "text": {
+            "zh": "先試辦四週早上二十分鐘，放學時段留待檢討。",
+            "en": "Pilot twenty morning minutes for four weeks; review dismissal hours later."
+          },
+          "source": {
+            "tool": "polis",
+            "sourceId": "synthetic-r2-polis",
+            "artifactId": "polis:statement1"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r2:tttc:theme1",
+            "demo:school-street:r2:call-in:q1"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r2:polis:statement2",
+          "phaseId": "deliberate",
+          "kind": "proposal",
+          "text": {
+            "zh": "共同設計無障礙接送、照顧通行與配送緩衝時間。",
+            "en": "Co-design accessible drop-off, home-care access and delivery buffers."
+          },
+          "source": {
+            "tool": "polis",
+            "sourceId": "synthetic-r2-polis",
+            "artifactId": "polis:statement2"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r2:tttc:theme2",
+            "demo:school-street:r2:call-in:q2"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r2:polis:statement3",
+          "phaseId": "deliberate",
+          "kind": "proposal",
+          "text": {
+            "zh": "若出入口受阻或緊急通道失效，立即暫停並檢討。",
+            "en": "Pause and review immediately if access is blocked or the emergency route fails."
+          },
+          "source": {
+            "tool": "polis",
+            "sourceId": "synthetic-r2-polis",
+            "artifactId": "polis:statement3"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r2:tttc:theme3",
+            "demo:school-street:r2:call-in:q3"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r2:polis:statement4",
+          "phaseId": "deliberate",
+          "kind": "proposal",
+          "text": {
+            "zh": "試辦成本由店家平均負擔。",
+            "en": "Split pilot costs equally among local shops."
+          },
+          "source": {
+            "tool": "polis",
+            "sourceId": "synthetic-r2-polis",
+            "artifactId": "polis:statement4"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r2:tttc:theme4",
+            "demo:school-street:r2:call-in:q4"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r2:reply:q1",
+          "phaseId": "respond",
+          "kind": "reply",
+          "text": {
+            "zh": "模擬回覆 1：本輪已連結原提問與方案；模擬主辦者提出附條件試辦草案：晨間二十分鐘、通行例外、每週檢討與明確暫停條件。經費方案未採納，需另作回覆。",
+            "en": "Fictional response 1: this round links the source question and proposal. The fictional organizer drafts a conditional pilot: twenty morning minutes, access exceptions, weekly review and pause conditions. The cost-sharing proposal is not adopted and needs a reasoned response."
+          },
+          "source": {
+            "tool": "reply",
+            "sourceId": "synthetic-r2-reply",
+            "artifactId": "reply:q1"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r2:call-in:q1",
+            "demo:school-street:r2:polis:statement1"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r2:reply:q2",
+          "phaseId": "respond",
+          "kind": "reply",
+          "text": {
+            "zh": "模擬回覆 2：本輪已連結原提問與方案；模擬主辦者提出附條件試辦草案：晨間二十分鐘、通行例外、每週檢討與明確暫停條件。經費方案未採納，需另作回覆。",
+            "en": "Fictional response 2: this round links the source question and proposal. The fictional organizer drafts a conditional pilot: twenty morning minutes, access exceptions, weekly review and pause conditions. The cost-sharing proposal is not adopted and needs a reasoned response."
+          },
+          "source": {
+            "tool": "reply",
+            "sourceId": "synthetic-r2-reply",
+            "artifactId": "reply:q2"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r2:call-in:q2",
+            "demo:school-street:r2:polis:statement2"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r2:reply:q3",
+          "phaseId": "respond",
+          "kind": "reply",
+          "text": {
+            "zh": "模擬回覆 3：本輪已連結原提問與方案；模擬主辦者提出附條件試辦草案：晨間二十分鐘、通行例外、每週檢討與明確暫停條件。經費方案未採納，需另作回覆。",
+            "en": "Fictional response 3: this round links the source question and proposal. The fictional organizer drafts a conditional pilot: twenty morning minutes, access exceptions, weekly review and pause conditions. The cost-sharing proposal is not adopted and needs a reasoned response."
+          },
+          "source": {
+            "tool": "reply",
+            "sourceId": "synthetic-r2-reply",
+            "artifactId": "reply:q3"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r2:call-in:q3",
+            "demo:school-street:r2:polis:statement3"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r2:reply:q4",
+          "phaseId": "respond",
+          "kind": "reply",
+          "text": {
+            "zh": "模擬回覆 4：本輪已連結原提問與方案；模擬主辦者提出附條件試辦草案：晨間二十分鐘、通行例外、每週檢討與明確暫停條件。經費方案未採納，需另作回覆。",
+            "en": "Fictional response 4: this round links the source question and proposal. The fictional organizer drafts a conditional pilot: twenty morning minutes, access exceptions, weekly review and pause conditions. The cost-sharing proposal is not adopted and needs a reasoned response."
+          },
+          "source": {
+            "tool": "reply",
+            "sourceId": "synthetic-r2-reply",
+            "artifactId": "reply:q4"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r2:call-in:q4",
+            "demo:school-street:r2:polis:statement4"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r2:decision",
+          "phaseId": "respond",
+          "kind": "decision",
+          "text": {
+            "zh": "模擬主辦者提出附條件試辦草案：晨間二十分鐘、通行例外、每週檢討與明確暫停條件。經費方案未採納，需另作回覆。",
+            "en": "The fictional organizer drafts a conditional pilot: twenty morning minutes, access exceptions, weekly review and pause conditions. The cost-sharing proposal is not adopted and needs a reasoned response."
+          },
+          "source": {
+            "tool": "facilitation",
+            "sourceId": "synthetic-r2-facilitation",
+            "artifactId": "decision"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r2:reply:q1",
+            "demo:school-street:r2:reply:q2",
+            "demo:school-street:r2:reply:q3",
+            "demo:school-street:r2:reply:q4"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r2:unresolved",
+          "phaseId": "feedback",
+          "kind": "feedback",
+          "text": {
+            "zh": "試辦經費由誰負擔仍未解決；未採納的店家分攤方案要有理由。",
+            "en": "Funding remains unresolved; the rejected shop cost-sharing proposal needs an explanation."
+          },
+          "source": {
+            "tool": "facilitation",
+            "sourceId": "synthetic-r2-facilitation",
+            "artifactId": "unresolved"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r2:decision"
+          ],
+          "status": "needs-response",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r2:next-brief",
+          "phaseId": "feedback",
+          "kind": "feedback",
+          "text": {
+            "zh": "回到共同學習：帶入模擬觀察紀錄、經費選項和參與者更正，再檢討是否延長試辦。",
+            "en": "Return to learning: bring simulated observations, funding options and participant corrections, then review whether the pilot should continue."
+          },
+          "source": {
+            "tool": "facilitation",
+            "sourceId": "synthetic-r2-facilitation",
+            "artifactId": "next-brief"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r2:unresolved"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        }
+      ],
+      "responses": [
+        {
+          "id": "demo:school-street:r2:vote:1:p01",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement1",
+          "participantRef": "p01",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:1:p02",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement1",
+          "participantRef": "p02",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:1:p03",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement1",
+          "participantRef": "p03",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:1:p04",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement1",
+          "participantRef": "p04",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:1:p05",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement1",
+          "participantRef": "p05",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:1:p06",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement1",
+          "participantRef": "p06",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:1:p07",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement1",
+          "participantRef": "p07",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:1:p08",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement1",
+          "participantRef": "p08",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:1:p11",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement1",
+          "participantRef": "p11",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:1:p12",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement1",
+          "participantRef": "p12",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:1:p13",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement1",
+          "participantRef": "p13",
+          "value": "disagree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:1:p14",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement1",
+          "participantRef": "p14",
+          "value": "pass",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:2:p01",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement2",
+          "participantRef": "p01",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:2:p02",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement2",
+          "participantRef": "p02",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:2:p03",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement2",
+          "participantRef": "p03",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:2:p04",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement2",
+          "participantRef": "p04",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:2:p05",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement2",
+          "participantRef": "p05",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:2:p06",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement2",
+          "participantRef": "p06",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:2:p07",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement2",
+          "participantRef": "p07",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:2:p08",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement2",
+          "participantRef": "p08",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:2:p11",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement2",
+          "participantRef": "p11",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:2:p12",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement2",
+          "participantRef": "p12",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:2:p13",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement2",
+          "participantRef": "p13",
+          "value": "pass",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:2:p14",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement2",
+          "participantRef": "p14",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:3:p01",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement3",
+          "participantRef": "p01",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:3:p02",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement3",
+          "participantRef": "p02",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:3:p03",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement3",
+          "participantRef": "p03",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:3:p04",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement3",
+          "participantRef": "p04",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:3:p05",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement3",
+          "participantRef": "p05",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:3:p06",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement3",
+          "participantRef": "p06",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:3:p07",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement3",
+          "participantRef": "p07",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:3:p08",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement3",
+          "participantRef": "p08",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:3:p11",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement3",
+          "participantRef": "p11",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:3:p12",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement3",
+          "participantRef": "p12",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:3:p13",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement3",
+          "participantRef": "p13",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:3:p14",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement3",
+          "participantRef": "p14",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:4:p01",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement4",
+          "participantRef": "p01",
+          "value": "disagree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:4:p02",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement4",
+          "participantRef": "p02",
+          "value": "disagree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:4:p03",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement4",
+          "participantRef": "p03",
+          "value": "disagree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:4:p04",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement4",
+          "participantRef": "p04",
+          "value": "disagree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:4:p05",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement4",
+          "participantRef": "p05",
+          "value": "disagree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:4:p06",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement4",
+          "participantRef": "p06",
+          "value": "disagree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:4:p07",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement4",
+          "participantRef": "p07",
+          "value": "disagree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:4:p08",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement4",
+          "participantRef": "p08",
+          "value": "disagree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:4:p11",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement4",
+          "participantRef": "p11",
+          "value": "pass",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:4:p12",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement4",
+          "participantRef": "p12",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:4:p13",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement4",
+          "participantRef": "p13",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r2:vote:4:p14",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r2:polis:statement4",
+          "participantRef": "p14",
+          "value": "disagree",
+          "tool": "polis"
+        }
+      ],
+      "next": {
+        "phaseId": "learn",
+        "reason": {
+          "zh": "回到共同學習：帶入模擬觀察紀錄、經費選項和參與者更正，再檢討是否延長試辦。",
+          "en": "Return to learning: bring simulated observations, funding options and participant corrections, then review whether the pilot should continue."
+        },
+        "owner": {
+          "zh": "模擬主辦工作小組",
+          "en": "Fictional organizing group"
+        },
+        "reviewOn": "2026-11-12",
+        "carryForwardRefs": [
+          "demo:school-street:r2:unresolved",
+          "demo:school-street:r2:next-brief",
+          "demo:school-street:r2:decision"
+        ]
+      }
+    },
+    {
+      "id": "r3",
+      "sequence": 3,
+      "previousRoundId": "r2",
+      "title": {
+        "zh": "第 3 輪：檢視回覆，保留下一輪",
+        "en": "Round 3: Review responses and keep the loop open"
+      },
+      "goal": {
+        "zh": "用明確標記的虛構觀察資料示範檢討，不把支持數當成正式決定或交通改善實證。",
+        "en": "Use explicitly fictional observations to demonstrate review; support counts are neither a formal decision nor evidence of traffic improvement."
+      },
+      "focus": {
+        "zh": "巷弄影響與持續檢討",
+        "en": "Side-street effects and continued review"
+      },
+      "attendance": [
+        {
+          "participantRef": "p01",
+          "mode": "online"
+        },
+        {
+          "participantRef": "p03",
+          "mode": "online"
+        },
+        {
+          "participantRef": "p04",
+          "mode": "online"
+        },
+        {
+          "participantRef": "p05",
+          "mode": "online"
+        },
+        {
+          "participantRef": "p06",
+          "mode": "online"
+        },
+        {
+          "participantRef": "p07",
+          "mode": "online"
+        },
+        {
+          "participantRef": "p09",
+          "mode": "online"
+        },
+        {
+          "participantRef": "p10",
+          "mode": "in-person"
+        },
+        {
+          "participantRef": "p11",
+          "mode": "in-person"
+        },
+        {
+          "participantRef": "p12",
+          "mode": "in-person"
+        },
+        {
+          "participantRef": "p13",
+          "mode": "in-person"
+        },
+        {
+          "participantRef": "p14",
+          "mode": "in-person"
+        }
+      ],
+      "phases": [
+        {
+          "id": "frame",
+          "mode": "hybrid",
+          "participantRefs": [
+            "p01",
+            "p03",
+            "p04",
+            "p05"
+          ],
+          "tools": [
+            "facilitation"
+          ],
+          "inputRefs": [
+            "demo:school-street:r2:unresolved",
+            "demo:school-street:r2:next-brief",
+            "demo:school-street:r2:decision"
+          ],
+          "outputRefs": [
+            "demo:school-street:r3:brief"
+          ],
+          "input": {
+            "zh": "上一輪未回答的問題、決策權限與本輪範圍。",
+            "en": "Carry-over questions, decision authority and scope."
+          },
+          "output": {
+            "zh": "用明確標記的虛構觀察資料示範檢討，不把支持數當成正式決定或交通改善實證。",
+            "en": "Use explicitly fictional observations to demonstrate review; support counts are neither a formal decision nor evidence of traffic improvement."
+          },
+          "guidance": {
+            "zh": "先確認能改什麼、由誰回覆；本案例全部是虛構示範。",
+            "en": "Clarify what can change and who must respond; this entire case is fictional."
+          }
+        },
+        {
+          "id": "recruit",
+          "mode": "hybrid",
+          "participantRefs": [
+            "p01",
+            "p03",
+            "p04",
+            "p05",
+            "p06",
+            "p07",
+            "p09",
+            "p10",
+            "p11",
+            "p12",
+            "p13",
+            "p14"
+          ],
+          "tools": [
+            "form"
+          ],
+          "inputRefs": [
+            "demo:school-street:r3:brief"
+          ],
+          "outputRefs": [
+            "demo:school-street:r3:form:p01-q1",
+            "demo:school-street:r3:form:p03-q1",
+            "demo:school-street:r3:form:p04-q1",
+            "demo:school-street:r3:form:p05-q1",
+            "demo:school-street:r3:form:p06-q1",
+            "demo:school-street:r3:form:p07-q1",
+            "demo:school-street:r3:form:p09-q1",
+            "demo:school-street:r3:form:p10-q1"
+          ],
+          "input": {
+            "zh": "議題簡介、可近用需求與上一輪的缺席聲音。",
+            "en": "Issue brief, access needs and voices missing last round."
+          },
+          "output": {
+            "zh": "8 則表單意見；聯絡方式與意見分開保管。",
+            "en": "8 form comments; keep contact details separate from views."
+          },
+          "guidance": {
+            "zh": "線上表單搭配電話或現場邀請，讓夜班、照顧者與無網路者能進來。",
+            "en": "Pair the online form with calls or in-person invitations so shifts, caring duties and internet access do not exclude people."
+          }
+        },
+        {
+          "id": "sortition",
+          "mode": "hybrid",
+          "participantRefs": [
+            "p01",
+            "p03",
+            "p04",
+            "p05",
+            "p06",
+            "p07",
+            "p09",
+            "p10",
+            "p11",
+            "p12",
+            "p13",
+            "p14"
+          ],
+          "tools": [
+            "facilitation"
+          ],
+          "inputRefs": [
+            "demo:school-street:r3:form:p01-q1",
+            "demo:school-street:r3:form:p03-q1",
+            "demo:school-street:r3:form:p04-q1",
+            "demo:school-street:r3:form:p05-q1",
+            "demo:school-street:r3:form:p06-q1",
+            "demo:school-street:r3:form:p07-q1",
+            "demo:school-street:r3:form:p09-q1",
+            "demo:school-street:r3:form:p10-q1"
+          ],
+          "outputRefs": [
+            "demo:school-street:r3:inclusion-check"
+          ],
+          "input": {
+            "zh": "本輪 12 位虛構參與者的觀點分布。",
+            "en": "The perspectives of 12 fictional participants this round."
+          },
+          "output": {
+            "zh": "涵蓋缺口紀錄；本示範採定向邀請，未做抽樣。",
+            "en": "An inclusion-gap record; this demo uses purposive invitation, not a random sample."
+          },
+          "guidance": {
+            "zh": "大型公民會議可另用可稽核抽樣；小型工作坊也必須說清楚誰缺席。",
+            "en": "For a citizens’ assembly consider auditable selection; a small workshop must still explain who is missing."
+          }
+        },
+        {
+          "id": "learn",
+          "mode": "hybrid",
+          "participantRefs": [
+            "p01",
+            "p03",
+            "p04",
+            "p05",
+            "p06",
+            "p07",
+            "p09",
+            "p10",
+            "p11",
+            "p12",
+            "p13",
+            "p14"
+          ],
+          "tools": [
+            "call-in"
+          ],
+          "inputRefs": [
+            "demo:school-street:r3:inclusion-check",
+            "demo:school-street:r3:form:p01-q1",
+            "demo:school-street:r3:form:p03-q1"
+          ],
+          "outputRefs": [
+            "demo:school-street:r3:call-in:q1",
+            "demo:school-street:r3:call-in:q2",
+            "demo:school-street:r3:call-in:q3",
+            "demo:school-street:r3:call-in:q4"
+          ],
+          "input": {
+            "zh": "原始意見、背景材料與可查證的問題。",
+            "en": "Source comments, background materials and questions that can be checked."
+          },
+          "output": {
+            "zh": "4 則 Call-in 提問，作為後續回覆的來源。",
+            "en": "4 Call-in questions, retained as sources for later responses."
+          },
+          "guidance": {
+            "zh": "共同讀資料、現地走讀或線上問答；保留更正與不同立場的證據。",
+            "en": "Use shared reading, a site walk or online Q&A; retain corrections and evidence from different positions."
+          }
+        },
+        {
+          "id": "listen",
+          "mode": "hybrid",
+          "participantRefs": [
+            "p01",
+            "p03",
+            "p04",
+            "p05",
+            "p06",
+            "p07",
+            "p09",
+            "p10",
+            "p11",
+            "p12",
+            "p13",
+            "p14"
+          ],
+          "tools": [
+            "harmonica",
+            "tttc"
+          ],
+          "inputRefs": [
+            "demo:school-street:r3:form:p01-q1",
+            "demo:school-street:r3:form:p03-q1",
+            "demo:school-street:r3:form:p04-q1",
+            "demo:school-street:r3:form:p05-q1",
+            "demo:school-street:r3:form:p06-q1",
+            "demo:school-street:r3:form:p07-q1",
+            "demo:school-street:r3:form:p09-q1",
+            "demo:school-street:r3:form:p10-q1",
+            "demo:school-street:r3:call-in:q1",
+            "demo:school-street:r3:call-in:q2",
+            "demo:school-street:r3:call-in:q3",
+            "demo:school-street:r3:call-in:q4"
+          ],
+          "outputRefs": [
+            "demo:school-street:r3:harmonica:p11-m1",
+            "demo:school-street:r3:harmonica:p12-m1",
+            "demo:school-street:r3:harmonica:p13-m1",
+            "demo:school-street:r3:harmonica:p14-m1",
+            "demo:school-street:r3:tttc:theme1",
+            "demo:school-street:r3:tttc:theme2",
+            "demo:school-street:r3:tttc:theme3",
+            "demo:school-street:r3:tttc:theme4"
+          ],
+          "input": {
+            "zh": "8 則表單意見、4 則問題及補訪。",
+            "en": "8 form comments, 4 questions and follow-up interviews."
+          },
+          "output": {
+            "zh": "4 則訪談意見與 4 個附來源主題。",
+            "en": "4 interview comments and 4 source-linked themes."
+          },
+          "guidance": {
+            "zh": "Harmonica 補訪缺席聲音，TTTC 協助整理；此處主題是預先編寫的模擬，需主持人覆核。",
+            "en": "Harmonica reaches missing voices and TTTC organizes material; these themes are pre-authored simulation and require facilitator review."
+          }
+        },
+        {
+          "id": "deliberate",
+          "mode": "hybrid",
+          "participantRefs": [
+            "p01",
+            "p03",
+            "p04",
+            "p05",
+            "p06",
+            "p07",
+            "p09",
+            "p10",
+            "p11",
+            "p12",
+            "p13",
+            "p14"
+          ],
+          "tools": [
+            "polis"
+          ],
+          "inputRefs": [
+            "demo:school-street:r3:tttc:theme1",
+            "demo:school-street:r3:tttc:theme2",
+            "demo:school-street:r3:tttc:theme3",
+            "demo:school-street:r3:tttc:theme4",
+            "demo:school-street:r3:call-in:q1",
+            "demo:school-street:r3:call-in:q2",
+            "demo:school-street:r3:call-in:q3",
+            "demo:school-street:r3:call-in:q4"
+          ],
+          "outputRefs": [
+            "demo:school-street:r3:polis:statement1",
+            "demo:school-street:r3:polis:statement2",
+            "demo:school-street:r3:polis:statement3",
+            "demo:school-street:r3:polis:statement4"
+          ],
+          "input": {
+            "zh": "附來源的主題、提問與 4 項可修訂方案。",
+            "en": "Source-linked themes, questions and 4 revisable proposals."
+          },
+          "output": {
+            "zh": "12 位模擬參與者 × 4 題，共 48 筆同意／不同意／略過。",
+            "en": "12 simulated participants × 4 statements: 48 agree/disagree/pass responses."
+          },
+          "guidance": {
+            "zh": "先討論理由再比較陳述；計數不等於共識、代表性民意或授權。少數理由仍要留下。",
+            "en": "Discuss reasons, then compare statements. Counts are not consensus, representative opinion or a mandate; retain minority reasons."
+          }
+        },
+        {
+          "id": "respond",
+          "mode": "hybrid",
+          "participantRefs": [
+            "p01",
+            "p03",
+            "p04",
+            "p05"
+          ],
+          "tools": [
+            "reply"
+          ],
+          "inputRefs": [
+            "demo:school-street:r3:polis:statement1",
+            "demo:school-street:r3:polis:statement2",
+            "demo:school-street:r3:polis:statement3",
+            "demo:school-street:r3:polis:statement4",
+            "demo:school-street:r3:call-in:q1",
+            "demo:school-street:r3:call-in:q2",
+            "demo:school-street:r3:call-in:q3",
+            "demo:school-street:r3:call-in:q4"
+          ],
+          "outputRefs": [
+            "demo:school-street:r3:reply:q1",
+            "demo:school-street:r3:reply:q2",
+            "demo:school-street:r3:reply:q3",
+            "demo:school-street:r3:reply:q4",
+            "demo:school-street:r3:decision"
+          ],
+          "input": {
+            "zh": "4 項候選方案、模擬投票與原始提問。",
+            "en": "4 candidate proposals, simulated votes and source questions."
+          },
+          "output": {
+            "zh": "模擬回覆保留晨間試辦方向，但不宣稱交通已改善；全天方案未採納。下一輪仍須檢查巷弄影響及輪值負擔。",
+            "en": "The fictional response keeps a morning-pilot direction without claiming improved traffic; the all-day proposal is not adopted. Side-street effects and steward workload remain for the next round."
+          },
+          "guidance": {
+            "zh": "Pocket Reply 草擬逐題回覆，主辦者覆核後才形成自己的承諾；模型不能代替有權決定者。",
+            "en": "Pocket Reply drafts question-linked replies; the organizer reviews before making commitments. A model cannot replace the authorized decision-maker."
+          }
+        },
+        {
+          "id": "feedback",
+          "mode": "hybrid",
+          "participantRefs": [
+            "p01",
+            "p03",
+            "p04",
+            "p05",
+            "p06",
+            "p07",
+            "p09",
+            "p10",
+            "p11",
+            "p12",
+            "p13",
+            "p14"
+          ],
+          "tools": [
+            "form",
+            "call-in"
+          ],
+          "inputRefs": [
+            "demo:school-street:r3:decision",
+            "demo:school-street:r3:reply:q1",
+            "demo:school-street:r3:reply:q2",
+            "demo:school-street:r3:reply:q3",
+            "demo:school-street:r3:reply:q4"
+          ],
+          "outputRefs": [
+            "demo:school-street:r3:unresolved",
+            "demo:school-street:r3:next-brief"
+          ],
+          "input": {
+            "zh": "本輪回覆、修正要求與仍未解決的問題。",
+            "en": "This round’s responses, correction requests and unresolved questions."
+          },
+          "output": {
+            "zh": "巷弄觀察資料仍不足，放學時段與輪值負擔不可視為已解決。",
+            "en": "Side-street observations remain insufficient; dismissal hours and steward workload are unresolved."
+          },
+          "guidance": {
+            "zh": "開啟第 4 輪的問題定義：公開哪些已改、哪些沒改，補充觀察並重新邀請缺席的人。",
+            "en": "Start round 4 by reframing: explain what changed and what did not, gather observations and reinvite missing voices."
+          }
+        }
+      ],
+      "artifacts": [
+        {
+          "id": "demo:school-street:r3:brief",
+          "phaseId": "frame",
+          "kind": "brief",
+          "text": {
+            "zh": "用明確標記的虛構觀察資料示範檢討，不把支持數當成正式決定或交通改善實證。",
+            "en": "Use explicitly fictional observations to demonstrate review; support counts are neither a formal decision nor evidence of traffic improvement."
+          },
+          "source": {
+            "tool": "facilitation",
+            "sourceId": "synthetic-r3-facilitation",
+            "artifactId": "brief"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r2:unresolved",
+            "demo:school-street:r2:next-brief",
+            "demo:school-street:r2:decision"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r3:form:p01-q1",
+          "phaseId": "recruit",
+          "kind": "statement",
+          "text": {
+            "zh": "模擬檢討：接送時間比較可預期，希望維持每週回覆。",
+            "en": "Fictional review: drop-off times feel more predictable; keep weekly responses."
+          },
+          "source": {
+            "tool": "form",
+            "sourceId": "synthetic-r3-form",
+            "artifactId": "form:p01-q1"
+          },
+          "participantRef": "p01",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r3:form:p03-q1",
+          "phaseId": "recruit",
+          "kind": "statement",
+          "text": {
+            "zh": "模擬檢討：提前配送可行，但周一的告示需要更清楚。",
+            "en": "Fictional review: earlier deliveries work, but Monday signage needs clarification."
+          },
+          "source": {
+            "tool": "form",
+            "sourceId": "synthetic-r3-form",
+            "artifactId": "form:p03-q1"
+          },
+          "participantRef": "p03",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r3:form:p04-q1",
+          "phaseId": "recruit",
+          "kind": "statement",
+          "text": {
+            "zh": "模擬檢討：入口斜坡已列入修正清單，希望有完成日期。",
+            "en": "Fictional review: the ramp is on the correction list; give it a completion date."
+          },
+          "source": {
+            "tool": "form",
+            "sourceId": "synthetic-r3-form",
+            "artifactId": "form:p04-q1"
+          },
+          "participantRef": "p04",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r3:form:p05-q1",
+          "phaseId": "recruit",
+          "kind": "statement",
+          "text": {
+            "zh": "模擬檢討：巷口車流沒有足夠觀察，不能只靠印象判斷。",
+            "en": "Fictional review: side-street traffic observations are insufficient; impressions are not enough."
+          },
+          "source": {
+            "tool": "form",
+            "sourceId": "synthetic-r3-form",
+            "artifactId": "form:p05-q1"
+          },
+          "participantRef": "p05",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r3:form:p06-q1",
+          "phaseId": "recruit",
+          "kind": "statement",
+          "text": {
+            "zh": "模擬檢討：配送緩衝時間有幫助，遇到臨時訂單仍需窗口。",
+            "en": "Fictional review: delivery buffers help, but urgent orders still need a contact process."
+          },
+          "source": {
+            "tool": "form",
+            "sourceId": "synthetic-r3-form",
+            "artifactId": "form:p06-q1"
+          },
+          "participantRef": "p06",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r3:form:p07-q1",
+          "phaseId": "recruit",
+          "kind": "statement",
+          "text": {
+            "zh": "模擬檢討：輪值負擔需要檢查，不能只看工具上的支持。",
+            "en": "Fictional review: check steward workload as well as support in the tool."
+          },
+          "source": {
+            "tool": "form",
+            "sourceId": "synthetic-r3-form",
+            "artifactId": "form:p07-q1"
+          },
+          "participantRef": "p07",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r3:form:p09-q1",
+          "phaseId": "recruit",
+          "kind": "statement",
+          "text": {
+            "zh": "模擬檢討：市場工作者上一輪沒參與，請補上放學時段問題。",
+            "en": "Fictional review: market workers missed the last round; restore the dismissal-time question."
+          },
+          "source": {
+            "tool": "form",
+            "sourceId": "synthetic-r3-form",
+            "artifactId": "form:p09-q1"
+          },
+          "participantRef": "p09",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r3:form:p10-q1",
+          "phaseId": "recruit",
+          "kind": "statement",
+          "text": {
+            "zh": "模擬檢討：我用晚間表單補回意見，不應被當成已退出。",
+            "en": "Fictional review: I rejoined through the evening form; absence should not mean permanent withdrawal."
+          },
+          "source": {
+            "tool": "form",
+            "sourceId": "synthetic-r3-form",
+            "artifactId": "form:p10-q1"
+          },
+          "participantRef": "p10",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r3:inclusion-check",
+          "phaseId": "sortition",
+          "kind": "inclusion-check",
+          "text": {
+            "zh": "這是虛構的定向邀請小組，沒有執行隨機抽樣，也不代表全體居民。",
+            "en": "This is a fictional purposively invited group. No random selection was performed and it does not represent all residents."
+          },
+          "source": {
+            "tool": "facilitation",
+            "sourceId": "synthetic-r3-facilitation",
+            "artifactId": "inclusion-check"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r3:brief"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r3:call-in:q1",
+          "phaseId": "learn",
+          "kind": "question",
+          "text": {
+            "zh": "實際有權核准試辦的是誰？",
+            "en": "Who has actual authority to approve the pilot?"
+          },
+          "source": {
+            "tool": "call-in",
+            "sourceId": "synthetic-r3-call-in",
+            "artifactId": "call-in:q1"
+          },
+          "participantRef": "p01",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r3:call-in:q2",
+          "phaseId": "learn",
+          "kind": "question",
+          "text": {
+            "zh": "無障礙接送如何保留？",
+            "en": "How will accessible drop-off remain available?"
+          },
+          "source": {
+            "tool": "call-in",
+            "sourceId": "synthetic-r3-call-in",
+            "artifactId": "call-in:q2"
+          },
+          "participantRef": "p03",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r3:call-in:q3",
+          "phaseId": "learn",
+          "kind": "question",
+          "text": {
+            "zh": "誰承擔試辦成本與引導工作？",
+            "en": "Who pays for the pilot and coordinates crossing stewards?"
+          },
+          "source": {
+            "tool": "call-in",
+            "sourceId": "synthetic-r3-call-in",
+            "artifactId": "call-in:q3"
+          },
+          "participantRef": "p04",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r3:call-in:q4",
+          "phaseId": "learn",
+          "kind": "question",
+          "text": {
+            "zh": "若巷弄塞車或有人無法進出，要如何暫停？",
+            "en": "How can the pilot pause if side streets clog or someone loses access?"
+          },
+          "source": {
+            "tool": "call-in",
+            "sourceId": "synthetic-r3-call-in",
+            "artifactId": "call-in:q4"
+          },
+          "participantRef": "p05",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r3:harmonica:p11-m1",
+          "phaseId": "listen",
+          "kind": "statement",
+          "text": {
+            "zh": "模擬檢討：公車轉乘標示還要再測一次。",
+            "en": "Fictional review: test the bus-transfer signage again."
+          },
+          "source": {
+            "tool": "harmonica",
+            "sourceId": "synthetic-r3-harmonica",
+            "artifactId": "harmonica:p11-m1"
+          },
+          "participantRef": "p11",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r3:harmonica:p12-m1",
+          "phaseId": "listen",
+          "kind": "statement",
+          "text": {
+            "zh": "模擬檢討：可延長晨間試辦，但不要直接擴大到全天。",
+            "en": "Fictional review: extend the morning pilot without expanding straight to all day."
+          },
+          "source": {
+            "tool": "harmonica",
+            "sourceId": "synthetic-r3-harmonica",
+            "artifactId": "harmonica:p12-m1"
+          },
+          "participantRef": "p12",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r3:harmonica:p13-m1",
+          "phaseId": "listen",
+          "kind": "statement",
+          "text": {
+            "zh": "模擬檢討：照顧通行不要保存受照顧者的健康資料。",
+            "en": "Fictional review: care access should not retain clients’ health details."
+          },
+          "source": {
+            "tool": "harmonica",
+            "sourceId": "synthetic-r3-harmonica",
+            "artifactId": "harmonica:p13-m1"
+          },
+          "participantRef": "p13",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r3:harmonica:p14-m1",
+          "phaseId": "listen",
+          "kind": "statement",
+          "text": {
+            "zh": "模擬檢討：先加強巷口觀察，再決定是否增加封閉時段。",
+            "en": "Fictional review: improve side-street observation before adding closure hours."
+          },
+          "source": {
+            "tool": "harmonica",
+            "sourceId": "synthetic-r3-harmonica",
+            "artifactId": "harmonica:p14-m1"
+          },
+          "participantRef": "p14",
+          "derivedFrom": [],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r3:tttc:theme1",
+          "phaseId": "listen",
+          "kind": "theme",
+          "text": {
+            "zh": "過街安全與學習",
+            "en": "Crossing safety and learning"
+          },
+          "source": {
+            "tool": "tttc",
+            "sourceId": "synthetic-r3-tttc",
+            "artifactId": "tttc:theme1"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r3:form:p01-q1",
+            "demo:school-street:r3:form:p06-q1",
+            "demo:school-street:r3:harmonica:p11-m1"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r3:tttc:theme2",
+          "phaseId": "listen",
+          "kind": "theme",
+          "text": {
+            "zh": "無障礙與照顧通行",
+            "en": "Accessibility and care access"
+          },
+          "source": {
+            "tool": "tttc",
+            "sourceId": "synthetic-r3-tttc",
+            "artifactId": "tttc:theme2"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r3:form:p03-q1",
+            "demo:school-street:r3:form:p07-q1",
+            "demo:school-street:r3:harmonica:p12-m1"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r3:tttc:theme3",
+          "phaseId": "listen",
+          "kind": "theme",
+          "text": {
+            "zh": "配送、生計與執行成本",
+            "en": "Deliveries, livelihoods and implementation cost"
+          },
+          "source": {
+            "tool": "tttc",
+            "sourceId": "synthetic-r3-tttc",
+            "artifactId": "tttc:theme3"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r3:form:p04-q1",
+            "demo:school-street:r3:form:p09-q1",
+            "demo:school-street:r3:harmonica:p13-m1"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r3:tttc:theme4",
+          "phaseId": "listen",
+          "kind": "theme",
+          "text": {
+            "zh": "巷弄影響與檢討責任",
+            "en": "Side-street effects and review responsibility"
+          },
+          "source": {
+            "tool": "tttc",
+            "sourceId": "synthetic-r3-tttc",
+            "artifactId": "tttc:theme4"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r3:form:p05-q1",
+            "demo:school-street:r3:form:p10-q1",
+            "demo:school-street:r3:harmonica:p14-m1"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r3:polis:statement1",
+          "phaseId": "deliberate",
+          "kind": "proposal",
+          "text": {
+            "zh": "在完成無障礙修正與責任分工後，延長晨間試辦。",
+            "en": "Extend the morning pilot after accessibility corrections and responsibilities are completed."
+          },
+          "source": {
+            "tool": "polis",
+            "sourceId": "synthetic-r3-polis",
+            "artifactId": "polis:statement1"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r3:tttc:theme1",
+            "demo:school-street:r3:call-in:q1"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r3:polis:statement2",
+          "phaseId": "deliberate",
+          "kind": "proposal",
+          "text": {
+            "zh": "目前直接擴大為全天徒步區。",
+            "en": "Expand immediately to an all-day pedestrian zone."
+          },
+          "source": {
+            "tool": "polis",
+            "sourceId": "synthetic-r3-polis",
+            "artifactId": "polis:statement2"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r3:tttc:theme2",
+            "demo:school-street:r3:call-in:q2"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r3:polis:statement3",
+          "phaseId": "deliberate",
+          "kind": "proposal",
+          "text": {
+            "zh": "下一輪優先檢視巷弄交通、照顧通行與輪值負擔。",
+            "en": "Prioritize side-street traffic, care access and steward workload in the next round."
+          },
+          "source": {
+            "tool": "polis",
+            "sourceId": "synthetic-r3-polis",
+            "artifactId": "polis:statement3"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r3:tttc:theme3",
+            "demo:school-street:r3:call-in:q3"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r3:polis:statement4",
+          "phaseId": "deliberate",
+          "kind": "proposal",
+          "text": {
+            "zh": "每項未採納建議都保留理由、負責者與再檢視日期。",
+            "en": "Keep a reason, owner and review date for every proposal not adopted."
+          },
+          "source": {
+            "tool": "polis",
+            "sourceId": "synthetic-r3-polis",
+            "artifactId": "polis:statement4"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r3:tttc:theme4",
+            "demo:school-street:r3:call-in:q4"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r3:reply:q1",
+          "phaseId": "respond",
+          "kind": "reply",
+          "text": {
+            "zh": "模擬回覆 1：本輪已連結原提問與方案；模擬回覆保留晨間試辦方向，但不宣稱交通已改善；全天方案未採納。下一輪仍須檢查巷弄影響及輪值負擔。",
+            "en": "Fictional response 1: this round links the source question and proposal. The fictional response keeps a morning-pilot direction without claiming improved traffic; the all-day proposal is not adopted. Side-street effects and steward workload remain for the next round."
+          },
+          "source": {
+            "tool": "reply",
+            "sourceId": "synthetic-r3-reply",
+            "artifactId": "reply:q1"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r3:call-in:q1",
+            "demo:school-street:r3:polis:statement1"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r3:reply:q2",
+          "phaseId": "respond",
+          "kind": "reply",
+          "text": {
+            "zh": "模擬回覆 2：本輪已連結原提問與方案；模擬回覆保留晨間試辦方向，但不宣稱交通已改善；全天方案未採納。下一輪仍須檢查巷弄影響及輪值負擔。",
+            "en": "Fictional response 2: this round links the source question and proposal. The fictional response keeps a morning-pilot direction without claiming improved traffic; the all-day proposal is not adopted. Side-street effects and steward workload remain for the next round."
+          },
+          "source": {
+            "tool": "reply",
+            "sourceId": "synthetic-r3-reply",
+            "artifactId": "reply:q2"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r3:call-in:q2",
+            "demo:school-street:r3:polis:statement2"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r3:reply:q3",
+          "phaseId": "respond",
+          "kind": "reply",
+          "text": {
+            "zh": "模擬回覆 3：本輪已連結原提問與方案；模擬回覆保留晨間試辦方向，但不宣稱交通已改善；全天方案未採納。下一輪仍須檢查巷弄影響及輪值負擔。",
+            "en": "Fictional response 3: this round links the source question and proposal. The fictional response keeps a morning-pilot direction without claiming improved traffic; the all-day proposal is not adopted. Side-street effects and steward workload remain for the next round."
+          },
+          "source": {
+            "tool": "reply",
+            "sourceId": "synthetic-r3-reply",
+            "artifactId": "reply:q3"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r3:call-in:q3",
+            "demo:school-street:r3:polis:statement3"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r3:reply:q4",
+          "phaseId": "respond",
+          "kind": "reply",
+          "text": {
+            "zh": "模擬回覆 4：本輪已連結原提問與方案；模擬回覆保留晨間試辦方向，但不宣稱交通已改善；全天方案未採納。下一輪仍須檢查巷弄影響及輪值負擔。",
+            "en": "Fictional response 4: this round links the source question and proposal. The fictional response keeps a morning-pilot direction without claiming improved traffic; the all-day proposal is not adopted. Side-street effects and steward workload remain for the next round."
+          },
+          "source": {
+            "tool": "reply",
+            "sourceId": "synthetic-r3-reply",
+            "artifactId": "reply:q4"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r3:call-in:q4",
+            "demo:school-street:r3:polis:statement4"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r3:decision",
+          "phaseId": "respond",
+          "kind": "decision",
+          "text": {
+            "zh": "模擬回覆保留晨間試辦方向，但不宣稱交通已改善；全天方案未採納。下一輪仍須檢查巷弄影響及輪值負擔。",
+            "en": "The fictional response keeps a morning-pilot direction without claiming improved traffic; the all-day proposal is not adopted. Side-street effects and steward workload remain for the next round."
+          },
+          "source": {
+            "tool": "facilitation",
+            "sourceId": "synthetic-r3-facilitation",
+            "artifactId": "decision"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r3:reply:q1",
+            "demo:school-street:r3:reply:q2",
+            "demo:school-street:r3:reply:q3",
+            "demo:school-street:r3:reply:q4"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r3:unresolved",
+          "phaseId": "feedback",
+          "kind": "feedback",
+          "text": {
+            "zh": "巷弄觀察資料仍不足，放學時段與輪值負擔不可視為已解決。",
+            "en": "Side-street observations remain insufficient; dismissal hours and steward workload are unresolved."
+          },
+          "source": {
+            "tool": "facilitation",
+            "sourceId": "synthetic-r3-facilitation",
+            "artifactId": "unresolved"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r3:decision"
+          ],
+          "status": "needs-response",
+          "reviewed": true,
+          "simulated": true
+        },
+        {
+          "id": "demo:school-street:r3:next-brief",
+          "phaseId": "feedback",
+          "kind": "feedback",
+          "text": {
+            "zh": "開啟第 4 輪的問題定義：公開哪些已改、哪些沒改，補充觀察並重新邀請缺席的人。",
+            "en": "Start round 4 by reframing: explain what changed and what did not, gather observations and reinvite missing voices."
+          },
+          "source": {
+            "tool": "facilitation",
+            "sourceId": "synthetic-r3-facilitation",
+            "artifactId": "next-brief"
+          },
+          "participantRef": null,
+          "derivedFrom": [
+            "demo:school-street:r3:unresolved"
+          ],
+          "status": "reviewed",
+          "reviewed": true,
+          "simulated": true
+        }
+      ],
+      "responses": [
+        {
+          "id": "demo:school-street:r3:vote:1:p01",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement1",
+          "participantRef": "p01",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:1:p03",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement1",
+          "participantRef": "p03",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:1:p04",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement1",
+          "participantRef": "p04",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:1:p05",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement1",
+          "participantRef": "p05",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:1:p06",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement1",
+          "participantRef": "p06",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:1:p07",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement1",
+          "participantRef": "p07",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:1:p09",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement1",
+          "participantRef": "p09",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:1:p10",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement1",
+          "participantRef": "p10",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:1:p11",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement1",
+          "participantRef": "p11",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:1:p12",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement1",
+          "participantRef": "p12",
+          "value": "disagree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:1:p13",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement1",
+          "participantRef": "p13",
+          "value": "disagree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:1:p14",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement1",
+          "participantRef": "p14",
+          "value": "pass",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:2:p01",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement2",
+          "participantRef": "p01",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:2:p03",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement2",
+          "participantRef": "p03",
+          "value": "disagree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:2:p04",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement2",
+          "participantRef": "p04",
+          "value": "disagree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:2:p05",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement2",
+          "participantRef": "p05",
+          "value": "disagree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:2:p06",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement2",
+          "participantRef": "p06",
+          "value": "disagree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:2:p07",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement2",
+          "participantRef": "p07",
+          "value": "disagree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:2:p09",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement2",
+          "participantRef": "p09",
+          "value": "disagree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:2:p10",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement2",
+          "participantRef": "p10",
+          "value": "disagree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:2:p11",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement2",
+          "participantRef": "p11",
+          "value": "disagree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:2:p12",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement2",
+          "participantRef": "p12",
+          "value": "disagree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:2:p13",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement2",
+          "participantRef": "p13",
+          "value": "pass",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:2:p14",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement2",
+          "participantRef": "p14",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:3:p01",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement3",
+          "participantRef": "p01",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:3:p03",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement3",
+          "participantRef": "p03",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:3:p04",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement3",
+          "participantRef": "p04",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:3:p05",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement3",
+          "participantRef": "p05",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:3:p06",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement3",
+          "participantRef": "p06",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:3:p07",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement3",
+          "participantRef": "p07",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:3:p09",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement3",
+          "participantRef": "p09",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:3:p10",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement3",
+          "participantRef": "p10",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:3:p11",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement3",
+          "participantRef": "p11",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:3:p12",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement3",
+          "participantRef": "p12",
+          "value": "pass",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:3:p13",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement3",
+          "participantRef": "p13",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:3:p14",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement3",
+          "participantRef": "p14",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:4:p01",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement4",
+          "participantRef": "p01",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:4:p03",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement4",
+          "participantRef": "p03",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:4:p04",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement4",
+          "participantRef": "p04",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:4:p05",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement4",
+          "participantRef": "p05",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:4:p06",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement4",
+          "participantRef": "p06",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:4:p07",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement4",
+          "participantRef": "p07",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:4:p09",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement4",
+          "participantRef": "p09",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:4:p10",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement4",
+          "participantRef": "p10",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:4:p11",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement4",
+          "participantRef": "p11",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:4:p12",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement4",
+          "participantRef": "p12",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:4:p13",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement4",
+          "participantRef": "p13",
+          "value": "agree",
+          "tool": "polis"
+        },
+        {
+          "id": "demo:school-street:r3:vote:4:p14",
+          "phaseId": "deliberate",
+          "itemRef": "demo:school-street:r3:polis:statement4",
+          "participantRef": "p14",
+          "value": "agree",
+          "tool": "polis"
+        }
+      ],
+      "next": {
+        "phaseId": "frame",
+        "reason": {
+          "zh": "開啟第 4 輪的問題定義：公開哪些已改、哪些沒改，補充觀察並重新邀請缺席的人。",
+          "en": "Start round 4 by reframing: explain what changed and what did not, gather observations and reinvite missing voices."
+        },
+        "owner": {
+          "zh": "模擬主辦工作小組",
+          "en": "Fictional organizing group"
+        },
+        "reviewOn": "2026-12-03",
+        "carryForwardRefs": [
+          "demo:school-street:r3:unresolved",
+          "demo:school-street:r3:next-brief",
+          "demo:school-street:r3:decision"
+        ]
+      }
+    }
+  ],
+  "dataCard": {
+    "containsParticipantData": false,
+    "containsDirectIdentifiers": false,
+    "containsPseudonymousLinkage": true,
+    "suitableForPublicSharing": true,
+    "publicationStatus": "public-synthetic-demo",
+    "simulationOnly": true,
+    "limitations": {
+      "zh": "跨輪代碼僅供虛構角色示範；真實活動的聯絡資訊必須分離，不能用投票圖推斷身分。",
+      "en": "Cross-round codes are fictional. Real contact records must be separate, and voting graphs must not be used to infer identities."
+    }
+  }
+}

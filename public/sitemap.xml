@@ -3,4 +3,6 @@
   <url><loc>https://delib.mashbean.net/</loc></url>
   <url><loc>https://delib.mashbean.net/deploy</loc></url>
   <url><loc>https://delib.mashbean.net/.well-known/delib/SKILL.md</loc></url>
+  <url><loc>https://delib.mashbean.net/?lang=en</loc></url>
+  <url><loc>https://delib.mashbean.net/handoff</loc></url>
 </urlset>

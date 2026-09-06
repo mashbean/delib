@@ -14,6 +14,7 @@ import {
 
 import { ReceiptIndex } from "./receipt-index";
 import packageJson from "../package.json";
+import toolStations from "../public/data/tool-stations.json";
 
 export { PublicReceipt, RankingRoom, ReceiptIndex };
 
@@ -147,7 +148,7 @@ async function route(request: Request, env: WorkerEnv, url: URL): Promise<Respon
             versionId: env.CF_VERSION_METADATA?.id || null,
             deployedAt: env.CF_VERSION_METADATA?.timestamp || null,
           },
-          ai: "bring-your-own-key",
+          ai: "agent-skill",
           storage: "optional-ephemeral-ranking-rooms-and-public-receipts",
           dataContract: "delib-data/v1",
           publicReceiptRetentionDays: [...PUBLIC_RECEIPT_RETENTION_DAYS],
@@ -159,14 +160,17 @@ async function route(request: Request, env: WorkerEnv, url: URL): Promise<Respon
       );
     }
 
+    if (url.pathname === "/api/agent") {
+      return json({
+        error: "The API-key assistant has been retired. Give the Delib skill to your own AI agent.",
+        skill: "/.well-known/delib/SKILL.md",
+      }, 410, request.method === "HEAD");
+    }
+
     if (url.pathname.startsWith("/api/") && request.method === "POST") {
       const limiter = url.pathname.endsWith("/submissions") ? env.SUBMIT_LIMIT : env.WRITE_LIMIT;
       const limited = await enforceRateLimit(limiter, request);
       if (limited) return limited;
-    }
-
-    if (url.pathname === "/api/agent" && request.method === "POST") {
-      return handleAgentRequest(request);
     }
 
     if (url.pathname === "/api/integrations" && request.method === "GET") {
@@ -290,8 +294,58 @@ async function route(request: Request, env: WorkerEnv, url: URL): Promise<Respon
       return new Response(page.body, { status, headers });
     }
 
+    const stationRoute = findToolStation(url.pathname);
+    if (stationRoute) return serveToolStation(request, env, url, stationRoute);
+
     const assetResponse = await env.ASSETS.fetch(request);
     return withSecurityHeaders(assetResponse, url.pathname);
+}
+
+function findToolStation(pathname: string) {
+  const prefix = pathname.split("/")[1];
+  return toolStations.find((station) => station.slug === prefix || station.aliases.includes(prefix));
+}
+
+async function serveToolStation(
+  request: Request,
+  env: WorkerEnv,
+  url: URL,
+  station: (typeof toolStations)[number],
+): Promise<Response> {
+  if (request.method !== "GET" && request.method !== "HEAD") {
+    return new Response("Method not allowed", { status: 405, headers: { Allow: "GET, HEAD" } });
+  }
+  const language = url.searchParams.get("lang") === "en" ? "en" : "zh";
+  // The origin is operator-configured, never taken from a query parameter.
+  const configuredOrigin = station.binding ? env[station.binding as keyof WorkerEnv] : null;
+  const origin = station.origin
+    ? new URL(typeof configuredOrigin === "string" ? configuredOrigin : station.origin).origin
+    : url.origin;
+  if (station.origin && !origin.startsWith("https://")) {
+    throw new Error("Tool station origins must use HTTPS");
+  }
+  // Do not forward station query strings, cookies or authorization headers to
+  // the asset binding. Activity fragments stay entirely in the browser.
+  const assetUrl = new URL("/tool-shell", url.origin);
+  const assetResponse = await env.ASSETS.fetch(new Request(assetUrl, { method: "GET" }));
+  if (!assetResponse.ok) return withSecurityHeaders(assetResponse, url.pathname);
+  const title = `${station.name} · ${station.title[language]} · Delib`;
+  const rewritten = new HTMLRewriter()
+    .on("html", { element(element) { element.setAttribute("lang", language === "en" ? "en" : "zh-Hant"); } })
+    .on("title", { element(element) { element.setInnerContent(title); } })
+    .on("body", { element(element) {
+      element.setAttribute("data-station", station.slug);
+      element.setAttribute("data-origin", origin);
+    } })
+    .on("#station-name", { element(element) { element.setInnerContent(station.name); } })
+    .on("#station-heading", { element(element) { element.setInnerContent(station.title[language]); } })
+    .transform(assetResponse);
+  const headers = new Headers(withSecurityHeaders(rewritten, url.pathname).headers);
+  headers.set("Content-Security-Policy", `default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-src ${origin}; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'`);
+  headers.set("Referrer-Policy", "no-referrer");
+  headers.set("Cache-Control", "no-store");
+  headers.set("X-Robots-Tag", "noindex, nofollow");
+  return new Response(request.method === "HEAD" ? null : rewritten.body, { status: rewritten.status, headers });
 }
 
 async function enforceRateLimit(limiter: RateLimiter | undefined, request: Request): Promise<Response | null> {
@@ -3101,6 +3155,7 @@ function json(
 
 function withSecurityHeaders(response: Response, pathname: string): Response {
   const next = new Response(response.body, response);
+  const rankWorkspace = pathname === "/integrations/power-ranker" || pathname === "/integrations/power-ranker.html";
   const polisWorkspace = pathname === "/integrations/polis.html" || pathname === "/integrations/polis";
   const heyFormWorkspace = pathname === "/integrations/heyform.html" || pathname === "/integrations/heyform";
   const agoraWorkspace = pathname === "/integrations/agora.html" || pathname === "/integrations/agora";
@@ -3123,12 +3178,12 @@ function withSecurityHeaders(response: Response, pathname: string): Response {
   // instead of logging a CSP violation on every page view.
   next.headers.set(
     "Content-Security-Policy",
-    `default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self'; img-src 'self' data:; connect-src 'self' https://cloudflareinsights.com; frame-src ${frameSource}; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'`,
+    `default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self'; img-src 'self' data:; connect-src 'self' https://cloudflareinsights.com; frame-src ${frameSource}; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors ${rankWorkspace ? "'self'" : "'none'"}`,
   );
   next.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   next.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
   next.headers.set("X-Content-Type-Options", "nosniff");
-  next.headers.set("X-Frame-Options", "DENY");
+  next.headers.set("X-Frame-Options", rankWorkspace ? "SAMEORIGIN" : "DENY");
   if (pathname === "/" || pathname.endsWith(".html")) {
     next.headers.set("Cache-Control", "public, max-age=0, must-revalidate");
   } else if (!next.headers.has("Cache-Control")) {

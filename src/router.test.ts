@@ -129,6 +129,49 @@ async function publish(receipt: unknown, envOverride = publicReceiptEnv) {
 }
 
 describe("router", () => {
+  it("retires the API-key endpoint without forwarding credentials or calling a model", async () => {
+    const response = await SELF.fetch("https://delib.example/api/agent", {
+      method: "POST", headers: { Authorization: "Bearer do-not-forward" }, body: "{}",
+    });
+    expect(response.status).toBe(410);
+    expect(await response.json()).toMatchObject({ skill: "/.well-known/delib/SKILL.md" });
+  });
+
+  it("renders each tool station with a fixed frame origin and bilingual navigation", async () => {
+    const routes = ["form", "harmonica", "polis", "call-in", "reply", "tttc", "ttt-city", "values", "budget", "checks", "check", "proposals", "argument", "maple", "maple-tw", "rank", "power-ranker"];
+    for (const route of routes) {
+      const response = await SELF.fetch(`https://delib.example/${route}?lang=en`);
+      expect(response.status, route).toBe(200);
+      const html = await response.text();
+      expect(html, route).toContain('lang="en"');
+      expect(html, route).toContain('id="tool-frame"');
+      expect(response.headers.get("Content-Security-Policy"), route).toContain("frame-ancestors 'none'");
+      expect(response.headers.get("Referrer-Policy"), route).toBe("no-referrer");
+      expect(response.headers.get("Cache-Control"), route).toBe("no-store");
+    }
+  });
+
+  it("keeps activity deep links in the station without leaking query tokens into HTML", async () => {
+    const response = await SELF.fetch("https://delib.example/form/h/abcdefghij?token=private-management-token&lang=en");
+    expect(response.status).toBe(200);
+    const html = await response.text();
+    expect(html).toContain('data-station="form"');
+    expect(html).not.toContain("private-management-token");
+    expect(response.headers.get("Content-Security-Policy")).toContain("frame-src https://form.mashbean.net;");
+    const head = await SELF.fetch("https://delib.example/polis", { method: "HEAD" });
+    expect(head.status).toBe(200);
+    expect(await head.text()).toBe("");
+    const post = await SELF.fetch("https://delib.example/form", { method: "POST" });
+    expect(post.status).toBe(405);
+  });
+
+  it("allows only same-origin embedding of the local ranking workspace", async () => {
+    const response = await SELF.fetch("https://delib.example/integrations/power-ranker");
+    expect(response.status).toBe(200);
+    expect(response.headers.get("Content-Security-Policy")).toContain("frame-ancestors 'self'");
+    expect(response.headers.get("X-Frame-Options")).toBe("SAMEORIGIN");
+  });
+
   it("reports the service version on GET and HEAD health checks", async () => {
     const response = await SELF.fetch("https://delib.example/api/health");
     expect(response.status).toBe(200);

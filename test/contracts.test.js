@@ -64,8 +64,12 @@ describe("public contracts", () => {
   it("keeps the homepage dense sections progressively disclosed", async () => {
     const homepage = await readFile(new URL("public/index.html", root), "utf8");
     expect(homepage).toContain('id="comparison-more"');
-    expect(homepage).toContain('class="tool-catalog-details"');
-    expect(homepage.match(/<details id="launch-/g)).toHaveLength(8);
+    expect(homepage).toContain('tool-catalog-details');
+    expect(homepage).toContain('id="flow-scene"');
+    expect(homepage).toContain('id="stage-buttons"');
+    expect(homepage).toContain('id="demo-rounds"');
+    expect(homepage).toContain('id="agent-prompt"');
+    expect(homepage).not.toContain('type="password"');
     expect(homepage).toContain('/assets/lucide-LICENSE.txt');
   });
 

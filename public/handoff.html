@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="在瀏覽器本機檢查並合併審議資料，保留來源，再交給下一個工具。Local CSV handoff for deliberation tools." />
+  <title>資料交接工作台 · Delib</title>
+  <link rel="stylesheet" href="/handoff.css" />
+  <script type="module" src="/handoff.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main" data-i18n="skip">跳到工作台</a>
+  <header class="site-header"><a class="brand" href="/">delib<span> / </span><span data-i18n="brand">資料交接</span></a><nav aria-label="Language"><button id="language" type="button" lang="en">English</button><a href="/#data" data-i18n="back">回到工具集 ↗</a></nav></header>
+  <main id="main">
+    <section class="intro">
+      <p class="eyebrow" data-i18n="eyebrow">KEEP THE SOURCE. CONTINUE THE CONVERSATION.</p>
+      <h1 data-i18n="title">換一個工具，<br>別弄丟一個聲音。</h1>
+      <p class="lede" data-i18n="lede">把表單、訪談、提問與陳述接在一起。先在這裡檢查資料與來源，再帶到下一輪。</p>
+      <p class="local"><span aria-hidden="true"></span><span data-i18n="local">檔案只在此分頁記憶體中處理；不會上傳或存入瀏覽器儲存空間。重新整理即清除。</span></p>
+    </section>
+
+    <div class="flow-strip" aria-hidden="true"><span>Form / Harmonica / Call-in / Polis</span><i></i><strong>id · interview · comment</strong><i></i><span>TTTC / Reply</span></div>
+
+    <section class="workspace" aria-labelledby="workspace-title">
+      <h2 class="sr-only" id="workspace-title" data-i18n="workspace">資料交接工作台</h2>
+      <article class="card receive">
+        <span class="step">01</span><h2 data-i18n="receive">帶入原始文字</h2>
+        <p data-i18n="receiveBody">從工具的主辦者頁下載 tttc.csv。這個工作台接受 id、interview、comment 三欄；每份檔案最多 3 MB，一次最多 20 份。</p>
+        <label class="file-area" for="files"><span class="file-symbol" aria-hidden="true">＋</span><strong data-i18n="choose">選擇 CSV 檔案</strong><span data-i18n="chooseHint">可一次選擇多份；不會上傳</span><input id="files" type="file" multiple accept=".csv,text/csv" /></label>
+        <div class="actions"><button id="sample" class="secondary" type="button" data-i18n="sample">先用三輪模擬資料試試</button><button id="clear" class="quiet" type="button" disabled data-i18n="clear">清除</button></div>
+        <ul id="file-list" class="file-list"></ul>
+      </article>
+      <article class="card check">
+        <span class="step">02</span><h2 data-i18n="check">確認資料的意思</h2>
+        <p data-i18n="checkBody">每份來源加上獨立前綴，保留原始 id 對照。同一來源的暱稱轉成代碼；不依同名暱稱推定跨工具是同一人。</p>
+        <div id="stats" class="stats" aria-live="polite"><p data-i18n="empty">選擇檔案後，這裡會顯示檢查結果。</p></div>
+        <p class="note" data-i18n="semantics">代碼群組數不是人數。空白 interview 只代表來源未提供分組；TTTC 可能改以資料列計數。CSV 不會攜帶原始票數、共識分析或參與同意。</p>
+        <div id="notices" aria-live="polite"></div>
+      </article>
+    </section>
+
+    <section class="card preview" aria-labelledby="preview-title">
+      <div class="section-top"><div><span class="step">03</span><h2 id="preview-title" data-i18n="preview">預覽，再交接</h2></div><span id="preview-count" class="badge"></span></div>
+      <p data-i18n="previewBody">下方最多顯示 12 列；下載會包含全部資料。內容仍是原始發言，代碼化並不等於去識別化。</p>
+      <div id="preview-empty" class="preview-empty" data-i18n="previewEmpty">每則發言都能回到原始來源。</div>
+      <div id="preview-table-wrap" class="table-wrap" hidden><table><thead><tr><th scope="col">id</th><th scope="col" data-i18n="group">來源內代碼</th><th scope="col" data-i18n="comment">原始文字</th></tr></thead><tbody id="preview-rows"></tbody></table></div>
+      <div class="download-row"><button id="download-csv" class="primary" type="button" disabled data-i18n="downloadCsv">下載交接 CSV ↓</button><button id="download-manifest" class="secondary" type="button" disabled data-i18n="downloadManifest">下載私人來源對照表 ↓</button></div>
+      <p class="note" data-i18n="manifestNote">來源對照表包含檔案雜湊、原始 id 與原始暱稱，請與 CSV 一起私下保存。不要把對照表當成公開成果。</p>
+      <div class="destinations"><a href="/tttc" target="_blank" rel="noopener"><span data-i18n="tttcLabel">整理成附來源的議題樹</span><strong>Pocket TTTC ↗</strong></a><a href="/reply" target="_blank" rel="noopener"><span data-i18n="replyLabel">草擬逐題回覆</span><strong>Pocket Reply ↗</strong></a></div>
+      <p class="destination-note" data-i18n="destinationNote">「開啟」只會打開工具，不會傳送檔案。在下一個工具自行選擇或貼上 CSV 並建立分析後，資料會送到該服務；TTTC 與 Reply 的結果可能透過持有連結公開閱覽。請先確認文字內容、用途與參與者同意。</p>
+    </section>
+    <p id="status" role="status" aria-live="polite"></p>
+    <footer><a href="/#demo" data-i18n="demoLink">看三輪審議如何延續 →</a><span data-i18n="footer">保留來源，也保留不同意的理由。</span></footer>
+  </main>
+</body>
+</html>

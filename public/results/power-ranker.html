@@ -14,11 +14,12 @@
     <a class="skip-link" href="#receipt-main">跳到成果內容</a>
     <header class="site-header">
       <div class="wrap header-inner">
+        <a id="ranking-language-switch" class="button button-small button-ghost" href="?lang=en" lang="en" target="_top">English</a>
         <a class="brand" href="/" aria-label="回 Delib 審議拼圖">
           <span class="brand-mark" aria-hidden="true">⿻</span>
           <span><strong>Delib</strong><span class="brand-divider">·</span>成果收據</span>
         </a>
-        <a class="button button-small button-ghost" href="/#launch-power-ranker">開啟新一輪</a>
+        <a class="button button-small button-ghost" href="/rank">開啟新一輪</a>
       </div>
     </header>
 
@@ -174,8 +175,8 @@
               </div>
               <p id="receipt-handoff-boundary" class="handoff-boundary"></p>
               <p id="receipt-handoff-data" class="handoff-boundary" hidden>排序收據沒有文字意見。若前一輪用過口袋審議，到其報告頁的「資料與其他工具」下載 tttc.csv，或把 statements.csv 與 votes.csv 帶到 <a href="/integrations/pocket-polis-data">Delib 資料工作台</a> 轉換。</p>
-              <p class="field-note">草稿只存在同一個分頁，最多兩小時；進入設定頁後即從暫存中刪除。現在不會建立外部活動或上傳資料。</p>
-              <button id="receipt-handoff-continue" class="button button-primary" type="button">帶到設定頁</button>
+              <p class="field-note">草稿只在同一分頁暫存，最多兩小時；可在預覽頁下載或清除。開啟工具後仍須人工貼上、審閱與確認，不會自動建立活動或上傳資料。</p>
+              <button id="receipt-handoff-continue" class="button button-primary" type="button">預覽交接草稿</button>
             </aside>
           </section>
 
@@ -186,7 +187,7 @@
             </div>
             <div class="result-actions">
               <a id="receipt-next-round" class="button button-primary">同一組選項再跑一輪</a>
-              <a class="button button-ghost" href="/#start">重新規劃流程</a>
+              <a class="button button-ghost" href="/#journey">重新規劃流程</a>
               <button id="receipt-copy-summary" class="button button-ghost" type="button">複製成果摘要</button>
               <button id="receipt-download-json" class="button button-ghost" type="button">下載 JSON</button>
               <button id="receipt-download-md" class="button button-ghost" type="button">下載 Markdown</button>
