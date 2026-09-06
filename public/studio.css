@@ -1,0 +1,27 @@
+/* Sculptural cover: the same source-to-structure metaphor as the working map. */
+.hero-sculpture{height:370px;position:relative;perspective:700px;overflow:hidden;isolation:isolate;background:radial-gradient(ellipse at 50% 55%,#b9fa570c,transparent 65%)}.sculpture-field{width:250px;height:230px;position:absolute;left:0;top:65px;transform:rotateX(52deg) rotateZ(-34deg);transform-style:preserve-3d}.voxel{width:28px;height:28px;display:block;position:absolute;background:#a6dc6440;border:1px solid #b9fa5777;box-shadow:10px 10px 0 #b9fa5709;transform:translateZ(0)}.sculpture-arrow{position:absolute;left:46%;top:45%;font-size:60px;color:#8ec65699;transform:rotate(25deg)}.sculpture-core{position:absolute;right:30px;top:75px;width:145px;height:190px;transform-style:preserve-3d;transform:rotateX(50deg) rotateZ(32deg)}.sculpture-core i{position:absolute;inset:20px;border:1px solid #b9fa57;background:#a6d87716;box-shadow:0 0 45px #b9fa570c;transform:translateZ(30px)}.sculpture-core i:nth-child(2){transform:translateZ(0)}.sculpture-core i:nth-child(3){transform:translateZ(-30px)}.sculpture-core i:nth-child(4){transform:translateZ(-60px)}
+.v0{left:0px;top:0px;opacity:0.3;transform:translateZ(0px)}
+.v1{left:48px;top:0px;opacity:0.5;transform:translateZ(20px)}
+.v2{left:96px;top:0px;opacity:0.7;transform:translateZ(40px)}
+.v3{left:144px;top:0px;opacity:0.9000000000000001;transform:translateZ(10px)}
+.v4{left:192px;top:0px;opacity:0.3;transform:translateZ(30px)}
+.v5{left:0px;top:48px;opacity:0.5;transform:translateZ(0px)}
+.v6{left:48px;top:48px;opacity:0.7;transform:translateZ(20px)}
+.v7{left:96px;top:48px;opacity:0.9000000000000001;transform:translateZ(40px)}
+.v8{left:144px;top:48px;opacity:0.3;transform:translateZ(10px)}
+.v9{left:192px;top:48px;opacity:0.5;transform:translateZ(30px)}
+.v10{left:0px;top:96px;opacity:0.7;transform:translateZ(0px)}
+.v11{left:48px;top:96px;opacity:0.9000000000000001;transform:translateZ(20px)}
+.v12{left:96px;top:96px;opacity:0.3;transform:translateZ(40px)}
+.v13{left:144px;top:96px;opacity:0.5;transform:translateZ(10px)}
+.v14{left:192px;top:96px;opacity:0.7;transform:translateZ(30px)}
+.v15{left:0px;top:144px;opacity:0.9000000000000001;transform:translateZ(0px)}
+.v16{left:48px;top:144px;opacity:0.3;transform:translateZ(20px)}
+.v17{left:96px;top:144px;opacity:0.5;transform:translateZ(40px)}
+.v18{left:144px;top:144px;opacity:0.7;transform:translateZ(10px)}
+.v19{left:192px;top:144px;opacity:0.9000000000000001;transform:translateZ(30px)}
+.v20{left:0px;top:192px;opacity:0.3;transform:translateZ(0px)}
+.v21{left:48px;top:192px;opacity:0.5;transform:translateZ(20px)}
+.v22{left:96px;top:192px;opacity:0.7;transform:translateZ(40px)}
+.v23{left:144px;top:192px;opacity:0.9000000000000001;transform:translateZ(10px)}
+.v24{left:192px;top:192px;opacity:0.3;transform:translateZ(30px)}

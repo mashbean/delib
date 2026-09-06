@@ -6,7 +6,7 @@
 
 Delib 把線上與實體參與、工具與資料，接成可以持續多輪的審議。新版入口提供
 可旋轉的 3D 八步流程、依缺口找起點、13 個站內工具工作區與完整中英引導。
-GSAP 負責進場與視角轉場；3D 圖以透視投影繪製，支援觸控、步驟按鈕、暫停與減少動態。
+Three.js 提供真正的 WebGL 場景，GSAP 控制進場與視角／參與者轉場；支援觸控、步驟按鈕、暫停與減少動態。線上與實體是同一路徑上可交替的場景，不是兩條同步平行流程。
 
 ## 現在能做什麼
 
@@ -15,7 +15,7 @@ GSAP 負責進場與視角轉場；3D 圖以透視投影繪製，支援觸控、
   `/proposals`、`/argument`、`/budget`、`/rank`、`/checks`、`/values`、`/maple`。
   工作區保留工具原本的來源與資料儲存，並可將既有活動網址轉成站內入口。
 - **多輪模擬**：虛構校門口安全案例涵蓋 3 輪、14 個角色；人數與票數從 fixture
-  計算，可匯出輪次 JSON、TTTC CSV、人工審閱的 Polis 起始陳述。沒有實際招募或投票。
+  計算，可匯出輪次 JSON、TTTC CSV、人工審閱的 Polis 起始陳述，以及資料／人流 SVG 資訊圖。點選原話可沿來源走到後續輪次；出席模式按階段記錄。沒有實際招募或投票。
 - **資料交接**：`/handoff` 在本機瀏覽器檢查、預覽與合併來源 CSV，保留來源映射、
   避免 ID 碰撞與跨來源錯認參與者；匯入目標工具前由主辦者確認。
 - **Agent**：複製帶入目前規劃選擇的 prompt，或下載 `/.well-known/delib/SKILL.md`。
@@ -32,6 +32,7 @@ round-simulation adapter. `delib-rounds/v1` adds versioned rounds, provenance,
 participation modes and explicit return points. These are Delib contracts, not an
 established universal standard or automatic data synchronization across all tools.
 
+- [Second iteration: graphics, participation and applied methods](docs/iteration-two-2026-09-06.md)
 - [Methodology and source audit](docs/methodology-research-2026-09-06.md)
 - [Actual import/export contract audit](docs/data-flow-audit-2026-09-06.md)
 - [Release changes](CHANGELOG.md) · [Operations](docs/operations.md)

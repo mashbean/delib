@@ -32,7 +32,10 @@ export function parseTttcCsv({ text, label }) {
     }
     if (interview.length > MAX_INTERVIEW_CHARS) throw new Error(`${fileLabel}第 ${rowNumber} 列的 interview 過長`);
     for (const { name, pattern } of PII_PATTERNS) {
-      if (pattern.test(comment) || pattern.test(interview)) {
+      // Skip the unanchored email search when @ is absent. Long plain-text
+      // responses otherwise repeatedly backtrack through the local-part run.
+      const matches = (value) => (name !== "email" || value.includes("@")) && pattern.test(value);
+      if (matches(comment) || matches(interview)) {
         warnings.push(`${fileLabel}第 ${rowNumber} 列可能含有 ${name}，公開前請人工檢查。`);
         break;
       }

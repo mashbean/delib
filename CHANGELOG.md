@@ -2,6 +2,14 @@
 
 日期以正式站部署為準。每一版列出「使用者看得到的改變」與「營運者需要知道的改變」，資料邊界的變動另外標明。
 
+## 0.5.0 — 2026-09-06
+
+- Replace parallel 2D-projected rings with an interactive Three.js route through alternating participation settings and distinct data forms.
+- Add selectable provenance and people pipelines, cross-round tracing, SVG export and stage-specific attendance modes.
+- Restore the complete searchable 38-tool inventory below native stations.
+- Apply facilitator actions, review gates and transition reasons within all eight steps; retain sources as contextual notes.
+- Correct synthetic theme/source mappings through a fresh manual review and synchronize machine-readable facilitation guidance.
+
 ## 0.4.0 — 2026-09-06
 
 - Rebuild the homepage in Traditional Chinese and English around iterative

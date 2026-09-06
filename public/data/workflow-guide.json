@@ -41,7 +41,34 @@
         "zh": "權限不清楚，先留在這一步；確認後再招募。",
         "en": "Stay here if authority is unclear; recruit once it is explicit."
       },
-      "source": "metagov"
+      "source": "metagov",
+      "facilitation": {
+        "place": {
+          "zh": "現地走訪",
+          "en": "Site walk"
+        },
+        "mode": "in-person",
+        "maturity": {
+          "zh": "關切 → 可修改的問題",
+          "en": "Concern → revisable question"
+        },
+        "action": {
+          "zh": "邀受影響者一起走一次現場。把「能決定、只能建議、暫時不能改」分開寫，指定回覆人。",
+          "en": "Walk the site with affected people. Separate decisions, recommendations and fixed constraints; name a response owner."
+        },
+        "gate": {
+          "zh": "至少一位受影響者能用自己的話重述問題，且有權回覆的人確認範圍。",
+          "en": "An affected person can restate the issue, and the responsible decision maker confirms its scope."
+        },
+        "move": {
+          "zh": "現場觀察需要更多人補充：把可修訂的議題單與公開回覆期限帶到線上。",
+          "en": "The site walk needs more perspectives: take a revisable brief and response date online."
+        },
+        "sources": [
+          "cip",
+          "metagov"
+        ]
+      }
     },
     {
       "id": "recruit",
@@ -81,7 +108,34 @@
         "zh": "人沒有到齊時，補招募；不要用更多投票掩蓋缺席。",
         "en": "Recruit missing voices before relying on more votes."
       },
-      "source": "cortico"
+      "source": "cortico",
+      "facilitation": {
+        "place": {
+          "zh": "非同步招募",
+          "en": "Asynchronous outreach"
+        },
+        "mode": "online",
+        "maturity": {
+          "zh": "個別聲音 → 缺席地圖",
+          "en": "Individual voices → participation gaps"
+        },
+        "action": {
+          "zh": "畫出利害關係人與缺席清單。聯絡資訊分開保存；提供電話補訪、翻譯、照顧與交通支持，讓新人知道共同規範與申訴窗口。",
+          "en": "Map stakeholders and missing voices. Separate contacts; offer phone interviews, language, care and travel support, with clear norms and an appeal contact."
+        },
+        "gate": {
+          "zh": "主持人能說出誰仍缺席、原因是什麼、要如何補邀；不要把回覆數當成涵蓋率。",
+          "en": "Facilitators can name missing groups, barriers and an outreach action; response counts are not coverage."
+        },
+        "move": {
+          "zh": "線上報名偏向熟悉工具的人：回到電話或現場，確認出席與可近用條件。",
+          "en": "Online sign-ups favor connected people: return to calls or the site to confirm access and attendance."
+        },
+        "sources": [
+          "cortico",
+          "newpublic"
+        ]
+      }
     },
     {
       "id": "sortition",
@@ -121,7 +175,34 @@
         "zh": "開放諮詢可略過；需要抽樣時使用專門工具並人工覆核。",
         "en": "Skip for open consultation; use a dedicated sortition tool and human review for panels."
       },
-      "source": "stanford"
+      "source": "stanford",
+      "facilitation": {
+        "place": {
+          "zh": "電話與出席確認",
+          "en": "Calls & access check"
+        },
+        "mode": "in-person",
+        "maturity": {
+          "zh": "報名池 → 可交代的組成",
+          "en": "Volunteer pool → accountable composition"
+        },
+        "action": {
+          "zh": "先決定這輪是開放諮詢或抽籤小組。需要抽樣才設定配額、候補與可稽核程序；本例採定向邀請，不宣稱代表性。",
+          "en": "Decide between open consultation and a civic lottery. Use quotas, reserves and an auditable draw only when needed. This example uses targeted invitations, not a representative sample."
+        },
+        "gate": {
+          "zh": "缺席、替補和參與支持都有紀錄；自願報名不能改稱代表性抽樣。",
+          "en": "Record absences, replacements and support. Do not relabel volunteers as a representative sample."
+        },
+        "move": {
+          "zh": "組成確認後，先在線上共讀平衡資訊；不要求每個人同時到場。",
+          "en": "After confirming the group, share balanced materials asynchronously; attendance need not be simultaneous."
+        },
+        "sources": [
+          "stanford",
+          "cortico"
+        ]
+      }
     },
     {
       "id": "learn",
@@ -162,7 +243,34 @@
         "zh": "出現共同誤解就補資料、再學習，不急著表決。",
         "en": "Return to learning when shared misconceptions appear."
       },
-      "source": "stanford"
+      "source": "stanford",
+      "facilitation": {
+        "place": {
+          "zh": "線上共讀與提問",
+          "en": "Online reading & questions"
+        },
+        "mode": "online",
+        "maturity": {
+          "zh": "零散資訊 → 可查證的問題",
+          "en": "Scattered information → checkable questions"
+        },
+        "action": {
+          "zh": "把支持與反對的證據並列，區分事實、推測與價值取捨。讓參與者先提問，再由不同觀點的知情者回應；理解檢核用來補教，不排除異議。",
+          "en": "Present evidence on different sides; separate facts, assumptions and value choices. Collect questions before balanced expert responses. Use understanding checks to support learning, not exclude dissent."
+        },
+        "gate": {
+          "zh": "爭議事實有來源；仍無法回答的問題被留下，而非變成投票題逼人選邊。",
+          "en": "Contested facts have sources; unanswered questions remain open rather than becoming forced votes."
+        },
+        "move": {
+          "zh": "文字仍說不清巷弄、接送與配送的衝突：把問題池帶回走讀與小圈對話。",
+          "en": "Text cannot resolve the street, access and delivery tensions: carry the questions into a site walk and small groups."
+        },
+        "sources": [
+          "stanford",
+          "vtaiwan"
+        ]
+      }
     },
     {
       "id": "listen",
@@ -177,6 +285,7 @@
       "tools": [
         "harmonica",
         "form",
+        "tttc",
         "polis",
         "values"
       ],
@@ -204,7 +313,34 @@
         "zh": "讓參與者校對整理，再把可討論的選項帶往審議。",
         "en": "Invite participant correction before turning stories into options."
       },
-      "source": "mit"
+      "source": "mit",
+      "facilitation": {
+        "place": {
+          "zh": "現場小圈聆聽",
+          "en": "In-person listening circles"
+        },
+        "mode": "in-person",
+        "maturity": {
+          "zh": "原話 → 附引文的主題",
+          "en": "Source voices → traceable themes"
+        },
+        "action": {
+          "zh": "先輪流說生活經驗，其他人重述確認，再比較立場。錄音與公開引文分別取得同意；將整理出的主題交回發言者校對，保留不符合大類的聲音。",
+          "en": "Take turns sharing experience; listeners restate it before debating positions. Obtain separate recording and quote-sharing consent. Return themes to speakers for correction and retain outlying voices."
+        },
+        "gate": {
+          "zh": "每個主題能點回原話；發言者可修正誤讀。不能把摘要的簡潔當成共識。",
+          "en": "Each theme links to source voices, and speakers can correct interpretations. A neat summary is not consensus."
+        },
+        "move": {
+          "zh": "大家確認主題後，將可比較的提案帶到線上；未被理解的聲音留在聆聽，不急著轉成票。",
+          "en": "Once themes are checked, take comparable proposals online. Keep misunderstood voices in listening instead of rushing to a vote."
+        },
+        "sources": [
+          "mit",
+          "cortico"
+        ]
+      }
     },
     {
       "id": "deliberate",
@@ -247,7 +383,34 @@
         "zh": "選項不完整回到聆聽；資料不足回到學習。",
         "en": "Return to listening for missing options or learning for missing evidence."
       },
-      "source": "cip"
+      "source": "cip",
+      "facilitation": {
+        "place": {
+          "zh": "非同步比較與修案",
+          "en": "Asynchronous comparison"
+        },
+        "mode": "online",
+        "maturity": {
+          "zh": "主題 → 方案與分歧",
+          "en": "Themes → proposals and dissent"
+        },
+        "action": {
+          "zh": "讓參與者新增選項、寫明成本與例外。比較跨群接受度時同時看反對理由、未投票者與少數處境；有爭議的理由帶回小組對話，修案再比較。",
+          "en": "Allow new options, costs and exceptions. Read bridging support alongside objections, non-voters and minority circumstances. Take disputed reasons back to small groups, revise, then compare again."
+        },
+        "gate": {
+          "zh": "每個方案都能說明處理了誰的問題、犧牲了什麼；高分不代替授權。",
+          "en": "Each option explains whose concern it addresses and its trade-offs; a high score does not confer authority."
+        },
+        "move": {
+          "zh": "票數只能指出取捨：回到有決定權的人在場的回覆會，說清採納與不採納的理由。",
+          "en": "Counts expose trade-offs: move to a response meeting with decision makers and explain acceptance or rejection."
+        },
+        "sources": [
+          "cip",
+          "stanford"
+        ]
+      }
     },
     {
       "id": "respond",
@@ -288,7 +451,34 @@
         "zh": "尚未回答的問題保留為下一輪輸入，不能用摘要消失。",
         "en": "Carry unanswered questions into the next round."
       },
-      "source": "civic"
+      "source": "civic",
+      "facilitation": {
+        "place": {
+          "zh": "現場回覆與確認",
+          "en": "In-person response meeting"
+        },
+        "mode": "in-person",
+        "maturity": {
+          "zh": "方案 → 逐題回覆與責任",
+          "en": "Proposals → responses and ownership"
+        },
+        "action": {
+          "zh": "先逐題對照原問，再請責任人確認採納、拒絕或待查。每項承諾寫負責人與日期；AI 草稿須由真正回覆的人修改確認，保留拒絕理由。",
+          "en": "Match responses to original questions. Owners confirm acceptance, rejection or further inquiry, with dates. The actual respondent edits and approves AI drafts; keep reasons for rejection."
+        },
+        "gate": {
+          "zh": "沒有回覆的問題仍可看見；「整理稿、提案、正式決定」狀態清楚分開。",
+          "en": "Unanswered questions remain visible; synthesis, proposals and official decisions have distinct statuses."
+        },
+        "move": {
+          "zh": "把確認後的回覆放回線上，讓未到場者檢查，並蒐集試辦期間的新經驗。",
+          "en": "Publish reviewed responses online for absent people to inspect, and gather experiences during the trial."
+        },
+        "sources": [
+          "civic",
+          "metagov"
+        ]
+      }
     },
     {
       "id": "feedback",
@@ -329,7 +519,35 @@
         "zh": "依缺口選下一步：補人、補知識、修方案或追蹤執行。",
         "en": "Choose the return point: people, evidence, options or implementation."
       },
-      "source": "vtaiwan"
+      "source": "vtaiwan",
+      "facilitation": {
+        "place": {
+          "zh": "線上追蹤，再約現場",
+          "en": "Online follow-up → next meeting"
+        },
+        "mode": "online",
+        "maturity": {
+          "zh": "回覆 → 新問題與下一輪",
+          "en": "Responses → questions for the next round"
+        },
+        "action": {
+          "zh": "逐項檢查承諾是否履行，讓參與者指出漏接與傷害。把新證據、未回答問題與缺席群體轉成下一輪議題單，直接回到需要修補的步驟。",
+          "en": "Check commitments one by one and invite reports of omissions or harm. Turn new evidence, unanswered questions and missing groups into the next brief, returning to the step that needs repair."
+        },
+        "gate": {
+          "zh": "下一輪起點、理由、責任人和檢視日期齊全；結束活動不等於問題已解決。",
+          "en": "Record the next start, reason, owner and review date. Closing an event does not mean the issue is resolved."
+        },
+        "move": {
+          "zh": "缺人回招募、缺證據回共讀、方案衝突回現場審議；每輪都能改走法。",
+          "en": "Return to outreach for missing voices, reading for evidence or a meeting for conflicting options. Adapt each round."
+        },
+        "sources": [
+          "vtaiwan",
+          "newpublic",
+          "metagov"
+        ]
+      }
     }
   ],
   "tools": [
@@ -648,5 +866,9 @@
         7
       ]
     }
-  ]
+  ],
+  "participation": {
+    "mode": "per-phase",
+    "description": "Online and in-person settings can alternate. The displayed route is an adaptable example, not a required schedule."
+  }
 }

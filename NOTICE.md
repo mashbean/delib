@@ -77,3 +77,7 @@ projects, but does not imply endorsement by their maintainers.
 Tool names and trademarks belong to their respective owners. The tool registry
 stores links and factual interoperability metadata; no third-party source code
 is bundled unless explicitly noted above.
+
+## Three.js
+
+The 0.5 WebGL scene bundles Three.js 0.185.1 (MIT). The complete license is retained at `public/vendor/THREE-LICENSE.txt`. Rebuild with `npm run build:scene`.

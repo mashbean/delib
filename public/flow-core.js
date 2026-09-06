@@ -53,6 +53,7 @@ export function validateFlowBundle(bundle) {
       if (!participantIds.has(entry.participantRef) || attendance.has(entry.participantRef)) errors.push(`Round ${round.id}: invalid or duplicate attendance.`);
       attendance.add(entry.participantRef);
       if (!["online", "in-person"].includes(entry.mode)) errors.push(`Round ${round.id}: invalid attendance mode.`);
+      if (entry.phaseModes !== undefined && (!entry.phaseModes || Array.isArray(entry.phaseModes) || typeof entry.phaseModes !== 'object' || Object.entries(entry.phaseModes).some(([phase, mode]) => !PHASE_IDS.includes(phase) || !['online','in-person'].includes(mode)))) errors.push(`Round ${round.id}: invalid phase participation mode.`);
     }
     for (const artifact of list(round.artifacts)) {
       if (!ID.test(artifact.id || "") || artifactIndex.has(artifact.id)) errors.push(`Invalid or duplicate artifact id: ${artifact.id}`);
@@ -135,8 +136,8 @@ export function getRoundStats(bundle, roundId, phaseId) {
   const attendance = round.attendance.filter((entry) => refs.has(entry.participantRef));
   return {
     participants: refs.size,
-    online: attendance.filter((entry) => entry.mode === "online").length,
-    inPerson: attendance.filter((entry) => entry.mode === "in-person").length,
+    online: attendance.filter((entry) => (entry.phaseModes?.[phaseId] ?? entry.mode) === "online").length,
+    inPerson: attendance.filter((entry) => (entry.phaseModes?.[phaseId] ?? entry.mode) === "in-person").length,
     inputs: phase ? phase.inputRefs.length : new Set(round.phases.flatMap((p) => p.inputRefs)).size,
     outputs: phase ? phase.outputRefs.length : round.artifacts.length,
     responses: round.responses.filter((r) => !phaseId || r.phaseId === phaseId).length,
@@ -153,7 +154,7 @@ export function getStepState(bundle, { roundId, phaseId, language = "zh" }) {
     id: phase.id, roundId: round.id, title: localized(PHASE_TITLES[phase.id], language),
     input: localized(phase.input, language), output: localized(phase.output, language), guidance: localized(phase.guidance, language),
     tools: phase.tools, mode: phase.mode, stats: getRoundStats(bundle, roundId, phaseId),
-    participants: phase.participantRefs.map((ref) => ({ ...bundle.participants.find((p) => p.id === ref), mode: round.attendance.find((a) => a.participantRef === ref)?.mode })),
+    participants: phase.participantRefs.map((ref) => { const a=round.attendance.find((a) => a.participantRef === ref); return { ...bundle.participants.find((p) => p.id === ref), mode: a?.phaseModes?.[phaseId] ?? a?.mode }; }),
     artifacts: round.artifacts.filter((a) => phase.outputRefs.includes(a.id)).map((a) => ({ ...a, text: localized(a.text, language) })),
     next: { ...round.next, reason: localized(round.next.reason, language), owner: localized(round.next.owner, language) },
   };

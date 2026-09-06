@@ -208,57 +208,161 @@
       "attendance": [
         {
           "participantRef": "p01",
-          "mode": "online"
+          "mode": "online",
+          "phaseModes": {
+            "frame": "in-person",
+            "recruit": "online",
+            "sortition": "in-person",
+            "learn": "online",
+            "listen": "in-person",
+            "deliberate": "online",
+            "respond": "in-person",
+            "feedback": "online"
+          }
         },
         {
           "participantRef": "p02",
-          "mode": "online"
+          "mode": "online",
+          "phaseModes": {
+            "frame": "in-person",
+            "recruit": "online",
+            "sortition": "in-person",
+            "learn": "online",
+            "listen": "in-person",
+            "deliberate": "online",
+            "respond": "in-person",
+            "feedback": "online"
+          }
         },
         {
           "participantRef": "p03",
-          "mode": "online"
+          "mode": "online",
+          "phaseModes": {
+            "frame": "in-person",
+            "recruit": "online",
+            "sortition": "in-person",
+            "learn": "online",
+            "listen": "in-person",
+            "deliberate": "online",
+            "respond": "in-person",
+            "feedback": "online"
+          }
         },
         {
           "participantRef": "p04",
-          "mode": "online"
+          "mode": "online",
+          "phaseModes": {
+            "frame": "in-person",
+            "recruit": "online",
+            "sortition": "in-person",
+            "learn": "online",
+            "listen": "in-person",
+            "deliberate": "online",
+            "respond": "in-person",
+            "feedback": "online"
+          }
         },
         {
           "participantRef": "p05",
-          "mode": "online"
+          "mode": "online",
+          "phaseModes": {
+            "recruit": "online",
+            "sortition": "in-person",
+            "learn": "online",
+            "listen": "in-person",
+            "deliberate": "online",
+            "feedback": "online"
+          }
         },
         {
           "participantRef": "p06",
-          "mode": "online"
+          "mode": "online",
+          "phaseModes": {
+            "recruit": "online",
+            "sortition": "in-person",
+            "learn": "online",
+            "listen": "in-person",
+            "deliberate": "online",
+            "feedback": "online"
+          }
         },
         {
           "participantRef": "p07",
-          "mode": "online"
+          "mode": "online",
+          "phaseModes": {
+            "recruit": "online",
+            "sortition": "in-person",
+            "learn": "online",
+            "listen": "in-person",
+            "deliberate": "online",
+            "feedback": "online"
+          }
         },
         {
           "participantRef": "p08",
-          "mode": "online"
+          "mode": "online",
+          "phaseModes": {
+            "recruit": "online",
+            "sortition": "in-person",
+            "learn": "online",
+            "listen": "in-person",
+            "deliberate": "online",
+            "feedback": "online"
+          }
         },
         {
           "participantRef": "p09",
-          "mode": "in-person"
+          "mode": "in-person",
+          "phaseModes": {
+            "recruit": "online",
+            "sortition": "in-person",
+            "learn": "online",
+            "listen": "in-person",
+            "deliberate": "online",
+            "feedback": "online"
+          }
         },
         {
           "participantRef": "p10",
-          "mode": "in-person"
+          "mode": "in-person",
+          "phaseModes": {
+            "recruit": "online",
+            "sortition": "in-person",
+            "learn": "online",
+            "listen": "in-person",
+            "deliberate": "online",
+            "feedback": "online"
+          }
         },
         {
           "participantRef": "p11",
-          "mode": "in-person"
+          "mode": "in-person",
+          "phaseModes": {
+            "recruit": "online",
+            "sortition": "in-person",
+            "learn": "online",
+            "listen": "in-person",
+            "deliberate": "online",
+            "feedback": "online"
+          }
         },
         {
           "participantRef": "p12",
-          "mode": "in-person"
+          "mode": "in-person",
+          "phaseModes": {
+            "recruit": "online",
+            "sortition": "online",
+            "learn": "online",
+            "listen": "online",
+            "deliberate": "online",
+            "feedback": "online"
+          }
         }
       ],
       "phases": [
         {
           "id": "frame",
-          "mode": "hybrid",
+          "mode": "in-person",
           "participantRefs": [
             "p01",
             "p02",
@@ -287,7 +391,7 @@
         },
         {
           "id": "recruit",
-          "mode": "hybrid",
+          "mode": "online",
           "participantRefs": [
             "p01",
             "p02",
@@ -379,7 +483,7 @@
         },
         {
           "id": "learn",
-          "mode": "hybrid",
+          "mode": "online",
           "participantRefs": [
             "p01",
             "p02",
@@ -481,7 +585,7 @@
         },
         {
           "id": "deliberate",
-          "mode": "hybrid",
+          "mode": "online",
           "participantRefs": [
             "p01",
             "p02",
@@ -530,7 +634,7 @@
         },
         {
           "id": "respond",
-          "mode": "hybrid",
+          "mode": "in-person",
           "participantRefs": [
             "p01",
             "p02",
@@ -572,7 +676,7 @@
         },
         {
           "id": "feedback",
-          "mode": "hybrid",
+          "mode": "online",
           "participantRefs": [
             "p01",
             "p02",
@@ -966,8 +1070,8 @@
           "phaseId": "listen",
           "kind": "theme",
           "text": {
-            "zh": "過街安全與學習",
-            "en": "Crossing safety and learning"
+            "zh": "過街安全與試辦範圍",
+            "en": "Crossing safety and pilot scope"
           },
           "source": {
             "tool": "tttc",
@@ -977,8 +1081,8 @@
           "participantRef": null,
           "derivedFrom": [
             "demo:school-street:r1:form:p01-q1",
-            "demo:school-street:r1:form:p05-q1",
-            "demo:school-street:r1:harmonica:p09-m1"
+            "demo:school-street:r1:form:p07-q1",
+            "demo:school-street:r1:form:p08-q1"
           ],
           "status": "reviewed",
           "reviewed": true,
@@ -999,9 +1103,9 @@
           },
           "participantRef": null,
           "derivedFrom": [
-            "demo:school-street:r1:form:p02-q1",
-            "demo:school-street:r1:form:p06-q1",
-            "demo:school-street:r1:harmonica:p10-m1"
+            "demo:school-street:r1:form:p04-q1",
+            "demo:school-street:r1:harmonica:p11-m1",
+            "demo:school-street:r1:harmonica:p12-m1"
           ],
           "status": "reviewed",
           "reviewed": true,
@@ -1023,8 +1127,8 @@
           "participantRef": null,
           "derivedFrom": [
             "demo:school-street:r1:form:p03-q1",
-            "demo:school-street:r1:form:p07-q1",
-            "demo:school-street:r1:harmonica:p11-m1"
+            "demo:school-street:r1:form:p06-q1",
+            "demo:school-street:r1:harmonica:p09-m1"
           ],
           "status": "reviewed",
           "reviewed": true,
@@ -1035,8 +1139,8 @@
           "phaseId": "listen",
           "kind": "theme",
           "text": {
-            "zh": "巷弄影響與檢討責任",
-            "en": "Side-street effects and review responsibility"
+            "zh": "巷弄影響與參與檢討",
+            "en": "Side-street effects and participation review"
           },
           "source": {
             "tool": "tttc",
@@ -1045,9 +1149,9 @@
           },
           "participantRef": null,
           "derivedFrom": [
-            "demo:school-street:r1:form:p04-q1",
-            "demo:school-street:r1:form:p08-q1",
-            "demo:school-street:r1:harmonica:p12-m1"
+            "demo:school-street:r1:form:p02-q1",
+            "demo:school-street:r1:form:p05-q1",
+            "demo:school-street:r1:harmonica:p10-m1"
           ],
           "status": "reviewed",
           "reviewed": true,
@@ -1719,57 +1823,161 @@
       "attendance": [
         {
           "participantRef": "p01",
-          "mode": "online"
+          "mode": "online",
+          "phaseModes": {
+            "frame": "in-person",
+            "recruit": "online",
+            "sortition": "in-person",
+            "learn": "online",
+            "listen": "in-person",
+            "deliberate": "online",
+            "respond": "in-person",
+            "feedback": "online"
+          }
         },
         {
           "participantRef": "p02",
-          "mode": "online"
+          "mode": "online",
+          "phaseModes": {
+            "frame": "in-person",
+            "recruit": "online",
+            "sortition": "in-person",
+            "learn": "online",
+            "listen": "in-person",
+            "deliberate": "online",
+            "respond": "in-person",
+            "feedback": "online"
+          }
         },
         {
           "participantRef": "p03",
-          "mode": "online"
+          "mode": "online",
+          "phaseModes": {
+            "frame": "in-person",
+            "recruit": "online",
+            "sortition": "in-person",
+            "learn": "online",
+            "listen": "in-person",
+            "deliberate": "online",
+            "respond": "in-person",
+            "feedback": "online"
+          }
         },
         {
           "participantRef": "p04",
-          "mode": "online"
+          "mode": "online",
+          "phaseModes": {
+            "frame": "in-person",
+            "recruit": "online",
+            "sortition": "in-person",
+            "learn": "online",
+            "listen": "in-person",
+            "deliberate": "online",
+            "respond": "in-person",
+            "feedback": "online"
+          }
         },
         {
           "participantRef": "p05",
-          "mode": "online"
+          "mode": "online",
+          "phaseModes": {
+            "recruit": "online",
+            "sortition": "in-person",
+            "learn": "online",
+            "listen": "in-person",
+            "deliberate": "online",
+            "feedback": "online"
+          }
         },
         {
           "participantRef": "p06",
-          "mode": "in-person"
+          "mode": "in-person",
+          "phaseModes": {
+            "recruit": "online",
+            "sortition": "in-person",
+            "learn": "online",
+            "listen": "in-person",
+            "deliberate": "online",
+            "feedback": "online"
+          }
         },
         {
           "participantRef": "p07",
-          "mode": "in-person"
+          "mode": "in-person",
+          "phaseModes": {
+            "recruit": "online",
+            "sortition": "in-person",
+            "learn": "online",
+            "listen": "in-person",
+            "deliberate": "online",
+            "feedback": "online"
+          }
         },
         {
           "participantRef": "p08",
-          "mode": "in-person"
+          "mode": "in-person",
+          "phaseModes": {
+            "recruit": "online",
+            "sortition": "in-person",
+            "learn": "online",
+            "listen": "in-person",
+            "deliberate": "online",
+            "feedback": "online"
+          }
         },
         {
           "participantRef": "p11",
-          "mode": "in-person"
+          "mode": "in-person",
+          "phaseModes": {
+            "recruit": "online",
+            "sortition": "in-person",
+            "learn": "online",
+            "listen": "in-person",
+            "deliberate": "online",
+            "feedback": "online"
+          }
         },
         {
           "participantRef": "p12",
-          "mode": "in-person"
+          "mode": "in-person",
+          "phaseModes": {
+            "recruit": "online",
+            "sortition": "online",
+            "learn": "online",
+            "listen": "online",
+            "deliberate": "online",
+            "feedback": "online"
+          }
         },
         {
           "participantRef": "p13",
-          "mode": "in-person"
+          "mode": "in-person",
+          "phaseModes": {
+            "recruit": "online",
+            "sortition": "in-person",
+            "learn": "online",
+            "listen": "in-person",
+            "deliberate": "online",
+            "feedback": "online"
+          }
         },
         {
           "participantRef": "p14",
-          "mode": "in-person"
+          "mode": "in-person",
+          "phaseModes": {
+            "recruit": "online",
+            "sortition": "in-person",
+            "learn": "online",
+            "listen": "in-person",
+            "deliberate": "online",
+            "feedback": "online"
+          }
         }
       ],
       "phases": [
         {
           "id": "frame",
-          "mode": "hybrid",
+          "mode": "in-person",
           "participantRefs": [
             "p01",
             "p02",
@@ -1802,7 +2010,7 @@
         },
         {
           "id": "recruit",
-          "mode": "hybrid",
+          "mode": "online",
           "participantRefs": [
             "p01",
             "p02",
@@ -1894,7 +2102,7 @@
         },
         {
           "id": "learn",
-          "mode": "hybrid",
+          "mode": "online",
           "participantRefs": [
             "p01",
             "p02",
@@ -1996,7 +2204,7 @@
         },
         {
           "id": "deliberate",
-          "mode": "hybrid",
+          "mode": "online",
           "participantRefs": [
             "p01",
             "p02",
@@ -2045,7 +2253,7 @@
         },
         {
           "id": "respond",
-          "mode": "hybrid",
+          "mode": "in-person",
           "participantRefs": [
             "p01",
             "p02",
@@ -2087,7 +2295,7 @@
         },
         {
           "id": "feedback",
-          "mode": "hybrid",
+          "mode": "online",
           "participantRefs": [
             "p01",
             "p02",
@@ -2485,8 +2693,8 @@
           "phaseId": "listen",
           "kind": "theme",
           "text": {
-            "zh": "過街安全與學習",
-            "en": "Crossing safety and learning"
+            "zh": "過街安全與試辦範圍",
+            "en": "Crossing safety and pilot scope"
           },
           "source": {
             "tool": "tttc",
@@ -2496,8 +2704,8 @@
           "participantRef": null,
           "derivedFrom": [
             "demo:school-street:r2:form:p01-q1",
-            "demo:school-street:r2:form:p05-q1",
-            "demo:school-street:r2:harmonica:p11-m1"
+            "demo:school-street:r2:form:p02-q1",
+            "demo:school-street:r2:form:p08-q1"
           ],
           "status": "reviewed",
           "reviewed": true,
@@ -2518,9 +2726,9 @@
           },
           "participantRef": null,
           "derivedFrom": [
-            "demo:school-street:r2:form:p02-q1",
-            "demo:school-street:r2:form:p06-q1",
-            "demo:school-street:r2:harmonica:p12-m1"
+            "demo:school-street:r2:form:p04-q1",
+            "demo:school-street:r2:harmonica:p11-m1",
+            "demo:school-street:r2:harmonica:p13-m1"
           ],
           "status": "reviewed",
           "reviewed": true,
@@ -2542,8 +2750,8 @@
           "participantRef": null,
           "derivedFrom": [
             "demo:school-street:r2:form:p03-q1",
-            "demo:school-street:r2:form:p07-q1",
-            "demo:school-street:r2:harmonica:p13-m1"
+            "demo:school-street:r2:form:p06-q1",
+            "demo:school-street:r2:form:p07-q1"
           ],
           "status": "reviewed",
           "reviewed": true,
@@ -2554,8 +2762,8 @@
           "phaseId": "listen",
           "kind": "theme",
           "text": {
-            "zh": "巷弄影響與檢討責任",
-            "en": "Side-street effects and review responsibility"
+            "zh": "巷弄影響與參與檢討",
+            "en": "Side-street effects and participation review"
           },
           "source": {
             "tool": "tttc",
@@ -2564,8 +2772,8 @@
           },
           "participantRef": null,
           "derivedFrom": [
-            "demo:school-street:r2:form:p04-q1",
-            "demo:school-street:r2:form:p08-q1",
+            "demo:school-street:r2:form:p05-q1",
+            "demo:school-street:r2:harmonica:p12-m1",
             "demo:school-street:r2:harmonica:p14-m1"
           ],
           "status": "reviewed",
@@ -3238,57 +3446,161 @@
       "attendance": [
         {
           "participantRef": "p01",
-          "mode": "online"
+          "mode": "online",
+          "phaseModes": {
+            "frame": "in-person",
+            "recruit": "online",
+            "sortition": "in-person",
+            "learn": "online",
+            "listen": "in-person",
+            "deliberate": "online",
+            "respond": "in-person",
+            "feedback": "online"
+          }
         },
         {
           "participantRef": "p03",
-          "mode": "online"
+          "mode": "online",
+          "phaseModes": {
+            "frame": "in-person",
+            "recruit": "online",
+            "sortition": "in-person",
+            "learn": "online",
+            "listen": "in-person",
+            "deliberate": "online",
+            "respond": "in-person",
+            "feedback": "online"
+          }
         },
         {
           "participantRef": "p04",
-          "mode": "online"
+          "mode": "online",
+          "phaseModes": {
+            "frame": "in-person",
+            "recruit": "online",
+            "sortition": "in-person",
+            "learn": "online",
+            "listen": "in-person",
+            "deliberate": "online",
+            "respond": "in-person",
+            "feedback": "online"
+          }
         },
         {
           "participantRef": "p05",
-          "mode": "online"
+          "mode": "online",
+          "phaseModes": {
+            "frame": "in-person",
+            "recruit": "online",
+            "sortition": "in-person",
+            "learn": "online",
+            "listen": "in-person",
+            "deliberate": "online",
+            "respond": "in-person",
+            "feedback": "online"
+          }
         },
         {
           "participantRef": "p06",
-          "mode": "online"
+          "mode": "online",
+          "phaseModes": {
+            "recruit": "online",
+            "sortition": "in-person",
+            "learn": "online",
+            "listen": "in-person",
+            "deliberate": "online",
+            "feedback": "online"
+          }
         },
         {
           "participantRef": "p07",
-          "mode": "online"
+          "mode": "online",
+          "phaseModes": {
+            "recruit": "online",
+            "sortition": "in-person",
+            "learn": "online",
+            "listen": "in-person",
+            "deliberate": "online",
+            "feedback": "online"
+          }
         },
         {
           "participantRef": "p09",
-          "mode": "online"
+          "mode": "online",
+          "phaseModes": {
+            "recruit": "online",
+            "sortition": "in-person",
+            "learn": "online",
+            "listen": "in-person",
+            "deliberate": "online",
+            "feedback": "online"
+          }
         },
         {
           "participantRef": "p10",
-          "mode": "in-person"
+          "mode": "in-person",
+          "phaseModes": {
+            "recruit": "online",
+            "sortition": "in-person",
+            "learn": "online",
+            "listen": "in-person",
+            "deliberate": "online",
+            "feedback": "online"
+          }
         },
         {
           "participantRef": "p11",
-          "mode": "in-person"
+          "mode": "in-person",
+          "phaseModes": {
+            "recruit": "online",
+            "sortition": "in-person",
+            "learn": "online",
+            "listen": "in-person",
+            "deliberate": "online",
+            "feedback": "online"
+          }
         },
         {
           "participantRef": "p12",
-          "mode": "in-person"
+          "mode": "in-person",
+          "phaseModes": {
+            "recruit": "online",
+            "sortition": "online",
+            "learn": "online",
+            "listen": "online",
+            "deliberate": "online",
+            "feedback": "online"
+          }
         },
         {
           "participantRef": "p13",
-          "mode": "in-person"
+          "mode": "in-person",
+          "phaseModes": {
+            "recruit": "online",
+            "sortition": "in-person",
+            "learn": "online",
+            "listen": "in-person",
+            "deliberate": "online",
+            "feedback": "online"
+          }
         },
         {
           "participantRef": "p14",
-          "mode": "in-person"
+          "mode": "in-person",
+          "phaseModes": {
+            "recruit": "online",
+            "sortition": "in-person",
+            "learn": "online",
+            "listen": "in-person",
+            "deliberate": "online",
+            "feedback": "online"
+          }
         }
       ],
       "phases": [
         {
           "id": "frame",
-          "mode": "hybrid",
+          "mode": "in-person",
           "participantRefs": [
             "p01",
             "p03",
@@ -3321,7 +3633,7 @@
         },
         {
           "id": "recruit",
-          "mode": "hybrid",
+          "mode": "online",
           "participantRefs": [
             "p01",
             "p03",
@@ -3413,7 +3725,7 @@
         },
         {
           "id": "learn",
-          "mode": "hybrid",
+          "mode": "online",
           "participantRefs": [
             "p01",
             "p03",
@@ -3515,7 +3827,7 @@
         },
         {
           "id": "deliberate",
-          "mode": "hybrid",
+          "mode": "online",
           "participantRefs": [
             "p01",
             "p03",
@@ -3564,7 +3876,7 @@
         },
         {
           "id": "respond",
-          "mode": "hybrid",
+          "mode": "in-person",
           "participantRefs": [
             "p01",
             "p03",
@@ -3606,7 +3918,7 @@
         },
         {
           "id": "feedback",
-          "mode": "hybrid",
+          "mode": "online",
           "participantRefs": [
             "p01",
             "p03",
@@ -4004,8 +4316,8 @@
           "phaseId": "listen",
           "kind": "theme",
           "text": {
-            "zh": "過街安全與學習",
-            "en": "Crossing safety and learning"
+            "zh": "過街安全與試辦範圍",
+            "en": "Crossing safety and pilot scope"
           },
           "source": {
             "tool": "tttc",
@@ -4015,8 +4327,8 @@
           "participantRef": null,
           "derivedFrom": [
             "demo:school-street:r3:form:p01-q1",
-            "demo:school-street:r3:form:p06-q1",
-            "demo:school-street:r3:harmonica:p11-m1"
+            "demo:school-street:r3:harmonica:p11-m1",
+            "demo:school-street:r3:harmonica:p12-m1"
           ],
           "status": "reviewed",
           "reviewed": true,
@@ -4037,9 +4349,8 @@
           },
           "participantRef": null,
           "derivedFrom": [
-            "demo:school-street:r3:form:p03-q1",
-            "demo:school-street:r3:form:p07-q1",
-            "demo:school-street:r3:harmonica:p12-m1"
+            "demo:school-street:r3:form:p04-q1",
+            "demo:school-street:r3:harmonica:p13-m1"
           ],
           "status": "reviewed",
           "reviewed": true,
@@ -4060,9 +4371,10 @@
           },
           "participantRef": null,
           "derivedFrom": [
-            "demo:school-street:r3:form:p04-q1",
-            "demo:school-street:r3:form:p09-q1",
-            "demo:school-street:r3:harmonica:p13-m1"
+            "demo:school-street:r3:form:p03-q1",
+            "demo:school-street:r3:form:p06-q1",
+            "demo:school-street:r3:form:p07-q1",
+            "demo:school-street:r3:form:p09-q1"
           ],
           "status": "reviewed",
           "reviewed": true,
@@ -4073,8 +4385,8 @@
           "phaseId": "listen",
           "kind": "theme",
           "text": {
-            "zh": "巷弄影響與檢討責任",
-            "en": "Side-street effects and review responsibility"
+            "zh": "巷弄影響與參與檢討",
+            "en": "Side-street effects and participation review"
           },
           "source": {
             "tool": "tttc",

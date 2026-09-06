@@ -229,6 +229,28 @@
             "online",
             "in-person"
           ]
+        },
+        "phaseModes": {
+          "type": "object",
+          "description": "Optional per-phase modes override the nominal round mode. Absence is expressed by phase.participantRefs.",
+          "propertyNames": {
+            "enum": [
+              "frame",
+              "recruit",
+              "sortition",
+              "learn",
+              "listen",
+              "deliberate",
+              "respond",
+              "feedback"
+            ]
+          },
+          "additionalProperties": {
+            "enum": [
+              "online",
+              "in-person"
+            ]
+          }
         }
       }
     },
