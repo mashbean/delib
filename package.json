@@ -20,6 +20,7 @@
     "deploy:production": "wrangler deploy --env production --var BUILD_SHA:$(git rev-parse --short HEAD)",
     "install-skill": "node scripts/install-skill.mjs install-skill",
     "pilot:pocket-polis": "node scripts/run-pocket-polis-pilot.mjs",
+    "audit:interop": "node scripts/audit-interoperability.mjs",
     "smoke": "node scripts/smoke.mjs",
     "build:scene": "node scripts/build-scene.mjs"
   },
