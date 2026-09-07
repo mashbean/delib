@@ -9,10 +9,12 @@ in the working tree before reviewing it.
 
 ## 0. Baseline and decisions before coding
 
-- [ ] Inspect and either complete or explicitly separate the uncommitted
+- [x] Inspect and explicitly separate the uncommitted
   facilitation files (`facilitation-core.js`, `facilitation-view.js`, the
   workspace changes and tests). Keep the homepage rename commit `e8245bc` and
   the deployed v0.7 baseline identifiable.
+- [x] Record the repository and verification baseline in
+  `docs/baseline-audit-2026-09-07.md`.
 - [ ] Record a before screenshot and a route inventory for `/`, `/workspace`,
   `/voice`, `/handoff` and the station shell in both languages and themes.
 - [ ] Keep the default QA mode fixture-backed. No real Form, TTTC, Reply, Pol.is
@@ -20,6 +22,10 @@ in the working tree before reviewing it.
   explicitly.
 - [ ] Establish the visual tokens, card states, interaction rules and the
   canonical data contract before adding decorative assets.
+
+The read-only contract inventory is recorded in
+`docs/interoperability-audit-2026-09-07.md`; the canonical envelope and loss
+vocabulary still require a product decision.
 
 ## 1. Merge Part 0 and Part 1 into the landing hero
 
@@ -202,4 +208,3 @@ next pass must reconcile their semantics before changing the UI.
 5. Fictional persona cards and journey maps.
 6. Adapter matrix, loss reports and exchange desk rebuild.
 7. Full browser/accessibility/performance QA and deployment.
-
