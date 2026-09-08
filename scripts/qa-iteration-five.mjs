@@ -5,9 +5,9 @@ import {readFile} from 'node:fs/promises';
 const moduleName=process.env.DELIB_PLAYWRIGHT_MODULE||'playwright';
 const {chromium}=await import(moduleName.startsWith('/')?pathToFileURL(moduleName).href:moduleName);
 const browser=await chromium.launch({headless:true,channel:'chrome'}),base=process.argv[2]||'http://localhost:8790';
-const context=await browser.newContext({viewport:{width:1440,height:1000},colorScheme:'light'}),page=await context.newPage(),errors=[],writes=[];
+const context=await browser.newContext({viewport:{width:1440,height:1000},colorScheme:'light'}),page=await context.newPage(),errors=[],writes=[],blockedTelemetry=[];
 page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error'&&/Content Security Policy/.test(m.text()))errors.push(m.text());});
-await context.route('**/*',route=>{if(!['GET','HEAD'].includes(route.request().method())){writes.push(route.request().url());return route.abort();}return route.continue();});
+await context.route('**/*',route=>{if(!['GET','HEAD'].includes(route.request().method())){const url=new URL(route.request().url());if(url.origin===new URL(base).origin&&url.pathname==='/cdn-cgi/rum')blockedTelemetry.push(url.pathname);else writes.push(url.href);return route.abort();}return route.continue();});
 const noOverflow=async()=>assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'page horizontal overflow');
 try{
  await page.goto(base+'/?lang=zh');await page.waitForFunction(()=>document.querySelector('#flow-scene')?.dataset.sceneTheme==='light');
@@ -34,5 +34,5 @@ try{
  await page.locator('#native-destination').selectOption('sensemaker');assert.match(await page.locator('#native-export').innerText(),/backend JSON/);assert.match(await page.locator('.exchange-ports').innerText(),/CSV-only/);
  for(const width of [390,320]){await page.setViewportSize({width,height:844});await noOverflow();await page.locator('#language').click();await noOverflow();}
  const fallback=await context.newPage();await fallback.addInitScript(()=>{const original=HTMLCanvasElement.prototype.getContext;HTMLCanvasElement.prototype.getContext=function(type,...rest){return /webgl/.test(type)?null:original.call(this,type,...rest);};});await fallback.goto(base+'/?lang=en');await fallback.locator('.scene-fallback').waitFor();assert.equal(await fallback.locator('#stage-buttons button').count(),8);await fallback.locator('#stage-buttons [data-step="6"]').click();assert.equal(await fallback.locator('#stage-buttons [data-step="6"]').getAttribute('aria-pressed'),'true');await fallback.close();
- assert.deepEqual(errors,[]);assert.deepEqual(writes,[]);console.log('PASS: merged themed WebGL hero and fallback, keyboard cards, 14 fictional people × 3 rounds × 8 stages, 38 catalog tools, 320/390/1024/1440 layouts, 12 native/canonical fixture imports, source manifest reconnection, downloads, withdrawal, Sensemaker entry boundary; zero upstream writes.');
+ assert.deepEqual(errors,[]);assert.deepEqual(writes,[]);console.log('PASS: merged themed WebGL hero and fallback, keyboard cards, 14 fictional people × 3 rounds × 8 stages, 38 catalog tools, 320/390/1024/1440 layouts, 12 native/canonical fixture imports, source manifest reconnection, downloads, withdrawal, Sensemaker entry boundary; zero upstream writes. Blocked analytics beacons: '+blockedTelemetry.length);
 }catch(e){console.error({errors,writes,url:page.url(),status:await page.locator('#native-status').textContent().catch(()=>null)});await page.screenshot({path:'/private/tmp/delib-five-failure.png',fullPage:true});throw e;}finally{await browser.close();}
