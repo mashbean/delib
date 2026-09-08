@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "issue_id": 42,
+    "summary": "Keep the accessible drop-off bay.",
+    "created_at": "2026-09-08T00:00:00Z",
+    "author_name": "Fictional caregiver",
+    "author_email": "fictional@example.invalid",
+    "abuse_flagged": 0
+  },
+  {
+    "id": 2,
+    "issue_id": 42,
+    "summary": null,
+    "created_at": "2026-09-08T00:01:00Z",
+    "author_name": null,
+    "author_email": null,
+    "abuse_flagged": 3
+  }
+]

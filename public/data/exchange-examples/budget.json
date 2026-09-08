@@ -1,0 +1,48 @@
+{
+  "budget": {
+    "budgetId": "fictional-budget"
+  },
+  "results": {
+    "ballots": 3,
+    "total": 100,
+    "unit": "points",
+    "mode": "knapsack",
+    "options": [
+      {
+        "id": "o1",
+        "name": "Accessible bay",
+        "description": "Paint a protected access lane",
+        "cost": 40,
+        "category": "Access",
+        "votes": 2,
+        "support": 0.6666666666666666,
+        "fundedPopular": true,
+        "fundedFair": true
+      }
+    ],
+    "bundles": {
+      "popular": {
+        "ids": [
+          "o1"
+        ],
+        "cost": 40,
+        "support": 0.6666666666666666,
+        "inequality": 0.3,
+        "score": 0.46
+      },
+      "fair": {
+        "ids": [
+          "o1"
+        ],
+        "cost": 40,
+        "support": 0.6666666666666666,
+        "inequality": 0.3,
+        "score": 0.46
+      }
+    },
+    "majority": [
+      "o1"
+    ],
+    "generatedAt": 1788832800000
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "hearing": {
+    "hearingId": "fictional-maple"
+  },
+  "testimonies": [
+    {
+      "id": 1,
+      "stance": "support",
+      "name": "Fictional caregiver",
+      "org": "Fictional group",
+      "summary": "Keep access",
+      "text": "I support a protected accessible bay.",
+      "createdAt": 1788832800000,
+      "updatedAt": 1788832800000,
+      "revised": false
+    }
+  ]
+}

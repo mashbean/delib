@@ -1,0 +1,19 @@
+{
+  "space": {
+    "spaceId": "fictional-proposals"
+  },
+  "proposals": [
+    {
+      "id": 1,
+      "title": "Protected bay",
+      "body": "Pilot an accessible drop-off bay.",
+      "alias": "Fictional caregiver",
+      "version": 2,
+      "endorsements": 3,
+      "amendments": 1,
+      "responses": 2,
+      "createdAt": 1788832800000,
+      "updatedAt": 1788832800000
+    }
+  ]
+}

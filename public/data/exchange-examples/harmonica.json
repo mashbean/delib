@@ -1,0 +1,29 @@
+{
+  "session": {
+    "sessionId": "demointer1",
+    "topic": "Safe access",
+    "model": "fictional-example"
+  },
+  "conversations": [
+    {
+      "participant": 1,
+      "alias": "Fictional resident",
+      "turns": 1,
+      "done": true,
+      "messages": [
+        {
+          "seq": 1,
+          "role": "interviewer",
+          "text": "What makes arrival difficult?",
+          "at": 1788768000000
+        },
+        {
+          "seq": 2,
+          "role": "participant",
+          "text": "I need a place to stop without blocking the crossing.",
+          "at": 1788768001000
+        }
+      ]
+    }
+  ]
+}

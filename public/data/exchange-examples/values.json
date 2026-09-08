@@ -1,0 +1,31 @@
+{
+  "session": {
+    "sessionId": "fictional-values"
+  },
+  "graph": {
+    "nodes": [
+      {
+        "cardId": "v1",
+        "title": "Accessible arrival",
+        "attention": [
+          "Keep access"
+        ],
+        "story": "Keep an accessible bay.",
+        "alias": "Fictional caregiver",
+        "wins": 2,
+        "losses": 1,
+        "compared": 3,
+        "strength": 0.67,
+        "rank": 1
+      }
+    ],
+    "edges": [],
+    "stats": {
+      "participants": 3,
+      "cards": 1,
+      "judgments": 3,
+      "comparedPairs": 1
+    },
+    "generatedAt": 1788832800000
+  }
+}

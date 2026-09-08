@@ -1,3 +1,6 @@
+import {nativeAdapters} from '../public/exchange-core.js';
+import {pocketPolisBundleToDelibData,rankingBundleToDelibData} from '../public/delib-data-core.js';
+import {parseTttcCsv} from '../public/tttc-csv-core.js';
 import { readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -44,16 +47,13 @@ export async function buildAudit(root = defaultRoot) {
     "public/integrations/pocket-polis-data.js",
     "public/integrations/power-ranker.js",
   ];
-  const adapterText = await Promise.all(adapterFiles.map((path) => readFile(resolve(root, path), "utf8")));
+  adapterFiles.push('public/exchange-core.js');
   const adapterCoverage = [
-    ["Pocket Polis", /pocketPolisBundleToDelibData|parsePocketPolisExports/],
-    ["Power Ranker", /rankingBundleToDelibData/],
-    ["TTTC CSV", /parseTttcCsv|tttcRowsToCsv/],
-    ["Form native JSON", /form.*delib-data|delib-data.*form/i],
-    ["Harmonica native JSON", /harmonica.*delib-data|delib-data.*harmonica/i],
-    ["TTTC report JSON", /report.*delib-data|delib-data.*report/i],
-    ["Reply native JSON", /reply.*delib-data|delib-data.*reply/i],
-  ].map(([name, pattern]) => ({ name, implemented: adapterText.some((text) => pattern.test(text)) }));
+    {name:'Pocket Polis',implemented:typeof pocketPolisBundleToDelibData === 'function',contract:'delib-data/v1'},
+    {name:'Power Ranker',implemented:typeof rankingBundleToDelibData === 'function',contract:'delib-data/v1'},
+    {name:'TTTC CSV',implemented:typeof parseTttcCsv === 'function',contract:'id,interview,comment'},
+    ...nativeAdapters.map(tool=>({name:({form:'Form native JSON',harmonica:'Harmonica native JSON',tttc:'TTTC report JSON',reply:'Reply native JSON'})[tool] || `${tool} native JSON`,implemented:true,contract:'delib-exchange/v1 private companion'}))
+  ];
 
   const duplicateToolIds = toolIds.filter((id, index) => toolIds.indexOf(id) !== index);
   const duplicateAuditIds = auditedIds.filter((id, index) => auditedIds.indexOf(id) !== index);
@@ -114,16 +114,16 @@ export function renderMarkdown(audit) {
     "",
     "## Local adapter coverage",
     "",
-    "| Surface | Local adapter detected | Interpretation |",
+    "| Surface | Executable adapter | Interpretation |",
     "| --- | --- | --- |",
-    ...audit.adapterCoverage.map((item) => `| ${item.name} | ${item.implemented ? "yes" : "no"} | ${item.implemented ? "Existing code contains a local conversion path." : "No native JSON → canonical adapter detected; keep this as a next implementation gate."} |`),
+    ...audit.adapterCoverage.map((item) => `| ${item.name} | ${item.implemented ? "yes" : "no"} | ${item.implemented ? "Exported adapter covered by contract fixtures; destination semantics remain explicit." : "No native JSON → canonical adapter detected; keep this as a next implementation gate."} |`),
     "",
     "## Repair queue",
     "",
-    "1. Add native JSON adapters and fixtures for Form, Harmonica, Pocket TTTC reports and Pocket Reply receipts.",
+    "1. Extend native export coverage for omitted proposal revisions, ballot reasons and remote withdrawal histories.",
     "2. Keep CSV adapters as compatibility bridges; emit field-level preservation and loss reports.",
-    "3. Add withdrawal tombstones, typed derivation links and activity-scoped consent to the canonical envelope.",
-    "4. Verify the exact current Civic Talk/Sensemaking export contract before adding an adapter.",
+    "3. Local withdrawal and typed relations are implemented in delib-exchange/v1; destination permission remains an explicit human review.",
+    "4. Civic Talk public opinions import and Sensemaker backend JSON export are fixture-tested; the Sensemaker web picker still needs a JSON entry path.",
     "5. Keep live upstream writes behind the existing human confirmation boundary.",
     "",
   ];

@@ -1,0 +1,37 @@
+{
+  "reportId": "demottcc01",
+  "title": "Safe access",
+  "model": "fictional-example",
+  "topics": [
+    {
+      "name": "Access",
+      "subtopics": [
+        {
+          "name": "Drop-off",
+          "claims": [
+            {
+              "id": "c1",
+              "text": "Retain accessible drop-off access.",
+              "people": 1,
+              "quotes": [
+                {
+                  "commentId": "d1",
+                  "interview": "",
+                  "text": "Keep the accessible drop-off bay."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "stats": {
+    "comments": 1,
+    "people": 1,
+    "claims": 1,
+    "groupedClaims": 1,
+    "unassigned": 0
+  },
+  "generatedAt": 1788768000000
+}

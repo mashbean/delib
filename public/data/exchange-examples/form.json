@@ -1,0 +1,32 @@
+{
+  "form": {
+    "formId": "demoform01",
+    "title": "校門口 / School gate",
+    "questions": [
+      {
+        "id": "q1",
+        "type": "long",
+        "label": "What needs to change? / 哪裡需要改善？",
+        "exportText": true
+      },
+      {
+        "id": "q2",
+        "type": "scale",
+        "label": "Safety rating",
+        "exportText": false
+      }
+    ]
+  },
+  "responses": [
+    {
+      "seq": 1,
+      "alias": "Fictional caregiver",
+      "answers": {
+        "q1": "Keep the accessible drop-off bay. / 保留無障礙接送區。",
+        "q2": 3
+      },
+      "createdAt": 1788768000000,
+      "updatedAt": 1788768000000
+    }
+  ]
+}

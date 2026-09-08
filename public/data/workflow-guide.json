@@ -1,6 +1,6 @@
 {
   "schema": "delib-workflow-guide/v1",
-  "updatedAt": "2026-09-06",
+  "updatedAt": "2026-09-07",
   "scope": "Bilingual guidance. Does not imply universal automatic imports or endorsement.",
   "stages": [
     {
@@ -898,6 +898,31 @@
       "Preview and confirm each service write. Readback is bounded and may need manual retry.",
       "Source references and revisions are preserved; no automatic identity matching, public sharing or deletion propagation.",
       "Reply drafts are not treated as participant voices in subsequent rounds."
+    ]
+  },
+  "facilitationWorkspace": {
+    "url": "https://delib.mashbean.net/workspace",
+    "schema": "https://delib.mashbean.net/schemas/delib-workspace/v1.json",
+    "focusView": true,
+    "independentRecords": [
+      "text review",
+      "speaker confirmation",
+      "owner commitment",
+      "voice disposition",
+      "participation gaps"
+    ],
+    "commitmentStates": [
+      "draft",
+      "confirmed",
+      "committed",
+      "piloting",
+      "review-due",
+      "closed"
+    ],
+    "boundaries": [
+      "Local organizer records are not verified signatures or remote publications.",
+      "No automatic adoption, representation or identity inference.",
+      "Unresolved participation gaps and record references carry across rounds; originals remain."
     ]
   }
 }

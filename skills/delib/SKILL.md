@@ -136,7 +136,7 @@ that recording consent permits publishing a transcript.
 ## Preserve data meaning across tools
 
 Use the [browser data workbench](https://delib.mashbean.net/handoff) for its
-supported CSV checks and conversions. Files are processed in browser memory on
+supported native JSON and CSV checks and conversions. Files are processed in browser memory on
 that page; this does not mean downstream tools also process locally. Check the
 workbench's supported inputs and its declared conversion losses before use.
 
@@ -146,6 +146,22 @@ retention, and a transformation log. For each handoff, show what survives, what
 is omitted, and which editorial changes need review. A text CSV cannot preserve
 a complete voting matrix, nor can a topic summary be treated as original evidence.
 
+- Read the [adapter matrix](https://delib.mashbean.net/data/adapter-matrix.json)
+  before selecting a source or destination. Tested file compatibility does not
+  establish live service integration.
+- [delib-exchange/v1](https://delib.mashbean.net/schemas/delib-exchange/v1.json)
+  is the private native-format companion: typed records, original IDs, source
+  hashes, native method fields, derivation links, local withdrawal tombstones,
+  and explicit conversion losses. Keep it alongside the original export.
+  CSV carries only eligible participant text. Do not turn scales, allocation
+  scores, pairwise judgments or model drafts into participant voices.
+  Match TTTC quotes with the explicit transfer manifest and exact source text.
+  Local withdrawal blocks further transfer and flags descendants; it is not
+  confirmation that an upstream service has deleted its copies.
+- Civic Talk public-opinion JSON can enter this companion. Sensemaker backend
+  JSON export omits unavailable vote information; its current CSV-only web
+  picker still needs a JSON entry path. Do not invent vote counts to satisfy
+  another tool's importer, or claim the backend file export is a live round trip.
 - [delib-data/v1](https://delib.mashbean.net/schemas/delib-data/v1.json) is the
   common source and privacy envelope; it is a Delib contract, not a universal standard.
 - [delib-rounds/v1](https://delib.mashbean.net/schemas/delib-rounds/v1.json) is its

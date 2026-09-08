@@ -4,8 +4,8 @@ import { exportTttcCsv } from "./flow-core.js";
 const text = {
   skip: ["跳到工作台", "Skip to workbench"], brand: ["資料交接", "Data handoff"], back: ["回到工具集 ↗", "Back to the toolkit ↗"],
   eyebrow: ["保留來源，讓對話繼續。", "KEEP THE SOURCE. CONTINUE THE CONVERSATION."],
-  title: ["換一個工具，\n別弄丟一個聲音。", "Change the tool.\nKeep every voice."],
-  lede: ["把表單、訪談、提問與陳述接在一起。先在這裡檢查資料與來源，再帶到下一輪。", "Bring forms, interviews, questions and statements together. Check the data and its sources here, then carry it into the next round."],
+  title: ["資料交接", "Data handoff"],
+  lede: ["帶入來源，查看轉換，再交給下一個工具。", "Bring in a source, inspect the changes, then hand it over."],
   local: ["檔案只在此分頁記憶體中處理；不會上傳或存入瀏覽器儲存空間。重新整理即清除。", "Files stay in this tab’s memory. Nothing is uploaded or written to browser storage; reloading clears the data."],
   workspace: ["資料交接工作台", "Data handoff workbench"], receive: ["帶入原始文字", "Bring in the source text"],
   receiveBody: ["從工具的主辦者頁下載 tttc.csv。這個工作台接受 id、interview、comment 三欄；每份檔案最多 3 MB，一次最多 20 份。", "Download tttc.csv from a tool’s host page. This workbench accepts id, interview and comment columns: up to 3 MB per file and 20 files at a time."],

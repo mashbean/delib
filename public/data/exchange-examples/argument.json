@@ -1,0 +1,47 @@
+{
+  "debate": {
+    "debateId": "fictional-argument"
+  },
+  "tree": {
+    "roots": [
+      {
+        "id": 1,
+        "parentId": 0,
+        "side": "pro",
+        "text": "Keep access for wheelchair users.",
+        "source": "Fictional observation",
+        "alias": "Fictional caregiver",
+        "up": 3,
+        "down": 1,
+        "votes": 4,
+        "voteScore": 0.333,
+        "strength": 0.3,
+        "depth": 1,
+        "createdAt": 1788832800000,
+        "children": [
+          {
+            "id": 2,
+            "parentId": 1,
+            "side": "con",
+            "text": "The entrance is too narrow; test another location.",
+            "source": "Fictional walk",
+            "alias": "Fictional resident",
+            "up": 1,
+            "down": 0,
+            "votes": 1,
+            "voteScore": 0.333,
+            "strength": 0.333,
+            "depth": 2,
+            "createdAt": 1788832800000,
+            "children": []
+          }
+        ]
+      }
+    ],
+    "balance": 0.3,
+    "strongestPro": null,
+    "strongestCon": null,
+    "myVotes": {},
+    "generatedAt": 1788832800000
+  }
+}

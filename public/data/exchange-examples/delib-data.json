@@ -1,0 +1,57 @@
+{
+  "schema": "https://delib.mashbean.net/schemas/delib-data/v1.json",
+  "kind": "delib-data-bundle",
+  "bundleId": "fictional-polis",
+  "exportedAt": "2026-09-08T00:00:00Z",
+  "source": {
+    "tool": "Pocket Polis",
+    "sourceId": "fictional"
+  },
+  "phases": [
+    {
+      "id": "opinion",
+      "type": "opinion"
+    }
+  ],
+  "items": [
+    {
+      "id": "s1",
+      "phaseId": "opinion",
+      "type": "statement",
+      "text": "Keep the accessible bay.",
+      "status": "approved",
+      "origin": "participant"
+    }
+  ],
+  "responses": [
+    {
+      "id": "v1",
+      "phaseId": "opinion",
+      "subjectRef": "s1",
+      "participantRef": "Fictional caregiver",
+      "response": "agree",
+      "count": 1
+    }
+  ],
+  "outcomes": [
+    {
+      "id": "c1",
+      "phaseId": "opinion",
+      "type": "response-counts",
+      "itemRef": "s1",
+      "counts": {
+        "agree": 1,
+        "disagree": 0,
+        "pass": 0
+      }
+    }
+  ],
+  "summary": {
+    "participants": 1,
+    "responses": 1
+  },
+  "provenance": {},
+  "dataCard": {
+    "publicationStatus": "local-private-export"
+  }
+}

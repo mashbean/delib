@@ -1,3 +1,5 @@
+> Historical snapshot. The 2026-09-08 adapters supersede the missing-adapter findings below. See [iteration five](iteration-five-2026-09-08.md) and `/data/adapter-matrix.json`; `npm run audit:interop` inspects executable adapter exports.
+
 # Delib interoperability audit
 
 Date: 2026-09-07

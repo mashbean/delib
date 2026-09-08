@@ -1,0 +1,127 @@
+{
+  "schema": "delib-adapter-matrix/v1",
+  "verifiedAt": "2026-09-08",
+  "verification": "Local source contracts and synthetic fixtures; not proof of current production exports or remote round trips.",
+  "entries": [
+    {
+      "tool": "form",
+      "format": "{form,responses}",
+      "status": "local-native-adapter-tested",
+      "contract": "delib-exchange/v1",
+      "source": "https://github.com/mashbean/pocket-form/tree/8a16dbd0a1c0bd2fdff6984159d1bdaaa188a396/src",
+      "boundary": "Typed answers retained; only exportText string answers enter text transfer. Consent answer is not transfer permission."
+    },
+    {
+      "tool": "harmonica",
+      "format": "{session,conversations}",
+      "status": "local-native-adapter-tested",
+      "contract": "delib-exchange/v1",
+      "source": "https://github.com/mashbean/pocket-harmonica/tree/1696165f69fd3c302f60bbe23e3af8d24eb461b5/src",
+      "boundary": "Interviewer prompts separate from participant messages."
+    },
+    {
+      "tool": "tttc",
+      "format": "report.json: topics[].subtopics[].claims[]",
+      "status": "local-native-adapter-tested",
+      "contract": "delib-exchange/v1",
+      "source": "https://github.com/mashbean/tttc-serverless/tree/4aa8a00dd54128d7a9248585c021d4bfa35ee043/src",
+      "boundary": "Exact quote and manifest needed for source reconnection. Group counts are not people."
+    },
+    {
+      "tool": "reply",
+      "format": "receipt.json: questions[],loopbacks[]",
+      "status": "local-native-adapter-tested",
+      "contract": "delib-exchange/v1",
+      "source": "https://github.com/mashbean/pocket-reply/tree/7cbf5ba5f91e7b240457943778ce4336251acaa9/src",
+      "boundary": "Model replies remain drafts; responsibility confirmation absent."
+    },
+    {
+      "tool": "values",
+      "format": "{session,graph}",
+      "status": "local-native-adapter-tested",
+      "contract": "delib-exchange/v1",
+      "source": "https://github.com/mashbean/pocket-values/tree/9bf410345f547e4a6acf29050d10633e4666b056/src",
+      "boundary": "Confirmed synthesis excluded from verbatim source transfer. Pairwise graph retained."
+    },
+    {
+      "tool": "budget",
+      "format": "{budget,results}",
+      "status": "local-native-adapter-tested",
+      "contract": "delib-exchange/v1",
+      "source": "https://github.com/mashbean/pocket-budget/tree/31d861b7036eea34b38fb32fbb6fceedd218844e/src",
+      "boundary": "Aggregate allocations retained, no individual ballots in this export."
+    },
+    {
+      "tool": "check",
+      "format": "{check,results}",
+      "status": "local-native-adapter-tested",
+      "contract": "delib-exchange/v1",
+      "source": "https://github.com/mashbean/pocket-check/tree/5f1e102c1bf029e08ce0bbd367db25addd1189f1/src",
+      "boundary": "Correctness is not agreement; individual feedback absent."
+    },
+    {
+      "tool": "proposals",
+      "format": "{space,proposals}",
+      "status": "local-native-adapter-tested",
+      "contract": "delib-exchange/v1",
+      "source": "https://github.com/mashbean/pocket-proposals/tree/6cdbb476385e4550bd1c15eec8654c97aefca036/src",
+      "boundary": "Current proposals retained; amendment bodies and revision histories absent."
+    },
+    {
+      "tool": "argument",
+      "format": "{debate,tree}",
+      "status": "local-native-adapter-tested",
+      "contract": "delib-exchange/v1",
+      "source": "https://github.com/mashbean/pocket-argument/tree/2eeefa000ed829fc6cdcaf0362782ae0eb782ced/src",
+      "boundary": "Support/opposition preserved; strength is not consensus."
+    },
+    {
+      "tool": "maple",
+      "format": "{hearing,testimonies}",
+      "status": "local-native-adapter-tested",
+      "contract": "delib-exchange/v1",
+      "source": "https://github.com/mashbean/pocket-maple/tree/a1a97c4f310e1885ca4a2a652a725ccbb84f37c7/src",
+      "boundary": "Visible testimony archive only; missing entries are not withdrawal evidence."
+    },
+    {
+      "tool": "polis",
+      "format": "statements.csv + votes.csv",
+      "status": "existing-adapter-plus-companion-tested",
+      "contract": "delib-data/v1 → delib-exchange/v1",
+      "source": "https://github.com/mashbean/pocket-polis",
+      "entry": "/integrations/pocket-polis-data",
+      "boundary": "Use the existing tool export to obtain delib-data, then import into exchange. Values and counts remain; participant response linkage is removed and reported. No clustering or consensus inferred."
+    },
+    {
+      "tool": "power-ranker",
+      "format": "ranking bundle",
+      "status": "existing-adapter-plus-companion-tested",
+      "contract": "delib-data/v1 → delib-exchange/v1",
+      "entry": "/rank",
+      "boundary": "Use the existing tool export to obtain delib-data, then import into exchange. Values and counts remain; participant response linkage is removed and reported. No clustering or consensus inferred."
+    },
+    {
+      "tool": "call-in",
+      "format": "tttc.csv",
+      "status": "csv-bridge-tested",
+      "entry": "/call-in",
+      "boundary": "Questions only; slides, reactions and poll results require separate exports."
+    },
+    {
+      "tool": "civic-talk",
+      "format": "GET /api/issues/:id/opinions public JSON array",
+      "status": "local-native-adapter-tested",
+      "contract": "delib-exchange/v1",
+      "source": "https://github.com/g0v/civic-talk-hono/blob/main/src/db/queries.ts",
+      "boundary": "Only unflagged nonempty opinions transfer. Materials and briefing are separate; public display is not destination permission."
+    },
+    {
+      "tool": "sensemaker",
+      "format": "{comments:[{id,text}]} backend JSON",
+      "status": "backend-shape-fixture-tested-web-entry-gap",
+      "source": "https://github.com/bestian/sensemaker-backend/blob/master/src/utils/parseJSON.ts",
+      "entry": "https://make.vtaiwan.tw",
+      "boundary": "Web picker currently accepts CSV only. No voteInfo fabricated. No live analysis or report round trip tested. Source license unspecified: link and interoperate, do not vendor."
+    }
+  ]
+}

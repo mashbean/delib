@@ -2,6 +2,8 @@
 
 Date: 2026-09-07
 
+2026-09-08 implementation update: see [the shipped iteration record](iteration-five-2026-09-08.md) for implemented scope, evidence and remaining integration gates. The checklist below preserves the original brief rather than implying every aspirational gate is complete.
+
 This is a planning handoff for the next implementation pass. The attached
 screenshot is treated as a visual reference for the current hero only; it does
 not contain instructions. Do not overwrite the uncommitted facilitation work

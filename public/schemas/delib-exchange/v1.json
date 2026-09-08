@@ -1,0 +1,295 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://delib.mashbean.net/schemas/delib-exchange/v1.json",
+  "title": "Delib private exchange companion v1",
+  "description": "Versioned local adapter contract. Native method fields remain in private source companions; destination compatibility is explicit. Not an ecosystem standard or remote deletion protocol.",
+  "type": "object",
+  "required": [
+    "schema",
+    "version",
+    "simulated",
+    "generatedAt",
+    "sources",
+    "records",
+    "externalSources",
+    "tombstones",
+    "losses",
+    "privacy"
+  ],
+  "properties": {
+    "schema": {
+      "const": "https://delib.mashbean.net/schemas/delib-exchange/v1.json"
+    },
+    "version": {
+      "const": 1
+    },
+    "simulated": {
+      "type": "boolean"
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "tool",
+          "activity",
+          "sha256",
+          "filename",
+          "methodData"
+        ],
+        "properties": {
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 12000
+          },
+          "tool": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 12000
+          },
+          "activity": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 12000
+          },
+          "filename": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 12000
+          },
+          "methodData": {
+            "type": [
+              "object",
+              "array"
+            ]
+          }
+        }
+      }
+    },
+    "records": {
+      "type": "array",
+      "maxItems": 5000,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "sourceId",
+          "originalId",
+          "kind",
+          "text",
+          "origin",
+          "status",
+          "relations",
+          "fields",
+          "transferEligible"
+        ],
+        "properties": {
+          "status": {
+            "enum": [
+              "draft",
+              "unreviewed",
+              "reviewed",
+              "withdrawn",
+              "needs-review"
+            ]
+          },
+          "transferEligible": {
+            "type": "boolean"
+          },
+          "relations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "ref",
+                "type"
+              ],
+              "properties": {
+                "type": {
+                  "enum": [
+                    "context",
+                    "derived",
+                    "responds",
+                    "quotes",
+                    "revises",
+                    "supports",
+                    "opposes"
+                  ]
+                },
+                "ref": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 12000
+                }
+              }
+            }
+          },
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 12000
+          },
+          "sourceId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 12000
+          },
+          "originalId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 12000
+          },
+          "kind": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 12000
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 12000
+          },
+          "origin": {
+            "enum": [
+              "participant",
+              "model",
+              "source-excerpt",
+              "organizer",
+              "participant-confirmed-synthesis",
+              "calculated"
+            ]
+          },
+          "fields": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "externalSources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "originalId",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 12000
+          },
+          "originalId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 12000
+          },
+          "status": {
+            "const": "unresolved"
+          }
+        }
+      }
+    },
+    "tombstones": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "ref",
+          "reason",
+          "by",
+          "at"
+        ],
+        "properties": {
+          "ref": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 12000
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 12000
+          },
+          "by": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 12000
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "losses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "action",
+          "reason"
+        ],
+        "properties": {
+          "action": {
+            "enum": [
+              "preserved",
+              "transformed",
+              "blocked",
+              "unavailable",
+              "review",
+              "dropped",
+              "aggregated"
+            ]
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 12000
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 12000
+          }
+        }
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "required": [
+        "visibility",
+        "identityLinking",
+        "consent",
+        "remoteDeletionConfirmed"
+      ],
+      "properties": {
+        "visibility": {
+          "const": "private"
+        },
+        "identityLinking": {
+          "const": false
+        },
+        "consent": {
+          "const": "unknown"
+        },
+        "remoteDeletionConfirmed": {
+          "const": false
+        }
+      }
+    }
+  }
+}

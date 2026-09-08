@@ -14,7 +14,7 @@ describe("read-only interoperability audit", () => {
     expect(audit.adapterCoverage.find((item) => item.name === "Power Ranker").implemented).toBe(true);
     expect(audit.adapterCoverage.find((item) => item.name === "TTTC CSV").implemented).toBe(true);
     for (const name of ["Form native JSON", "Harmonica native JSON", "TTTC report JSON", "Reply native JSON"]) {
-      expect(audit.adapterCoverage.find((item) => item.name === name).implemented).toBe(false);
+      expect(audit.adapterCoverage.find((item) => item.name === name).implemented).toBe(true);
     }
   });
 });

@@ -1,0 +1,287 @@
+{
+  "schema": "delib-fictional-personas/v1",
+  "simulated": true,
+  "note": "Authored learning scenarios, not inferred emotions or observations of real people. Source and attendance links are computed from flow-demo.json.",
+  "profiles": [
+    {
+      "id": "p01",
+      "icon": "clock",
+      "barrier": {
+        "zh": "接送空檔有限",
+        "en": "Limited time between care duties"
+      },
+      "support": {
+        "zh": "表單可分段填寫，會議提供照顧支持",
+        "en": "Allow pauses in the form and offer care support"
+      },
+      "positive": {
+        "zh": "原話變成明確的過街改善條件",
+        "en": "The crossing concern becomes an explicit condition"
+      },
+      "need": {
+        "zh": "確認意見如何被回覆，並保留修正入口",
+        "en": "See how the voice is answered and keep a correction route"
+      }
+    },
+    {
+      "id": "p02",
+      "icon": "route",
+      "barrier": {
+        "zh": "討論只聚焦校門，忽略完整步行路線",
+        "en": "Discussion misses the rest of the walking route"
+      },
+      "support": {
+        "zh": "把完整路線帶進走讀與地圖",
+        "en": "Include the whole walking route in the site walk"
+      },
+      "positive": {
+        "zh": "討論範圍延伸到實際通勤路線",
+        "en": "The discussion includes the commuting route"
+      },
+      "need": {
+        "zh": "確認意見如何被回覆，並保留修正入口",
+        "en": "See how the voice is answered and keep a correction route"
+      }
+    },
+    {
+      "id": "p03",
+      "icon": "file",
+      "barrier": {
+        "zh": "營業時段無法長時間開會",
+        "en": "Business hours make long meetings difficult"
+      },
+      "support": {
+        "zh": "保留非同步發言與進貨時段紀錄",
+        "en": "Offer asynchronous input and record delivery times"
+      },
+      "positive": {
+        "zh": "進貨需求保留在方案比較裡",
+        "en": "Delivery needs remain visible in option comparisons"
+      },
+      "need": {
+        "zh": "確認意見如何被回覆，並保留修正入口",
+        "en": "See how the voice is answered and keep a correction route"
+      }
+    },
+    {
+      "id": "p04",
+      "icon": "people",
+      "barrier": {
+        "zh": "走讀動線與接送空間可能不可近用",
+        "en": "The site walk and drop-off may be inaccessible"
+      },
+      "support": {
+        "zh": "事先確認無障礙路線並由本人校對摘要",
+        "en": "Check access in advance and invite the speaker to review summaries"
+      },
+      "positive": {
+        "zh": "通行例外被明確寫入討論",
+        "en": "Access exceptions enter the discussion explicitly"
+      },
+      "need": {
+        "zh": "確認意見如何被回覆，並保留修正入口",
+        "en": "See how the voice is answered and keep a correction route"
+      }
+    },
+    {
+      "id": "p05",
+      "icon": "voice",
+      "barrier": {
+        "zh": "擔心不同意會被當成反對安全",
+        "en": "Concern that dissent will be read as opposition to safety"
+      },
+      "support": {
+        "zh": "分開記錄安全目標與具體方案異議",
+        "en": "Separate the safety goal from objections to an option"
+      },
+      "positive": {
+        "zh": "可以支持目標，同時保留反對理由",
+        "en": "Support for the goal can coexist with dissent"
+      },
+      "need": {
+        "zh": "確認意見如何被回覆，並保留修正入口",
+        "en": "See how the voice is answered and keep a correction route"
+      }
+    },
+    {
+      "id": "p06",
+      "icon": "route",
+      "barrier": {
+        "zh": "工作移動中難以參加固定場次",
+        "en": "Mobile work makes fixed sessions difficult"
+      },
+      "support": {
+        "zh": "提供短訪與配送時段的補充管道",
+        "en": "Offer short interviews and a way to add delivery schedules"
+      },
+      "positive": {
+        "zh": "配送安排成為可比較的條件",
+        "en": "Delivery arrangements become explicit trade-offs"
+      },
+      "need": {
+        "zh": "確認意見如何被回覆，並保留修正入口",
+        "en": "See how the voice is answered and keep a correction route"
+      }
+    },
+    {
+      "id": "p07",
+      "icon": "file",
+      "barrier": {
+        "zh": "教學與值勤之間沒有足夠討論時間",
+        "en": "Teaching and duty leave little discussion time"
+      },
+      "support": {
+        "zh": "提供精簡證據包與會後提問",
+        "en": "Offer a short evidence pack and follow-up questions"
+      },
+      "positive": {
+        "zh": "責任分工可以被具體檢視",
+        "en": "Responsibilities become inspectable"
+      },
+      "need": {
+        "zh": "確認意見如何被回覆，並保留修正入口",
+        "en": "See how the voice is answered and keep a correction route"
+      }
+    },
+    {
+      "id": "p08",
+      "icon": "route",
+      "barrier": {
+        "zh": "自行車通行可能在封街討論中被遺漏",
+        "en": "Cycling access may be overlooked"
+      },
+      "support": {
+        "zh": "要求方案標出自行車與行人的交會點",
+        "en": "Mark cycling and walking conflict points"
+      },
+      "positive": {
+        "zh": "自己的通行需求有了來源連結",
+        "en": "Access needs retain a source link"
+      },
+      "need": {
+        "zh": "確認意見如何被回覆，並保留修正入口",
+        "en": "See how the voice is answered and keep a correction route"
+      }
+    },
+    {
+      "id": "p09",
+      "icon": "clock",
+      "barrier": {
+        "zh": "市場尖峰與活動時間重疊",
+        "en": "Market peak hours overlap with meetings"
+      },
+      "support": {
+        "zh": "在離峰時段補訪並保留原始用語",
+        "en": "Interview off-peak and retain original wording"
+      },
+      "positive": {
+        "zh": "生計需求沒有被摘要抹去",
+        "en": "Livelihood needs survive synthesis"
+      },
+      "need": {
+        "zh": "確認意見如何被回覆，並保留修正入口",
+        "en": "See how the voice is answered and keep a correction route"
+      }
+    },
+    {
+      "id": "p10",
+      "icon": "clock",
+      "barrier": {
+        "zh": "白天開會會壓縮睡眠",
+        "en": "Day meetings reduce time for sleep"
+      },
+      "support": {
+        "zh": "提供晚間或非同步參與",
+        "en": "Offer evening or asynchronous participation"
+      },
+      "positive": {
+        "zh": "不必同時在線也能留下意見",
+        "en": "A voice can contribute without being online together"
+      },
+      "need": {
+        "zh": "確認意見如何被回覆，並保留修正入口",
+        "en": "See how the voice is answered and keep a correction route"
+      }
+    },
+    {
+      "id": "p11",
+      "icon": "route",
+      "barrier": {
+        "zh": "繞行可能改變候車與轉乘",
+        "en": "Diversions may affect waiting and transfers"
+      },
+      "support": {
+        "zh": "共同查證站點與替代動線",
+        "en": "Check stops and alternative routes together"
+      },
+      "positive": {
+        "zh": "轉乘問題進入共同證據包",
+        "en": "Transfer concerns enter shared evidence"
+      },
+      "need": {
+        "zh": "確認意見如何被回覆，並保留修正入口",
+        "en": "See how the voice is answered and keep a correction route"
+      }
+    },
+    {
+      "id": "p12",
+      "icon": "people",
+      "barrier": {
+        "zh": "兒童安全與接送便利需要同時考慮",
+        "en": "Child safety and drop-off access both matter"
+      },
+      "support": {
+        "zh": "把親子走讀與不同接送情境納入",
+        "en": "Include family walks and different drop-off situations"
+      },
+      "positive": {
+        "zh": "方案開始說清楚安全與通行取捨",
+        "en": "Options make safety and access trade-offs explicit"
+      },
+      "need": {
+        "zh": "確認意見如何被回覆，並保留修正入口",
+        "en": "See how the voice is answered and keep a correction route"
+      }
+    },
+    {
+      "id": "p13",
+      "icon": "people",
+      "barrier": {
+        "zh": "第一輪邀請沒有涵蓋到宅照顧工作",
+        "en": "First-round outreach missed home-care work"
+      },
+      "support": {
+        "zh": "補邀並詢問服務時間與通行限制",
+        "en": "Invite follow-up input on service times and access"
+      },
+      "positive": {
+        "zh": "下一輪重新打開了參與入口",
+        "en": "A later round reopens participation"
+      },
+      "need": {
+        "zh": "確認意見如何被回覆，並保留修正入口",
+        "en": "See how the voice is answered and keep a correction route"
+      }
+    },
+    {
+      "id": "p14",
+      "icon": "compass",
+      "barrier": {
+        "zh": "校門改善可能把負擔轉到巷弄",
+        "en": "Improvements may shift the burden to side streets"
+      },
+      "support": {
+        "zh": "補做巷弄走讀，追蹤外溢影響",
+        "en": "Walk side streets and track spillover"
+      },
+      "positive": {
+        "zh": "後續回饋仍能修正試辦範圍",
+        "en": "Later feedback can revise the pilot scope"
+      },
+      "need": {
+        "zh": "確認意見如何被回覆，並保留修正入口",
+        "en": "See how the voice is answered and keep a correction route"
+      }
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+import { validateFacilitation, carryParticipation, roundFollowups, saveParticipation, setCommitment, setDisposition } from './facilitation-core.js';
 import { parseTttcCsv, tttcRowsToCsv } from './tttc-csv-core.js';
 export const WORKSPACE_SCHEMA='https://delib.mashbean.net/schemas/delib-workspace/v1.json';
 export const uid=()=>crypto.randomUUID();
@@ -10,7 +11,7 @@ export const currentRound=p=>p.rounds.find(r=>r.id===p.view.roundId)||p.rounds.a
 export function createProject({title,audience,deadline,goal,language='zh'}) {
   if(!text(title,120)||!text(audience,500)||!text(goal,1000)||!/^\d{4}-\d{2}-\d{2}$/.test(deadline||''))throw new Error('請填寫議題、參與對象、目標與日期 / Complete the issue, audience, goal and date.');
   const id=uid(),roundId=uid();
-  return {schema:WORKSPACE_SCHEMA,id,title,audience,deadline,goal,language,simulated:false,createdAt:now(),updatedAt:now(),view:{roundId,tab:'route',selected:''},rounds:[{id:roundId,title:language==='en'?'Round 1':'第 1 輪',step:0,artifacts:[],inputs:[],connections:{},next:null}],events:[]};
+  return {schema:WORKSPACE_SCHEMA,id,title,audience,deadline,goal,language,simulated:false,createdAt:now(),updatedAt:now(),view:{roundId,tab:'route',selected:'',mode:'focus'},rounds:[{id:roundId,title:language==='en'?'Round 1':'第 1 輪',step:0,artifacts:[],inputs:[],connections:{},next:null}],events:[]};
 }
 export function validateProject(p) {
   if(!p||p.schema!==WORKSPACE_SCHEMA||!text(p.id,120)||!text(p.title,120)||typeof p.simulated!=='boolean'||!['zh','en'].includes(p.language)||!Array.isArray(p.rounds)||!p.rounds.length||p.rounds.length>30||!Array.isArray(p.events)||p.events.length>2000||!p.view)throw new Error('Invalid workspace');
@@ -29,11 +30,11 @@ export function validateProject(p) {
     for(const [tool,c] of Object.entries(r.connections)){if(!['form','tttc','reply'].includes(tool)||!c||!/^[a-z0-9]{10}$/.test(c.id||'')||!Array.isArray(c.inputRefs)||c.inputRefs.some(id=>!ids.has(id))||!Array.isArray(c.contextRefs)||c.contextRefs.some(id=>!ids.has(id)))throw new Error('Invalid service connection');}
     if(r.next&&(!text(r.next.reason,1000)||!text(r.next.owner,100)||!text(r.next.date,50)||!Array.isArray(r.next.carryForwardRefs)||r.next.carryForwardRefs.some(id=>!ids.has(id))))throw new Error('Invalid next-round commitment');
   }
-  if(!rounds.has(p.view.roundId)||!['route','voices','changes'].includes(p.view.tab))throw new Error('Invalid view');
+  if(!rounds.has(p.view.roundId)||!['route','voices','changes','participation'].includes(p.view.tab))throw new Error('Invalid view');
   // Credential fields are never part of a project or backup. UI credentials live in memory.
   const forbidden=o=>{if(!o||typeof o!=='object')return false;return Object.entries(o).some(([k,v])=>/^(adminToken|token|hostUrl|manageUrl|authorization)$/i.test(k)||forbidden(v));};
   if(forbidden(p))throw new Error('Remove management credentials before importing');
-  return p;
+  validateFacilitation(p);return p;
 }
 export function record(kind,value,source,refs=[],extra={}){return {id:uid(),kind,text:value,source,derivedFrom:[...new Set(refs)],relations:[...new Set(refs)].map(ref=>({ref,type:kind==='reply'?'responds':'derived'})),participantRef:null,supersedes:null,review:{checked:false,reviewer:'',at:null,quoteConfirmed:false},...extra};}
 export function addSources(p,csv,sourceId,{reconcile=false}={}){
@@ -88,10 +89,10 @@ export function reviewRecord(p,id,{reviewer,quoteConfirmed=false,checked=true}){
 export function nextRound(p,{reason,owner,date,phase}){
   if(!text(reason,1000)||!text(owner,100)||!/^\d{4}-\d{2}-\d{2}$/.test(date)||!['recruit','learn','deliberate','respond'].includes(phase))throw new Error('請填下一輪缺口、負責者與日期 / Complete the next round gap, owner and date.');
   const prev=currentRound(p);if(prev!==p.rounds.at(-1))throw new Error('請從最新一輪延續 / Continue from the latest round.');
-  const open=activeRecords(p).filter(a=>prev.artifacts.some(x=>x.id===a.id)&&(!a.review.checked||a.kind==='feedback'));
+  const open=roundFollowups(p,prev);
   prev.next={reason,owner,date,phase,carryForwardRefs:open.map(a=>a.id)};
   const brief=record('brief',reason,{tool:'facilitator',id:uid()},open.map(a=>a.id));
-  const r={id:uid(),title:p.language==='en'?`Round ${p.rounds.length+1}`:`第 ${p.rounds.length+1} 輪`,step:({recruit:0,learn:0,deliberate:1,respond:2})[phase],artifacts:[brief],inputs:open.map(a=>a.id),connections:{},next:null};
+  const r={id:uid(),title:p.language==='en'?`Round ${p.rounds.length+1}`:`第 ${p.rounds.length+1} 輪`,step:({recruit:0,learn:0,deliberate:1,respond:2})[phase],artifacts:[brief],inputs:open.map(a=>a.id),connections:{},next:null,participation:carryParticipation(prev)};
   p.rounds.push(r);p.view.roundId=r.id;p.view.tab='route';p.view.selected=brief.id;return r;
 }
 export function traceVoice(p,id){
@@ -107,5 +108,14 @@ export function projectFromDemo(bundle,language='zh'){
   const loc=v=>typeof v==='object'?(v[language]||v.en):v;
   const p=createProject({title:loc(bundle.issue.title)||'Demo',audience:language==='en'?'Fictional residents':'虛構居民',deadline:'2026-12-01',goal:language==='en'?'Explore how voices shape each round.':'探索聲音如何影響每一輪。',language});p.simulated=true;
   p.rounds=bundle.rounds.map(r=>({id:r.id,title:loc(r.title),step:0,inputs:r.artifacts.filter(a=>['statement','question'].includes(a.kind)).map(a=>a.id),connections:{},next:null,artifacts:r.artifacts.map(a=>record(a.kind,loc(a.text),{tool:a.source.tool,id:a.id},a.derivedFrom,{id:a.id,participantRef:a.participantRef,review:{checked:a.reviewed,reviewer:a.reviewed?(language==='en'?'Fictional facilitator':'模擬主持人'):'',at:a.reviewed?bundle.generatedAt:null,quoteConfirmed:false}}))}));
+  p.view.roundId=p.rounds[0].id;
+  const en=language==='en',by=en?'Fictional facilitator':'模擬主持人',owner=en?'Fictional school contact':'模擬校方窗口';
+  const gap={group:en?'Shift-working caregivers':'輪班照顧者',barrier:en?'Daytime sessions exclude shift workers':'白天場次不方便輪班者參加',action:en?'Offer an evening listening session':'另開晚間聆聽時段',note:en?'Fictional exercise: the invitation offered only daytime slots.':'示範登記：邀請原先只提供白天時段。',owner,reviewOn:'2026-12-01',by,status:'missing'};
+  saveParticipation(p,'',gap);
+  const source=p.rounds[0].artifacts.find(a=>a.kind==='statement');
+  if(source)setDisposition(p,source.id,{status:'deferred',reason:en?'Fictional exercise: inspect the site and accessible drop-off before deciding.':'示範登記：完成現場觀察與無障礙接送檢查後，再決定方案。',owner,reviewOn:'2026-12-01',by});
+  const reply=p.rounds[0].artifacts.find(a=>a.kind==='reply');
+  if(reply){reviewRecord(p,reply.id,{reviewer:by});for(const status of ['confirmed','committed'])setCommitment(p,reply.id,{status,owner,reviewOn:'2026-12-01',by,note:en?'Fictional exercise: arrange a drop-off trial and review access conditions.':'示範登記：安排接送動線試辦，檢視通行與無障礙需求。',authorityConfirmed:true});}
+  for(let i=1;i<p.rounds.length;i++){p.view.roundId=p.rounds[i].id;p.rounds[i].participation=carryParticipation(p.rounds[i-1]);const entry=p.rounds[i].participation[0];if(entry)saveParticipation(p,entry.id,{...gap,status:i===1?'invited':'heard',note:en?(i===1?'Fictional exercise: evening invitation prepared.':'Fictional exercise: facilitator recorded the follow-up accounts.'):(i===1?'示範登記：已準備晚間邀請。':'示範登記：主持人記錄了回訪經驗。')});}
   p.view.roundId=p.rounds[0].id;return validateProject(p);
 }

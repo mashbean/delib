@@ -1,0 +1,36 @@
+{
+  "loopId": "demoreply1",
+  "title": "Response",
+  "speaker": "Fictional school contact",
+  "model": "fictional-example",
+  "throughline": "Review access together",
+  "opening": "Draft for review",
+  "closing": "Review next round",
+  "beats": [],
+  "takes": [],
+  "bridges": [],
+  "questions": [
+    {
+      "qid": "q1",
+      "sourceId": "d1",
+      "name": "Fictional caregiver",
+      "text": "Keep the accessible drop-off bay. / 保留無障礙接送區。",
+      "upvotes": 0,
+      "lens": "access"
+    }
+  ],
+  "loopbacks": [
+    {
+      "qid": "q1",
+      "beatId": "b1",
+      "role": "keeper",
+      "reply": "Draft: examine the accessible bay during the site walk."
+    }
+  ],
+  "generatedAt": 1788768000000,
+  "verification": {
+    "pool": 1,
+    "replies": 1,
+    "coverage": true
+  }
+}
