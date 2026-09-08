@@ -1,0 +1,90 @@
+{
+  "mode": "built-in image_gen",
+  "note": "Each character was generated separately. The tool did not report a model identifier. JPEG derivatives only resize and encode for web delivery; no artwork content edits.",
+  "cards": [
+    {
+      "id": "p01",
+      "asset": "/images/personas/p01.jpg",
+      "original": "exec-d486e4f0-b62f-4bf1-8a94-96bd9a208c56.png",
+      "prompt": "Use case: illustration-story. Asset type: original artwork for a premium civic deliberation character trading card, portrait 2:3 format. Subject: a fictional Taiwanese caregiver, short-haired adult in an indigo utility vest, holding a small care tote and a hand-drawn crossing map, at a school-street pedestrian crossing. Single character, full upper body, expressive and dignified, approachable rather than superhero. Style: sophisticated collectible card illustration, graphic novel editorial painting, fine ink contours, tactile gouache grain, layered urban geometry, strong silhouette, luminous lime and cyan accents with warm amber against deep navy. Composition: character centered in the middle 70%, simple urban details, visible hands, clean outer edges, no typography, no letters, no numbers, no logos, no border (UI supplies frame and all text). This is fictional artwork, not a portrait of a real person. All cards in this series should share this art direction. Rich, polished, contemporary Taiwan street scene, not a generic app icon."
+    },
+    {
+      "id": "p02",
+      "asset": "/images/personas/p02.jpg",
+      "original": "exec-53bddb0e-7bab-4e71-a875-acc6f37a689f.png",
+      "prompt": "Use case: illustration-story. Asset type: original artwork for a premium civic deliberation character trading card, portrait 2:3 format. Single fictional character, full upper body or three-quarter where needed, expressive and dignified, approachable rather than superhero. Style: sophisticated collectible card illustration, graphic novel editorial painting, fine ink contours, tactile gouache grain, layered urban geometry, strong silhouette, luminous lime and cyan accents with warm amber against deep navy. Character centered in middle 70%, simple urban details, accurate anatomy and visible hands, clean outer edges. No typography, letters, numbers, logos or border; the UI supplies framing and text. Fictional artwork, not a real person's portrait. Cohesive contemporary Taiwanese street setting, polished and richly illustrated, not a generic app icon. Subject: a fictional Taiwanese walking commuter, young adult with round glasses and terracotta jacket, messenger bag, studying a pedestrian route map near a crossing"
+    },
+    {
+      "id": "p03",
+      "asset": "/images/personas/p03.jpg",
+      "original": "exec-57055f5c-9fa1-41f5-8607-602a159fac40.png",
+      "prompt": "Use case: illustration-story. Asset type: original artwork for a premium civic deliberation character trading card, portrait 2:3 format. Single fictional character, full upper body or three-quarter where needed, expressive and dignified, approachable rather than superhero. Style: sophisticated collectible card illustration, graphic novel editorial painting, fine ink contours, tactile gouache grain, layered urban geometry, strong silhouette, luminous lime and cyan accents with warm amber against deep navy. Character centered in middle 70%, simple urban details, accurate anatomy and visible hands, clean outer edges. No typography, letters, numbers, logos or border; the UI supplies framing and text. Fictional artwork, not a real person's portrait. Cohesive contemporary Taiwanese street setting, polished and richly illustrated, not a generic app icon. Subject: a fictional Taiwanese shopkeeper, middle-aged woman with dark tied-back hair, mustard shop apron, holding a small ledger beside a neighborhood storefront"
+    },
+    {
+      "id": "p04",
+      "asset": "/images/personas/p04.jpg",
+      "original": "exec-2f6bcc7a-c871-4fde-b9af-fb5fe2a129b9.png",
+      "prompt": "Use case: illustration-story. Asset type: original artwork for a premium civic deliberation character trading card, portrait 2:3 format. Single fictional character, full upper body or three-quarter where needed, expressive and dignified, approachable rather than superhero. Style: sophisticated collectible card illustration, graphic novel editorial painting, fine ink contours, tactile gouache grain, layered urban geometry, strong silhouette, luminous lime and cyan accents with warm amber against deep navy. Character centered in middle 70%, simple urban details, accurate anatomy and visible hands, clean outer edges. No typography, letters, numbers, logos or border; the UI supplies framing and text. Fictional artwork, not a real person's portrait. Cohesive contemporary Taiwanese street setting, polished and richly illustrated, not a generic app icon. Subject: a fictional Taiwanese wheelchair user, young adult with wavy hair and teal jacket, independently using an active manual wheelchair near a curb ramp; show the wheelchair accurately and naturally, eye-level dignified composition"
+    },
+    {
+      "id": "p05",
+      "asset": "/images/personas/p05.jpg",
+      "original": "exec-e41e35af-fd9e-45ff-a764-7742a54d2544.png",
+      "prompt": "Use case: illustration-story. Asset type: original artwork for a premium civic deliberation character trading card, portrait 2:3 format. Single fictional character, full upper body or three-quarter where needed, expressive and dignified, approachable rather than superhero. Style: sophisticated collectible card illustration, graphic novel editorial painting, fine ink contours, tactile gouache grain, layered urban geometry, strong silhouette, luminous lime and cyan accents with warm amber against deep navy. Character centered in middle 70%, simple urban details, accurate anatomy and visible hands, clean outer edges. No typography, letters, numbers, logos or border; the UI supplies framing and text. Fictional artwork, not a real person's portrait. Cohesive contemporary Taiwanese street setting, polished and richly illustrated, not a generic app icon. Subject: a fictional Taiwanese neighborhood resident, older woman with silver bob and plum cardigan, holding house keys and a notebook on an apartment stoop"
+    },
+    {
+      "id": "p06",
+      "asset": "/images/personas/p06.jpg",
+      "original": "exec-88f16a8b-45b7-491f-974a-585b4f14434b.png",
+      "prompt": "Use case: illustration-story. Asset type: original artwork for a premium civic deliberation character trading card, portrait 2:3 format. Single fictional character, full upper body or three-quarter where needed, expressive and dignified, approachable rather than superhero. Style: sophisticated collectible card illustration, graphic novel editorial painting, fine ink contours, tactile gouache grain, layered urban geometry, strong silhouette, luminous lime and cyan accents with warm amber against deep navy. Character centered in middle 70%, simple urban details, accurate anatomy and visible hands, clean outer edges. No typography, letters, numbers, logos or border; the UI supplies framing and text. Fictional artwork, not a real person's portrait. Cohesive contemporary Taiwanese street setting, polished and richly illustrated, not a generic app icon. Subject: a fictional Taiwanese delivery worker, adult man in coral windbreaker, helmet held in one hand, a delivery trolley and labeled-free parcel beside him on a school street"
+    },
+    {
+      "id": "p07",
+      "asset": "/images/personas/p07.jpg",
+      "original": "exec-233f9ce4-5da9-4a8a-96ec-989619dc625a.png",
+      "prompt": "Use case: illustration-story. Asset type: original artwork for a premium civic deliberation character trading card, portrait 2:3 format. Single fictional character, full upper body or three-quarter where needed, expressive and dignified, approachable rather than superhero. Style: sophisticated collectible card illustration, graphic novel editorial painting, fine ink contours, tactile gouache grain, layered urban geometry, strong silhouette, luminous lime and cyan accents with warm amber against deep navy. Character centered in middle 70%, simple urban details, accurate anatomy and visible hands, clean outer edges. No typography, letters, numbers, logos or border; the UI supplies framing and text. Fictional artwork, not a real person's portrait. Cohesive contemporary Taiwanese street setting, polished and richly illustrated, not a generic app icon. Subject: a fictional Taiwanese teacher, woman with short hair in blue shirt, holding a lesson folder in front of a school gate"
+    },
+    {
+      "id": "p08",
+      "asset": "/images/personas/p08.jpg",
+      "original": "exec-0c301daf-18ee-40a3-b951-5c78c2def60c.png",
+      "prompt": "Use case: illustration-story. Asset type: original artwork for a premium civic deliberation character trading card, portrait 2:3 format. Single fictional character, full upper body or three-quarter where needed, expressive and dignified, approachable rather than superhero. Style: sophisticated collectible card illustration, graphic novel editorial painting, fine ink contours, tactile gouache grain, layered urban geometry, strong silhouette, luminous lime and cyan accents with warm amber against deep navy. Character centered in middle 70%, simple urban details, accurate anatomy and visible hands, clean outer edges. No typography, letters, numbers, logos or border; the UI supplies framing and text. Fictional artwork, not a real person's portrait. Cohesive contemporary Taiwanese street setting, polished and richly illustrated, not a generic app icon. Subject: a fictional Taiwanese cyclist, adult with black curly hair wearing a sage windbreaker, standing with a city bicycle at a separated bike lane, helmet visible"
+    },
+    {
+      "id": "p09",
+      "asset": "/images/personas/p09.jpg",
+      "original": "exec-7a35572c-c5d3-497c-8abb-ba2f1c91ac89.png",
+      "prompt": "Use case: illustration-story. Asset type: original artwork for a premium civic deliberation character trading card, portrait 2:3 format. Single fictional character, full upper body or three-quarter where needed, expressive and dignified, approachable rather than superhero. Style: sophisticated collectible card illustration, graphic novel editorial painting, fine ink contours, tactile gouache grain, layered urban geometry, strong silhouette, luminous lime and cyan accents with warm amber against deep navy. Character centered in middle 70%, simple urban details, accurate anatomy and visible hands, clean outer edges. No typography, letters, numbers, logos or border; the UI supplies framing and text. Fictional artwork, not a real person's portrait. Cohesive contemporary Taiwanese street setting, polished and richly illustrated, not a generic app icon. Subject: a fictional Taiwanese market worker, older man wearing an ochre apron over a striped shirt, standing beside a cart with produce baskets at an early morning street market"
+    },
+    {
+      "id": "p10",
+      "asset": "/images/personas/p10.jpg",
+      "original": "exec-8fb597dd-1e4e-4cac-9c0e-91a17aab3fdb.png",
+      "prompt": "Use case: illustration-story. Asset type: original artwork for a premium civic deliberation character trading card, portrait 2:3 format. Single fictional character, full upper body or three-quarter where needed, expressive and dignified, approachable rather than superhero. Style: sophisticated collectible card illustration, graphic novel editorial painting, fine ink contours, tactile gouache grain, layered urban geometry, strong silhouette, luminous lime and cyan accents with warm amber against deep navy. Character centered in middle 70%, simple urban details, accurate anatomy and visible hands, clean outer edges. No typography, letters, numbers, logos or border; the UI supplies framing and text. Fictional artwork, not a real person's portrait. Cohesive contemporary Taiwanese street setting, polished and richly illustrated, not a generic app icon. Subject: a fictional Taiwanese night-shift worker, adult woman with cropped hair in lavender utility jacket, holding a lunch flask at a dawn bus stop, tired but thoughtful expression"
+    },
+    {
+      "id": "p11",
+      "asset": "/images/personas/p11.jpg",
+      "original": "exec-f8214afd-14b6-4dd4-8f42-648f81885deb.png",
+      "prompt": "Use case: illustration-story. Asset type: original artwork for a premium civic deliberation character trading card, portrait 2:3 format. Single fictional character, full upper body or three-quarter where needed, expressive and dignified, approachable rather than superhero. Style: sophisticated collectible card illustration, graphic novel editorial painting, fine ink contours, tactile gouache grain, layered urban geometry, strong silhouette, luminous lime and cyan accents with warm amber against deep navy. Character centered in middle 70%, simple urban details, accurate anatomy and visible hands, clean outer edges. No typography, letters, numbers, logos or border; the UI supplies framing and text. Fictional artwork, not a real person's portrait. Cohesive contemporary Taiwanese street setting, polished and richly illustrated, not a generic app icon. Subject: a fictional Taiwanese bus rider, middle-aged man with salt-and-pepper hair in rust jacket, holding a transit card at a bus shelter, city bus in background"
+    },
+    {
+      "id": "p12",
+      "asset": "/images/personas/p12.jpg",
+      "original": "exec-c0ecb112-bfe5-4fda-b3db-d62c0e22b716.png",
+      "prompt": "Use case: illustration-story. Asset type: original artwork for a premium civic deliberation character trading card, portrait 2:3 format. Single fictional character, full upper body or three-quarter where needed, expressive and dignified, approachable rather than superhero. Style: sophisticated collectible card illustration, graphic novel editorial painting, fine ink contours, tactile gouache grain, layered urban geometry, strong silhouette, luminous lime and cyan accents with warm amber against deep navy. Character centered in middle 70%, simple urban details, accurate anatomy and visible hands, clean outer edges. No typography, letters, numbers, logos or border; the UI supplies framing and text. Fictional artwork, not a real person's portrait. Cohesive contemporary Taiwanese street setting, polished and richly illustrated, not a generic app icon. Subject: a fictional Taiwanese parent, adult man in green knit sweater, holding a child's small backpack and a folded school notice near the school crossing; only the adult visible"
+    },
+    {
+      "id": "p13",
+      "asset": "/images/personas/p13.jpg",
+      "original": "exec-a57b5fa2-fd86-46bc-9953-ac60303f15e9.png",
+      "prompt": "Use case: illustration-story. Asset type: original artwork for a premium civic deliberation character trading card, portrait 2:3 format. Single fictional character, full upper body or three-quarter where needed, expressive and dignified, approachable rather than superhero. Style: sophisticated collectible card illustration, graphic novel editorial painting, fine ink contours, tactile gouache grain, layered urban geometry, strong silhouette, luminous lime and cyan accents with warm amber against deep navy. Character centered in middle 70%, simple urban details, accurate anatomy and visible hands, clean outer edges. No typography, letters, numbers, logos or border; the UI supplies framing and text. Fictional artwork, not a real person's portrait. Cohesive contemporary Taiwanese street setting, polished and richly illustrated, not a generic app icon. Subject: a fictional Taiwanese home-care worker, middle-aged woman with glasses and navy field vest, carrying a compact care bag and appointment notebook beside apartment steps"
+    },
+    {
+      "id": "p14",
+      "asset": "/images/personas/p14.jpg",
+      "original": "exec-adb11783-5406-4a38-a7d3-e17f860bd2ee.png",
+      "prompt": "Use case: illustration-story. Asset type: original artwork for a premium civic deliberation character trading card, portrait 2:3 format. Single fictional character, full upper body or three-quarter where needed, expressive and dignified, approachable rather than superhero. Style: sophisticated collectible card illustration, graphic novel editorial painting, fine ink contours, tactile gouache grain, layered urban geometry, strong silhouette, luminous lime and cyan accents with warm amber against deep navy. Character centered in middle 70%, simple urban details, accurate anatomy and visible hands, clean outer edges. No typography, letters, numbers, logos or border; the UI supplies framing and text. Fictional artwork, not a real person's portrait. Cohesive contemporary Taiwanese street setting, polished and richly illustrated, not a generic app icon. Subject: a fictional Taiwanese side-street resident, young woman with dark shoulder-length hair in burnt-orange overshirt, holding a neighborhood sketch map in a narrow residential lane"
+    }
+  ]
+}

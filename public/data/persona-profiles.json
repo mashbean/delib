@@ -1,5 +1,5 @@
 {
-  "schema": "delib-fictional-personas/v1",
+  "schema": "delib-fictional-personas/v2",
   "simulated": true,
   "note": "Authored learning scenarios, not inferred emotions or observations of real people. Source and attendance links are computed from flow-demo.json.",
   "profiles": [
@@ -21,7 +21,74 @@
       "need": {
         "zh": "確認意見如何被回覆，並保留修正入口",
         "en": "See how the voice is answered and keep a correction route"
-      }
+      },
+      "art": {
+        "src": "/images/personas/p01.jpg",
+        "width": 640,
+        "height": 960,
+        "generated": true
+      },
+      "motivation": {
+        "zh": "讓陪同過街不再是一場趕時間的冒險。",
+        "en": "Make assisted crossings safer without racing the clock."
+      },
+      "incentive": {
+        "zh": "能分段參與，也知道誰會處理照顧需求。",
+        "en": "Join in short sessions and know who will address care needs."
+      },
+      "desiredOutcome": {
+        "zh": "把照顧者的停等時間寫進試辦條件。",
+        "en": "Include caregivers’ waiting times in the pilot conditions."
+      },
+      "stageActions": [
+        {
+          "zh": "畫出陪同過街最吃力的位置。",
+          "en": "Map the hardest part of an assisted crossing."
+        },
+        {
+          "zh": "告知能參與的照顧空檔。",
+          "en": "Share available gaps between care duties."
+        },
+        {
+          "zh": "確認不同照顧需求都有代表。",
+          "en": "Check that different care needs are represented."
+        },
+        {
+          "zh": "比較號誌秒數與陪同行走速度。",
+          "en": "Compare signal timing with assisted walking speed."
+        },
+        {
+          "zh": "說明一次趕不及綠燈的經驗。",
+          "en": "Describe a crossing that outlasted the green light."
+        },
+        {
+          "zh": "協商停等空間與臨停例外。",
+          "en": "Negotiate waiting space and drop-off exceptions."
+        },
+        {
+          "zh": "確認照顧條件由誰負責落實。",
+          "en": "Check who owns the care-related conditions."
+        },
+        {
+          "zh": "帶著照顧紀錄回來檢查試辦。",
+          "en": "Return with care notes to review the pilot."
+        }
+      ],
+      "roundFocus": [
+        {
+          "zh": "讓安全問題包含陪同行走的速度。",
+          "en": "Bring assisted walking speed into the safety question."
+        },
+        {
+          "zh": "在禁車方向下，爭取照顧接送的具體例外。",
+          "en": "Seek specific care drop-off exceptions within the restriction."
+        },
+        {
+          "zh": "檢查例外是否真的減少接送壓力。",
+          "en": "Check whether exceptions actually ease care trips."
+        }
+      ],
+      "authored": true
     },
     {
       "id": "p02",
@@ -41,7 +108,74 @@
       "need": {
         "zh": "確認意見如何被回覆，並保留修正入口",
         "en": "See how the voice is answered and keep a correction route"
-      }
+      },
+      "art": {
+        "src": "/images/personas/p02.jpg",
+        "width": 640,
+        "height": 960,
+        "generated": true
+      },
+      "motivation": {
+        "zh": "希望每天上班的步行路線完整、安全。",
+        "en": "Want a safe, continuous daily walk to work."
+      },
+      "incentive": {
+        "zh": "能直接在地圖上補齊被忽略的路段。",
+        "en": "Add overlooked links directly on a route map."
+      },
+      "desiredOutcome": {
+        "zh": "改善不只停在校門，而能連到通勤路線。",
+        "en": "Extend improvements from the school gate to the commute."
+      },
+      "stageActions": [
+        {
+          "zh": "標出校門外仍不安全的通勤路段。",
+          "en": "Mark unsafe stretches beyond the school gate."
+        },
+        {
+          "zh": "留下可步行踏查的通勤時段。",
+          "en": "Offer commute times for a walking audit."
+        },
+        {
+          "zh": "提醒招募跨街區步行者。",
+          "en": "Include walkers from adjacent neighborhoods."
+        },
+        {
+          "zh": "沿整段路線核對行人設施。",
+          "en": "Check facilities along the entire route."
+        },
+        {
+          "zh": "描述通勤繞路的實際代價。",
+          "en": "Describe the cost of a walking detour."
+        },
+        {
+          "zh": "比較連續步道與局部改善方案。",
+          "en": "Compare a continuous path with isolated fixes."
+        },
+        {
+          "zh": "查核回覆是否處理路線斷點。",
+          "en": "Check whether responses address missing links."
+        },
+        {
+          "zh": "回報新的繞行點與步行時間。",
+          "en": "Report new detours and walking times."
+        }
+      ],
+      "roundFocus": [
+        {
+          "zh": "把通勤路線帶進校門口的議題範圍。",
+          "en": "Bring the commute into the school-gate problem."
+        },
+        {
+          "zh": "避免試辦只改善校門前的一小段。",
+          "en": "Prevent the pilot from fixing only the gate frontage."
+        },
+        {
+          "zh": "循新動線走一次，記下仍中斷的地方。",
+          "en": "Walk the new route and note remaining gaps."
+        }
+      ],
+      "authored": true
     },
     {
       "id": "p03",
@@ -61,7 +195,74 @@
       "need": {
         "zh": "確認意見如何被回覆，並保留修正入口",
         "en": "See how the voice is answered and keep a correction route"
-      }
+      },
+      "art": {
+        "src": "/images/personas/p03.jpg",
+        "width": 640,
+        "height": 960,
+        "generated": true
+      },
+      "motivation": {
+        "zh": "學生更安全，店家也能正常收貨、做生意。",
+        "en": "Keep students safe while shops can receive goods and trade."
+      },
+      "incentive": {
+        "zh": "營業時不用離店，也能核對涉及店家的文字。",
+        "en": "Contribute without closing and review shop-related wording."
+      },
+      "desiredOutcome": {
+        "zh": "有可執行的卸貨安排與試辦回報窗口。",
+        "en": "Get workable loading arrangements and a pilot feedback contact."
+      },
+      "stageActions": [
+        {
+          "zh": "把卸貨、客流與安全一起列入範圍。",
+          "en": "Include loading, footfall and safety in scope."
+        },
+        {
+          "zh": "選擇不影響開店的訪談時段。",
+          "en": "Choose an interview outside opening duties."
+        },
+        {
+          "zh": "確認小店與不同業種都被聽見。",
+          "en": "Check representation of small and varied shops."
+        },
+        {
+          "zh": "對照到貨時間與禁車時段。",
+          "en": "Compare delivery times with vehicle restrictions."
+        },
+        {
+          "zh": "具體說明一批貨如何搬進店。",
+          "en": "Explain how a delivery reaches the shop."
+        },
+        {
+          "zh": "比較定時卸貨與定點卸貨的負擔。",
+          "en": "Compare timed loading with designated bays."
+        },
+        {
+          "zh": "核對店家條件是否被誤寫成反對安全。",
+          "en": "Check that shop conditions are not framed as opposing safety."
+        },
+        {
+          "zh": "回報試辦後收貨與生意的變化。",
+          "en": "Report changes to deliveries and trade."
+        }
+      ],
+      "roundFocus": [
+        {
+          "zh": "先讓卸貨經驗成為可討論的限制。",
+          "en": "Make loading experience a discussable constraint."
+        },
+        {
+          "zh": "把支持安全與卸貨條件一起寫清楚。",
+          "en": "State support for safety alongside loading conditions."
+        },
+        {
+          "zh": "追蹤卸貨例外是否可用，再提修正。",
+          "en": "Test loading exceptions and propose adjustments."
+        }
+      ],
+      "authored": true
     },
     {
       "id": "p04",
@@ -81,7 +282,74 @@
       "need": {
         "zh": "確認意見如何被回覆，並保留修正入口",
         "en": "See how the voice is answered and keep a correction route"
-      }
+      },
+      "art": {
+        "src": "/images/personas/p04.jpg",
+        "width": 640,
+        "height": 960,
+        "generated": true
+      },
+      "motivation": {
+        "zh": "能自主通行，不必每次都請人抬輪椅。",
+        "en": "Travel independently without asking others to lift the wheelchair."
+      },
+      "incentive": {
+        "zh": "現場可到達、可發言，且能校對無障礙需求。",
+        "en": "Access the venue, speak and review accessibility needs."
+      },
+      "desiredOutcome": {
+        "zh": "無障礙通路與必要接送例外都有責任人。",
+        "en": "Assign owners for accessible routes and essential drop-offs."
+      },
+      "stageActions": [
+        {
+          "zh": "以完整無障礙路徑界定問題。",
+          "en": "Frame the issue around a complete accessible route."
+        },
+        {
+          "zh": "先核對會場坡道、廁所與接送點。",
+          "en": "Check ramps, toilets and drop-off before joining."
+        },
+        {
+          "zh": "指出不能到場的人也需被納入。",
+          "en": "Include people unable to reach the venue."
+        },
+        {
+          "zh": "實測坡度、路緣與通路寬度。",
+          "en": "Inspect slopes, curbs and clear widths."
+        },
+        {
+          "zh": "描述一次被迫繞路或求助的經驗。",
+          "en": "Describe a forced detour or need for assistance."
+        },
+        {
+          "zh": "協商禁車與必要接送如何並存。",
+          "en": "Negotiate restrictions alongside essential access."
+        },
+        {
+          "zh": "檢查回覆有沒有可量測的無障礙承諾。",
+          "en": "Check for measurable accessibility commitments."
+        },
+        {
+          "zh": "沿試辦路線驗證能否獨立通行。",
+          "en": "Verify independent access along the pilot route."
+        }
+      ],
+      "roundFocus": [
+        {
+          "zh": "把無障礙當成安全的一部分。",
+          "en": "Treat accessibility as part of safety."
+        },
+        {
+          "zh": "避免禁車方案同時切斷必要的接送。",
+          "en": "Prevent restrictions from cutting off essential access."
+        },
+        {
+          "zh": "由實際通行檢查例外與設施是否足夠。",
+          "en": "Check exceptions and facilities through an access audit."
+        }
+      ],
+      "authored": true
     },
     {
       "id": "p05",
@@ -101,7 +369,74 @@
       "need": {
         "zh": "確認意見如何被回覆，並保留修正入口",
         "en": "See how the voice is answered and keep a correction route"
-      }
+      },
+      "art": {
+        "src": "/images/personas/p05.jpg",
+        "width": 640,
+        "height": 960,
+        "generated": true
+      },
+      "motivation": {
+        "zh": "支持安全，也希望住宅生活的顧慮被理解。",
+        "en": "Support safety while having residential concerns understood."
+      },
+      "incentive": {
+        "zh": "能保留不同意的理由，不必先選邊站。",
+        "en": "Keep reasons for disagreement without choosing a camp."
+      },
+      "desiredOutcome": {
+        "zh": "回覆能區分共同目標與仍有爭議的做法。",
+        "en": "Separate shared goals from disputed measures."
+      },
+      "stageActions": [
+        {
+          "zh": "分開寫下安全目標與生活影響。",
+          "en": "Separate safety goals from residential impacts."
+        },
+        {
+          "zh": "確認能用熟悉的方式回覆邀請。",
+          "en": "Reply to the invitation in a familiar format."
+        },
+        {
+          "zh": "留意租戶、長者等較少發言者。",
+          "en": "Look for quieter voices such as tenants and older residents."
+        },
+        {
+          "zh": "對照車流資訊與日常居住經驗。",
+          "en": "Compare traffic evidence with lived experience."
+        },
+        {
+          "zh": "提出疑慮並請主持人確認原意。",
+          "en": "Raise concerns and ask the facilitator to check meaning."
+        },
+        {
+          "zh": "標記可接受與不可接受的條件。",
+          "en": "Mark acceptable and unacceptable conditions."
+        },
+        {
+          "zh": "查核少數意見有沒有被留下。",
+          "en": "Check that minority views remain visible."
+        },
+        {
+          "zh": "根據試辦影響重新表達立場。",
+          "en": "Revisit the position after seeing pilot impacts."
+        }
+      ],
+      "roundFocus": [
+        {
+          "zh": "讓疑慮被聽成條件，而非敵意。",
+          "en": "Have concerns heard as conditions rather than hostility."
+        },
+        {
+          "zh": "即使多數支持，也保留尚未解決的反對理由。",
+          "en": "Keep unresolved objections even with majority support."
+        },
+        {
+          "zh": "用居住經驗檢查承諾，不急著宣告共識。",
+          "en": "Check promises against daily life before claiming consensus."
+        }
+      ],
+      "authored": true
     },
     {
       "id": "p06",
@@ -121,7 +456,74 @@
       "need": {
         "zh": "確認意見如何被回覆，並保留修正入口",
         "en": "See how the voice is answered and keep a correction route"
-      }
+      },
+      "art": {
+        "src": "/images/personas/p06.jpg",
+        "width": 640,
+        "height": 960,
+        "generated": true
+      },
+      "motivation": {
+        "zh": "送貨能準時，也不把風險留給過街的人。",
+        "en": "Deliver on time without endangering people crossing."
+      },
+      "incentive": {
+        "zh": "能用短訪談參與，並看到配送條件被保留。",
+        "en": "Join a short interview and see delivery conditions retained."
+      },
+      "desiredOutcome": {
+        "zh": "有清楚的停靠時段、位置與搬運距離。",
+        "en": "Get clear stopping times, locations and carrying distances."
+      },
+      "stageActions": [
+        {
+          "zh": "把配送動線與過街衝突標在同張圖。",
+          "en": "Map delivery routes and crossing conflicts together."
+        },
+        {
+          "zh": "提供路線中可短暫停留的時段。",
+          "en": "Offer short interview windows along the route."
+        },
+        {
+          "zh": "提醒納入不同班次與車型。",
+          "en": "Include different shifts and vehicle types."
+        },
+        {
+          "zh": "核對卸貨點到目的地的搬運距離。",
+          "en": "Check carrying distances from bays to destinations."
+        },
+        {
+          "zh": "描述臨停背後的時間與工作限制。",
+          "en": "Explain the timing and work constraints behind stopping."
+        },
+        {
+          "zh": "比較替代停靠點能否實際使用。",
+          "en": "Compare the practicality of alternative stops."
+        },
+        {
+          "zh": "確認配送例外不只是模糊承諾。",
+          "en": "Check that delivery exceptions are specific."
+        },
+        {
+          "zh": "回報新動線的延誤與風險。",
+          "en": "Report delays and risks on the new route."
+        }
+      ],
+      "roundFocus": [
+        {
+          "zh": "把臨停問題拆成時段、位置與搬運距離。",
+          "en": "Break stopping issues into time, location and distance."
+        },
+        {
+          "zh": "協商能被配送班表採用的安排。",
+          "en": "Negotiate arrangements that fit delivery schedules."
+        },
+        {
+          "zh": "用實際路線修正不合用的停靠規則。",
+          "en": "Use route experience to revise impractical stopping rules."
+        }
+      ],
+      "authored": true
     },
     {
       "id": "p07",
@@ -141,7 +543,74 @@
       "need": {
         "zh": "確認意見如何被回覆，並保留修正入口",
         "en": "See how the voice is answered and keep a correction route"
-      }
+      },
+      "art": {
+        "src": "/images/personas/p07.jpg",
+        "width": 640,
+        "height": 960,
+        "generated": true
+      },
+      "motivation": {
+        "zh": "讓學生安全進校，也讓值勤安排可負擔。",
+        "en": "Keep arrivals safe with manageable staff duties."
+      },
+      "incentive": {
+        "zh": "短時間提供現場證據，後續能看到分工。",
+        "en": "Offer brief on-site evidence and see responsibilities assigned."
+      },
+      "desiredOutcome": {
+        "zh": "學校與道路主管機關的任務清楚分開。",
+        "en": "Clarify school and road authority responsibilities."
+      },
+      "stageActions": [
+        {
+          "zh": "整理上放學時的衝突位置。",
+          "en": "Identify conflicts at arrival and dismissal."
+        },
+        {
+          "zh": "避開授課與導護時段參與。",
+          "en": "Participate outside teaching and crossing duties."
+        },
+        {
+          "zh": "提醒不同年級的需求不同。",
+          "en": "Highlight differences between age groups."
+        },
+        {
+          "zh": "提供校門觀察並核對資料限制。",
+          "en": "Share gate observations and their limitations."
+        },
+        {
+          "zh": "說明導護人員難以處理的情境。",
+          "en": "Describe situations crossing staff cannot resolve."
+        },
+        {
+          "zh": "檢查方案是否增加不可負擔的值勤。",
+          "en": "Check whether options create unmanageable duties."
+        },
+        {
+          "zh": "逐項核對學校與機關的責任。",
+          "en": "Check each school and agency responsibility."
+        },
+        {
+          "zh": "回收值勤紀錄，調整試辦安排。",
+          "en": "Use duty logs to adjust the pilot."
+        }
+      ],
+      "roundFocus": [
+        {
+          "zh": "讓校門的日常觀察成為共同資料。",
+          "en": "Make everyday gate observations shared evidence."
+        },
+        {
+          "zh": "把改善方案對應到明確負責單位。",
+          "en": "Match improvements to responsible organizations."
+        },
+        {
+          "zh": "檢查安全改善是否以額外值勤為代價。",
+          "en": "Check whether safety gains depend on extra staff duties."
+        }
+      ],
+      "authored": true
     },
     {
       "id": "p08",
@@ -161,7 +630,74 @@
       "need": {
         "zh": "確認意見如何被回覆，並保留修正入口",
         "en": "See how the voice is answered and keep a correction route"
-      }
+      },
+      "art": {
+        "src": "/images/personas/p08.jpg",
+        "width": 640,
+        "height": 960,
+        "generated": true
+      },
+      "motivation": {
+        "zh": "騎車上學或通勤也能安全接近校門。",
+        "en": "Reach the school safely by bicycle."
+      },
+      "incentive": {
+        "zh": "能標出自行車與行人的具體衝突點。",
+        "en": "Mark specific conflicts between cycles and pedestrians."
+      },
+      "desiredOutcome": {
+        "zh": "方案保留自行車可通行性並降低衝突。",
+        "en": "Preserve cycle access while reducing conflicts."
+      },
+      "stageActions": [
+        {
+          "zh": "將自行車接近路線納入議題。",
+          "en": "Include cycling approaches in the scope."
+        },
+        {
+          "zh": "說明騎乘時段與可踏查時間。",
+          "en": "Share riding times and audit availability."
+        },
+        {
+          "zh": "確認學生與通勤騎士都被納入。",
+          "en": "Include student and commuting cyclists."
+        },
+        {
+          "zh": "核對車道、停車架與穿越點。",
+          "en": "Review lanes, cycle parking and crossings."
+        },
+        {
+          "zh": "描述需要下車或繞行的位置。",
+          "en": "Describe forced dismounts and detours."
+        },
+        {
+          "zh": "協商行人優先與自行車通行的界線。",
+          "en": "Negotiate pedestrian priority and cycle access."
+        },
+        {
+          "zh": "追查騎乘需求如何進入回覆。",
+          "en": "Trace cycling needs into the response."
+        },
+        {
+          "zh": "回報試辦後的新衝突或改善。",
+          "en": "Report new conflicts or improvements after the pilot."
+        }
+      ],
+      "roundFocus": [
+        {
+          "zh": "避免議題只剩汽車與行人的二分。",
+          "en": "Avoid reducing the issue to cars versus pedestrians."
+        },
+        {
+          "zh": "把自行車通行條件寫進試辦。",
+          "en": "Write cycling conditions into the pilot."
+        },
+        {
+          "zh": "觀察新動線是否把衝突移到其他路口。",
+          "en": "Check whether the new route moves conflicts elsewhere."
+        }
+      ],
+      "authored": true
     },
     {
       "id": "p09",
@@ -181,7 +717,74 @@
       "need": {
         "zh": "確認意見如何被回覆，並保留修正入口",
         "en": "See how the voice is answered and keep a correction route"
-      }
+      },
+      "art": {
+        "src": "/images/personas/p09.jpg",
+        "width": 640,
+        "height": 960,
+        "generated": true
+      },
+      "motivation": {
+        "zh": "市場照常運作，長者和學生也能安全走過。",
+        "en": "Keep the market operating with safe passage for older people and students."
+      },
+      "incentive": {
+        "zh": "離峰受訪，能先確認涉及生計的摘要。",
+        "en": "Join off-peak and review livelihood-related summaries."
+      },
+      "desiredOutcome": {
+        "zh": "市場運作限制有具體安排，沒有被摘要抹去。",
+        "en": "Retain market constraints and address them concretely."
+      },
+      "stageActions": [
+        {
+          "zh": "把市場搬運與步行需求一起畫出。",
+          "en": "Map market handling and pedestrian needs together."
+        },
+        {
+          "zh": "選擇收攤後能專心說明的時段。",
+          "en": "Choose a focused interview after closing."
+        },
+        {
+          "zh": "提醒招募攤商與搬運工作者。",
+          "en": "Include stallholders and handlers."
+        },
+        {
+          "zh": "對照市場尖峰與上學尖峰。",
+          "en": "Compare market and school peak times."
+        },
+        {
+          "zh": "說明一天進貨到收攤的節奏。",
+          "en": "Describe the day from delivery to closing."
+        },
+        {
+          "zh": "討論不讓生計承擔全部成本的做法。",
+          "en": "Discuss options that do not put all costs on livelihoods."
+        },
+        {
+          "zh": "校對摘要是否保留市場限制。",
+          "en": "Check that summaries retain market constraints."
+        },
+        {
+          "zh": "觀察試辦後搬運與步行是否更順。",
+          "en": "Observe handling and walking after the pilot."
+        }
+      ],
+      "roundFocus": [
+        {
+          "zh": "讓早晨市場的工作節奏被理解。",
+          "en": "Explain the rhythm of the morning market."
+        },
+        {
+          "zh": "把生計條件轉成可協商的試辦安排。",
+          "en": "Turn livelihood needs into negotiable pilot conditions."
+        },
+        {
+          "zh": "回報市場周邊是否出現新的擁塞。",
+          "en": "Report any new congestion around the market."
+        }
+      ],
+      "authored": true
     },
     {
       "id": "p10",
@@ -201,7 +804,74 @@
       "need": {
         "zh": "確認意見如何被回覆，並保留修正入口",
         "en": "See how the voice is answered and keep a correction route"
-      }
+      },
+      "art": {
+        "src": "/images/personas/p10.jpg",
+        "width": 640,
+        "height": 960,
+        "generated": true
+      },
+      "motivation": {
+        "zh": "安全改善不應只照顧白天作息的人。",
+        "en": "Safety improvements should also work for people on other schedules."
+      },
+      "incentive": {
+        "zh": "有晚間或非同步入口，不用犧牲睡眠。",
+        "en": "Use evening or asynchronous access without losing sleep."
+      },
+      "desiredOutcome": {
+        "zh": "夜班生活的需求在回覆與招募中都有位置。",
+        "en": "Include night-shift needs in responses and recruitment."
+      },
+      "stageActions": [
+        {
+          "zh": "指出清晨或夜間不同的安全問題。",
+          "en": "Identify distinct dawn and night-time safety issues."
+        },
+        {
+          "zh": "選擇下班後可回覆的非同步管道。",
+          "en": "Choose an asynchronous channel after work."
+        },
+        {
+          "zh": "檢查固定開會時間排除了誰。",
+          "en": "Check who fixed meeting times exclude."
+        },
+        {
+          "zh": "分段閱讀資料，標出作息落差。",
+          "en": "Read in short sessions and note schedule mismatches."
+        },
+        {
+          "zh": "留下夜班返家的通行經驗。",
+          "en": "Share the journey home from a night shift."
+        },
+        {
+          "zh": "用留言補充錯過現場的條件。",
+          "en": "Add conditions by message after missing a meeting."
+        },
+        {
+          "zh": "確認未到場的意見仍有回覆。",
+          "en": "Check that absent voices still receive responses."
+        },
+        {
+          "zh": "依睡眠與交通變化評估試辦。",
+          "en": "Review the pilot through sleep and travel changes."
+        }
+      ],
+      "roundFocus": [
+        {
+          "zh": "讓未同步到場不等於沒有參與意願。",
+          "en": "Avoid treating missed meetings as lack of interest."
+        },
+        {
+          "zh": "保留夜間補充與隔日確認的時間。",
+          "en": "Leave time for evening input and next-day review."
+        },
+        {
+          "zh": "檢查試辦是否改善白天卻增加夜班負擔。",
+          "en": "Check whether daytime gains burden night-shift lives."
+        }
+      ],
+      "authored": true
     },
     {
       "id": "p11",
@@ -221,7 +891,74 @@
       "need": {
         "zh": "確認意見如何被回覆，並保留修正入口",
         "en": "See how the voice is answered and keep a correction route"
-      }
+      },
+      "art": {
+        "src": "/images/personas/p11.jpg",
+        "width": 640,
+        "height": 960,
+        "generated": true
+      },
+      "motivation": {
+        "zh": "搭公車接近校門時，轉乘與步行不要更難。",
+        "en": "Avoid harder bus transfers and walks near the school."
+      },
+      "incentive": {
+        "zh": "能看懂站位與改道圖，指出多走的路。",
+        "en": "Read stop and diversion maps and flag extra walking."
+      },
+      "desiredOutcome": {
+        "zh": "改道決策同時交代站位與轉乘負擔。",
+        "en": "Explain stops and transfer burdens alongside diversions."
+      },
+      "stageActions": [
+        {
+          "zh": "把下車到校門的路線納入範圍。",
+          "en": "Include the walk from bus stop to school."
+        },
+        {
+          "zh": "提供常用路線與搭乘時段。",
+          "en": "Share usual routes and travel times."
+        },
+        {
+          "zh": "提醒納入依賴公車的不同乘客。",
+          "en": "Include diverse people who depend on buses."
+        },
+        {
+          "zh": "比對站位、班次與步行距離。",
+          "en": "Compare stops, service times and walking distance."
+        },
+        {
+          "zh": "說明一次轉乘如何受改道影響。",
+          "en": "Explain how a diversion affects a transfer."
+        },
+        {
+          "zh": "討論站位調整與行人安全的取捨。",
+          "en": "Discuss trade-offs between stop changes and pedestrian safety."
+        },
+        {
+          "zh": "確認回覆交代替代路線與資訊。",
+          "en": "Check that responses explain alternatives and information."
+        },
+        {
+          "zh": "試走新站位到目的地的路線。",
+          "en": "Try the walk from new stops to destinations."
+        }
+      ],
+      "roundFocus": [
+        {
+          "zh": "讓公車使用者的最後一段路被看見。",
+          "en": "Make the bus rider’s last walking segment visible."
+        },
+        {
+          "zh": "把轉乘成本放進試辦比較。",
+          "en": "Include transfer costs in the pilot comparison."
+        },
+        {
+          "zh": "回報新站位的可達性與資訊落差。",
+          "en": "Report stop accessibility and information gaps."
+        }
+      ],
+      "authored": true
     },
     {
       "id": "p12",
@@ -241,7 +978,74 @@
       "need": {
         "zh": "確認意見如何被回覆，並保留修正入口",
         "en": "See how the voice is answered and keep a correction route"
-      }
+      },
+      "art": {
+        "src": "/images/personas/p12.jpg",
+        "width": 640,
+        "height": 960,
+        "generated": true
+      },
+      "motivation": {
+        "zh": "孩子能安全到校，家庭接送也有可行安排。",
+        "en": "Get children to school safely with workable family trips."
+      },
+      "incentive": {
+        "zh": "能以家庭路線說明，而非被歸為支持或反對禁車。",
+        "en": "Explain a family route instead of being labeled for or against restrictions."
+      },
+      "desiredOutcome": {
+        "zh": "接送取捨與兒童安全都寫進條件。",
+        "en": "Include both drop-off trade-offs and child safety in conditions."
+      },
+      "stageActions": [
+        {
+          "zh": "把孩子從家到校的整段旅程畫出。",
+          "en": "Map the child’s full journey from home to school."
+        },
+        {
+          "zh": "提供上班與接送之間的參與空檔。",
+          "en": "Offer time between work and school trips."
+        },
+        {
+          "zh": "提醒不同照顧安排的家庭都需被聽見。",
+          "en": "Include families with different care arrangements."
+        },
+        {
+          "zh": "與孩子觀察路口，分開記錄看法。",
+          "en": "Observe crossings with children and distinguish their views."
+        },
+        {
+          "zh": "說明接送選擇背後的限制。",
+          "en": "Explain constraints behind drop-off choices."
+        },
+        {
+          "zh": "比較步行、接駁與臨停安排。",
+          "en": "Compare walking, shuttle and drop-off arrangements."
+        },
+        {
+          "zh": "確認安全承諾與家庭條件都有回覆。",
+          "en": "Check responses to safety promises and family needs."
+        },
+        {
+          "zh": "記錄試辦後接送是否更安心。",
+          "en": "Record whether school trips feel safer during the pilot."
+        }
+      ],
+      "roundFocus": [
+        {
+          "zh": "讓安全與接送的雙重需求同時被理解。",
+          "en": "Explain both safety and family travel needs."
+        },
+        {
+          "zh": "把家庭路線轉成方案的具體條件。",
+          "en": "Turn family routes into concrete conditions for options."
+        },
+        {
+          "zh": "用接送紀錄檢查條件是否可行。",
+          "en": "Use trip notes to check the conditions work."
+        }
+      ],
+      "authored": true
     },
     {
       "id": "p13",
@@ -261,7 +1065,74 @@
       "need": {
         "zh": "確認意見如何被回覆，並保留修正入口",
         "en": "See how the voice is answered and keep a correction route"
-      }
+      },
+      "art": {
+        "src": "/images/personas/p13.jpg",
+        "width": 640,
+        "height": 960,
+        "generated": true
+      },
+      "motivation": {
+        "zh": "服務對象能被照顧，工作路線不因禁車而中斷。",
+        "en": "Keep care visits possible when vehicle access changes."
+      },
+      "incentive": {
+        "zh": "收到補邀請，並能針對服務時段提出例外。",
+        "en": "Receive a follow-up invitation and propose service-hour exceptions."
+      },
+      "desiredOutcome": {
+        "zh": "必要到宅服務有可查核的通行安排。",
+        "en": "Provide verifiable access arrangements for essential home care."
+      },
+      "stageActions": [
+        {
+          "zh": "補充原議題未涵蓋的到宅服務需求。",
+          "en": "Add home-care needs missing from the original scope."
+        },
+        {
+          "zh": "回覆補邀請並說明服務路線。",
+          "en": "Respond to follow-up recruitment with service routes."
+        },
+        {
+          "zh": "協助辨識還未被邀請的照顧工作者。",
+          "en": "Identify care workers still missing from recruitment."
+        },
+        {
+          "zh": "核對禁車時段與服務班表。",
+          "en": "Compare restriction times with visit schedules."
+        },
+        {
+          "zh": "說明一次訪視的時間與設備需求。",
+          "en": "Explain the timing and equipment for a care visit."
+        },
+        {
+          "zh": "提出有條件的服務通行安排。",
+          "en": "Propose conditional access for care visits."
+        },
+        {
+          "zh": "確認必要服務例外有聯絡窗口。",
+          "en": "Check for a contact handling essential-service exceptions."
+        },
+        {
+          "zh": "回報通行安排是否維持照顧連續性。",
+          "en": "Report whether access arrangements preserve continuity of care."
+        }
+      ],
+      "roundFocus": [
+        {
+          "zh": "首輪尚未被納入；主持人要辨識到宅照顧的缺席。",
+          "en": "Not included in round one; facilitators need to identify missing home-care voices."
+        },
+        {
+          "zh": "補邀請後，把服務路線帶進試辦條件。",
+          "en": "After follow-up recruitment, bring service routes into pilot conditions."
+        },
+        {
+          "zh": "檢查服務例外能否避免照顧中斷。",
+          "en": "Check whether service exceptions prevent interrupted care."
+        }
+      ],
+      "authored": true
     },
     {
       "id": "p14",
@@ -281,7 +1152,78 @@
       "need": {
         "zh": "確認意見如何被回覆，並保留修正入口",
         "en": "See how the voice is answered and keep a correction route"
-      }
+      },
+      "art": {
+        "src": "/images/personas/p14.jpg",
+        "width": 640,
+        "height": 960,
+        "generated": true
+      },
+      "motivation": {
+        "zh": "校門更安全，也不把車流負擔轉進自家巷弄。",
+        "en": "Improve school-gate safety without shifting traffic into residential lanes."
+      },
+      "incentive": {
+        "zh": "有側街踏查與回報入口，能要求修正試辦。",
+        "en": "Use side-street audits and feedback to request pilot revisions."
+      },
+      "desiredOutcome": {
+        "zh": "分流負擔有監測，受影響巷弄有回應。",
+        "en": "Monitor diverted traffic and respond to affected lanes."
+      },
+      "stageActions": [
+        {
+          "zh": "補畫可能承接分流車輛的巷弄。",
+          "en": "Map lanes likely to receive diverted vehicles."
+        },
+        {
+          "zh": "回覆補邀請並標出受影響住戶。",
+          "en": "Reply to follow-up recruitment and identify affected homes."
+        },
+        {
+          "zh": "檢查分流路段居民是否被納入。",
+          "en": "Check representation along diversion routes."
+        },
+        {
+          "zh": "比較試辦前後巷內車流。",
+          "en": "Compare lane traffic before and during the pilot."
+        },
+        {
+          "zh": "描述巷內會車與生活受到的影響。",
+          "en": "Describe passing conflicts and daily-life impacts in the lane."
+        },
+        {
+          "zh": "討論避免風險轉移的修正條件。",
+          "en": "Discuss conditions preventing risk displacement."
+        },
+        {
+          "zh": "要求回覆交代分流監測與改善責任。",
+          "en": "Seek a response assigning diversion monitoring and mitigation."
+        },
+        {
+          "zh": "回報試辦外溢，推動下一輪調整。",
+          "en": "Report spillover and seek next-round adjustments."
+        }
+      ],
+      "roundFocus": [
+        {
+          "zh": "首輪尚未被納入；分流巷弄的經驗仍是缺口。",
+          "en": "Not included in round one; diversion-lane experience remains a gap."
+        },
+        {
+          "zh": "補邀請後，讓外溢車流成為試辦的檢查條件。",
+          "en": "After follow-up recruitment, make spillover a pilot check."
+        },
+        {
+          "zh": "以巷內回報推動修正，避免風險只是搬家。",
+          "en": "Use lane feedback to revise the pilot rather than relocate risk."
+        }
+      ],
+      "authored": true
     }
-  ]
+  ],
+  "description": {
+    "zh": "插畫、動機與旅程提示是編寫的虛構情境；出席與資料成果由 flow-demo.json 決定。",
+    "en": "Illustrations, motivations and journey prompts are authored fiction. Attendance and evidence come from flow-demo.json."
+  }
 }

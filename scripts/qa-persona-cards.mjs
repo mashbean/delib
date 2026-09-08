@@ -1,0 +1,31 @@
+// Read-only UI acceptance; all people and evidence are fixed fictional fixtures.
+import assert from 'node:assert/strict';
+import {readFile,writeFile} from 'node:fs/promises';
+import {pathToFileURL} from 'node:url';
+const moduleName=process.env.DELIB_PLAYWRIGHT_MODULE||'playwright';
+const {chromium}=await import(moduleName.startsWith('/')?pathToFileURL(moduleName).href:moduleName);
+const base=process.argv[2]||'http://localhost:8790',browser=await chromium.launch({channel:'chrome',headless:true});
+const context=await browser.newContext({viewport:{width:1440,height:1000},colorScheme:'light'}),page=await context.newPage(),errors=[],writes=[];
+page.on('pageerror',e=>errors.push(e.message));
+page.on('console',m=>{if(m.type()==='error'&&/Content Security Policy/.test(m.text()))errors.push(m.text());});
+await context.route('**/*',r=>{if(r.request().isNavigationRequest()&&r.request().frame().parentFrame())return r.fulfill({contentType:'text/html',body:'External tool frame excluded from local shell layout check.'});if(!['GET','HEAD'].includes(r.request().method())){if(!r.request().url().includes('/cdn-cgi/rum'))writes.push(r.request().url());return r.abort();}return r.continue();});
+const noOverflow=async()=>assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'page horizontal overflow');
+const profiles=JSON.parse(await readFile(new URL('../public/data/persona-profiles.json',import.meta.url),'utf8')).profiles;
+const choose=async id=>{if(!(await page.locator('.persona-shelf').getAttribute('open')!==null))await page.locator('.persona-shelf>summary').click();await page.locator(`[data-persona=${id}]`).click();await page.locator('#character-card img').evaluate(img=>img.decode());};
+try{
+ await page.goto(base+'/?lang=zh');await page.locator('[data-pane=people]').click();await page.locator('#flip-persona').waitFor();
+ for(const profile of profiles){await choose(profile.id);assert.equal(await page.locator('.journey-stop').count(),24);assert((await page.locator('.card-front-copy').innerText()).includes(profile.motivation.zh));
+  for(let round=0;round<3;round++){await page.locator(`[data-persona-round="${round}"]`).click();assert.equal(await page.locator('.round-personal-focus').innerText(),profile.roundFocus[round].zh);}
+ }
+ await choose('p04');await page.locator('[data-persona-round="1"]').click();await page.locator('[data-journey-round="1"][data-journey-step="5"]').click();
+ await page.locator('#flip-persona').focus();await page.keyboard.press('Enter');assert.equal(await page.locator('#flip-persona').getAttribute('aria-expanded'),'true');assert.equal(await page.locator('.card-back').getAttribute('aria-hidden'),'false');assert((await page.locator('.card-back').innerText()).includes(profiles[3].incentive.zh));
+ await page.waitForTimeout(700);await page.locator('#cockpit-people').screenshot({path:'/private/tmp/delib-cards-back-light.png'});
+ const download=page.waitForEvent('download');await page.locator('#download-persona').click();const file=await download,j=JSON.parse(await readFile(await file.path(),'utf8'));assert.equal(j.schema,'delib-fictional-journey/v2');assert.equal(j.person.id,'p04');assert.equal(j.rounds.length,3);assert.equal(j.rounds[1].steps[5].authoredPrompt.zh,profiles[3].stageActions[5].zh);
+ await page.locator('[data-evidence-step]').last().click();assert(await page.locator('#journey-records article').count()>0);assert.equal(await page.locator('.journey-stop[aria-pressed=true]').count(),1);
+ await choose('p13');await page.locator('[data-persona-round="0"]').click();assert.match(await page.locator('.personal-action').innerText(),/本人此步未出席/);assert.equal(await page.locator('#journey-records article').count(),0);
+ for(const theme of ['light','dark']){if(await page.locator('html').getAttribute('data-theme')!==theme)await page.locator('[data-theme-toggle]').click();for(const width of [1440,1024,390,320]){await page.setViewportSize({width,height:900});await noOverflow();await choose('p04');if(await page.locator('#flip-persona').getAttribute('aria-expanded')==='true')await page.locator('#flip-persona').click();await page.waitForTimeout(700);assert((await page.locator('#character-card').boundingBox()).width<=width);await page.locator('#cockpit-people').screenshot({path:`/private/tmp/delib-cards-${theme}-${width}.png`});}}
+ await page.goto(base+'/?lang=en');await page.locator('[data-pane=people]').click();await page.locator('#flip-persona').waitFor();await choose('p10');await page.locator('#flip-persona').click();assert.match(await page.locator('.card-back').innerText(),/Motivation[\s\S]*Constraint[\s\S]*Incentive[\s\S]*Desired outcome/);await noOverflow();await page.waitForTimeout(700);await page.locator('#cockpit-people').screenshot({path:'/private/tmp/delib-cards-en-mobile.png'});
+ await page.emulateMedia({reducedMotion:'reduce'});assert.equal(await page.locator('.card-turner').evaluate(el=>getComputedStyle(el).transitionDuration),'0s');await page.locator('#flip-persona').click();assert.equal(await page.locator('.card-front').getAttribute('aria-hidden'),'false');
+ const selects=[];for(const path of ['/','/handoff','/workspace','/polis']){await page.goto(base+path);await page.waitForTimeout(300);for(const select of await page.locator('select:not([multiple]):not([size])').all()){if(!await select.isVisible())continue;const style=await select.evaluate(e=>{const s=getComputedStyle(e);return {padding:s.paddingRight,position:s.backgroundPosition,image:s.backgroundImage,appearance:s.appearance};});assert.equal(style.padding,'42px');assert.equal(style.appearance,'none');assert(style.image.includes('chevron-down.svg'));selects.push({path,...style});}await noOverflow();}
+ assert(selects.length>=4);assert.deepEqual(errors,[]);assert.deepEqual(writes,[]);await writeFile('/private/tmp/delib-persona-qa.json',JSON.stringify({cards:14,roundsPerCard:3,stepsPerRound:8,selects,errors,writes},null,2));console.log('PASS: 14 illustrations decoded; individualized bilingual cards, 42 round contexts, keyboard flip, evidence shortcuts, absent-person distinction, journey download, 4 widths × 2 themes, reduced motion, select insets and zero upstream writes.');
+}catch(e){await page.screenshot({path:'/private/tmp/delib-cards-failure.png',fullPage:true});console.error({errors,writes,url:page.url()});throw e;}finally{await browser.close();}

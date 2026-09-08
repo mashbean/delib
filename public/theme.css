@@ -26,6 +26,16 @@ html[data-theme="light"] {
 .theme-toggle svg { flex-shrink: 0; }
 .skip { clip-path: inset(50%); background: var(--action); color: var(--action-ink); }
 .skip:focus { clip-path: none; }
+/* Give native selects a predictable inset; keep keyboard and option behavior native. */
+html body select:not([multiple]):not([size]) {
+  appearance: none; -webkit-appearance: none;
+  background-image: url('/chevron-down.svg'); background-repeat: no-repeat;
+  background-position: right 14px center; background-size: 16px 16px;
+  padding-inline: 12px 42px; text-align: start; min-height: 40px;
+}
+.work-rail button:not(:last-child):after { right: -18px; width: 24px; text-align: center; pointer-events: none; }
+@media(max-width:760px) { .work-rail button:not(:last-child):after { right: -15px; } }
+@media(forced-colors:active) { html body select:not([multiple]):not([size]) { appearance: auto; background-image: none; } }
 .site-head { border-color: var(--line); }
 .station-bar nav { align-items: center; }
 .btn, .segments button[aria-pressed=true], .demo-rounds button[aria-pressed=true],
@@ -45,7 +55,7 @@ html[data-theme="light"] {
 .handoff-label span { font-size: 12px; font-weight: 600; }
 .handoff-port p { font-size: 17px; line-height: 1.6; margin: 15px 0 0; color: var(--ink); overflow-wrap: anywhere; }
 .handoff-connector { display: grid; place-items: center; color: var(--green); }
-.handoff-connector .icon { width: 40px; height: 40px; stroke-width: 2; }
+.handoff-connector .icon { width: min(40px, 100%); height: auto; aspect-ratio: 1; stroke-width: 2; }
 .step-columns { grid-template-columns: .7fr 1.15fr 1.15fr; padding-top: 0; }
 .step-columns small { display: flex; align-items: center; gap: 8px; }
 .step-columns small .icon { width: 16px; height: 16px; }

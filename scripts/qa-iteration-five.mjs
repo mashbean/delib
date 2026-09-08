@@ -16,7 +16,7 @@ try{
  await page.locator('[data-stage-tab=gate]').click();assert.match(await page.locator('#step-detail').innerText(),/下一輪|回到|迭代/);await page.keyboard.press('Home');
  await page.screenshot({path:'/private/tmp/delib-five-light.png'});await page.locator('[data-theme-toggle]').click();await page.waitForFunction(()=>document.querySelector('#flow-scene').dataset.sceneTheme==='dark');await page.screenshot({path:'/private/tmp/delib-five-dark.png'});
  await page.locator('[data-pane=people]').click();await page.locator('.persona-moments').waitFor();assert.equal(await page.locator('.persona-card').count(),14);assert.equal(await page.locator('.journey-stop').count(),24);
- await page.locator('[data-persona=p04]').click();await page.locator('[data-journey-round="2"][data-journey-step="5"]').click();assert.equal(await page.locator('#demo-rounds [data-round="2"]').getAttribute('aria-pressed'),'true');
+ await page.locator('.persona-shelf>summary').click();await page.locator('[data-persona=p04]').click();await page.locator('[data-journey-round="2"][data-journey-step="5"]').click();assert.equal(await page.locator('#demo-rounds [data-round="2"]').getAttribute('aria-pressed'),'true');
  const download=page.waitForEvent('download');await page.locator('#download-persona').click();const f=await download;const person=JSON.parse(await readFile(await f.path(),'utf8'));assert.equal(person.person.id,'p04');assert.equal(person.rounds.length,3);assert.equal(person.simulated,true);
  await page.locator('#demo').screenshot({path:'/private/tmp/delib-five-journeys.png'});
  assert.equal(await page.locator('#full-catalog article').count(),38);
