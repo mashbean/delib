@@ -27,3 +27,5 @@
 - 人物插畫接觸表、手機卡面、卡背與桌機旅程已實際檢視。
 
 人物 QA 僅驗證 Delib 自有介面；本機工具外框測試排除站外 iframe。站外服務的原有 frame-ancestors 規則不接受 localhost，未為這次 UI 調整放寬。所有 QA 使用虛構資料，沒有對上游服務建立活動。
+
+正式站驗證：`265f8fb` 已透過 GitHub Actions 完成 check、deploy 與 smoke，正式網域 15 項 smoke 全數通過。人物 QA 也在正式站重跑通過，14 張圖片均實際解碼，亮暗／手機／中英文與下載互動正常。Cloudflare 自動注入的 analytics beacon 被原有 `script-src 'self'` 擋下；QA 將這個確切的第三方腳本訊息另行記錄，其餘 CSP 錯誤仍使驗證失敗，產品 CSP 保持原設定。
