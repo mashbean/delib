@@ -125,6 +125,7 @@ export function exchangeToCsv(bundle,{destination='tttc',reviewed=false}={}){
 }
 export function mergeExchange(bundles,transfer){
  if(!bundles.length)throw new Error('Choose source packages');bundles.forEach(validateExchange);
+ if(bundles.some(b=>b.simulated!==bundles[0].simulated))throw new Error('模擬與真實資料不可合併 / Fictional and real data cannot be merged');
  const result=structuredClone(bundles[0]);result.simulated=bundles.every(b=>b.simulated);for(const b of bundles.slice(1))for(const key of ['sources','records','externalSources','tombstones','losses']){
  for(const entry of b[key]){const old=entry.id?result[key].find(x=>x.id===entry.id):null;if(old){if(JSON.stringify(old)!==JSON.stringify(entry))throw new Error('Conflicting source revision / 同一來源有不同版本，請分開檢查');}else result[key].push(structuredClone(entry));}}
  if(transfer){if(transfer.schema!=='delib-exchange-transfer/v1'||!Array.isArray(transfer.mappings))throw new Error('Invalid transfer manifest');

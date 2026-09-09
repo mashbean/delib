@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://delib.mashbean.net/schemas/delib-workspace-import/v1.json",
+  "title": "Delib private workspace native import v1",
+  "description": "Local file observation, not remote delivery. Runtime also validates graph, exact source text, mappings, capacity and simulation boundaries.",
+  "type": "object",
+  "required": ["schema","id","roundId","importedAt","fileSha256","bundle","transferId","mappings","sourceLinks"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {"const":"delib-workspace-import/v1"},
+    "id": {"type":"string","minLength":1,"maxLength":120},
+    "roundId": {"type":"string"},
+    "importedAt": {"type":"string","format":"date-time"},
+    "fileSha256": {"type":"string","pattern":"^[a-f0-9]{64}$"},
+    "bundle": {"$ref":"/schemas/delib-exchange/v1.json"},
+    "transferId": {"type":["string","null"]},
+    "mappings": {"type":"array","maxItems":5000,"items":{"$ref":"#/$defs/mapping"}},
+    "sourceLinks": {"type":"array","maxItems":5000,"items":{"$ref":"#/$defs/mapping"}}
+  },
+  "$defs": {
+    "mapping": {"type":"object","required":["recordId","workspaceId"],"additionalProperties":false,"properties":{"recordId":{"type":"string"},"workspaceId":{"type":"string","minLength":1,"maxLength":120}}}
+  }
+}

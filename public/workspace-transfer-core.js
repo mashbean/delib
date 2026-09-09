@@ -1,3 +1,4 @@
+import { nativeRestrictions } from './workspace-import-core.js';
 // Delib-specific mapping, not a Metagov ontology or remote publication protocol.
 import { tttcRowsToCsv, parseTttcCsv } from './tttc-csv-core.js';
 import { openParticipation, roundFollowups, latest } from './facilitation-core.js';
@@ -11,7 +12,8 @@ const text = (v,max=12000) => typeof v === 'string' && !!v.trim() && v.length <=
 const snapshot = a => ({id:a.id,kind:a.kind,text:a.text,source:{tool:a.source.tool,id:a.source.id},reviewed:a.review.checked,relations:structuredClone(a.relations),supersedes:a.supersedes});
 export function transferCandidates(p) {
   const r=round(p),records=all(p),old=new Set(records.map(a=>a.supersedes).filter(Boolean)),scope=new Set([...r.inputs,...r.artifacts.map(a=>a.id)]);
-  const active=records.filter(a=>scope.has(a.id)&&!old.has(a.id));
+  const restricted=nativeRestrictions(p);
+  const active=records.filter(a=>scope.has(a.id)&&!old.has(a.id)&&!restricted.older.has(a.id)&&!restricted.withdrawn.has(a.id));
   return {sources:active.filter(a=>r.inputs.includes(a.id)&&['statement','question','feedback'].includes(a.kind)),context:active.filter(a=>['theme','proposal'].includes(a.kind)&&a.review.checked)};
 }
 export function planTransfer(p,{tool='tttc',refs,contextRefs}={}) {

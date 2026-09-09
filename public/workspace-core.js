@@ -1,10 +1,11 @@
+import { validateNativeImports, nativeRestrictions } from './workspace-import-core.js';
 import { validateTransfers } from './workspace-transfer-core.js';
 import { validateFacilitation, carryParticipation, roundFollowups, saveParticipation, setCommitment, setDisposition } from './facilitation-core.js';
 import { parseTttcCsv, tttcRowsToCsv } from './tttc-csv-core.js';
 export const WORKSPACE_SCHEMA='https://delib.mashbean.net/schemas/delib-workspace/v1.json';
 export const uid=()=>crypto.randomUUID();
 const now=()=>new Date().toISOString();
-const kinds=['statement','question','theme','proposal','reply','decision','feedback','brief','inclusion-check'];
+const kinds=['statement','question','theme','proposal','reply','decision','feedback','brief','inclusion-check','method-result','quote'];
 const text=(s,max=12000)=>typeof s==='string'&&s.trim().length>0&&s.length<=max;
 export const allRecords=p=>p.rounds.flatMap(r=>r.artifacts);
 export const activeRecords=p=>{const all=allRecords(p),old=new Set(all.map(a=>a.supersedes).filter(Boolean));return all.filter(a=>!old.has(a.id));};
@@ -35,7 +36,7 @@ export function validateProject(p) {
   // Credential fields are never part of a project or backup. UI credentials live in memory.
   const forbidden=o=>{if(!o||typeof o!=='object')return false;return Object.entries(o).some(([k,v])=>/^(adminToken|token|hostUrl|manageUrl|authorization)$/i.test(k)||forbidden(v));};
   if(forbidden(p))throw new Error('Remove management credentials before importing');
-  validateFacilitation(p);validateTransfers(p);return p;
+  validateFacilitation(p);validateTransfers(p);validateNativeImports(p);return p;
 }
 export function record(kind,value,source,refs=[],extra={}){return {id:uid(),kind,text:value,source,derivedFrom:[...new Set(refs)],relations:[...new Set(refs)].map(ref=>({ref,type:kind==='reply'?'responds':'derived'})),participantRef:null,supersedes:null,review:{checked:false,reviewer:'',at:null,quoteConfirmed:false},...extra};}
 export function addSources(p,csv,sourceId,{reconcile=false}={}){
@@ -52,7 +53,7 @@ export function addSources(p,csv,sourceId,{reconcile=false}={}){
   }
   return {added,warnings:parsed.warnings};
 }
-export function roundSources(p,r=currentRound(p)){const ids=new Set(r.inputs);const active=activeRecords(p);return active.filter(a=>ids.has(a.id)&&['statement','question','feedback'].includes(a.kind));}
+export function roundSources(p,r=currentRound(p)){const ids=new Set(r.inputs);const active=activeRecords(p),restricted=nativeRestrictions(p);return active.filter(a=>!restricted.older.has(a.id)&&!restricted.withdrawn.has(a.id)&&ids.has(a.id)&&['statement','question','feedback'].includes(a.kind));}
 export function sourcesCsv(p,refs){const ids=new Set(refs);return tttcRowsToCsv(allRecords(p).filter(a=>ids.has(a.id)).map(a=>({id:a.id,interview:'',comment:a.text})));}
 export function acceptTttc(p,result,connection){
   if(result.progress?.status!=='ready'||!result.tree?.topics)return false;

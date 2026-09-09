@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://delib.mashbean.net/schemas/delib-workspace/v1.json",
   "title": "Delib local issue workspace v1",
-  "description": "Private local projects. Companion to delib-rounds; not an ecosystem standard. Management credentials are excluded. Imports also require graph and size validation in workspace-core.js. Optional facilitation extensions preserve commitment, disposition and participation histories independently of text review. Older v1 backups remain valid. Optional transfers preserve scoped source snapshots and observed delivery history. Runtime validates graph links and lifecycle.",
+  "description": "Private local projects. Companion to delib-rounds; not an ecosystem standard. Management credentials are excluded. Imports also require graph and size validation in workspace-core.js. Optional facilitation extensions preserve commitment, disposition and participation histories independently of text review. Older v1 backups remain valid. Optional transfers preserve scoped source snapshots and observed delivery history. Runtime validates graph links and lifecycle. Optional native imports preserve typed method data and file observations; they are not remote delivery receipts.",
   "type": "object",
   "required": [
     "schema",
@@ -95,6 +95,13 @@
       "items": {
         "$ref": "/schemas/delib-workspace-transfer/v1.json"
       }
+    },
+    "imports": {
+      "type": "array",
+      "maxItems": 150,
+      "items": {
+        "$ref": "/schemas/delib-workspace-import/v1.json"
+      }
     }
   },
   "$defs": {
@@ -127,7 +134,9 @@
             "decision",
             "feedback",
             "brief",
-            "inclusion-check"
+            "inclusion-check",
+            "method-result",
+            "quote"
           ]
         },
         "text": {
@@ -234,6 +243,22 @@
           "maxItems": 60,
           "items": {
             "$ref": "#/$defs/disposition"
+          }
+        },
+        "nativeRef": {
+          "type": "object",
+          "required": [
+            "importId",
+            "recordId"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "importId": {
+              "type": "string"
+            },
+            "recordId": {
+              "type": "string"
+            }
           }
         }
       }
