@@ -1,0 +1,120 @@
+{
+  "mode": "built-in image_gen",
+  "style": "Flat editorial illustration",
+  "request": "圖片風格，可以給我更平面的插畫風格嗎？",
+  "note": "Individual style-transfer calls. Model identifier not reported by the tool. Web derivatives only resize and encode the outputs.",
+  "cards": [
+    {
+      "id": "p01",
+      "asset": "/images/personas-flat/p01.jpg",
+      "source": "/images/personas/p01.jpg",
+      "styleReference": null,
+      "original": "exec-63885937-22f0-40a5-8e83-027cf8a63658.png",
+      "prompt": "Use case: style-transfer. Transform the supplied character artwork into a distinctly FLAT contemporary editorial vector-style illustration for a civic participation card. Preserve this fictional Taiwanese caregiver's short dark hair, indigo vest, tote and crossing map, and a recognizable simplified school-crossing setting. Radically simplify the rendering: large clean solid color shapes, smooth precise curves, minimal uniform dark-navy contour lines, simplified expressive facial features, no realistic skin modeling. Restrained palette of warm ivory, navy, sage green, coral and muted golden yellow. At most ONE flat shadow shape per object. Simplify buildings and pedestrians into a few geometric silhouettes; generous quiet areas instead of dense street detail. A sophisticated graphic poster, friendly and adult, not a 3D cartoon. Absolutely NO painterly texture, grain, brush marks, hatching, gradients, volumetric lighting, photographic detail or realistic shading. Portrait 2:3 format, one character, no lettering, no card border, no logos. The goal is unmistakably flat graphic illustration, not a filtered painting."
+    },
+    {
+      "id": "p02",
+      "asset": "/images/personas-flat/p02.jpg",
+      "source": "/images/personas/p02.jpg",
+      "styleReference": "/images/personas-flat/p01.jpg",
+      "original": "exec-d0ab8b04-836f-4d2e-b289-7029aa1d9c6b.png",
+      "prompt": "Use case: style-transfer. Image 1 is the character to redraw; Image 2 is ONLY the target illustration style. Redraw the fictional person and their scene from Image 1 as a FLAT contemporary editorial illustration matching Image 2: large clean color blocks, precise simple curves, sparse dark-navy contours, simplified expressive face, very few flat shadow shapes. Preserve the first person's approximate age, hair, role, clothing colors, pose and identifying props (especially mobility aids or bicycles when present); do not replace them with the character from Image 2. Simplify the background to a few recognizable geometric shapes and quiet areas. Warm ivory, navy, sage, coral and muted yellow palette, with the character's distinguishing clothing accent. Remove realistic rendering, dense detail, painterly strokes, grain and hatching. Avoid gradients and volumetric shading. Friendly, sophisticated graphic poster for adult civic participation, not a 3D cartoon. Portrait 2:3 artwork, single subject; no text, lettering, logos or card border."
+    },
+    {
+      "id": "p03",
+      "asset": "/images/personas-flat/p03.jpg",
+      "source": "/images/personas/p03.jpg",
+      "styleReference": "/images/personas-flat/p01.jpg",
+      "original": "exec-5e671d15-cfef-4ef3-9574-9288218966e0.png",
+      "prompt": "Use case: style-transfer. Image 1 is the character to redraw; Image 2 is ONLY the target illustration style. Redraw the fictional person and their scene from Image 1 as a FLAT contemporary editorial illustration matching Image 2: large clean color blocks, precise simple curves, sparse dark-navy contours, simplified expressive face, very few flat shadow shapes. Preserve the first person's approximate age, hair, role, clothing colors, pose and identifying props (especially mobility aids or bicycles when present); do not replace them with the character from Image 2. Simplify the background to a few recognizable geometric shapes and quiet areas. Warm ivory, navy, sage, coral and muted yellow palette, with the character's distinguishing clothing accent. Remove realistic rendering, dense detail, painterly strokes, grain and hatching. Avoid gradients and volumetric shading. Friendly, sophisticated graphic poster for adult civic participation, not a 3D cartoon. Portrait 2:3 artwork, single subject; no text, lettering, logos or card border."
+    },
+    {
+      "id": "p04",
+      "asset": "/images/personas-flat/p04.jpg",
+      "source": "/images/personas/p04.jpg",
+      "styleReference": "/images/personas-flat/p01.jpg",
+      "original": "exec-9c57574b-4a23-460a-8662-2989acab1b6a.png",
+      "prompt": "Use case: style-transfer. Image 1 is the character to redraw; Image 2 is ONLY the target illustration style. Redraw the fictional person and their scene from Image 1 as a FLAT contemporary editorial illustration matching Image 2: large clean color blocks, precise simple curves, sparse dark-navy contours, simplified expressive face, very few flat shadow shapes. Preserve the first person's approximate age, hair, role, clothing colors, pose and identifying props (especially mobility aids or bicycles when present); do not replace them with the character from Image 2. Simplify the background to a few recognizable geometric shapes and quiet areas. Warm ivory, navy, sage, coral and muted yellow palette, with the character's distinguishing clothing accent. Remove realistic rendering, dense detail, painterly strokes, grain and hatching. Avoid gradients and volumetric shading. Friendly, sophisticated graphic poster for adult civic participation, not a 3D cartoon. Portrait 2:3 artwork, single subject; no text, lettering, logos or card border."
+    },
+    {
+      "id": "p05",
+      "asset": "/images/personas-flat/p05.jpg",
+      "source": "/images/personas/p05.jpg",
+      "styleReference": "/images/personas-flat/p01.jpg",
+      "original": "exec-72742010-7992-4bd1-b12e-c994239587e3.png",
+      "prompt": "Use case: style-transfer. Image 1 is the character to redraw; Image 2 is ONLY the target illustration style. Redraw the fictional person and their scene from Image 1 as a FLAT contemporary editorial illustration matching Image 2: large clean color blocks, precise simple curves, sparse dark-navy contours, simplified expressive face, very few flat shadow shapes. Preserve the first person's approximate age, hair, role, clothing colors, pose and identifying props (especially mobility aids or bicycles when present); do not replace them with the character from Image 2. Simplify the background to a few recognizable geometric shapes and quiet areas. Warm ivory, navy, sage, coral and muted yellow palette, with the character's distinguishing clothing accent. Remove realistic rendering, dense detail, painterly strokes, grain and hatching. Avoid gradients and volumetric shading. Friendly, sophisticated graphic poster for adult civic participation, not a 3D cartoon. Portrait 2:3 artwork, single subject; no text, lettering, logos or card border."
+    },
+    {
+      "id": "p06",
+      "asset": "/images/personas-flat/p06.jpg",
+      "source": "/images/personas/p06.jpg",
+      "styleReference": "/images/personas-flat/p01.jpg",
+      "original": "exec-8195d3f5-24b6-48ae-ad65-0d47331e0285.png",
+      "prompt": "Use case: style-transfer. Image 1 is the character to redraw; Image 2 is ONLY the target illustration style. Redraw the fictional person and their scene from Image 1 as a FLAT contemporary editorial illustration matching Image 2: large clean color blocks, precise simple curves, sparse dark-navy contours, simplified expressive face, very few flat shadow shapes. Preserve the first person's approximate age, hair, role, clothing colors, pose and identifying props (especially mobility aids or bicycles when present); do not replace them with the character from Image 2. Simplify the background to a few recognizable geometric shapes and quiet areas. Warm ivory, navy, sage, coral and muted yellow palette, with the character's distinguishing clothing accent. Remove realistic rendering, dense detail, painterly strokes, grain and hatching. Avoid gradients and volumetric shading. Friendly, sophisticated graphic poster for adult civic participation, not a 3D cartoon. Portrait 2:3 artwork, single subject; no text, lettering, logos or card border."
+    },
+    {
+      "id": "p07",
+      "asset": "/images/personas-flat/p07.jpg",
+      "source": "/images/personas/p07.jpg",
+      "styleReference": "/images/personas-flat/p01.jpg",
+      "original": "exec-68b1ce97-11c2-46e6-a5ad-5dee16686b5d.png",
+      "prompt": "Use case: style-transfer. Image 1 is the character to redraw; Image 2 is ONLY the target illustration style. Redraw the fictional person and their scene from Image 1 as a FLAT contemporary editorial illustration matching Image 2: large clean color blocks, precise simple curves, sparse dark-navy contours, simplified expressive face, very few flat shadow shapes. Preserve the first person's approximate age, hair, role, clothing colors, pose and identifying props (especially mobility aids or bicycles when present); do not replace them with the character from Image 2. Simplify the background to a few recognizable geometric shapes and quiet areas. Warm ivory, navy, sage, coral and muted yellow palette, with the character's distinguishing clothing accent. Remove realistic rendering, dense detail, painterly strokes, grain and hatching. Avoid gradients and volumetric shading. Friendly, sophisticated graphic poster for adult civic participation, not a 3D cartoon. Portrait 2:3 artwork, single subject; no text, lettering, logos or card border."
+    },
+    {
+      "id": "p08",
+      "asset": "/images/personas-flat/p08.jpg",
+      "source": "/images/personas/p08.jpg",
+      "styleReference": "/images/personas-flat/p01.jpg",
+      "original": "exec-7ae5542f-b328-4f75-8603-1342279cb0b3.png",
+      "prompt": "Use case: style-transfer. Image 1 is the character to redraw; Image 2 is ONLY the target illustration style. Redraw the fictional person and their scene from Image 1 as a FLAT contemporary editorial illustration matching Image 2: large clean color blocks, precise simple curves, sparse dark-navy contours, simplified expressive face, very few flat shadow shapes. Preserve the first person's approximate age, hair, role, clothing colors, pose and identifying props (especially mobility aids or bicycles when present); do not replace them with the character from Image 2. Simplify the background to a few recognizable geometric shapes and quiet areas. Warm ivory, navy, sage, coral and muted yellow palette, with the character's distinguishing clothing accent. Remove realistic rendering, dense detail, painterly strokes, grain and hatching. Avoid gradients and volumetric shading. Friendly, sophisticated graphic poster for adult civic participation, not a 3D cartoon. Portrait 2:3 artwork, single subject; no text, lettering, logos or card border."
+    },
+    {
+      "id": "p09",
+      "asset": "/images/personas-flat/p09.jpg",
+      "source": "/images/personas/p09.jpg",
+      "styleReference": "/images/personas-flat/p01.jpg",
+      "original": "exec-77f28f00-6475-42fb-a685-173a7ceea875.png",
+      "prompt": "Use case: style-transfer. Image 1 is the character to redraw; Image 2 is ONLY the target illustration style. Redraw the fictional person and their scene from Image 1 as a FLAT contemporary editorial illustration matching Image 2: large clean color blocks, precise simple curves, sparse dark-navy contours, simplified expressive face, very few flat shadow shapes. Preserve the first person's approximate age, hair, role, clothing colors, pose and identifying props (especially mobility aids or bicycles when present); do not replace them with the character from Image 2. Simplify the background to a few recognizable geometric shapes and quiet areas. Warm ivory, navy, sage, coral and muted yellow palette, with the character's distinguishing clothing accent. Remove realistic rendering, dense detail, painterly strokes, grain and hatching. Avoid gradients and volumetric shading. Friendly, sophisticated graphic poster for adult civic participation, not a 3D cartoon. Portrait 2:3 artwork, single subject; no text, lettering, logos or card border."
+    },
+    {
+      "id": "p10",
+      "asset": "/images/personas-flat/p10.jpg",
+      "source": "/images/personas/p10.jpg",
+      "styleReference": "/images/personas-flat/p01.jpg",
+      "original": "exec-f8f5a52d-0395-41b3-b3a0-355ca8f4ed9f.png",
+      "prompt": "Use case: style-transfer. Image 1 is the character to redraw; Image 2 is ONLY the target illustration style. Redraw the fictional person and their scene from Image 1 as a FLAT contemporary editorial illustration matching Image 2: large clean color blocks, precise simple curves, sparse dark-navy contours, simplified expressive face, very few flat shadow shapes. Preserve the first person's approximate age, hair, role, clothing colors, pose and identifying props (especially mobility aids or bicycles when present); do not replace them with the character from Image 2. Simplify the background to a few recognizable geometric shapes and quiet areas. Warm ivory, navy, sage, coral and muted yellow palette, with the character's distinguishing clothing accent. Remove realistic rendering, dense detail, painterly strokes, grain and hatching. Avoid gradients and volumetric shading. Friendly, sophisticated graphic poster for adult civic participation, not a 3D cartoon. Portrait 2:3 artwork, single subject; no text, lettering, logos or card border."
+    },
+    {
+      "id": "p11",
+      "asset": "/images/personas-flat/p11.jpg",
+      "source": "/images/personas/p11.jpg",
+      "styleReference": "/images/personas-flat/p01.jpg",
+      "original": "exec-a847fa23-0aa9-4610-b7bb-af7da0d54542.png",
+      "prompt": "Use case: style-transfer. Image 1 is the character to redraw; Image 2 is ONLY the target illustration style. Redraw the fictional person and their scene from Image 1 as a FLAT contemporary editorial illustration matching Image 2: large clean color blocks, precise simple curves, sparse dark-navy contours, simplified expressive face, very few flat shadow shapes. Preserve the first person's approximate age, hair, role, clothing colors, pose and identifying props (especially mobility aids or bicycles when present); do not replace them with the character from Image 2. Simplify the background to a few recognizable geometric shapes and quiet areas. Warm ivory, navy, sage, coral and muted yellow palette, with the character's distinguishing clothing accent. Remove realistic rendering, dense detail, painterly strokes, grain and hatching. Avoid gradients and volumetric shading. Friendly, sophisticated graphic poster for adult civic participation, not a 3D cartoon. Portrait 2:3 artwork, single subject; no text, lettering, logos or card border."
+    },
+    {
+      "id": "p12",
+      "asset": "/images/personas-flat/p12.jpg",
+      "source": "/images/personas/p12.jpg",
+      "styleReference": "/images/personas-flat/p01.jpg",
+      "original": "exec-5361e879-8545-4abb-bf3a-0ce3d6d23fac.png",
+      "prompt": "Use case: style-transfer. Image 1 is the character to redraw; Image 2 is ONLY the target illustration style. Redraw the fictional person and their scene from Image 1 as a FLAT contemporary editorial illustration matching Image 2: large clean color blocks, precise simple curves, sparse dark-navy contours, simplified expressive face, very few flat shadow shapes. Preserve the first person's approximate age, hair, role, clothing colors, pose and identifying props (especially mobility aids or bicycles when present); do not replace them with the character from Image 2. Simplify the background to a few recognizable geometric shapes and quiet areas. Warm ivory, navy, sage, coral and muted yellow palette, with the character's distinguishing clothing accent. Remove realistic rendering, dense detail, painterly strokes, grain and hatching. Avoid gradients and volumetric shading. Friendly, sophisticated graphic poster for adult civic participation, not a 3D cartoon. Portrait 2:3 artwork, single subject; no text, lettering, logos or card border."
+    },
+    {
+      "id": "p13",
+      "asset": "/images/personas-flat/p13.jpg",
+      "source": "/images/personas/p13.jpg",
+      "styleReference": "/images/personas-flat/p01.jpg",
+      "original": "exec-df08cd7c-d336-434c-854d-f0602827f489.png",
+      "prompt": "Use case: style-transfer. Image 1 is the character to redraw; Image 2 is ONLY the target illustration style. Redraw the fictional person and their scene from Image 1 as a FLAT contemporary editorial illustration matching Image 2: large clean color blocks, precise simple curves, sparse dark-navy contours, simplified expressive face, very few flat shadow shapes. Preserve the first person's approximate age, hair, role, clothing colors, pose and identifying props (especially mobility aids or bicycles when present); do not replace them with the character from Image 2. Simplify the background to a few recognizable geometric shapes and quiet areas. Warm ivory, navy, sage, coral and muted yellow palette, with the character's distinguishing clothing accent. Remove realistic rendering, dense detail, painterly strokes, grain and hatching. Avoid gradients and volumetric shading. Friendly, sophisticated graphic poster for adult civic participation, not a 3D cartoon. Portrait 2:3 artwork, single subject; no text, lettering, logos or card border."
+    },
+    {
+      "id": "p14",
+      "asset": "/images/personas-flat/p14.jpg",
+      "source": "/images/personas/p14.jpg",
+      "styleReference": "/images/personas-flat/p01.jpg",
+      "original": "exec-d2810baf-de6c-4f8f-af75-d66353df69c0.png",
+      "prompt": "Use case: style-transfer. Image 1 is the character to redraw; Image 2 is ONLY the target illustration style. Redraw the fictional person and their scene from Image 1 as a FLAT contemporary editorial illustration matching Image 2: large clean color blocks, precise simple curves, sparse dark-navy contours, simplified expressive face, very few flat shadow shapes. Preserve the first person's approximate age, hair, role, clothing colors, pose and identifying props (especially mobility aids or bicycles when present); do not replace them with the character from Image 2. Simplify the background to a few recognizable geometric shapes and quiet areas. Warm ivory, navy, sage, coral and muted yellow palette, with the character's distinguishing clothing accent. Remove realistic rendering, dense detail, painterly strokes, grain and hatching. Avoid gradients and volumetric shading. Friendly, sophisticated graphic poster for adult civic participation, not a 3D cartoon. Portrait 2:3 artwork, single subject; no text, lettering, logos or card border."
+    }
+  ]
+}

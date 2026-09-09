@@ -14,7 +14,7 @@ const profiles=JSON.parse(await readFile(new URL('../public/data/persona-profile
 const choose=async id=>{if(!(await page.locator('.persona-shelf').getAttribute('open')!==null))await page.locator('.persona-shelf>summary').click();await page.locator(`[data-persona=${id}]`).click();await page.locator('#character-card img').evaluate(img=>img.decode());};
 try{
  await page.goto(base+'/?lang=zh');await page.locator('[data-pane=people]').click();await page.locator('#flip-persona').waitFor();
- for(const profile of profiles){await choose(profile.id);assert.equal(await page.locator('.journey-stop').count(),24);assert((await page.locator('.card-front-copy').innerText()).includes(profile.motivation.zh));
+ for(const profile of profiles){await choose(profile.id);assert.equal(await page.locator('#character-card img').getAttribute('src'),profile.art.src,profile.id+' must use its current artwork');assert.equal(await page.locator('.journey-stop').count(),24);assert((await page.locator('.card-front-copy').innerText()).includes(profile.motivation.zh));
   for(let round=0;round<3;round++){await page.locator(`[data-persona-round="${round}"]`).click();assert.equal(await page.locator('.round-personal-focus').innerText(),profile.roundFocus[round].zh);}
  }
  await choose('p04');await page.locator('[data-persona-round="1"]').click();await page.locator('[data-journey-round="1"][data-journey-step="5"]').click();

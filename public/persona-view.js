@@ -14,7 +14,7 @@ export function renderPersonaView({bundle,personId,roundIndex,phaseIndex,profile
  const route=personalizedJourney(bundle,personId,profile),step=route[roundIndex].steps[phaseIndex];
  const mode=m=>m==='online'?L('線上參與','Online'):m==='in-person'?L('實體參與','In person'):L('此步未出席','Absent at this step');
  const mark=m=>m==='online'?'◉':m==='in-person'?'◇':'—';
- const art=(p,small=false)=>`<img src="/images/personas/${p.id}.jpg" width="640" height="960" alt="${esc(loc(p.perspective))} · ${L('虛構角色插畫','fictional character illustration')}" loading="${small?'lazy':'eager'}" decoding="async">`;
+ const art=(p,small=false)=>`<img src="/images/personas-flat/${p.id}.jpg" width="640" height="960" alt="${esc(loc(p.perspective))} · ${L('虛構角色插畫','fictional character illustration')}" loading="${small?'lazy':'eager'}" decoding="async">`;
  const deck=bundle.participants.map(p=>`<button class="persona-card" data-persona="${p.id}" aria-pressed="${p.id===personId}">${art(p,true)}<span class="card-serial">${p.id.toUpperCase()}</span><span class="card-mini-caption"><strong>${esc(loc(p.perspective))}</strong><small>${p.id===personId?L('正在探索','Exploring'):L('查看旅程','Explore journey')}</small></span></button>`).join('');
  const traits=profile?[['compass','動機','Motivation',profile.motivation],['clock','限制','Constraint',profile.barrier],['people','誘因','Incentive',profile.incentive],['check','期待成果','Desired outcome',profile.desiredOutcome]]:[];
  const stops=route.flatMap((r,ri)=>r.steps.map(s=>({...s,roundIndex:ri}))),first=stops.find(s=>s.sourceRefs.length),last=stops.findLast(s=>s.resultRefs.length);
