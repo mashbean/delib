@@ -20,7 +20,8 @@ export async function handleWorkspaceRead(request: Request, origins: Record<stri
   if (origin.protocol !== 'https:' || origin.username || origin.password) return send({ error: 'Invalid service configuration' }, 503);
   const path = tool === 'form' ? `/api/forms/${body.id}/export/tttc.csv` : tool === 'tttc' ? `/api/reports/${body.id}` : `/api/loops/${body.id}`;
   try {
-    const response = await upstreamFetch(new URL(path, origin.origin), { headers: tool === 'form' ? { 'X-Form-Admin': body.token as string } : {}, redirect: 'error', signal: AbortSignal.timeout(12000) });
+    const response = await upstreamFetch(new URL(path, origin.origin), { headers: tool === 'form' ? { 'X-Form-Admin': body.token as string } : {}, redirect: 'manual', signal: AbortSignal.timeout(12000) });
+    if (response.status >= 300 && response.status < 400) return send({ error: 'Service redirected; use its original export. No credential was forwarded.' }, 502);
     if (!response.ok) return send({ error: 'Service could not return this activity. Check the link and access, or try again later.', upstreamStatus: response.status }, [401,403,404,410,429].includes(response.status) ? response.status : 502);
     const stream = response.body?.getReader(); if (!stream) return send({ error: 'Empty service result' }, 502);
     const chunks: Uint8Array[] = []; let bytes = 0;
