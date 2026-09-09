@@ -1,0 +1,219 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://delib.mashbean.net/schemas/delib-workspace-transfer/v1.json",
+  "title": "Delib private workspace transfer",
+  "description": "Delib mapping, not a Metagov ontology. Runtime also validates snapshot correspondence, relation scope and legal state transitions. Export companions add explicitly documented transport guidance.",
+  "type": "object",
+  "required": [
+    "schema",
+    "mappingVersion",
+    "roundId",
+    "tool",
+    "simulated",
+    "context",
+    "inputs",
+    "annotations",
+    "id",
+    "private",
+    "history",
+    "outputRefs"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "delib-workspace-transfer/v1"
+    },
+    "mappingVersion": {
+      "const": "workspace-text/1"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "roundId": {
+      "type": "string"
+    },
+    "tool": {
+      "enum": [
+        "tttc",
+        "reply"
+      ]
+    },
+    "simulated": {
+      "type": "boolean"
+    },
+    "private": {
+      "const": true
+    },
+    "activityId": {
+      "type": "string",
+      "pattern": "^[a-z0-9]{10}$"
+    },
+    "context": {
+      "type": "object",
+      "required": [
+        "title",
+        "goal",
+        "audience",
+        "deadline",
+        "language"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "goal": {
+          "type": "string"
+        },
+        "audience": {
+          "type": "string"
+        },
+        "deadline": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        }
+      }
+    },
+    "inputs": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 600,
+      "items": {
+        "$ref": "#/$defs/snapshot"
+      }
+    },
+    "annotations": {
+      "type": "array",
+      "maxItems": 5000,
+      "items": {
+        "$ref": "#/$defs/snapshot"
+      }
+    },
+    "outputRefs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "history": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "required": [
+          "state",
+          "at"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "state": {
+            "enum": [
+              "prepared",
+              "exported",
+              "submitted",
+              "received",
+              "completed",
+              "reconnected",
+              "uncertain",
+              "failed"
+            ]
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "snapshot": {
+      "type": "object",
+      "required": [
+        "id",
+        "kind",
+        "text",
+        "source",
+        "reviewed",
+        "relations",
+        "supersedes"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "statement",
+            "question",
+            "feedback",
+            "theme",
+            "proposal"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 12000
+        },
+        "source": {
+          "type": "object",
+          "required": [
+            "tool",
+            "id"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "tool": {
+              "type": "string"
+            },
+            "id": {
+              "type": "string"
+            }
+          }
+        },
+        "reviewed": {
+          "type": "boolean"
+        },
+        "relations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "ref",
+              "type"
+            ],
+            "properties": {
+              "ref": {
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "derived",
+                  "responds",
+                  "revises",
+                  "supports",
+                  "opposes",
+                  "context"
+                ]
+              }
+            }
+          }
+        },
+        "supersedes": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}

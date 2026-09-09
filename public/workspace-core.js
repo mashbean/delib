@@ -1,3 +1,4 @@
+import { validateTransfers } from './workspace-transfer-core.js';
 import { validateFacilitation, carryParticipation, roundFollowups, saveParticipation, setCommitment, setDisposition } from './facilitation-core.js';
 import { parseTttcCsv, tttcRowsToCsv } from './tttc-csv-core.js';
 export const WORKSPACE_SCHEMA='https://delib.mashbean.net/schemas/delib-workspace/v1.json';
@@ -30,11 +31,11 @@ export function validateProject(p) {
     for(const [tool,c] of Object.entries(r.connections)){if(!['form','tttc','reply'].includes(tool)||!c||!/^[a-z0-9]{10}$/.test(c.id||'')||!Array.isArray(c.inputRefs)||c.inputRefs.some(id=>!ids.has(id))||!Array.isArray(c.contextRefs)||c.contextRefs.some(id=>!ids.has(id)))throw new Error('Invalid service connection');}
     if(r.next&&(!text(r.next.reason,1000)||!text(r.next.owner,100)||!text(r.next.date,50)||!Array.isArray(r.next.carryForwardRefs)||r.next.carryForwardRefs.some(id=>!ids.has(id))))throw new Error('Invalid next-round commitment');
   }
-  if(!rounds.has(p.view.roundId)||!['route','voices','changes','participation'].includes(p.view.tab))throw new Error('Invalid view');
+  if(!rounds.has(p.view.roundId)||!['route','voices','changes','participation','transfer'].includes(p.view.tab))throw new Error('Invalid view');
   // Credential fields are never part of a project or backup. UI credentials live in memory.
   const forbidden=o=>{if(!o||typeof o!=='object')return false;return Object.entries(o).some(([k,v])=>/^(adminToken|token|hostUrl|manageUrl|authorization)$/i.test(k)||forbidden(v));};
   if(forbidden(p))throw new Error('Remove management credentials before importing');
-  validateFacilitation(p);return p;
+  validateFacilitation(p);validateTransfers(p);return p;
 }
 export function record(kind,value,source,refs=[],extra={}){return {id:uid(),kind,text:value,source,derivedFrom:[...new Set(refs)],relations:[...new Set(refs)].map(ref=>({ref,type:kind==='reply'?'responds':'derived'})),participantRef:null,supersedes:null,review:{checked:false,reviewer:'',at:null,quoteConfirmed:false},...extra};}
 export function addSources(p,csv,sourceId,{reconcile=false}={}){
@@ -57,6 +58,7 @@ export function acceptTttc(p,result,connection){
   if(result.progress?.status!=='ready'||!result.tree?.topics)return false;
   const allowed=new Set(connection.inputRefs),existing=allRecords(p),added=[];
   for(const topic of result.tree.topics)for(const sub of topic.subtopics||[])for(const claim of sub.claims||[]){
+    if((claim.quotes||[]).some(q=>typeof q.text==='string'&&!existing.some(a=>a.id===q.commentId&&a.text.includes(q.text))))throw new Error('引文與來源文字不符 / Quote differs from source');
     const source={tool:'tttc',id:`${connection.id}/${claim.id}`};if(existing.some(a=>a.source.tool===source.tool&&a.source.id===source.id))continue;
     const refs=[...new Set((claim.quotes||[]).map(q=>q.commentId))];
     if(!refs.length||refs.some(id=>!allowed.has(id)))throw new Error('分析包含無法對應的來源，未匯入。 / Unmatched analysis sources; nothing imported.');
@@ -97,7 +99,7 @@ export function nextRound(p,{reason,owner,date,phase}){
 }
 export function traceVoice(p,id){
   const all=allRecords(p),found=new Set([id]);let changed=true;
-  while(changed){changed=false;for(const a of all)if(!found.has(a.id)&&a.derivedFrom.some(ref=>found.has(ref))){found.add(a.id);changed=true;}}
+  while(changed){changed=false;for(const a of all)if(!found.has(a.id)&&a.derivedFrom.some(ref=>found.has(ref)&&(!a.relations.some(e=>e.ref===ref)||a.relations.some(e=>e.ref===ref&&e.type!=='context')))){found.add(a.id);changed=true;}}
   return all.filter(a=>found.has(a.id));
 }
 export function compareRounds(p){const r=currentRound(p),i=p.rounds.indexOf(r),prev=p.rounds[i-1];if(!prev)return null;

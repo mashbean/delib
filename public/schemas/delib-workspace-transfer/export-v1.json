@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://delib.mashbean.net/schemas/delib-workspace-transfer/export-v1.json",
+  "title": "Delib private transfer export companion",
+  "description": "A local transfer snapshot and explicit transport guidance. Not accepted automatically by destination tools.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "private",
+    "simulated",
+    "transfer",
+    "externalRefs",
+    "destinationPayload",
+    "destinationReads",
+    "staysLocal",
+    "excluded",
+    "notice"
+  ],
+  "properties": {
+    "schema": {
+      "const": "delib-workspace-transfer-export/v1"
+    },
+    "private": {
+      "const": true
+    },
+    "simulated": {
+      "type": "boolean"
+    },
+    "transfer": {
+      "$ref": "./v1.json"
+    },
+    "externalRefs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "destinationPayload": {
+      "type": "object",
+      "required": [
+        "csv"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "csv": {
+          "type": "string"
+        },
+        "positions": {
+          "type": "string",
+          "maxLength": 6000
+        }
+      }
+    },
+    "destinationReads": {
+      "type": "object",
+      "required": [
+        "sourceColumns",
+        "context"
+      ],
+      "properties": {
+        "sourceColumns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "context": {
+          "type": "string"
+        }
+      }
+    },
+    "staysLocal": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "excluded": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "notice": {
+      "type": "string"
+    }
+  }
+}

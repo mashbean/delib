@@ -100,5 +100,7 @@ export function roundFollowups(project,r = round(project)) {
 }
 export function voiceTrailExport(project,records) {
   // Project-level gap notes and management context never enter a participant's receipt.
-  return {schema:'delib-voice-trail/v1',simulated:project.simulated,private:true,issue:project.title,exportedAt:new Date().toISOString(),records:structuredClone(records)};
+  const ids=new Set(records.map(a=>a.id));
+  const transfers=(project.transfers||[]).filter(t=>[...t.inputs,...t.annotations].some(a=>ids.has(a.id))||t.outputRefs.some(id=>ids.has(id))).map(t=>({id:t.id,tool:t.tool,history:structuredClone(t.history),recordRefs:[...new Set([...t.inputs,...t.annotations].map(a=>a.id).concat(t.outputRefs).filter(id=>ids.has(id)))]}));
+  return {schema:'delib-voice-trail/v1',simulated:project.simulated,private:true,issue:project.title,exportedAt:new Date().toISOString(),records:structuredClone(records),transfers};
 }
