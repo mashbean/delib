@@ -1,0 +1,11 @@
+{
+  "success": true,
+  "taskId": "fictional-sensemaker",
+  "status": "completed",
+  "completedAt": "2026-09-09T00:00:00Z",
+  "model": "fictional-model",
+  "commentsProcessed": 3,
+  "additionalContext": "Entirely fictional adapter fixture; no service analysis was run.",
+  "outputLanguage": "en",
+  "summary": "## Fictional draft\nReview accessible arrival and delivery hours. This fixture has no source-linked claims."
+}

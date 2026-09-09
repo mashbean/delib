@@ -1,0 +1,70 @@
+{
+  "schema": "delib-interoperability-evidence/v1",
+  "checkedAt": "2026-09-09",
+  "boundary": "Dated acceptance snapshots, not live uptime or blanket interoperability conformance. No credentials or original public vote data included.",
+  "edges": [
+    {
+      "tools": [
+        "form",
+        "tttc",
+        "reply"
+      ],
+      "status": "production-synthetic-round-trip-verified",
+      "delibBuild": "f1befd9",
+      "sourceRecords": 3,
+      "sourceLinkedClaims": 3,
+      "sourceLinkedReplyDrafts": 3,
+      "rounds": 2,
+      "cleanup": "all-three-owned-activities-deleted-and-verified",
+      "script": "scripts/run-workspace-pilot.mjs"
+    },
+    {
+      "tool": "proposals",
+      "status": "production-synthetic-export-and-local-import-verified",
+      "checkedAt": "2026-09-09T15:12:19.908Z",
+      "serviceBuild": "524eb61",
+      "scope": "Synthetic proposal creation, amendment, endorsement, acceptance, response, two authenticated archives, legacy compatibility, Delib graph/version comparison and backup reload",
+      "counts": {
+        "proposals": 1,
+        "amendments": 1,
+        "responses": 1,
+        "versions": 2,
+        "normalizedRecords": 5
+      },
+      "archiveSha256": "d2d7059e82a061661f647d89577324fa21e2b855ca247ed92741a04673accb41",
+      "cleanup": "deleted-and-verified"
+    },
+    {
+      "tool": "polis",
+      "status": "production-public-read-and-local-import-verified",
+      "checkedAt": "2026-09-09T15:10:32.974Z",
+      "scope": "Read-only public statements.csv and votes.csv → delib-data → exchange → workspace backup reload",
+      "source": "https://polis.mashbean.net/r/3ovoxq5c6o",
+      "files": [
+        {
+          "role": "statements",
+          "name": "statements.csv",
+          "size": 3375,
+          "sha256": "fac255bcdcd8d03aea67665af6bfd6ab7868ad3919b4339039fa036f6cfb6732"
+        },
+        {
+          "role": "votes",
+          "name": "votes.csv",
+          "size": 99389,
+          "sha256": "af289f407a3b7e89382e41192ae78a3ac9788109a299764e5162f8b1b97dfa77"
+        }
+      ],
+      "records": 2973,
+      "typedResponses": 2923,
+      "writes": 0,
+      "boundary": "No analysis, clustering, representativeness, synthesis generation or reverse import tested. Pilot text is fictional but may include visitor responses."
+    },
+    {
+      "tool": "sensemaker",
+      "status": "source-contract-and-local-fixture-tested",
+      "source": "https://github.com/bestian/sensemaker-backend/blob/164a712434cc074648b5203c2c6e8bf527db3660/src/index.ts#L946",
+      "format": "GET /api/sensemake/result/:taskId completed JSON",
+      "boundary": "Markdown summary only; no structured source lineage or vote table. No third-party activity created or remote analysis performed."
+    }
+  ]
+}

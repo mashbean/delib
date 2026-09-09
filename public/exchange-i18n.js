@@ -1,4 +1,7 @@
 const reasons={
+  "Legacy space.json contains current proposals and counts only. Use archive.json for full amendments, responses and versions.": "舊版 space.json 只有當前提案與數量。完整修正案、回應與版本請使用 archive.json。",
+  "Full versions, amendment bodies and rationales, acceptance states, responses and endorsement totals retained. Acceptance is the proposal author’s action, not group consensus. Response-time version is unknown.": "保留版本全文、修正理由、採納狀態、回應及附議總數。採納由提案人決定，不代表群體共識；回應當時的版本未知。",
+  "Markdown summary is an unreviewed model result. The result API has no machine-readable comment lineage or vote table; commentsProcessed is not a participant count. No source links or consensus are inferred.": "Markdown 摘要是待審模型成果。結果 API 未提供逐筆來源關聯或票數表；處理意見數不是參與人數，不推定來源或共識。",
   "Identity/linking fields excluded; content consent is separate.": "排除身分與串連欄位；內容轉交的同意另行確認。",
   "Source group labels excluded; no cross-tool identity matching.": "排除來源群組標記，不跨工具比對身分。",
   "CSV has no votes, question types, consent, withdrawal or revision history.": "CSV 不含票數、題型、同意、撤回或修訂歷史。",
@@ -22,5 +25,5 @@ const reasons={
   "CSV formula-leading text is escaped for spreadsheet safety.": "試算表可能當成公式的開頭已跳脫處理。",
   "No voteInfo synthesized from missing votes. Verified backend JSON shape; current web upload picker requires a separate JSON entry path.": "不以缺少票數補造 voteInfo。已核對後端 JSON 格式；現行網頁仍需另接 JSON 選檔入口。"
 };
-const labels={preserved:'保留',transformed:'轉換',blocked:'排除',review:'待覆核',unavailable:'未提供',dropped:'未轉交',aggregated:'彙總',participant:'參與者',model:'模型草稿','source-excerpt':'來源節錄',organizer:'主辦者','participant-confirmed-synthesis':'參與者確認的整理',calculated:'計算成果',draft:'草稿',unreviewed:'待檢查',reviewed:'已檢查',withdrawn:'已撤回','needs-review':'須重新覆核'};
+const labels={'proposal':'當前提案','proposal-version':'提案版本','proposal-amendment':'修正案','proposal-response':'提案回應','method-result':'方法成果',preserved:'保留',transformed:'轉換',blocked:'排除',review:'待覆核',unavailable:'未提供',dropped:'未轉交',aggregated:'彙總',participant:'參與者',model:'模型草稿','source-excerpt':'來源節錄',organizer:'主辦者','participant-confirmed-synthesis':'參與者確認的整理',calculated:'計算成果',draft:'草稿',unreviewed:'待檢查',reviewed:'已檢查',withdrawn:'已撤回','needs-review':'須重新覆核'};
 export function exchangeLabel(value,en){if(en)return value;if(reasons[value])return reasons[value];if(labels[value])return labels[value];if(/^\d+ source references matched/.test(value))return `${value.split(' ')[0]} 個來源已透過交接對照表與精確引文核對接回。`;return value;}

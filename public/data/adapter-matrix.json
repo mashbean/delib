@@ -61,11 +61,13 @@
     },
     {
       "tool": "proposals",
-      "format": "{space,proposals}",
-      "status": "local-native-adapter-tested",
+      "format": "archive.json (pocket-proposals-archive/v1) or legacy {space,proposals}",
+      "status": "production-synthetic-export-and-local-import-verified",
       "contract": "delib-exchange/v1",
-      "source": "https://github.com/mashbean/pocket-proposals/tree/6cdbb476385e4550bd1c15eec8654c97aefca036/src",
-      "boundary": "Current proposals retained; amendment bodies and revision histories absent."
+      "source": "https://github.com/mashbean/pocket-proposals/tree/524eb61a6d22b62c6abafbc5ec9e05dedff4dae2/src",
+      "boundary": "Full version bodies, amendment rationale, acceptance, responses and endorsement totals retained. No actor hashes or aliases. Response-time version and remote withdrawal history absent; acceptance is not consensus.",
+      "verifiedAt": "2026-09-09",
+      "evidence": "/data/interop-evidence.json"
     },
     {
       "tool": "argument",
@@ -86,11 +88,13 @@
     {
       "tool": "polis",
       "format": "statements.csv + votes.csv",
-      "status": "existing-adapter-plus-companion-tested",
+      "status": "production-public-read-and-local-import-verified",
       "contract": "delib-data/v1 → delib-exchange/v1",
       "source": "https://github.com/mashbean/pocket-polis",
       "entry": "/integrations/pocket-polis-data",
-      "boundary": "Use the existing tool export to obtain delib-data, then import into exchange. Values and counts remain; participant response linkage is removed and reported. No clustering or consensus inferred."
+      "boundary": "Use the existing tool export to obtain delib-data, then import into exchange. Values and counts remain; participant response linkage is removed and reported. No clustering or consensus inferred.",
+      "verifiedAt": "2026-09-09",
+      "evidence": "/data/interop-evidence.json"
     },
     {
       "tool": "power-ranker",
@@ -121,7 +125,12 @@
       "status": "backend-shape-fixture-tested-web-entry-gap",
       "source": "https://github.com/bestian/sensemaker-backend/blob/master/src/utils/parseJSON.ts",
       "entry": "https://make.vtaiwan.tw",
-      "boundary": "Web picker currently accepts CSV only. No voteInfo fabricated. No live analysis or report round trip tested. Source license unspecified: link and interoperate, do not vendor."
+      "boundary": "Input backend shape tested; web JSON picker gap remains. Result JSON imports as unreviewed model Markdown with no structured source links or votes. No live remote analysis or report round trip tested. No source code vendored.",
+      "resultFormat": "Completed result JSON: success, taskId, status, completedAt, model, commentsProcessed, additionalContext, outputLanguage, summary",
+      "resultStatus": "source-contract-and-local-fixture-tested",
+      "resultSource": "https://github.com/bestian/sensemaker-backend/blob/164a712434cc074648b5203c2c6e8bf527db3660/src/index.ts#L946",
+      "verifiedAt": "2026-09-09"
     }
-  ]
+  ],
+  "evidence": "/data/interop-evidence.json"
 }

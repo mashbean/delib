@@ -1,6 +1,7 @@
+import {proposalArchiveRecords} from './proposals-archive-core.js';
 import {parseTttcCsv,tttcRowsToCsv} from './tttc-csv-core.js';
 export const EXCHANGE_SCHEMA='https://delib.mashbean.net/schemas/delib-exchange/v1.json';
-export const nativeAdapters=Object.freeze(['form','harmonica','tttc','reply','values','budget','check','proposals','argument','maple','civic-talk','delib-data']);
+export const nativeAdapters=Object.freeze(['form','harmonica','tttc','reply','values','budget','check','proposals','argument','maple','civic-talk','sensemaker','delib-data']);
 const secret=/^(adminToken|adminHash|token|responderHash|authorization|hostUrl|manageUrl|apiKey|password)$/i;
 const privateField=/^(alias|name|interview|participant|responder|email|phone|contact|org|author_name|author_email|author_id|show_email|participantRef)$/i;
 const text=(v,label)=>{if(typeof v!=='string'||!v.trim()||v.length>12000)throw new Error(`Invalid ${label} / 欄位無效`);return v;};
@@ -16,7 +17,7 @@ export function importExchange(input,{tool,sourceId,sha256,simulated=false,filen
  if(input?.schema==='https://delib.mashbean.net/schemas/delib-data/v1.json')tool='delib-data';
  if(!nativeAdapters.includes(tool)&&tool!=='csv')throw new Error('Unsupported native format; use TTTC CSV / 請使用 TTTC CSV');
  if(new TextEncoder().encode(typeof input==='string'?input:JSON.stringify(input)).length>3*1024*1024)throw new Error('Maximum 3 MiB');forbidSecrets(input);
- const activity=String(sourceId||input?.form?.formId||input?.session?.sessionId||input?.reportId||input?.loopId||input?.bundleId||input?.budget?.budgetId||input?.check?.checkId||input?.space?.spaceId||input?.debate?.debateId||input?.hearing?.hearingId||(tool==='civic-talk'&&input?.[0]?.issue_id)||sha256.slice(0,16));
+ const activity=String(sourceId||input?.form?.formId||input?.session?.sessionId||input?.reportId||input?.taskId||input?.loopId||input?.bundleId||input?.budget?.budgetId||input?.check?.checkId||input?.space?.spaceId||input?.debate?.debateId||input?.hearing?.hearingId||(tool==='civic-talk'&&input?.[0]?.issue_id)||sha256.slice(0,16));
  if(!activity||activity.length>200)throw new Error('Invalid activity reference');
  const scope=`${tool}:${encodeURIComponent(activity)}`,losses=[],records=[],externalSources=[];
  const add=(id,kind,value,origin,relations=[],fields={},eligible=false)=>{records.push({id:ref(scope,id),sourceId:scope,originalId:String(id),kind,text:text(value,'record text'),origin,status:origin==='model'?'draft':'unreviewed',relations,fields,transferEligible:eligible});return ref(scope,id);};
@@ -62,8 +63,13 @@ export function importExchange(input,{tool,sourceId,sha256,simulated=false,filen
  losses.push({path:'/results',action:'aggregated',reason:'Question accuracy is retained; it is not agreement. Individual feedback and attempts require their separate exports.'});
  }else if(tool==='proposals'){
  if(!input.space?.spaceId)throw new Error('Missing proposal space');
+ if(input.schema!==undefined){
+ for(const r of proposalArchiveRecords(input))add(r.id,r.kind,r.text,'participant',r.relations.map(e=>({...e,ref:ref(scope,e.ref)})),r.fields,r.eligible);
+ losses.push({path:'/proposals',action:'preserved',reason:'Full versions, amendment bodies and rationales, acceptance states, responses and endorsement totals retained. Acceptance is the proposal author’s action, not group consensus. Response-time version is unknown.'});
+ }else{
  for(const q of arr(input.proposals,'proposals')){const {alias,...fields}=q;add(q.id,'proposal',q.body,'participant',[],fields,true);}
- losses.push({path:'/proposals',action:'unavailable',reason:'space.json contains current proposals and counts, not amendment bodies, response bodies or version history. Do not infer their content.'});
+ losses.push({path:'/proposals',action:'unavailable',reason:'Legacy space.json contains current proposals and counts only. Use archive.json for full amendments, responses and versions.'});
+ }
  }else if(tool==='argument'){
  if(!input.debate?.debateId)throw new Error('Missing debate');
  const visit=(n,parent,depth)=>{if(depth>30)throw new Error('Argument depth exceeds limit');if(!['pro','con'].includes(n.side)||n.parentId!==(parent??0))throw new Error('Invalid argument parent or side');const {alias,children,...fields}=n;add(n.id,'argument',n.text,'participant',parent?[{ref:ref(scope,parent),type:n.side==='pro'?'supports':'opposes'}]:[],fields,true);for(const c of arr(children,'children'))visit(c,n.id,depth+1);};
@@ -83,6 +89,10 @@ export function importExchange(input,{tool,sourceId,sha256,simulated=false,filen
  methodData=clean(opinions.filter(o=>o.abuse_flagged===0&&o.summary),'',[]);
  losses.push({path:'/',action:'unavailable',reason:'Civic Talk public opinions only; briefing, evidence materials, terms acceptance and remote moderation history are separate. Public visibility does not grant transfer permission.'});
 
+ }else if(tool==='sensemaker'){
+ if(input.success!==true||input.status!=='completed'||!text(input.taskId,'taskId')||!Number.isSafeInteger(input.commentsProcessed)||input.commentsProcessed<0||!Number.isFinite(Date.parse(input.completedAt)))throw new Error('Sensemaker requires a completed result JSON / 請使用完成後的結果 JSON');
+ add('summary','method-result',input.summary,'model',[],{model:input.model,commentsProcessed:input.commentsProcessed,completedAt:input.completedAt,outputLanguage:input.outputLanguage},false);
+ losses.push({path:'/summary',action:'review',reason:'Markdown summary is an unreviewed model result. The result API has no machine-readable comment lineage or vote table; commentsProcessed is not a participant count. No source links or consensus are inferred.'});
  }else if(tool==='delib-data'){
  if(input.schema!=='https://delib.mashbean.net/schemas/delib-data/v1.json'||input.kind!=='delib-data-bundle'||!input.source)throw new Error('Invalid delib-data bundle');
  for(const i of arr(input.items,'items')){if(!['participant','organizer','model'].includes(i.origin))throw new Error('Unknown item origin');const {text:body,...fields}=i;add(i.id,i.type,body,i.origin,[],clean(fields,'/items',losses),i.origin==='participant'&&i.type==='statement'&&i.status==='approved');}

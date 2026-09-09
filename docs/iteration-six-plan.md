@@ -12,7 +12,7 @@
 | 3 | Connect transfer provenance to voice trails; evidence-based next-round suggestions and four-operation/eight-method-step mapping | A voice links to its transfer; unresolved work and participation gaps explain a proposed next step; facilitator retains control | Complete |
 | 4 | Regression checks, synthetic two-round service loop, browser review, production deployment and read-only verification | Unit and Worker suites, prior workspace flows, export/reload, failure handling, public build verified | Released as 6398113; CI deploy and production smoke passed |
 | 5a | Native exchange and tool-file import into workspace; file round trips; compare versions | Typed method fields preserved, file provenance reconnects by exact IDs/text, old backups load | Implemented; see stage-five-native-import.md for acceptance |
-| 5b | Expanded remote round trips and Sensemaker result contract | Verify current production exports and destination support separately for each edge | Pending; no new upstream writes or Sensemaker conformance claimed |
+| 5b | Expanded remote round trips and Sensemaker result contract | Verify current production exports and destination support separately for each edge | Complete for Form → TTTC → Reply, Proposals full archive and read-only Polis export; Sensemaker result contract locally tested only. See stage-five-live-acceptance.md |
 | 6 | Connect the 3D view to observed workspace transfers and selectable voice paths | Same records power 2D/3D; online/offline events use recorded context; no invented delivery animations | Follow-on |
 | 7 | Metagov crosswalk and external-team acceptance | Obtain current ontology and translated flatfiles from authors; publish tested mappings with agreed vocabulary | External input needed |
 

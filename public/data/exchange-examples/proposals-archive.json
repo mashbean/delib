@@ -1,0 +1,54 @@
+{
+  "schema": "pocket-proposals-archive/v1",
+  "exportedAt": "2026-09-09T00:00:00Z",
+  "space": {
+    "spaceId": "fictional-proposals"
+  },
+  "proposals": [
+    {
+      "id": 1,
+      "title": "Protected bay",
+      "body": "Pilot an accessible drop-off bay and review delivery access after two weeks.",
+      "version": 2,
+      "endorsements": 3,
+      "createdAt": 1788832800000,
+      "updatedAt": 1788832800000,
+      "amendments": [
+        {
+          "id": 1,
+          "proposalId": 1,
+          "body": "Pilot an accessible drop-off bay and review delivery access after two weeks.",
+          "rationale": "Delivery access needs a scheduled review.",
+          "baseVersion": 1,
+          "added": 1,
+          "removed": 1,
+          "state": "accepted",
+          "endorsements": 2,
+          "createdAt": 1788832800000
+        }
+      ],
+      "responses": [
+        {
+          "id": 1,
+          "proposalId": 1,
+          "text": "Can wheelchair users join the review?",
+          "createdAt": 1788832800000
+        }
+      ],
+      "versions": [
+        {
+          "version": 1,
+          "body": "Pilot an accessible drop-off bay.",
+          "source": "original",
+          "createdAt": 1788832800000
+        },
+        {
+          "version": 2,
+          "body": "Pilot an accessible drop-off bay and review delivery access after two weeks.",
+          "source": "amendment-1",
+          "createdAt": 1788832800000
+        }
+      ]
+    }
+  ]
+}
