@@ -75,7 +75,8 @@
             "voices",
             "changes",
             "participation",
-            "transfer"
+            "transfer",
+            "flow"
           ]
         },
         "selected": {
@@ -86,6 +87,10 @@
             "focus",
             "overview"
           ]
+        },
+        "flowVoice": {
+          "type": "string",
+          "description": "Optional selected source record; empty means current round."
         }
       }
     },
@@ -258,6 +263,50 @@
             },
             "recordId": {
               "type": "string"
+            }
+          }
+        },
+        "settingHistory": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 60,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "at",
+              "by",
+              "setting",
+              "note"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
+              "at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "by": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "setting": {
+                "enum": [
+                  "unknown",
+                  "online",
+                  "in-person"
+                ]
+              },
+              "note": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1000
+              }
             }
           }
         }

@@ -1,3 +1,4 @@
+import {validateSettings} from './workspace-setting-core.js';
 import { validateNativeImports, nativeRestrictions } from './workspace-import-core.js';
 import { validateTransfers } from './workspace-transfer-core.js';
 import { validateFacilitation, carryParticipation, roundFollowups, saveParticipation, setCommitment, setDisposition } from './facilitation-core.js';
@@ -32,11 +33,12 @@ export function validateProject(p) {
     for(const [tool,c] of Object.entries(r.connections)){if(!['form','tttc','reply'].includes(tool)||!c||!/^[a-z0-9]{10}$/.test(c.id||'')||!Array.isArray(c.inputRefs)||c.inputRefs.some(id=>!ids.has(id))||!Array.isArray(c.contextRefs)||c.contextRefs.some(id=>!ids.has(id)))throw new Error('Invalid service connection');}
     if(r.next&&(!text(r.next.reason,1000)||!text(r.next.owner,100)||!text(r.next.date,50)||!Array.isArray(r.next.carryForwardRefs)||r.next.carryForwardRefs.some(id=>!ids.has(id))))throw new Error('Invalid next-round commitment');
   }
-  if(!rounds.has(p.view.roundId)||!['route','voices','changes','participation','transfer'].includes(p.view.tab))throw new Error('Invalid view');
+  if(!rounds.has(p.view.roundId)||!['route','voices','changes','participation','transfer','flow'].includes(p.view.tab))throw new Error('Invalid view');
   // Credential fields are never part of a project or backup. UI credentials live in memory.
   const forbidden=o=>{if(!o||typeof o!=='object')return false;return Object.entries(o).some(([k,v])=>/^(adminToken|token|hostUrl|manageUrl|authorization)$/i.test(k)||forbidden(v));};
   if(forbidden(p))throw new Error('Remove management credentials before importing');
-  validateFacilitation(p);validateTransfers(p);validateNativeImports(p);return p;
+  if(p.view.flowVoice!==undefined && (typeof p.view.flowVoice!=='string'||(p.view.flowVoice&&!ids.has(p.view.flowVoice))))throw new Error('Unknown flow voice');
+  validateSettings(p);validateFacilitation(p);validateTransfers(p);validateNativeImports(p);return p;
 }
 export function record(kind,value,source,refs=[],extra={}){return {id:uid(),kind,text:value,source,derivedFrom:[...new Set(refs)],relations:[...new Set(refs)].map(ref=>({ref,type:kind==='reply'?'responds':'derived'})),participantRef:null,supersedes:null,review:{checked:false,reviewer:'',at:null,quoteConfirmed:false},...extra};}
 export function addSources(p,csv,sourceId,{reconcile=false}={}){

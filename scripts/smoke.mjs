@@ -67,6 +67,15 @@ await check("GET /workspace serves the local issue workbench", async () => {
   expect(html.includes('/workspace.js') && html.includes('project-content'), 'workspace assets missing');
 });
 
+await check("Workspace flow assets are published", async () => {
+  for (const path of ['/workspace-flow-core.js', '/workspace-flow-view.js', '/workspace-setting-core.js', '/workspace-flow.css', '/vendor/workspace-flow.bundle.js']) {
+    const response = await get(path);
+    expect(response.status === 200, `${path}: status ${response.status}`);
+    expect(!(response.headers.get('content-type') || '').includes('text/html'), `${path}: unexpected HTML fallback`);
+    expect((await response.text()).length > 100, `${path}: empty asset`);
+  }
+});
+
 await check("Workspace contract is published", async () => {
   const response = await get('/schemas/delib-workspace/v1.json');
   expect(response.status === 200, `status ${response.status}`);
