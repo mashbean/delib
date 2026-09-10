@@ -1,5 +1,7 @@
 # Stage 7a: inspect the public model before converting
 
+> Stage 7b1 update: selected Statement export is now implemented with pinned upstream schema validation. See [stage-seven-statement-export.md](stage-seven-statement-export.md). External acceptance is still pending. The text below records the earlier Stage 7a audit.
+
 2026-09-10. Metagov's public source is available, so source inspection and a draft crosswalk no longer depend on receiving private files from the authors.
 
 ## Pinned evidence

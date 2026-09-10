@@ -1,0 +1,11 @@
+import Ajv from 'ajv';
+import addFormats from 'ajv-formats';
+import standaloneCode from 'ajv/dist/standalone/index.js';
+import {build} from 'esbuild';
+import {readFile,writeFile} from 'node:fs/promises';
+const schema=JSON.parse(await readFile('public/schemas/metagov/e5d3312/all-types.json','utf8'));
+const statement={$schema:schema.$schema,$ref:'#/definitions/Statement',definitions:schema.definitions};
+const ajv=new Ajv({strict:true,allErrors:true,code:{source:true}});addFormats(ajv);
+const code=standaloneCode(ajv,ajv.compile(statement));
+const result=await build({stdin:{contents:code,resolveDir:process.cwd(),sourcefile:'metagov-validator.cjs',loader:'js'},bundle:true,format:'esm',minify:true,write:false,platform:'browser',target:'es2022'});
+await writeFile('public/vendor/metagov-statement-validator.js','// Generated from Metagov e5d3312 AllTypes Statement definition. See /schemas/metagov/e5d3312/provenance.json.\n'+result.outputFiles[0].text);

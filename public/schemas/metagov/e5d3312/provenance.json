@@ -1,0 +1,13 @@
+{
+  "revision": "e5d3312aa0da481429ef4545ac172b668ead5f55",
+  "source": "https://github.com/metagov/ontology/tree/e5d3312aa0da481429ef4545ac172b668ead5f55",
+  "command": "cargo run --locked -p data_model",
+  "license": "MPL-2.0",
+  "files": {
+    "Cargo.lock": "8699ccebe208698f598263bf506258010b0480d3661589616396ca474c686602",
+    "ontology/data/src/lib.rs": "9aba32aad626c2e98333c0e7e87f29a5ea5ea49b12aaad7ad9c0be1e0d13ce53",
+    "ontology/data/src/main.rs": "e9ee84ff72376af90ae9f5e921249c4c438206e99bca5d56069afa8369d1979d",
+    "all-types.schema.json": "38dc98fc48db776ddaab4d75b78cc56a1493ee68ea0b8bb043aba0b3c14378b2"
+  },
+  "validationScope": "Individual Statement definitions in generated AllTypes schema. Delib selects the definition; no artificial Collection or Reaction is generated to fill AllTypes. The batch array and companion are Delib containers, not upstream transport contracts."
+}

@@ -1,3 +1,4 @@
+import {validateMetagovMappings} from './metagov-mapping-core.js';
 import {validateSettings} from './workspace-setting-core.js';
 import { validateNativeImports, nativeRestrictions } from './workspace-import-core.js';
 import { validateTransfers } from './workspace-transfer-core.js';
@@ -38,7 +39,7 @@ export function validateProject(p) {
   const forbidden=o=>{if(!o||typeof o!=='object')return false;return Object.entries(o).some(([k,v])=>/^(adminToken|token|hostUrl|manageUrl|authorization)$/i.test(k)||forbidden(v));};
   if(forbidden(p))throw new Error('Remove management credentials before importing');
   if(p.view.flowVoice!==undefined && (typeof p.view.flowVoice!=='string'||(p.view.flowVoice&&!ids.has(p.view.flowVoice))))throw new Error('Unknown flow voice');
-  validateSettings(p);validateFacilitation(p);validateTransfers(p);validateNativeImports(p);return p;
+  validateSettings(p);validateMetagovMappings(p);validateFacilitation(p);validateTransfers(p);validateNativeImports(p);return p;
 }
 export function record(kind,value,source,refs=[],extra={}){return {id:uid(),kind,text:value,source,derivedFrom:[...new Set(refs)],relations:[...new Set(refs)].map(ref=>({ref,type:kind==='reply'?'responds':'derived'})),participantRef:null,supersedes:null,review:{checked:false,reviewer:'',at:null,quoteConfirmed:false},...extra};}
 export function addSources(p,csv,sourceId,{reconcile=false}={}){

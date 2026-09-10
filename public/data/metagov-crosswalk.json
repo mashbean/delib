@@ -1,6 +1,6 @@
 {
   "schema": "delib-metagov-crosswalk/v1",
-  "status": "draft-source-inspected",
+  "status": "statement-schema-validated-locally",
   "checkedAt": "2026-09-10",
   "target": {
     "repository": "metagov/ontology",
@@ -10,7 +10,7 @@
     "representation": "Rust structs with JsonSchema; RDF and ATProto exports have different shapes"
   },
   "externalAcceptance": false,
-  "nativeExporterImplemented": false,
+  "nativeExporterImplemented": true,
   "mappings": [
     {
       "delib": "project.title",
@@ -27,32 +27,32 @@
     {
       "delib": "record.id",
       "target": "Statement.id",
-      "status": "partial",
-      "boundary": "Namespaced IDs require a reversible UUID map; never discard original IDs."
+      "status": "implemented-local",
+      "boundary": "Scoped deterministic UUIDv8; original IDs are retained in the private ID map."
     },
     {
       "delib": "record.text",
       "target": "Statement.content",
-      "status": "candidate",
-      "boundary": "Text only; this does not establish permission to share."
+      "status": "implemented-local",
+      "boundary": "Selected original text only. Manual review of sharing purpose is still required."
     },
     {
       "delib": "record.kind",
       "target": "Statement.role",
-      "status": "review",
-      "boundary": "Question, Summary, Proposal and Decision are candidate roles, subject to individual semantic review. No default Belief or Fact."
+      "status": "explicit-attestation",
+      "boundary": "An explicit role is recorded for each selected record; no default role, consensus or fact inference."
     },
     {
       "delib": "record.source / participantRef",
       "target": "Statement.made_by",
-      "status": "missing",
-      "boundary": "Generator requires Participant/Host UUID or AlgorithmDescriptor. Local aliases, tool IDs and reviewers are insufficient."
+      "status": "explicit-attestation",
+      "boundary": "User registers a scoped Participant, Host or Algorithm UUID with evidence, then attributes each record. This does not authenticate identity."
     },
     {
       "delib": "record.review",
       "target": "Statement.role_classified_by",
-      "status": "missing",
-      "boundary": "Review and quotation confirmation do not identify who assigned a semantic role."
+      "status": "explicit-attestation",
+      "boundary": "Separate explicit classifier registration and mapping history; review flags never infer the classifier."
     },
     {
       "delib": "record.derivedFrom / relations",
@@ -80,5 +80,8 @@
     }
   ],
   "relatedDiscussion": "https://github.com/metagov/ontology/issues/2",
-  "discussionBoundary": "An open alignment proposal is not proof of an agreed namespace, joint specification or W3C standard."
+  "discussionBoundary": "An open alignment proposal is not proof of an agreed namespace, joint specification or W3C standard.",
+  "exportScope": "Statement definition only, packaged as a Delib JSON array with a private provenance companion. No agreed upstream transport or external acceptance.",
+  "schemaArtifact": "/schemas/metagov/e5d3312/all-types.json",
+  "provenanceArtifact": "/schemas/metagov/e5d3312/provenance.json"
 }

@@ -1,3 +1,4 @@
+import {currentMetagovMapping} from './metagov-mapping-core.js';
 import {validateProject} from './workspace-core.js';
 export const METAGOV_REVISION='e5d3312aa0da481429ef4545ac172b668ead5f55';
 export const METAGOV_SOURCE=`https://github.com/metagov/ontology/blob/${METAGOV_REVISION}/ontology/data/src/lib.rs`;
@@ -18,9 +19,9 @@ export function metagovReadiness(project){
    {code:'project-uuid',count:uuid(project.id)?0:1,level:'missing'},
    {code:'phase-uuid',count:project.rounds.filter(r=>!uuid(r.id)).length,level:'missing'},
    {code:'record-uuid',count:records.filter(a=>!uuid(a.id)).length,level:'missing'},
-   {code:'generator',count:records.length,level:'missing'},
-   {code:'role-classifier',count:records.length,level:'missing'},
-   {code:'role-review',count:records.filter(a=>!roles[a.kind]).length,level:'review'},
+   {code:'generator',count:records.filter(a=>!currentMetagovMapping(a)).length,level:'missing'},
+   {code:'role-classifier',count:records.filter(a=>!currentMetagovMapping(a)).length,level:'missing'},
+   {code:'role-review',count:records.filter(a=>!currentMetagovMapping(a)&&!roles[a.kind]).length,level:'review'},
    {code:'multi-parent',count:records.filter(a=>a.derivedFrom.length>1).length,level:'retain'},
    {code:'typed-links',count:records.reduce((n,a)=>n+a.relations.filter(e=>e.type!=='responds').length,0),level:'retain'},
    {code:'phase-times',count:project.rounds.length,level:'missing'},

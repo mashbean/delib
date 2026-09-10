@@ -15,7 +15,8 @@
 | 5b | Expanded remote round trips and Sensemaker result contract | Verify current production exports and destination support separately for each edge | Complete for Form → TTTC → Reply, Proposals full archive and read-only Polis export; Sensemaker result contract locally tested only. See stage-five-live-acceptance.md |
 | 6 | Connect the 3D view to observed workspace transfers and selectable voice paths | Same records power 2D/3D; online/offline events use recorded context; no invented delivery animations | Implemented; see stage-six-workspace-flow.md for acceptance and limits |
 | 7a | Inspect public Metagov model and expose local mapping gaps | Pin source revision; publish draft field mapping and content-free diagnostics; do not fabricate missing identity or flatten provenance | Implemented; see stage-seven-metagov-crosswalk.md |
-| 7b | Native export contract and external-team acceptance | Agree on representation, multi-parent relations, generator attribution and method-data fixtures with authors | Pending joint contract and acceptance; no native conformance claim |
+| 7b1 | Local Statement export | Explicit attribution, stable UUID map, upstream-generated schema validation, private provenance companion | Implemented; see stage-seven-statement-export.md; external acceptance remains false |
+| 7b2 | External-team acceptance and wider model | Agree transport envelope, multi-parent relations, events, methods and fixtures with authors | Pending joint contract and acceptance |
 
 Stages 1–4 form the first independently useful release. They extend the existing Form → TTTC → Reply route. They do not require rewriting every Pocket service or adding a central participant database. Stage 5 must preserve typed votes, amendments and method data rather than flattening everything into source text.
 
