@@ -7,3 +7,5 @@
 .native-diff table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:.85rem}.native-diff th,.native-diff td{padding:.6rem;text-align:left;border-bottom:1px solid var(--line);overflow-wrap:anywhere}.native-diff th{color:var(--muted)}
 
 .interop-evidence{margin:16px 0;padding:14px 18px;border:1px solid var(--line);border-radius:12px;font-size:13px;line-height:1.7}.interop-evidence summary,.proposal-history summary{cursor:pointer;font-weight:600}.interop-evidence li{margin:10px 0}.proposal-history{margin:18px 0;padding:16px;border:1px solid var(--line);border-radius:10px}.proposal-history ol{padding-left:24px}.proposal-history li{padding:10px 0 16px 8px;border-bottom:1px solid var(--line)}.proposal-history p{white-space:pre-wrap;overflow-wrap:anywhere}.proposal-history small{color:var(--muted)}
+
+.metagov-readiness{border:1px solid var(--line);border-radius:12px;padding:18px;margin:20px 0;background:var(--paper);font-size:13px}.metagov-readiness summary{cursor:pointer;font-weight:650;min-height:28px}.metagov-readiness li{margin:12px 0;line-height:1.65}.metagov-readiness a{overflow-wrap:anywhere}

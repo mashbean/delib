@@ -2,6 +2,7 @@ import { buildHandoff } from "./handoff-core.js";
 import { exportTttcCsv } from "./flow-core.js";
 
 const text = {
+  openFlow:["開啟 3D 資料流 ↗","Open 3D data flow ↗"],flowHint:["查看原話、整理結果與下一輪的關係。另開工作台；此頁檔案不會自動帶入。","Follow sources, synthesis and later rounds. Opens a separate workspace; files from this page are not transferred automatically."],
   skip: ["跳到工作台", "Skip to workbench"], brand: ["資料交接", "Data handoff"], back: ["回到工具集 ↗", "Back to the toolkit ↗"],
   eyebrow: ["保留來源，讓對話繼續。", "KEEP THE SOURCE. CONTINUE THE CONVERSATION."],
   title: ["資料交接", "Data handoff"],
@@ -43,6 +44,7 @@ function applyLanguage() {
   document.querySelectorAll("[data-i18n]").forEach((node) => {
     node.textContent = t(node.dataset.i18n);
   });
+  $("workspace-flow-link").href=`/workspace?view=flow&lang=${language}`;
   $("language").textContent = language === "en" ? "正體中文" : "English";
   $("language").lang = language === "en" ? "zh-Hant" : "en";
   document.querySelectorAll('a[href^="/tttc"],a[href^="/reply"]').forEach((a) => { const url = new URL(a.href); url.searchParams.set("lang", language === "en" ? "en" : "zh-Hant"); a.href = url.pathname + url.search; });

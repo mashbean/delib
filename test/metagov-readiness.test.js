@@ -1,0 +1,15 @@
+import {describe,it,expect} from 'vitest';
+import {readFileSync} from 'node:fs';
+import {createProject,record} from '../public/workspace-core.js';
+import {metagovReadiness,METAGOV_REVISION} from '../public/metagov-readiness-core.js';
+import {metagovReadinessView} from '../public/metagov-readiness-view.js';
+const fixture=()=>{const p=createProject({title:'Private title',audience:'Private audience',goal:'Private goal',deadline:'2026-12-01'});const a=record('statement','Private source text',{tool:'form',id:'source-a'}),b=record('statement','Other source',{tool:'form',id:'source-b'}),q=record('question','Private question',{tool:'reply',id:'q'},[a.id,b.id]);a.id='form:non-uuid';q.derivedFrom=[a.id,b.id];q.relations=[{ref:a.id,type:'responds'},{ref:b.id,type:'context'}];a.participantRef='PRIVATE-ALIAS';p.rounds[0].artifacts.push(a,b,q);return p;};
+const count=(r,code)=>r.checks.find(x=>x.code===code).count;
+describe('Metagov draft readiness, not native conformance',()=>{
+ it('pins an inspected representation and never declares a valid native export',()=>{const p=fixture(),r=metagovReadiness(p),crosswalk=JSON.parse(readFileSync('public/data/metagov-crosswalk.json','utf8'));expect(r.target.revision).toBe(METAGOV_REVISION);expect(crosswalk.target.revision).toBe(METAGOV_REVISION);expect(crosswalk.target.sourceSha256).toMatch(/^[a-f0-9]{64}$/);expect(r.nativeExport).toBe(false);expect(r.externalAcceptance).toBe(false);});
+ it('does not infer generators, classifiers or beliefs from review and aliases',()=>{const p=fixture();p.rounds[0].artifacts[0].review={checked:true,reviewer:'Host',at:'2026-09-10',quoteConfirmed:true};const r=metagovReadiness(p);expect(count(r,'generator')).toBe(3);expect(count(r,'role-classifier')).toBe(3);expect(r.candidates.find(x=>x.kind==='statement').candidateRole).toBe(null);expect(r.candidates.find(x=>x.kind==='question').candidateRole).toBe('Question');});
+ it('flags non-UUID IDs and all multi-parent and non-response relations without flattening',()=>{const p=fixture(),before=JSON.stringify(p),r=metagovReadiness(p);expect(count(r,'record-uuid')).toBe(1);expect(count(r,'multi-parent')).toBe(1);expect(count(r,'typed-links')).toBe(1);expect(JSON.stringify(p)).toBe(before);});
+ it('does not treat deadline or online annotation as Event timestamps',()=>{const p=fixture();p.rounds[0].artifacts[0].settingHistory=[{id:'s',at:'2026-09-10T00:00:00Z',by:'Host',note:'Recorded setting',setting:'online'}];const r=metagovReadiness(p);expect(count(r,'phase-times')).toBe(1);expect(count(r,'setting-is-not-event')).toBe(1);});
+ it('exports aggregate diagnostics without original content or IDs',()=>{const p=fixture(),serialized=JSON.stringify(metagovReadiness(p));for(const secret of [p.title,p.audience,p.goal,p.id,'Private source text','PRIVATE-ALIAS',...p.rounds[0].artifacts.map(a=>a.id)])expect(serialized).not.toContain(secret);});
+ it('rejects invalid backups and renders bilingual review boundaries',()=>{expect(()=>metagovReadiness({})).toThrow();const p=fixture();expect(metagovReadinessView(p,'zh')).toContain('尚未產生 Metagov 匯出檔');expect(metagovReadinessView(p,'en')).toContain('not a Metagov export');});
+});

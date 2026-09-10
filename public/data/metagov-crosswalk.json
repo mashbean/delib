@@ -1,0 +1,84 @@
+{
+  "schema": "delib-metagov-crosswalk/v1",
+  "status": "draft-source-inspected",
+  "checkedAt": "2026-09-10",
+  "target": {
+    "repository": "metagov/ontology",
+    "revision": "e5d3312aa0da481429ef4545ac172b668ead5f55",
+    "source": "https://github.com/metagov/ontology/blob/e5d3312aa0da481429ef4545ac172b668ead5f55/ontology/data/src/lib.rs",
+    "sourceSha256": "9aba32aad626c2e98333c0e7e87f29a5ea5ea49b12aaad7ad9c0be1e0d13ce53",
+    "representation": "Rust structs with JsonSchema; RDF and ATProto exports have different shapes"
+  },
+  "externalAcceptance": false,
+  "nativeExporterImplemented": false,
+  "mappings": [
+    {
+      "delib": "project.title",
+      "target": "Project.name",
+      "status": "candidate",
+      "boundary": "Project UUID and representation-specific constraints need validation."
+    },
+    {
+      "delib": "round",
+      "target": "Phase",
+      "status": "partial",
+      "boundary": "Requires UUID, description, project_id, starts_at and ends_at. Do not infer an interval from the review deadline."
+    },
+    {
+      "delib": "record.id",
+      "target": "Statement.id",
+      "status": "partial",
+      "boundary": "Namespaced IDs require a reversible UUID map; never discard original IDs."
+    },
+    {
+      "delib": "record.text",
+      "target": "Statement.content",
+      "status": "candidate",
+      "boundary": "Text only; this does not establish permission to share."
+    },
+    {
+      "delib": "record.kind",
+      "target": "Statement.role",
+      "status": "review",
+      "boundary": "Question, Summary, Proposal and Decision are candidate roles, subject to individual semantic review. No default Belief or Fact."
+    },
+    {
+      "delib": "record.source / participantRef",
+      "target": "Statement.made_by",
+      "status": "missing",
+      "boundary": "Generator requires Participant/Host UUID or AlgorithmDescriptor. Local aliases, tool IDs and reviewers are insufficient."
+    },
+    {
+      "delib": "record.review",
+      "target": "Statement.role_classified_by",
+      "status": "missing",
+      "boundary": "Review and quotation confirmation do not identify who assigned a semantic role."
+    },
+    {
+      "delib": "record.derivedFrom / relations",
+      "target": "Statement.in_response_to",
+      "status": "lossy",
+      "boundary": "The target accepts one optional UUID. Preserve all source and typed relations separately; never select an arbitrary parent."
+    },
+    {
+      "delib": "record.settingHistory",
+      "target": "Event / Location",
+      "status": "partial",
+      "boundary": "A setting observation supplies neither Event time interval nor Location coordinates. Unknown is not false."
+    },
+    {
+      "delib": "native method data",
+      "target": "Reaction / Collection",
+      "status": "unmapped",
+      "boundary": "Retain native archives. Reaction in this revision has entity_type but no explicit target entity ID; voting semantics and target linkage need joint review."
+    },
+    {
+      "delib": "transfer.history / commitments / consent",
+      "target": "No direct mapping claimed",
+      "status": "retain-local",
+      "boundary": "Keep the Delib private backup; do not reinterpret transfer receipt, review, consent or accountability as consensus."
+    }
+  ],
+  "relatedDiscussion": "https://github.com/metagov/ontology/issues/2",
+  "discussionBoundary": "An open alignment proposal is not proof of an agreed namespace, joint specification or W3C standard."
+}

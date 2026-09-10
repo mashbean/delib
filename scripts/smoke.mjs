@@ -76,6 +76,22 @@ await check("Workspace flow assets are published", async () => {
   }
 });
 
+await check("3D entry and pinned Metagov draft are published", async () => {
+  const response = await get('/handoff?lang=zh');
+  expect(response.status === 200, `handoff status ${response.status}`);
+  expect((await response.text()).includes('workspace-flow-link'), 'missing handoff flow entry');
+  const mappingResponse = await get('/data/metagov-crosswalk.json');
+  expect(mappingResponse.status === 200, `mapping status ${mappingResponse.status}`);
+  const mapping = await mappingResponse.json();
+  expect(mapping.schema === 'delib-metagov-crosswalk/v1', 'wrong crosswalk');
+  expect(mapping.target.revision === 'e5d3312aa0da481429ef4545ac172b668ead5f55', 'unexpected target revision');
+  expect(mapping.externalAcceptance === false && mapping.nativeExporterImplemented === false, 'incorrect acceptance claim');
+  for (const path of ['/metagov-readiness-core.js', '/metagov-readiness-view.js']) {
+    const asset = await get(path);
+    expect(asset.status === 200 && !(asset.headers.get('content-type') || '').includes('text/html'), `${path}: missing module`);
+  }
+});
+
 await check("Workspace contract is published", async () => {
   const response = await get('/schemas/delib-workspace/v1.json');
   expect(response.status === 200, `status ${response.status}`);
