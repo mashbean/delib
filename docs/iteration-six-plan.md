@@ -16,6 +16,7 @@
 | 6 | Connect the 3D view to observed workspace transfers and selectable voice paths | Same records power 2D/3D; online/offline events use recorded context; no invented delivery animations | Implemented; see stage-six-workspace-flow.md for acceptance and limits |
 | 7a | Inspect public Metagov model and expose local mapping gaps | Pin source revision; publish draft field mapping and content-free diagnostics; do not fabricate missing identity or flatten provenance | Implemented; see stage-seven-metagov-crosswalk.md |
 | 7b1 | Local Statement export | Explicit attribution, stable UUID map, upstream-generated schema validation, private provenance companion | Implemented; see stage-seven-statement-export.md; external acceptance remains false |
+| 7b2a | Browser handoff inspection and local snapshot comparison | Validate paired files, inspect source links, identify restored copies and later changes, export content-free diagnostics | Implemented; see stage-seven-handoff-inspector.md; read-only, no external acceptance |
 | 7b2 | External-team acceptance and wider model | Agree transport envelope, multi-parent relations, events, methods and fixtures with authors | Pending joint contract and acceptance |
 
 Stages 1–4 form the first independently useful release. They extend the existing Form → TTTC → Reply route. They do not require rewriting every Pocket service or adding a central participant database. Stage 5 must preserve typed votes, amendments and method data rather than flattening everything into source text.

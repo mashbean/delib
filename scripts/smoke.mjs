@@ -101,6 +101,17 @@ await check("Pinned upstream Statement schema is available", async () => {
   expect(provenance.status === 200, 'missing source provenance');
 });
 
+await check("Handoff inspector and local-only modules are published", async () => {
+  const response = await get('/interop?lang=zh');
+  expect(response.status === 200, 'missing inspector page');
+  const html = await response.text();
+  expect(html.includes('interop-main') && html.includes('/interop.js'), 'wrong inspector page');
+  for (const path of ['/interop-core.js', '/interop-view.js', '/interop-demo.js', '/interop.css', '/metagov-files-core.js']) {
+    const asset = await get(path);
+    expect(asset.status === 200 && !(asset.headers.get('content-type') || '').includes('text/html'), `${path}: missing module`);
+  }
+});
+
 await check("Workspace contract is published", async () => {
   const response = await get('/schemas/delib-workspace/v1.json');
   expect(response.status === 200, `status ${response.status}`);
