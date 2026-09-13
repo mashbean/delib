@@ -68,7 +68,7 @@ await check("GET /workspace serves the local issue workbench", async () => {
 });
 
 await check("Workspace flow assets are published", async () => {
-  for (const path of ['/workspace-persistence.js', '/workspace-shell.js', '/workspace-shell.css', '/workspace-flow-core.js', '/workspace-flow-view.js', '/workspace-setting-core.js', '/workspace-flow.css', '/vendor/workspace-flow.bundle.js']) {
+  for (const path of ['/transfer-impact-core.js', '/transfer-impact-view.js', '/workspace-persistence.js', '/workspace-shell.js', '/workspace-shell.css', '/workspace-flow-core.js', '/workspace-flow-view.js', '/workspace-setting-core.js', '/workspace-flow.css', '/vendor/workspace-flow.bundle.js']) {
     const response = await get(path);
     expect(response.status === 200, `${path}: status ${response.status}`);
     expect(!(response.headers.get('content-type') || '').includes('text/html'), `${path}: unexpected HTML fallback`);
