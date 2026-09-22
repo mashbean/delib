@@ -9,6 +9,7 @@ import { traceArtifact, participationAt, participationChange, personJourney } fr
 import { validateFlowBundle, getStepState, exportRoundBundle, exportTttcCsv, exportPolisSeeds } from './flow-core.js';
 
 const copy = {
+ navPlaybook:["操作手冊","Playbook"],
  deckLabel:["選一張流程卡，開始探索","PICK A STAGE. FIND YOUR NEXT MOVE."],deckHint:["08 STEPS / 可回返","08 STEPS / REVISIT ANYTIME"],
  openFlow:['3D 資料流 ↗','3D data flow ↗'],handoffOpen:["開啟交接工作台 ↗", "Open handoff workbench ↗"],schematic:['高處：線上 · 地面：實體','ELEVATED: ONLINE · GROUND: IN PERSON'],skip:['跳至主要內容','Skip to content'],brand:['審議拼圖','Deliberation toolkit'],navFlow:["審議流程", "Process"],navTools:["工具集", "Tools"],navDemo:["模擬案例", "Simulation"],navAgent:['交給 Agent','For your agent'],start:['開始一輪 ↗','Start a round ↗'],eyebrow:['一站式審議工具集','YOUR DELIBERATION TOOLKIT'],
  heroTitle:['Delib','Delib'],heroDescription:["協助審議的一站式工具", "One-stop tools for deliberation."],explore:["探索流程 ↗", "Explore the process ↗"],watch:["看模擬案例 ↗", "Try the simulation ↗"],heroNote:["免安裝・免架伺服器", "No installation. No server setup."],loopCaption:["原話 → 行動 → 下一輪", "Voices → action → next round"],eight:['個可以反覆走的步驟','repeatable steps'],thirteen:['個直接開啟的工具','ready-to-open tools'],infinite:['輪持續修正的對話','rounds of possibility'],
@@ -103,7 +104,7 @@ function renderDemo(){if(!demo)return;const focusRound=document.activeElement?.d
  if(focusNext){const heading=$('#demo-step h3');heading.tabIndex=-1;heading.focus({preventScroll:true});}
 }
 function stopDemo(){clearInterval(demoTimer);demoTimer=null;$('#demo-play').textContent=t('playDemo');$('#scene-play').textContent=t('playDemo');}
-function render(){document.documentElement.lang=lang==='en'?'en':'zh-Hant';document.title=lang==='en'?'Delib · One-stop tools for deliberation':'Delib · 協助審議的一站式工具';
+function render(){document.querySelectorAll('[data-i18n=navPlaybook]').forEach(a=>a.href=`/playbook?lang=${lang}`);document.documentElement.lang=lang==='en'?'en':'zh-Hant';document.title=lang==='en'?'Delib · One-stop tools for deliberation':'Delib · 協助審議的一站式工具';
  document.querySelector('meta[name=description]').content=t('heroDescription');document.querySelector('meta[property=\"og:title\"]').content=document.title;document.querySelector('meta[property=\"og:description\"]').content=t('heroDescription');
  document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=t(el.dataset.i18n));document.querySelectorAll('[data-i18n-html]').forEach(el=>el.innerHTML=t(el.dataset.i18nHtml));
  $('#language').textContent=lang==='en'?'中文 ↗':'EN ↗';$('#language').setAttribute('aria-label',lang==='en'?'切換為正體中文':'Switch to English');$('#nav').setAttribute('aria-label',lang==='en'?'Main navigation':'主要選單');$('#stage-buttons').setAttribute('aria-label',lang==='en'?'Choose a deliberation stage':'選擇審議步驟');$('#space-switch').setAttribute('aria-label',lang==='en'?'Participation mode':'參與空間');$('#flow-scene').setAttribute('aria-label',lang==='en'?'Interactive 3D deliberation map. Drag to rotate; stage buttons below provide the same selection.':'八步驟線上與實體審議 3D 流程，可拖曳旋轉；下方按鈕提供相同操作');

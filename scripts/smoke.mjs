@@ -67,6 +67,22 @@ await check("GET /workspace serves the local issue workbench", async () => {
   expect(html.includes('/workspace.js') && html.includes('project-content'), 'workspace assets missing');
 });
 
+await check("Bilingual playbook and attributed public replay are published", async () => {
+  for (const lang of ['zh', 'en']) {
+    const response = await get(`/playbook?lang=${lang}`);
+    expect(response.status === 200, `playbook ${lang}: ${response.status}`);
+    expect((await response.text()).includes('/playbook.js'), 'playbook module missing');
+  }
+  for (const path of ['/playbook.js', '/playbook-content.js', '/playbook.css', '/public-replay-core.js']) {
+    const response = await get(path);
+    expect(response.status === 200 && !(response.headers.get('content-type') || '').includes('text/html'), `${path}: missing asset`);
+  }
+  const response = await get('/data/uberx-replay.json');
+  const data = await response.json();
+  expect(data.schema === 'delib-public-replay-source/v1' && data.records.length === 6, 'incorrect replay source');
+  expect(data.license === 'CC BY 4.0' && data.revision === '3be5785c3f5975d31f4578ee8bbf4426d45b7bf2', 'missing pinned attribution');
+});
+
 await check("Workspace flow assets are published", async () => {
   for (const path of ['/native-import-impact-core.js', '/native-import-impact-view.js', '/transfer-impact-core.js', '/transfer-impact-view.js', '/workspace-persistence.js', '/workspace-shell.js', '/workspace-shell.css', '/workspace-flow-core.js', '/workspace-flow-view.js', '/workspace-setting-core.js', '/workspace-flow.css', '/vendor/workspace-flow.bundle.js']) {
     const response = await get(path);

@@ -1,0 +1,83 @@
+{
+  "schema": "delib-public-replay-source/v1",
+  "source": "vTaiwan UberX / Computational Democracy Project openData",
+  "url": "https://github.com/compdemocracy/openData/tree/3be5785c3f5975d31f4578ee8bbf4426d45b7bf2/vtaiwan.uberx",
+  "revision": "3be5785c3f5975d31f4578ee8bbf4426d45b7bf2",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "commentsSha256": "719de1220b72e1e2e323109a528f2685ce6e2eea006f7d5fa02c607eccbfa2d8",
+  "retrieved": "2026-09-22",
+  "selection": [
+    3,
+    4,
+    7,
+    8,
+    12,
+    17
+  ],
+  "selectionRule": "Editorial teaching subset: pricing, dispatch, insurance, taxation and conflicting platform definitions. Not random, representative or selected by support. All selected rows have raw moderated=1; no new moderation decision is inferred.",
+  "omitted": [
+    "author-id",
+    "individual votes",
+    "participant identifiers"
+  ],
+  "sourceRows": 197,
+  "summaryReportedVoters": 1921,
+  "summaryReportedCommenters": 105,
+  "records": [
+    {
+      "id": 3,
+      "text": "我覺得尖峰時段可以彈性提高收費。",
+      "translation": "I think fares may increase flexibly during peak hours.",
+      "timestamp": "1435654296727",
+      "moderated": 1,
+      "agree": 555,
+      "disagree": 152
+    },
+    {
+      "id": 4,
+      "text": "我覺得應該開放司機同時接受多家派遣。",
+      "translation": "I think drivers should be allowed to accept dispatches from multiple companies.",
+      "timestamp": "1435654422024",
+      "moderated": 1,
+      "agree": 474,
+      "disagree": 179
+    },
+    {
+      "id": 7,
+      "text": "我覺得載客的司機都應該保意外險。",
+      "translation": "I think all drivers carrying passengers should have accident insurance.",
+      "timestamp": "1435654536236",
+      "moderated": 1,
+      "agree": 691,
+      "disagree": 34
+    },
+    {
+      "id": 8,
+      "text": "我覺得 Uber 應該向營業地的政府納稅。",
+      "translation": "I think Uber should pay taxes to the government where it operates.",
+      "timestamp": "1435654577982",
+      "moderated": 1,
+      "agree": 589,
+      "disagree": 103
+    },
+    {
+      "id": 12,
+      "text": "Uber 是媒合平台，就像拍賣網站，屬於資訊業。",
+      "translation": "Uber is a matching platform, like an auction website, and belongs to the information industry.",
+      "timestamp": "1435667819880",
+      "moderated": 1,
+      "agree": 440,
+      "disagree": 230
+    },
+    {
+      "id": 17,
+      "text": "Uber 是人力派遣，就像客運僱員，屬於服務業。",
+      "translation": "Uber dispatches workers, like a bus company employing drivers, and belongs to the service industry.",
+      "timestamp": "1436087607481",
+      "moderated": 1,
+      "agree": 471,
+      "disagree": 185
+    }
+  ]
+}
