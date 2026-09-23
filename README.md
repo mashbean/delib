@@ -12,7 +12,7 @@ Delib 把線上與實體參與、工具與資料，接成可以持續多輪的�
 可旋轉的 3D 八步流程、依缺口找起點、13 個站內工具工作區與完整中英引導。
 Three.js 提供真正的 WebGL 場景，GSAP 控制進場與視角／參與者轉場；支援觸控、步驟按鈕、暫停與減少動態。線上與實體是同一路徑上可交替的場景，不是兩條同步平行流程。
 
-[Polis 分析交接 / Analysis](https://delib.mashbean.net/analysis?lang=zh) · [主持工作室 / Facilitation studio](https://delib.mashbean.net/facilitate?lang=zh) · [本輪實作與限制 / Delivery and limits](docs/stages-p2-p7-2026-09-23.md)
+[Polis 分析交接 / Analysis](https://delib.mashbean.net/analysis?lang=zh) · [主持工作室 / Facilitation studio](https://delib.mashbean.net/facilitate?lang=zh) · [本輪實作與限制 / Delivery and limits](docs/stages-p2-p7-2026-09-23.md) · [輪次回顧 / Round review](docs/round-review-2026-09-23.md)
 
 [台灣重啟核電 Pocket 試玩室](https://delib.mashbean.net/nuclear-restart)：11 個已建立活動，附官方來源、12 位虛構角色與模擬提案／回覆；所有票數只供工具體驗，不代表民意。
 

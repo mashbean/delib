@@ -1,3 +1,4 @@
+import {roundReview,roundReviewSuggestion,roundReviewMarkdown} from './round-review-core.js';
 import {nextRoundView} from './workspace-next-view.js';
 import {partitionWorkspaceBackups} from './workspace-contract-core.js';
 import {transferImpact} from './transfer-impact-core.js';
@@ -33,7 +34,7 @@ const stateLabel=s=>({ready:L('結果可讀取','Ready to read'),reviewed:L('已
 const btn=(action,name,glyph='arrow',cls='subtle')=>`<button type="button" class="${cls}" data-action="${action}">${icon(glyph)}${name}</button>`;
 const empty=(zh,en)=>`<div class="empty-state">${icon('layers')}<p>${L(zh,en)}</p></div>`;
 function notice(s){$('#work-notice').textContent=s;if($('#send-dialog').open){let el=$('#dialog-error');if(!el){el=document.createElement('p');el.id='dialog-error';el.setAttribute('role','alert');$('#send-preview').append(el);}el.textContent=s;}}
-function download(value,name){const url=URL.createObjectURL(new Blob([typeof value==='string'?value:JSON.stringify(value,null,2)],{type:typeof value==='string'&&!name.endsWith('.json')?'text/csv':'application/json'}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+function download(value,name){const url=URL.createObjectURL(new Blob([typeof value==='string'?value:JSON.stringify(value,null,2)],{type:typeof value==='string'&&!name.endsWith('.json')?(name.endsWith('.md')?'text/markdown;charset=utf-8':'text/csv'):'application/json'}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 const persistence=createPersistence(snapshot=>projectStore('save',snapshot),renderSaveState);
 const backupRequests=new Map();let lastSaveError='';
 function renderSaveState(){if(!$('#save-status'))return;let backup=project&&backupRequests.get(project.id);try{backup??=localStorage.getItem(`delib:backup-request:${project?.id}`);}catch{}$('#save-status').innerHTML=saveStatus(project,persistence.get(project?.id),persistence.dirty(),backup,lang);}
@@ -124,6 +125,8 @@ async function handleAction(action){
   if(action==='native-import'){clearTimeout(poll);nativePending=null;$('#send-preview').innerHTML=nativeImportForm(project,lang);$('#send-dialog').showModal();return;}
   if(action==='transfer'){transferRefs=null;transferTool='tttc';await commit(p=>{p.view.tab='transfer';p.view.selected='';});return;}
   if(['plan-next-round','open-following-round','open-latest-round'].includes(action)){await commit(p=>{const i=p.rounds.findIndex(r=>r.id===p.view.roundId);if(action==='open-following-round'){const following=p.rounds[i+1];if(following)p.view.roundId=following.id;}else if(action==='open-latest-round')p.view.roundId=p.rounds.at(-1).id;p.view.tab='route';p.view.selected='';if(action!=='open-following-round')currentRound(p).step=3;});($('#next-round')||$('.next-round-existing')||$('#work-view'))?.scrollIntoView({block:'start'});$('#next-round [name=reason]')?.focus({preventScroll:true});return;}
+  if(action==='download-round-review'){download(roundReviewMarkdown(project),'delib-private-round-review-zh-en.md');notice(L('已產生中英私人回顧並交給瀏覽器下載；分享前請檢查原文與代稱。','Private bilingual review generated and handed to your browser; check source text and aliases before sharing.'));return;}
+  if(action==='use-round-review'){const a=roundReviewSuggestion(roundReview(project),lang);$('#next-round [name=reason]').value=a.text;$('#next-round [name=phase]').value=a.phase;$('#next-round [name=reason]').focus();return;}
   if(action==='use-next-advice'){const a=adviceText(project,lang);document.querySelector('#next-round [name=reason]').value=a.text;document.querySelector('#next-round [name=phase]').value=a.phase;return;}
   if(action==='download-impact'){const plan=planTransfer(project,{tool:transferTool,refs:transferRefs});download(transferImpact(plan),'delib-transfer-impact.json');notice(L('已準備欄位對照下載，不含原文、個人或紀錄代碼；這不是送達收據。','Field mapping download prepared without source text, people or record IDs; it is not a delivery receipt.'));return;}
   if(action==='download-transfer'){
@@ -226,9 +229,11 @@ if(new URLSearchParams(location.search).get('demo')==='1'){try{await handleActio
 if(project&&['transfer','flow','route','participation','voices','changes'].includes(new URLSearchParams(location.search).get('view')))project.view.tab=new URLSearchParams(location.search).get('view');
 if(new URLSearchParams(location.search).get('from')==='interop'){try{const ctx=JSON.parse(sessionStorage.getItem('delib:inspector-context'));const found=projects.find(p=>p.id===ctx?.projectId);if(found){project=found;project.view.tab='transfer';if(project.rounds.some(r=>r.id===ctx.roundId))project.view.roundId=ctx.roundId;}}catch{}}
 if(new URLSearchParams(location.search).get('from')==='interop'){const u=new URL(location.href);u.searchParams.delete('from');history.replaceState(null,'',u);}
+if(project&&new URLSearchParams(location.search).get('step')==='next'){project.view.tab='route';project.view.selected='';currentRound(project).step=3;}
 if(project&&metagovOpen)project.view.tab='transfer';
 render();
 renderRecovery();
+if(project&&new URLSearchParams(location.search).get('step')==='next'){($('#next-round')||$('.next-round-existing'))?.scrollIntoView({block:'start'});const u=new URL(location.href);u.searchParams.delete('step');history.replaceState(null,'',u);}
 if(metagovOpen)$('#metagov-export')?.scrollIntoView({block:'start'});
 
 window.addEventListener('beforeunload',e=>{if(persistence.dirty().length){e.preventDefault();e.returnValue='';}});

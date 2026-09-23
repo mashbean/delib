@@ -1,0 +1,12 @@
+.round-review{min-width:0;overflow-wrap:anywhere}
+.round-review details{margin:18px 0}
+.round-review h4{margin:16px 0 8px}
+.round-review li{margin:12px 0}
+.round-review dl{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.round-review dd{margin:0}
+.round-review blockquote{border-left:3px solid var(--accent);margin:12px 0;padding-left:12px}
+.round-review .actions a{padding:10px;overflow-wrap:anywhere}
+.round-review .next-advice{border:1px solid var(--line);padding:16px;border-radius:12px}
+.review-counts{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.review-counts span{border:1px solid var(--line);padding:6px 10px;border-radius:7px}
+.round-review .studio-card{border:1px solid var(--line);padding:16px;border-radius:12px;margin:14px 0}

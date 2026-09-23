@@ -98,8 +98,8 @@
         "P3"
       ],
       "delivery": {
-        "zh": "已加入更正申請、理由、期限、多來源影響與修訂歷程；沿用既有回覆責任與處置功能。",
-        "en": "Added correction requests, reasons, deadlines, multi-source impact and revisions, alongside existing accountability and disposition."
+        "zh": "已加入更正申請、理由、期限、多來源影響與修訂歷程；沿用既有回覆責任與處置功能。 輪次回顧串接未結更正與下一輪承接。",
+        "en": "Added correction requests, reasons, deadlines, multi-source impact and revisions, alongside existing accountability and disposition. Round reviews connect open corrections to carry-forward planning."
       },
       "implementationLevel": "local-baseline"
     },
@@ -123,8 +123,8 @@
         "P4"
       ],
       "delivery": {
-        "zh": "已加入議程、分組、線上／實體場次、分開的參與紀錄與會後回饋；為本機主持工具，非即時多人會議服務。",
-        "en": "Added agendas, groups, settings, distinct participation observations and post-session feedback. A local facilitation tool, not a live conferencing service."
+        "zh": "已加入議程、分組、線上／實體場次、分開的參與紀錄與會後回饋；為本機主持工具，非即時多人會議服務。 輪次回顧分場呈現參與障礙、回饋缺值與逐題分母。",
+        "en": "Added agendas, groups, settings, distinct participation observations and post-session feedback. A local facilitation tool, not a live conferencing service. Round reviews show session barriers, missing feedback and per-question denominators."
       },
       "implementationLevel": "local-baseline"
     },
@@ -148,8 +148,8 @@
         "P5"
       ],
       "delivery": {
-        "zh": "已加入固定門檻、佐證、少數意見與逐階段推進；可追溯既有提案版本。尚未重寫 Evocracy 代表選拔或 Swarmcheck 完整演算法。",
-        "en": "Added fixed thresholds, evidence, minority views and stage progression, linked to proposal versions. Evocracy representative selection and full Swarmcheck algorithms are not reimplemented."
+        "zh": "已加入固定門檻、佐證、少數意見與逐階段推進；可追溯既有提案版本。尚未重寫 Evocracy 代表選拔或 Swarmcheck 完整演算法。 未結提案及佐證可跨輪承接，明列更正、覆核與門檻缺口，並匯出中英私人回顧。",
+        "en": "Added fixed thresholds, evidence, minority views and stage progression, linked to proposal versions. Evocracy representative selection and full Swarmcheck algorithms are not reimplemented. Open proposals and evidence carry across rounds, with explicit correction, review and threshold gaps and a private bilingual review export."
       },
       "implementationLevel": "local-baseline"
     },

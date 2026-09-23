@@ -28,6 +28,10 @@ P1、P2 以及 P4–P6 本機基礎功能已實作；P3／P7 部分完成，仍�
 
 P1, P2 and local baseline features for P4–P6 are implemented. P3/P7 remain partial; external contracts and joint acceptance are outstanding. See [delivery and limitations](stages-p2-p7-2026-09-23.md). Partner acceptance in P3 depends on actual fixtures and agreement. Public-format adapters can proceed independently, without claiming partner acceptance.
 
+本機 P4–P6 已續接 [輪次回顧與下一輪規劃](round-review-2026-09-23.md)：分場回饋、未結更正、提案條件及佐證跨輪承接。
+
+P4–P6 now connect [round reviews and next-round planning](round-review-2026-09-23.md), including per-session feedback, open corrections, proposal checks and evidence carry-forward.
+
 ## 論文服務盤點與重寫策略 / Paper services and implementation strategy
 
 | 服務 / Service | 目前對應 / Current counterpart | 後續工作 / Next work |

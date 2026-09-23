@@ -96,8 +96,13 @@ export function needsFollowup(record) {
 }
 export function roundFollowups(project,r = round(project)) {
   const ids = new Set([...r.inputs,...r.artifacts.map(a => a.id)]),records = all(project),superseded = new Set(records.map(a => a.supersedes).filter(Boolean));
-  const corrections=new Set((project.operations?.corrections||[]).filter(c=>c.history.at(-1).status==='requested').map(c=>c.recordId));
-  return records.filter(a => (ids.has(a.id)||corrections.has(a.id)) && !superseded.has(a.id) && (needsFollowup(a)||corrections.has(a.id)));
+  const prior=new Set(project.rounds.slice(0,project.rounds.indexOf(r)+1).map(x=>x.id));
+  const operationRefs=new Set((project.operations?.corrections||[]).filter(c=>prior.has(c.roundId)&&c.history.at(-1).status==='requested').map(c=>c.recordId));
+  for(const g of project.operations?.progressions||[])if(prior.has(g.roundId)&&g.history.at(-1).stage!=='reviewed'){
+    operationRefs.add(g.proposalRef);g.history.at(-1).evidenceRefs.forEach(id=>operationRefs.add(id));
+  }
+  // Keep the exact revision used in an unfinished operation for audit; never silently retarget it.
+  return records.filter(a => operationRefs.has(a.id)||(ids.has(a.id)&&!superseded.has(a.id)&&needsFollowup(a)));
 }
 export function voiceTrailExport(project,records) {
   // Project-level gap notes and management context never enter a participant's receipt.
