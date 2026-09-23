@@ -243,6 +243,9 @@
         }
       },
       "description": "Provenance of an explicitly simulated public-data rehearsal."
+    },
+    "operations": {
+      "$ref": "https://delib.mashbean.net/schemas/delib-operations/v1.json"
     }
   },
   "$defs": {

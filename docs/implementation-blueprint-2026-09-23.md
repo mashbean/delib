@@ -24,25 +24,25 @@ Functional similarity, schema validity, production reads, bidirectional writes a
 | P6 | 團隊提案推進與論證證據 / Team proposal progression and argument evidence | 透明推進規則、版本差異、支持／反對證據與少數意見保留 / Explicit progression rules, version differences, pro/con evidence and minority views | P4–P5 |
 | P7 | 聯邦整合與大型諮詢 / Federation and larger consultations | 真實介面、資料授權與負載驗證；沒有 API 時保留手動轉接 / Verify real interfaces, data permissions and load; retain manual handoff where APIs are unavailable | P3、P6 |
 
-P1 已實作於本批次。P2–P7 尚未實作；不以預定日冒充完成日期。P3 的合作夥伴驗收取決於可取得的測試資料與共同確認；未收到資料前可先完成公開格式 adapter，但不宣稱外部已接受。
+P1、P2 以及 P4–P6 本機基礎功能已實作；P3／P7 部分完成，仍待外部契約與共同驗收。詳見 [本輪實作與限制](stages-p2-p7-2026-09-23.md)。P3 的合作夥伴驗收取決於可取得的測試資料與共同確認；未收到資料前可先完成公開格式 adapter，但不宣稱外部已接受。
 
-P1 is implemented in this increment. P2–P7 remain planned; no estimated date is presented as completion. Partner acceptance in P3 depends on actual fixtures and agreement. Public-format adapters can proceed independently, without claiming partner acceptance.
+P1, P2 and local baseline features for P4–P6 are implemented. P3/P7 remain partial; external contracts and joint acceptance are outstanding. See [delivery and limitations](stages-p2-p7-2026-09-23.md). Partner acceptance in P3 depends on actual fixtures and agreement. Public-format adapters can proceed independently, without claiming partner acceptance.
 
 ## 論文服務盤點與重寫策略 / Paper services and implementation strategy
 
 | 服務 / Service | 目前對應 / Current counterpart | 後續工作 / Next work |
 | --- | --- | --- |
-| Pol.is | Pocket Polis：輕量獨立實作 / Independent lightweight implementation | P2 完整方法資料 adapter；不再另造投票工具 / Full method-data adapter; no duplicate voting tool |
+| Pol.is | Pocket Polis：輕量獨立實作 / Independent lightweight implementation | P2 彙總方法資料 adapter，保留已知損失 / Aggregate method-data adapter with explicit losses |
 | Talk to the City | Pocket TTTC：輕量重寫 / Lightweight reimplementation | P2 持續驗證引文與版本；保留原生格式差異 / Maintain quotation/version tests and native distinctions |
 | Harmonica | Pocket Harmonica：獨立重寫 / Independent reimplementation | P2 驗證角色、訪談脈絡與合成內容區別 / Verify roles, interview context and synthesized content |
 | MAPLE | Pocket Maple：臺灣情境輕量版 / Taiwan-oriented lightweight version | P3 原版另設 adapter；不宣稱立法通知、追蹤等完整功能 / Separate original-service adapter; no full notification/tracking claim |
 | HeyForm | Pocket Form：部分功能 / Partial counterpart | P5 只按活動需求補跳題、前後問卷與評估 / Add branching and pre/post surveys for session needs |
 | Decidim | Pocket Proposals：提案／修正／附議 / Proposals, amendments, endorsements | P3 先接資料；P6 延伸提案模組；不重寫整套治理平台 / Import first, extend proposals later; no whole-platform rewrite |
 | Voice to Vision | 工作台／Reply 有功能重疊 / Workspace / Reply overlap | P4 獨立實作意見到決策、責任與更正功能 / Implement traceability, accountability and corrections |
-| Assemblis | 尚無專門重寫 / No dedicated counterpart | P5 優先候選：場次、分組、主持紀錄、會後品質評估 / Priority candidate: sessions, groups, notes and quality evaluation |
+| Assemblis | 主持工作室已有本機基礎功能 / Local studio baseline implemented | P5 優先候選：場次、分組、主持紀錄、會後品質評估 / Priority candidate: sessions, groups, notes and quality evaluation |
 | Evocracy | Pocket Proposals 部分重疊 / Partial overlap | P6 團隊協作與代表推進；先確認方法規則 / Team collaboration and representative progression after method review |
 | Swarmcheck | Pocket Argument 功能相近 / Similar functions | P6 證據圖、論證關係與來源回查；不標成已重寫原版 / Evidence graph and provenance; do not claim an existing rewrite |
-| Hypha | Delib 工作台定位重疊 / Workspace overlaps | P7 優先接入；只有不足功能才考慮獨立模組 / Integrate first; implement only demonstrated gaps |
+| Hypha | 已接指定匯出格式 / Pinned export adapter implemented | P7 優先接入；只有不足功能才考慮獨立模組 / Integrate first; implement only demonstrated gaps |
 | Make.org | 無直接對應 / No direct counterpart | P7 調查可授權資料匯出；完整服務重寫暫緩 / Investigate permitted exports; full service rewrite deferred |
 
 所有「可重寫」都是功能設計候選，不是已確認可複製原始碼。實作前逐案檢查上游版本、授權、商標、資料使用條件與實際格式。現有工具不因上表而新增外部寫入權限。

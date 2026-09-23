@@ -96,7 +96,8 @@ export function needsFollowup(record) {
 }
 export function roundFollowups(project,r = round(project)) {
   const ids = new Set([...r.inputs,...r.artifacts.map(a => a.id)]),records = all(project),superseded = new Set(records.map(a => a.supersedes).filter(Boolean));
-  return records.filter(a => ids.has(a.id) && !superseded.has(a.id) && needsFollowup(a));
+  const corrections=new Set((project.operations?.corrections||[]).filter(c=>c.history.at(-1).status==='requested').map(c=>c.recordId));
+  return records.filter(a => (ids.has(a.id)||corrections.has(a.id)) && !superseded.has(a.id) && (needsFollowup(a)||corrections.has(a.id)));
 }
 export function voiceTrailExport(project,records) {
   // Project-level gap notes and management context never enter a participant's receipt.

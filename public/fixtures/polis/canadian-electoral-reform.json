@@ -1,0 +1,86 @@
+{
+  "schema": "delib-polis-analysis/v1",
+  "conversationId": "canadian-electoral-reform",
+  "sourceFormat": "polis-open-data",
+  "sourceRevision": "3be5785c3f5975d31f4578ee8bbf4426d45b7bf2",
+  "statements": [
+    {
+      "statementId": 161,
+      "text": "MMP is simpler to explain than STV.",
+      "status": "approved",
+      "isSeed": null,
+      "agrees": 5,
+      "disagrees": 4,
+      "passes": null
+    },
+    {
+      "statementId": 159,
+      "text": "The Liberal party no longer supports meaningful electoral reform because they now have 55% of the seats with only 40% of the vote.",
+      "status": "approved",
+      "isSeed": null,
+      "agrees": 16,
+      "disagrees": 2,
+      "passes": null
+    },
+    {
+      "statementId": 152,
+      "text": "I have voted for a third-party candidate in a federal election.",
+      "status": "approved",
+      "isSeed": null,
+      "agrees": 13,
+      "disagrees": 1,
+      "passes": null
+    },
+    {
+      "statementId": 148,
+      "text": "I do not want my preferred party to have greater-than-proportional representation in parliament.",
+      "status": "approved",
+      "isSeed": null,
+      "agrees": 17,
+      "disagrees": 1,
+      "passes": null
+    },
+    {
+      "statementId": 136,
+      "text": "Politically similar parties are pressured to merge by FPTP to gain proportional seats, such as the Conservative merger in 2003.",
+      "status": "approved",
+      "isSeed": null,
+      "agrees": 22,
+      "disagrees": 2,
+      "passes": null
+    },
+    {
+      "statementId": 92,
+      "text": "Our current electoral voting system can be improved in a way that can better represent Canada's diversity of opinions.",
+      "status": "approved",
+      "isSeed": null,
+      "agrees": 75,
+      "disagrees": 7,
+      "passes": null
+    }
+  ],
+  "analysis": null,
+  "synthesis": null,
+  "evidence": {
+    "title": "Canadian electoral reform",
+    "revision": "3be5785c3f5975d31f4578ee8bbf4426d45b7bf2",
+    "license": "CC BY 4.0",
+    "attribution": "Data gathered using Polis; attribution to The Computational Democracy Project.",
+    "caseStudy": "https://compdemocracy.org/case-studies/2016-canadian-electoral-reform",
+    "sourceUrl": "https://github.com/compdemocracy/openData/tree/3be5785c3f5975d31f4578ee8bbf4426d45b7bf2/canadian-electoral-reform",
+    "sha256": "f3fca647a6b13e218a454f06a9f8c985a0a7b63d64daf277b6f0916cf6d54a5d",
+    "sourceRows": 174,
+    "selection": "First six approved rows in source order. Editorial test subset; not representative.",
+    "omitted": [
+      "author-id",
+      "timestamps",
+      "individual votes"
+    ],
+    "analysisUnavailable": [
+      "groups",
+      "pass counts",
+      "coverage",
+      "algorithm version"
+    ]
+  }
+}

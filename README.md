@@ -6,11 +6,13 @@
 
 [中文版](https://delib.mashbean.net/?lang=zh) · [English](https://delib.mashbean.net/?lang=en)
 
-2026-09-23：新增 [資料契約與開發藍圖](https://delib.mashbean.net/contracts?lang=zh) / [Contracts and roadmap](https://delib.mashbean.net/contracts?lang=en)，含七階段計畫、論文 12 項服務盤點與本機備份檢查器。第一階段已實作，後續階段仍在規劃中；[完整藍圖](docs/implementation-blueprint-2026-09-23.md)與[資料規格](docs/data-contracts.md)均提供中英文。CLI：`npm run validate:workspace -- path/to/backup.json`。
+2026-09-23：新增 [資料契約與開發藍圖](https://delib.mashbean.net/contracts?lang=zh) / [Contracts and roadmap](https://delib.mashbean.net/contracts?lang=en)，含七階段計畫、論文 12 項服務盤點與本機備份檢查器。P1、P2 與 P4–P6 本機基礎功能已實作；P3／P7 部分完成；[完整藍圖](docs/implementation-blueprint-2026-09-23.md)與[資料規格](docs/data-contracts.md)均提供中英文。CLI：`npm run validate:workspace -- path/to/backup.json`。
 
 Delib 把線上與實體參與、工具與資料，接成可以持續多輪的審議。新版入口提供
 可旋轉的 3D 八步流程、依缺口找起點、13 個站內工具工作區與完整中英引導。
 Three.js 提供真正的 WebGL 場景，GSAP 控制進場與視角／參與者轉場；支援觸控、步驟按鈕、暫停與減少動態。線上與實體是同一路徑上可交替的場景，不是兩條同步平行流程。
+
+[Polis 分析交接 / Analysis](https://delib.mashbean.net/analysis?lang=zh) · [主持工作室 / Facilitation studio](https://delib.mashbean.net/facilitate?lang=zh) · [本輪實作與限制 / Delivery and limits](docs/stages-p2-p7-2026-09-23.md)
 
 ## 現在能做什麼
 

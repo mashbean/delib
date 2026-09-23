@@ -1,0 +1,86 @@
+{
+  "schema": "delib-polis-analysis/v1",
+  "conversationId": "15-per-hour-seattle",
+  "sourceFormat": "polis-open-data",
+  "sourceRevision": "3be5785c3f5975d31f4578ee8bbf4426d45b7bf2",
+  "statements": [
+    {
+      "statementId": 48,
+      "text": "Businesses, small or large, shouldn't be able to pay workers anything below a livable wage. Why should we subsidize businesses that depend on inadequate wages? If a business's product is good, then this shouldn't be a challenge.",
+      "status": "approved",
+      "isSeed": null,
+      "agrees": 38,
+      "disagrees": 18,
+      "passes": null
+    },
+    {
+      "statementId": 36,
+      "text": "It's just going to speed up the adoption of robotics in industries with unskilled or low-skilled workers.",
+      "status": "approved",
+      "isSeed": null,
+      "agrees": 53,
+      "disagrees": 30,
+      "passes": null
+    },
+    {
+      "statementId": 20,
+      "text": "Reactionary liberal trash. Doesn't solve the problem. It's a systemic problem and this solution is like a band aid on a broken leg.",
+      "status": "approved",
+      "isSeed": null,
+      "agrees": 43,
+      "disagrees": 46,
+      "passes": null
+    },
+    {
+      "statementId": 4,
+      "text": "While the arguments for the raise in the minimum wage law have been trumpeted as being “anti corporate greed”, those larger companies are, ironically, the most able to pay for the increase in wages. This will hurt small businesses the most, and I don’t think the law’s provisions do enough to accommodate this.\n",
+      "status": "approved",
+      "isSeed": null,
+      "agrees": 60,
+      "disagrees": 25,
+      "passes": null
+    },
+    {
+      "statementId": 0,
+      "text": "I imagine new businesses opening will run counter operations where guests grab their own silverware and bus their own tables.\n",
+      "status": "approved",
+      "isSeed": null,
+      "agrees": 54,
+      "disagrees": 35,
+      "passes": null
+    },
+    {
+      "statementId": 1,
+      "text": "This is a game changer. The myriad of unintended consequences it too complex to really understand; even for restaurant veterans.\n",
+      "status": "approved",
+      "isSeed": null,
+      "agrees": 67,
+      "disagrees": 25,
+      "passes": null
+    }
+  ],
+  "analysis": null,
+  "synthesis": null,
+  "evidence": {
+    "title": "Seattle $15/hour",
+    "revision": "3be5785c3f5975d31f4578ee8bbf4426d45b7bf2",
+    "license": "CC BY 4.0",
+    "attribution": "Data gathered using Polis; attribution to The Computational Democracy Project.",
+    "caseStudy": "https://compdemocracy.org/case-studies/2014-seattle-15-per-hour",
+    "sourceUrl": "https://github.com/compdemocracy/openData/tree/3be5785c3f5975d31f4578ee8bbf4426d45b7bf2/15-per-hour-seattle",
+    "sha256": "23306ea084fbecf5e924e78da03b13cd3ad289e5f9b533b658b8caa59f5c1981",
+    "sourceRows": 54,
+    "selection": "First six approved rows in source order. Editorial test subset; not representative.",
+    "omitted": [
+      "author-id",
+      "timestamps",
+      "individual votes"
+    ],
+    "analysisUnavailable": [
+      "groups",
+      "pass counts",
+      "coverage",
+      "algorithm version"
+    ]
+  }
+}

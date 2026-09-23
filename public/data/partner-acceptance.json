@@ -1,0 +1,17 @@
+{
+  "schema": "delib-partner-acceptance-plan/v1",
+  "updatedAt": "2026-09-23",
+  "externalAcceptance": false,
+  "sentToPartners": false,
+  "commonRequirements": {
+    "zh": ["指定服務、部署與版本", "取得可公開的虛構或已授權測試檔及欄位字典", "確認作者、生成者、引用與多來源的不同語意", "測試修訂、撤回、缺值、分頁、多語及不支援欄位", "雙方保存逐欄損失清單、雜湊與驗收結果"],
+    "en": ["Name the service, deployment and revision", "Obtain a shareable synthetic or licensed fixture and field dictionary", "Distinguish author, generator, citation and multiple-source semantics", "Test revisions, withdrawals, missingness, pagination, languages and unsupported fields", "Retain agreed field-level losses, hashes and acceptance results"]
+  },
+  "partners": [
+    {"id":"v2v","status":"awaiting-real-fixture","source":"https://metagov.org/delib-tools/voice-to-vision","mappingCandidate":{"voice":"statement.text","prompt":"record context, not a participant voice","themes":"derived records","decisions_linked":"typed relationships","cited_voices":"multiple source references","rationale":"decision reason"},"boundary":{"zh":"僅依論文表 1 建立候選對照；未取得實際格式，不宣稱 adapter 已支援。","en":"Candidate mapping from paper Table 1 only; no actual format fixture or adapter acceptance."}},
+    {"id":"assemblis","status":"awaiting-real-fixture","source":"https://doi.org/10.1145/3737609.3747119","mappingCandidate":{"purpose":"issue goal","start_date":"session date, preserve precision","target_actors":"responsibility context","voting_data":"method-specific data","tasks":"follow-up records"},"boundary":{"zh":"論文沒有將 Assemblis 列為原話輸入；不補造參與者原話。主持工作室是獨立的功能實作。","en":"The paper does not list Assemblis voice input; no participant speech is fabricated. The facilitation studio is an independent functional implementation."}},
+    {"id":"decidim","status":"read-tested-joint-acceptance-pending","source":"https://meta.decidim.org/api/docs/object/proposal/","evidence":"/data/decidim-evidence.json","boundary":{"zh":"指定 Metadecidim 回應格式已驗證；版本未揭露，尚未寫回或共同驗收。","en":"Named Metadecidim response shape verified; version undisclosed, no write-back or joint acceptance."}},
+    {"id":"hypha","status":"source-contract-tested-joint-acceptance-pending","source":"https://github.com/hyphacoop/governance-experiment/tree/a9cbcf1efe8a589e24af565b53efba95d1444256","boundary":{"zh":"已核對匯出原始碼並測試虛構檔；投票預設標籤、索引 ID 及 placeholder 均有限制。","en":"Export code inspected and synthetic fixture tested; ballot defaults, index IDs and placeholders remain limitations."}},
+    {"id":"make-org","status":"awaiting-export-contract-and-permitted-fixture","source":"https://about.make.org/en/start-a-project","boundary":{"zh":"官方介紹不足以確認資料匯出契約。未建立猜測格式的 adapter，也未發送合作邀請。","en":"Official product information does not establish an export contract. No guessed-format adapter or partner invitation has been sent."}}
+  ]
+}

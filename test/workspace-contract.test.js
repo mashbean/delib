@@ -89,11 +89,11 @@ describe('workspace contracts used by the workspace, local checker and CLI',()=>
 });
 
 describe('implementation roadmap boundaries',()=>{
-  it('covers all 12 paper tools and keeps later work planned with resolvable dependencies',()=>{
+  it('covers all 12 paper tools and keeps external acceptance separate with resolvable dependencies',()=>{
     const r=JSON.parse(readFileSync('public/data/implementation-roadmap.json','utf8'));
     expect(r.services).toHaveLength(12);expect(new Set(r.services.map(s=>s.name)).size).toBe(12);expect(r.externalAcceptance).toBe(false);
     const done=new Set();for(const p of r.phases){expect(p.dependsOn.every(id=>done.has(id))).toBe(true);done.add(p.id);for(const lang of ['zh','en']){expect(p.title[lang]).toBeTruthy();expect(p.acceptance[lang]).toBeTruthy();}}
-    expect(r.phases.filter(p=>p.status==='implemented').map(p=>p.id)).toEqual(['P1']);expect(r.services.every(s=>done.has(s.phase))).toBe(true);
+    expect(r.phases.filter(p=>p.status==='implemented').map(p=>p.id)).toEqual(['P1','P2','P4','P5','P6']);expect(r.services.every(s=>done.has(s.phase))).toBe(true);
     expect(r.services.find(s=>s.name==='Swarmcheck').status).toBe('functional-overlap');
   });
 });

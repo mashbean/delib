@@ -18,8 +18,15 @@ await check("Data contracts, roadmap and local validator are published", async (
   responses.forEach((response,i)=>expect(response.status===200,`${paths[i]}: ${response.status}`));
   expect((await responses[0].text()).includes('/contracts.js'),'missing contract entry');
   const roadmap=await responses[3].json();expect(roadmap.services.length===12,'missing paper services');
-  expect(roadmap.phases.filter(p=>p.status==='implemented').map(p=>p.id).join(',')==='P1','unexpected roadmap status');
+  expect(roadmap.phases.filter(p=>p.status==='implemented').map(p=>p.id).join(',')==='P1,P2,P4,P5,P6','unexpected roadmap status');
   const project=await responses[4].json();expect(project.simulated===true&&project.rounds.length===2,'missing simulated contract fixture');
+});
+
+await check("Analysis, facilitator workflows and scoped adapters are published", async () => {
+  const paths=['/analysis','/facilitate','/operations-core.js','/polis-analysis-core.js','/decidim-import-core.js','/hypha-import-core.js','/schemas/delib-operations/v1.json'];
+  for(const path of paths)expect((await get(path)).status===200,`missing ${path}`);
+  const manifest=await(await get('/data/polis-datasets.json')).json();expect(manifest.length===3,'missing pinned datasets');
+  const partners=await(await get('/data/partner-acceptance.json')).json();expect(partners.externalAcceptance===false,'unexpected partner acceptance');
 });
 
 function flag(name) {

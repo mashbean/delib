@@ -2,8 +2,8 @@
   "schema": "delib-implementation-roadmap/v1",
   "updatedAt": "2026-09-23",
   "scope": {
-    "zh": "功能對應不代表原版相容；P1 為本次實作，其餘為規劃。",
-    "en": "Functional counterparts do not imply original-service compatibility. P1 is this implementation; later stages are planned."
+    "zh": "P1、P2 與 P4–P6 的本機基礎功能已實作。P3、P7 已有部分 adapter；合作夥伴驗收與完整方法重寫仍未完成。",
+    "en": "P1, P2 and local baseline features for P4–P6 are implemented. P3 and P7 have scoped adapters; partner acceptance and full method reimplementations remain outstanding."
   },
   "externalAcceptance": false,
   "source": "https://doi.org/10.1145/3737609.3747119",
@@ -31,7 +31,7 @@
     },
     {
       "id": "P2",
-      "status": "planned",
+      "status": "implemented",
       "title": {
         "zh": "接回 Pocket Polis 的完整分析",
         "en": "Reconnect Pocket Polis analysis"
@@ -46,11 +46,16 @@
       },
       "dependsOn": [
         "P1"
-      ]
+      ],
+      "delivery": {
+        "zh": "已釘選 Pocket Polis 參考版本與三組公開選集，新增分析交接頁；正式站唯讀核對 25 則陳述、2 群。未取得的服務版本保持未知。",
+        "en": "Pinned Pocket Polis reference and three public subsets; added analysis handoff. Production read verified 25 statements and 2 groups. Undisclosed service versions remain unknown."
+      },
+      "implementationLevel": "scoped-adapter"
     },
     {
       "id": "P3",
-      "status": "planned",
+      "status": "partial",
       "title": {
         "zh": "原版服務轉接與共同驗收",
         "en": "Original-service adapters and joint acceptance"
@@ -66,11 +71,16 @@
       "dependsOn": [
         "P1",
         "P2"
-      ]
+      ],
+      "delivery": {
+        "zh": "已完成指定 Metadecidim 格式唯讀 adapter；版本端點為 null。V2V／Assemblis 實際檔案與共同驗收待取得。",
+        "en": "Implemented a named Metadecidim read-only adapter; version endpoint returns null. Actual V2V/Assemblis files and joint acceptance remain pending."
+      },
+      "implementationLevel": "scoped-adapter"
     },
     {
       "id": "P4",
-      "status": "planned",
+      "status": "implemented",
       "title": {
         "zh": "意見到決策的責任追蹤",
         "en": "Accountable voice-to-decision trails"
@@ -86,11 +96,16 @@
       "dependsOn": [
         "P1",
         "P3"
-      ]
+      ],
+      "delivery": {
+        "zh": "已加入更正申請、理由、期限、多來源影響與修訂歷程；沿用既有回覆責任與處置功能。",
+        "en": "Added correction requests, reasons, deadlines, multi-source impact and revisions, alongside existing accountability and disposition."
+      },
+      "implementationLevel": "local-baseline"
     },
     {
       "id": "P5",
-      "status": "planned",
+      "status": "implemented",
       "title": {
         "zh": "現場審議與品質評估",
         "en": "Facilitated sessions and quality assessment"
@@ -106,11 +121,16 @@
       "dependsOn": [
         "P1",
         "P4"
-      ]
+      ],
+      "delivery": {
+        "zh": "已加入議程、分組、線上／實體場次、分開的參與紀錄與會後回饋；為本機主持工具，非即時多人會議服務。",
+        "en": "Added agendas, groups, settings, distinct participation observations and post-session feedback. A local facilitation tool, not a live conferencing service."
+      },
+      "implementationLevel": "local-baseline"
     },
     {
       "id": "P6",
-      "status": "planned",
+      "status": "implemented",
       "title": {
         "zh": "協作提案與論證",
         "en": "Collaborative proposals and argumentation"
@@ -126,11 +146,16 @@
       "dependsOn": [
         "P4",
         "P5"
-      ]
+      ],
+      "delivery": {
+        "zh": "已加入固定門檻、佐證、少數意見與逐階段推進；可追溯既有提案版本。尚未重寫 Evocracy 代表選拔或 Swarmcheck 完整演算法。",
+        "en": "Added fixed thresholds, evidence, minority views and stage progression, linked to proposal versions. Evocracy representative selection and full Swarmcheck algorithms are not reimplemented."
+      },
+      "implementationLevel": "local-baseline"
     },
     {
       "id": "P7",
-      "status": "planned",
+      "status": "partial",
       "title": {
         "zh": "聯邦式整合與規模化諮詢",
         "en": "Federated integration and larger consultations"
@@ -146,7 +171,12 @@
       "dependsOn": [
         "P3",
         "P6"
-      ]
+      ],
+      "delivery": {
+        "zh": "已核對 Hypha 治理實驗匯出碼並實作檔案 adapter；預設值與不穩定 ID 明示。Make.org 尚缺可用的授權測試檔／契約。",
+        "en": "Inspected Hypha governance export code and implemented a file adapter with explicit placeholder and unstable-ID limits. Make.org still needs a usable authorized fixture/contract."
+      },
+      "implementationLevel": "scoped-adapter"
     }
   ],
   "services": [
@@ -212,7 +242,7 @@
     },
     {
       "name": "Voice to Vision",
-      "local": "Delib workspace / Reply",
+      "local": "Delib workspace / Reply / corrections",
       "status": "functional-overlap",
       "phase": "P4",
       "approach": {
@@ -222,8 +252,8 @@
     },
     {
       "name": "Assemblis",
-      "local": "Planned session module",
-      "status": "not-reimplemented",
+      "local": "Delib facilitation studio",
+      "status": "functional-overlap",
       "phase": "P5",
       "approach": {
         "zh": "獨立實作輕量場次與品質評估",
@@ -256,8 +286,8 @@
       "status": "functional-overlap",
       "phase": "P7",
       "approach": {
-        "zh": "優先整合既有工具",
-        "en": "Prioritize integration of existing tools"
+        "zh": "已接固定版本 exported_data.json；尚未共同驗收",
+        "en": "Pinned exported_data.json adapter implemented; no joint acceptance"
       }
     },
     {

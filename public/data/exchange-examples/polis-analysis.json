@@ -1,0 +1,488 @@
+{
+  "schema": "delib-polis-analysis/v1",
+  "conversationId": "fictional-school",
+  "sourceFormat": "pocket-polis",
+  "sourceRevision": "f7ec343b6ec7ee39a7586f4eba49771f0009738c",
+  "statements": [
+    {
+      "statementId": 1,
+      "text": "Fictional school access option 1 / 虛構校門方案 1",
+      "status": "approved",
+      "isSeed": true,
+      "agrees": 24,
+      "disagrees": 0,
+      "passes": 0
+    },
+    {
+      "statementId": 2,
+      "text": "Fictional school access option 2 / 虛構校門方案 2",
+      "status": "approved",
+      "isSeed": false,
+      "agrees": 24,
+      "disagrees": 0,
+      "passes": 0
+    },
+    {
+      "statementId": 3,
+      "text": "Fictional school access option 3 / 虛構校門方案 3",
+      "status": "approved",
+      "isSeed": false,
+      "agrees": 12,
+      "disagrees": 12,
+      "passes": 0
+    },
+    {
+      "statementId": 4,
+      "text": "Fictional school access option 4 / 虛構校門方案 4",
+      "status": "approved",
+      "isSeed": false,
+      "agrees": 12,
+      "disagrees": 12,
+      "passes": 0
+    },
+    {
+      "statementId": 5,
+      "text": "Fictional school access option 5 / 虛構校門方案 5",
+      "status": "approved",
+      "isSeed": false,
+      "agrees": 12,
+      "disagrees": 12,
+      "passes": 0
+    },
+    {
+      "statementId": 6,
+      "text": "Fictional school access option 6 / 虛構校門方案 6",
+      "status": "approved",
+      "isSeed": false,
+      "agrees": 12,
+      "disagrees": 12,
+      "passes": 0
+    },
+    {
+      "statementId": 7,
+      "text": "Fictional school access option 7 / 虛構校門方案 7",
+      "status": "approved",
+      "isSeed": false,
+      "agrees": 12,
+      "disagrees": 12,
+      "passes": 0
+    },
+    {
+      "statementId": 8,
+      "text": "Fictional school access option 8 / 虛構校門方案 8",
+      "status": "approved",
+      "isSeed": false,
+      "agrees": 12,
+      "disagrees": 12,
+      "passes": 0
+    }
+  ],
+  "analysis": {
+    "computedAt": 1790164800000,
+    "nParticipantsTotal": 24,
+    "nParticipantsClustered": 24,
+    "nVotes": 192,
+    "nStatements": 8,
+    "inclusionThreshold": 7,
+    "k": 2,
+    "groups": [
+      {
+        "id": 0,
+        "label": "A",
+        "size": 12,
+        "statsRedacted": false,
+        "statementStats": [
+          {
+            "sid": 1,
+            "agrees": 12,
+            "disagrees": 0,
+            "passes": 0,
+            "seen": 12
+          },
+          {
+            "sid": 2,
+            "agrees": 12,
+            "disagrees": 0,
+            "passes": 0,
+            "seen": 12
+          },
+          {
+            "sid": 3,
+            "agrees": 0,
+            "disagrees": 12,
+            "passes": 0,
+            "seen": 12
+          },
+          {
+            "sid": 4,
+            "agrees": 12,
+            "disagrees": 0,
+            "passes": 0,
+            "seen": 12
+          },
+          {
+            "sid": 5,
+            "agrees": 0,
+            "disagrees": 12,
+            "passes": 0,
+            "seen": 12
+          },
+          {
+            "sid": 6,
+            "agrees": 12,
+            "disagrees": 0,
+            "passes": 0,
+            "seen": 12
+          },
+          {
+            "sid": 7,
+            "agrees": 0,
+            "disagrees": 12,
+            "passes": 0,
+            "seen": 12
+          },
+          {
+            "sid": 8,
+            "agrees": 12,
+            "disagrees": 0,
+            "passes": 0,
+            "seen": 12
+          }
+        ],
+        "representative": [
+          {
+            "sid": 3,
+            "direction": "disagree",
+            "prob": 0.9285714285714286,
+            "probTest": 2.969229955832361,
+            "repness": 13.000000000000002,
+            "repnessTest": 4.370588154508101,
+            "metric": 156.6543239380135,
+            "nSuccess": 12,
+            "nSeen": 12
+          },
+          {
+            "sid": 4,
+            "direction": "agree",
+            "prob": 0.9285714285714286,
+            "probTest": 2.969229955832361,
+            "repness": 13.000000000000002,
+            "repnessTest": 4.370588154508101,
+            "metric": 156.6543239380135,
+            "nSuccess": 12,
+            "nSeen": 12
+          },
+          {
+            "sid": 5,
+            "direction": "disagree",
+            "prob": 0.9285714285714286,
+            "probTest": 2.969229955832361,
+            "repness": 13.000000000000002,
+            "repnessTest": 4.370588154508101,
+            "metric": 156.6543239380135,
+            "nSuccess": 12,
+            "nSeen": 12
+          },
+          {
+            "sid": 6,
+            "direction": "agree",
+            "prob": 0.9285714285714286,
+            "probTest": 2.969229955832361,
+            "repness": 13.000000000000002,
+            "repnessTest": 4.370588154508101,
+            "metric": 156.6543239380135,
+            "nSuccess": 12,
+            "nSeen": 12
+          },
+          {
+            "sid": 7,
+            "direction": "disagree",
+            "prob": 0.9285714285714286,
+            "probTest": 2.969229955832361,
+            "repness": 13.000000000000002,
+            "repnessTest": 4.370588154508101,
+            "metric": 156.6543239380135,
+            "nSuccess": 12,
+            "nSeen": 12
+          }
+        ]
+      },
+      {
+        "id": 1,
+        "label": "B",
+        "size": 12,
+        "statsRedacted": false,
+        "statementStats": [
+          {
+            "sid": 1,
+            "agrees": 12,
+            "disagrees": 0,
+            "passes": 0,
+            "seen": 12
+          },
+          {
+            "sid": 2,
+            "agrees": 12,
+            "disagrees": 0,
+            "passes": 0,
+            "seen": 12
+          },
+          {
+            "sid": 3,
+            "agrees": 12,
+            "disagrees": 0,
+            "passes": 0,
+            "seen": 12
+          },
+          {
+            "sid": 4,
+            "agrees": 0,
+            "disagrees": 12,
+            "passes": 0,
+            "seen": 12
+          },
+          {
+            "sid": 5,
+            "agrees": 12,
+            "disagrees": 0,
+            "passes": 0,
+            "seen": 12
+          },
+          {
+            "sid": 6,
+            "agrees": 0,
+            "disagrees": 12,
+            "passes": 0,
+            "seen": 12
+          },
+          {
+            "sid": 7,
+            "agrees": 12,
+            "disagrees": 0,
+            "passes": 0,
+            "seen": 12
+          },
+          {
+            "sid": 8,
+            "agrees": 0,
+            "disagrees": 12,
+            "passes": 0,
+            "seen": 12
+          }
+        ],
+        "representative": [
+          {
+            "sid": 3,
+            "direction": "agree",
+            "prob": 0.9285714285714286,
+            "probTest": 2.969229955832361,
+            "repness": 13.000000000000002,
+            "repnessTest": 4.370588154508101,
+            "metric": 156.6543239380135,
+            "nSuccess": 12,
+            "nSeen": 12
+          },
+          {
+            "sid": 4,
+            "direction": "disagree",
+            "prob": 0.9285714285714286,
+            "probTest": 2.969229955832361,
+            "repness": 13.000000000000002,
+            "repnessTest": 4.370588154508101,
+            "metric": 156.6543239380135,
+            "nSuccess": 12,
+            "nSeen": 12
+          },
+          {
+            "sid": 5,
+            "direction": "agree",
+            "prob": 0.9285714285714286,
+            "probTest": 2.969229955832361,
+            "repness": 13.000000000000002,
+            "repnessTest": 4.370588154508101,
+            "metric": 156.6543239380135,
+            "nSuccess": 12,
+            "nSeen": 12
+          },
+          {
+            "sid": 6,
+            "direction": "disagree",
+            "prob": 0.9285714285714286,
+            "probTest": 2.969229955832361,
+            "repness": 13.000000000000002,
+            "repnessTest": 4.370588154508101,
+            "metric": 156.6543239380135,
+            "nSuccess": 12,
+            "nSeen": 12
+          },
+          {
+            "sid": 7,
+            "direction": "agree",
+            "prob": 0.9285714285714286,
+            "probTest": 2.969229955832361,
+            "repness": 13.000000000000002,
+            "repnessTest": 4.370588154508101,
+            "metric": 156.6543239380135,
+            "nSuccess": 12,
+            "nSeen": 12
+          }
+        ]
+      }
+    ],
+    "statementStats": [
+      {
+        "sid": 1,
+        "agrees": 24,
+        "disagrees": 0,
+        "passes": 0,
+        "seen": 24
+      },
+      {
+        "sid": 2,
+        "agrees": 24,
+        "disagrees": 0,
+        "passes": 0,
+        "seen": 24
+      },
+      {
+        "sid": 3,
+        "agrees": 12,
+        "disagrees": 12,
+        "passes": 0,
+        "seen": 24
+      },
+      {
+        "sid": 4,
+        "agrees": 12,
+        "disagrees": 12,
+        "passes": 0,
+        "seen": 24
+      },
+      {
+        "sid": 5,
+        "agrees": 12,
+        "disagrees": 12,
+        "passes": 0,
+        "seen": 24
+      },
+      {
+        "sid": 6,
+        "agrees": 12,
+        "disagrees": 12,
+        "passes": 0,
+        "seen": 24
+      },
+      {
+        "sid": 7,
+        "agrees": 12,
+        "disagrees": 12,
+        "passes": 0,
+        "seen": 24
+      },
+      {
+        "sid": 8,
+        "agrees": 12,
+        "disagrees": 12,
+        "passes": 0,
+        "seen": 24
+      }
+    ],
+    "consensus": {
+      "agree": [
+        {
+          "sid": 1,
+          "direction": "agree",
+          "prob": 0.9615384615384616,
+          "probTest": 4.522134909753559,
+          "metric": 0.8622448979591837
+        },
+        {
+          "sid": 2,
+          "direction": "agree",
+          "prob": 0.9615384615384616,
+          "probTest": 4.522134909753559,
+          "metric": 0.8622448979591837
+        }
+      ],
+      "disagree": []
+    },
+    "bridging": {
+      "method": "matrix-factorization-1d",
+      "nParticipants": 24,
+      "minSeen": 3,
+      "iterations": 40,
+      "statements": [
+        {
+          "sid": 1,
+          "score": 0.999,
+          "polarity": 0,
+          "seen": 24,
+          "agrees": 24,
+          "disagrees": 0
+        },
+        {
+          "sid": 2,
+          "score": 0.999,
+          "polarity": 0,
+          "seen": 24,
+          "agrees": 24,
+          "disagrees": 0
+        },
+        {
+          "sid": 3,
+          "score": 0,
+          "polarity": 1,
+          "seen": 24,
+          "agrees": 12,
+          "disagrees": 12
+        },
+        {
+          "sid": 4,
+          "score": 0,
+          "polarity": 1,
+          "seen": 24,
+          "agrees": 12,
+          "disagrees": 12
+        },
+        {
+          "sid": 5,
+          "score": 0,
+          "polarity": 1,
+          "seen": 24,
+          "agrees": 12,
+          "disagrees": 12
+        },
+        {
+          "sid": 6,
+          "score": 0,
+          "polarity": 1,
+          "seen": 24,
+          "agrees": 12,
+          "disagrees": 12
+        },
+        {
+          "sid": 7,
+          "score": 0,
+          "polarity": 1,
+          "seen": 24,
+          "agrees": 12,
+          "disagrees": 12
+        },
+        {
+          "sid": 8,
+          "score": 0,
+          "polarity": 1,
+          "seen": 24,
+          "agrees": 12,
+          "disagrees": 12
+        }
+      ]
+    },
+    "coverage": {
+      "voteMatrix": 1,
+      "clusteredShare": 1
+    }
+  },
+  "synthesis": null,
+  "evidence": null
+}

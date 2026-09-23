@@ -1,4 +1,14 @@
 const reasons={
+  "Hypha export labels are not verified ballot semantics: single-choice and Yes/No/Abstain are export defaults; result may be a letter label.": "Hypha 匯出標籤尚未核實為投票規則；single-choice 與 Yes/No/Abstain 是固定預設，結果可能是字母標籤。",
+  "Exporter placeholder authors, dates, status and comment counts are not observations. Stored as unknown; identity fields excluded.": "匯出程式預設的作者、日期、狀態與留言數不是觀察資料；保留未知，排除身分欄位。",
+  "Export IDs depend on array order. Scope uses the file hash; no cross-export revision or relationship is inferred.": "匯出 ID 依陣列順序產生。以檔案雜湊區隔，不推定跨檔版本或關聯。",
+  "Source decision log text is retained, without local authority confirmation or links to proposals.": "保留來源決策紀錄原文，不推定本地決策權限或與提案的關聯。",
+  "Original translations, state labels, response dates and filtered revision changes remain. HTML is displayed as text. No local commitments or consensus inferred.": "保留各語言原文、狀態、回應日期與篩選後的修訂。HTML 以純文字顯示，不推定本地承諾或共識。",
+  "Only title/body/state/answer/date changes retained; identities and other changes excluded.": "僅保留標題、內文、狀態、回覆與日期修訂；排除身分與其他變更。",
+  "Named Metadecidim response shape only. A partial page is not a complete process. Server version may be undisclosed; external acceptance remains unverified.": "僅核對 Metadecidim 具名實例的回應格式。分頁不代表完整流程；伺服器版本可能未公開，尚未經外部驗收。",
+  "Aggregate group statistics, redaction markers, coverage, bridging and source citations are retained; no group assignments or individual coordinates.": "保留群組彙總、遮蔽標記、覆蓋率、跨群分析與來源引用；不保留個人分群或座標。",
+  "Model text remains synthesis. Matching counts do not prove matching revisions; the results API does not expose a revision. Cited IDs are links, not verified verbatim quotes.": "模型文字維持綜整。筆數相符不能證明版本相同；結果 API 不提供版本。引用 ID 是來源連結，不等於已核實的逐字引文。",
+  "Source version is supplied evidence, not a server attestation. Missing versions stay unknown.": "來源版本是提供的證據，不是伺服器證明。未提供的版本保持未知。",
   "Legacy space.json contains current proposals and counts only. Use archive.json for full amendments, responses and versions.": "舊版 space.json 只有當前提案與數量。完整修正案、回應與版本請使用 archive.json。",
   "Full versions, amendment bodies and rationales, acceptance states, responses and endorsement totals retained. Acceptance is the proposal author’s action, not group consensus. Response-time version is unknown.": "保留版本全文、修正理由、採納狀態、回應及附議總數。採納由提案人決定，不代表群體共識；回應當時的版本未知。",
   "Markdown summary is an unreviewed model result. The result API has no machine-readable comment lineage or vote table; commentsProcessed is not a participant count. No source links or consensus are inferred.": "Markdown 摘要是待審模型成果。結果 API 未提供逐筆來源關聯或票數表；處理意見數不是參與人數，不推定來源或共識。",
@@ -25,5 +35,5 @@ const reasons={
   "CSV formula-leading text is escaped for spreadsheet safety.": "試算表可能當成公式的開頭已跳脫處理。",
   "No voteInfo synthesized from missing votes. Verified backend JSON shape; current web upload picker requires a separate JSON entry path.": "不以缺少票數補造 voteInfo。已核對後端 JSON 格式；現行網頁仍需另接 JSON 選檔入口。"
 };
-const labels={'proposal':'當前提案','proposal-version':'提案版本','proposal-amendment':'修正案','proposal-response':'提案回應','method-result':'方法成果',preserved:'保留',transformed:'轉換',blocked:'排除',review:'待覆核',unavailable:'未提供',dropped:'未轉交',aggregated:'彙總',participant:'參與者',model:'模型草稿','source-excerpt':'來源節錄',organizer:'主辦者','participant-confirmed-synthesis':'參與者確認的整理',calculated:'計算成果',draft:'草稿',unreviewed:'待檢查',reviewed:'已檢查',withdrawn:'已撤回','needs-review':'須重新覆核'};
+const labels={statement:'原話',theme:'主題',reply:'回覆',question:'問題',quote:'引文',brief:'議題說明',feedback:'回饋',decision:'決策','proposal':'當前提案','proposal-version':'提案版本','proposal-amendment':'修正案','proposal-response':'提案回應','method-result':'方法成果',preserved:'保留',transformed:'轉換',blocked:'排除',review:'待覆核',unavailable:'未提供',dropped:'未轉交',aggregated:'彙總',participant:'參與者',model:'模型草稿','source-excerpt':'來源節錄',organizer:'主辦者','participant-confirmed-synthesis':'參與者確認的整理',calculated:'計算成果',draft:'草稿',unreviewed:'待檢查',reviewed:'已檢查',withdrawn:'已撤回','needs-review':'須重新覆核'};
 export function exchangeLabel(value,en){if(en)return value;if(reasons[value])return reasons[value];if(labels[value])return labels[value];if(/^\d+ source references matched/.test(value))return `${value.split(' ')[0]} 個來源已透過交接對照表與精確引文核對接回。`;return value;}

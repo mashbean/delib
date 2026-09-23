@@ -7,7 +7,7 @@ import {readFile,writeFile} from 'node:fs/promises';
 // All references resolve locally. No runtime schema fetching or eval in the browser.
 const ajv=new Ajv({strict:false,allErrors:false,code:{source:true}});
 addFormats(ajv);
-for(const name of ['delib-exchange','delib-workspace-import','delib-workspace-transfer','delib-workspace']) {
+for(const name of ['delib-operations','delib-exchange','delib-workspace-import','delib-workspace-transfer','delib-workspace']) {
   ajv.addSchema(JSON.parse(await readFile(`public/schemas/${name}/v1.json`,'utf8')));
 }
 const validate=ajv.getSchema('https://delib.mashbean.net/schemas/delib-workspace/v1.json');

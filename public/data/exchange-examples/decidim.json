@@ -1,0 +1,91 @@
+{
+  "schema": "delib-decidim-proposals/v1",
+  "source": {
+    "origin": "https://meta.decidim.org",
+    "version": null,
+    "retrievedAt": "2026-09-23T12:00:00Z"
+  },
+  "response": {
+    "data": {
+      "decidim": {
+        "version": null
+      },
+      "component": {
+        "id": "122",
+        "proposals": {
+          "pageInfo": {
+            "hasNextPage": true,
+            "endCursor": "Mw"
+          },
+          "edges": [
+            {
+              "node": {
+                "id": "fictional-1",
+                "url": "https://meta.decidim.org/processes/fictional/f/122/proposals/fictional-1",
+                "title": {
+                  "translations": [
+                    {
+                      "locale": "en",
+                      "text": "Fictional accessible crossing"
+                    },
+                    {
+                      "locale": "zh",
+                      "text": "虛構的無障礙穿越道"
+                    }
+                  ]
+                },
+                "body": {
+                  "translations": [
+                    {
+                      "locale": "en",
+                      "text": "<p>Test a safe crossing.</p>"
+                    },
+                    {
+                      "locale": "zh",
+                      "text": "<p>測試安全穿越道。</p>"
+                    }
+                  ]
+                },
+                "state": "finished",
+                "answer": {
+                  "translations": [
+                    {
+                      "locale": "en",
+                      "text": "Fictional response: pilot requires a budget."
+                    },
+                    {
+                      "locale": "ca",
+                      "text": null
+                    }
+                  ]
+                },
+                "answeredAt": "2026-09-02T00:00:00Z",
+                "updatedAt": "2026-09-02T00:00:00Z",
+                "withdrawn": false,
+                "official": false,
+                "voteCount": 3,
+                "versionsCount": 1,
+                "versions": [
+                  {
+                    "id": "fictional-v1",
+                    "createdAt": "2026-09-01T00:00:00Z",
+                    "changeset": {
+                      "body": [
+                        {
+                          "en": "First fictional version"
+                        },
+                        {
+                          "en": "Revised fictional version"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

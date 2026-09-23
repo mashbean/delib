@@ -1,7 +1,10 @@
+import {normalizeHypha,hyphaRecords} from './hypha-import-core.js';
+import {normalizeDecidim,decidimRecords} from './decidim-import-core.js';
+import {polisAnalysisRecords,normalizePolisAnalysis} from './polis-analysis-core.js';
 import {proposalArchiveRecords} from './proposals-archive-core.js';
 import {parseTttcCsv,tttcRowsToCsv} from './tttc-csv-core.js';
 export const EXCHANGE_SCHEMA='https://delib.mashbean.net/schemas/delib-exchange/v1.json';
-export const nativeAdapters=Object.freeze(['form','harmonica','tttc','reply','values','budget','check','proposals','argument','maple','civic-talk','sensemaker','delib-data']);
+export const nativeAdapters=Object.freeze(['hypha','decidim','polis-analysis','form','harmonica','tttc','reply','values','budget','check','proposals','argument','maple','civic-talk','sensemaker','delib-data']);
 const secret=/^(adminToken|adminHash|token|responderHash|authorization|hostUrl|manageUrl|apiKey|password)$/i;
 const privateField=/^(alias|name|interview|participant|responder|email|phone|contact|org|author_name|author_email|author_id|show_email|participantRef)$/i;
 const text=(v,label)=>{if(typeof v!=='string'||!v.trim()||v.length>12000)throw new Error(`Invalid ${label} / 欄位無效`);return v;};
@@ -17,7 +20,7 @@ export function importExchange(input,{tool,sourceId,sha256,simulated=false,filen
  if(input?.schema==='https://delib.mashbean.net/schemas/delib-data/v1.json')tool='delib-data';
  if(!nativeAdapters.includes(tool)&&tool!=='csv')throw new Error('Unsupported native format; use TTTC CSV / 請使用 TTTC CSV');
  if(new TextEncoder().encode(typeof input==='string'?input:JSON.stringify(input)).length>3*1024*1024)throw new Error('Maximum 3 MiB');forbidSecrets(input);
- const activity=String(sourceId||input?.form?.formId||input?.session?.sessionId||input?.reportId||input?.taskId||input?.loopId||input?.bundleId||input?.budget?.budgetId||input?.check?.checkId||input?.space?.spaceId||input?.debate?.debateId||input?.hearing?.hearingId||(tool==='civic-talk'&&input?.[0]?.issue_id)||sha256.slice(0,16));
+ const activity=String((tool==='hypha'?sha256:null)||sourceId||(tool==='decidim'&&input?.response?.data?.component?.id)||input?.conversationId||input?.form?.formId||input?.session?.sessionId||input?.reportId||input?.taskId||input?.loopId||input?.bundleId||input?.budget?.budgetId||input?.check?.checkId||input?.space?.spaceId||input?.debate?.debateId||input?.hearing?.hearingId||(tool==='civic-talk'&&input?.[0]?.issue_id)||sha256.slice(0,16));
  if(!activity||activity.length>200)throw new Error('Invalid activity reference');
  const scope=`${tool}:${encodeURIComponent(activity)}`,losses=[],records=[],externalSources=[];
  const add=(id,kind,value,origin,relations=[],fields={},eligible=false)=>{records.push({id:ref(scope,id),sourceId:scope,originalId:String(id),kind,text:text(value,'record text'),origin,status:origin==='model'?'draft':'unreviewed',relations,fields,transferEligible:eligible});return ref(scope,id);};
@@ -28,7 +31,18 @@ export function importExchange(input,{tool,sourceId,sha256,simulated=false,filen
  losses.push({path:'/interview',action:'blocked',reason:'Source group labels excluded; no cross-tool identity matching.'},{path:'/',action:'unavailable',reason:'CSV has no votes, question types, consent, withdrawal or revision history.'});
  }else{
  methodData=clean(input,'',losses);
- if(tool==='form'){
+ if(tool==='hypha'){
+ methodData=normalizeHypha(input);for(const r of hyphaRecords(input))add(r.id,r.kind,r.text,'organizer',[],r.fields,false);
+ losses.push({path:'/vote',action:'review',reason:'Hypha export labels are not verified ballot semantics: single-choice and Yes/No/Abstain are export defaults; result may be a letter label.'},{path:'/githubIssues',action:'unavailable',reason:'Exporter placeholder authors, dates, status and comment counts are not observations. Stored as unknown; identity fields excluded.'},{path:'/ids',action:'transformed',reason:'Export IDs depend on array order. Scope uses the file hash; no cross-export revision or relationship is inferred.'},{path:'/decisionLog',action:'review',reason:'Source decision log text is retained, without local authority confirmation or links to proposals.'});
+ }else if(tool==='decidim'){
+ methodData=clean(normalizeDecidim(input),'',losses);
+ for(const r of decidimRecords(input)){const id=add(r.id,r.kind,r.text,r.origin,r.relations.map(e=>({...e,ref:ref(scope,e.ref)})),r.fields,false);if(r.withdrawn)records.find(x=>x.id===id).status='withdrawn';}
+ losses.push({path:'/proposals',action:'preserved',reason:'Original translations, state labels, response dates and filtered revision changes remain. HTML is displayed as text. No local commitments or consensus inferred.'},{path:'/versions',action:'blocked',reason:'Only title/body/state/answer/date changes retained; identities and other changes excluded.'},{path:'/source',action:'review',reason:'Named Metadecidim response shape only. A partial page is not a complete process. Server version may be undisclosed; external acceptance remains unverified.'});
+ }else if(tool==='polis-analysis'){
+ const normalized=normalizePolisAnalysis(input);methodData=clean(normalized,'',losses);
+ for(const r of polisAnalysisRecords(normalized))add(r.id,r.kind,r.text,r.origin,r.relations.map(e=>({...e,ref:ref(scope,e.ref)})),r.fields,r.eligible);
+ losses.push({path:'/analysis',action:'preserved',reason:'Aggregate group statistics, redaction markers, coverage, bridging and source citations are retained; no group assignments or individual coordinates.'},{path:'/synthesis',action:'review',reason:'Model text remains synthesis. Matching counts do not prove matching revisions; the results API does not expose a revision. Cited IDs are links, not verified verbatim quotes.'},{path:'/sourceRevision',action:'review',reason:'Source version is supplied evidence, not a server attestation. Missing versions stay unknown.'});
+ }else if(tool==='form'){
  const questions=arr(input.form?.questions,'form.questions');for(const response of arr(input.responses,'responses')){
  if(!Number.isInteger(response.seq)||!response.answers||typeof response.answers!=='object')throw new Error('Invalid form response');
  for(const q of questions){text(q.id,'question id');text(q.label,'question label');text(q.type,'question type');const answer=response.answers[q.id];if(answer===undefined||answer==='')continue;

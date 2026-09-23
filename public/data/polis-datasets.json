@@ -1,0 +1,74 @@
+[
+  {
+    "id": "vtaiwan.uberx",
+    "title": "vTaiwan UberX",
+    "path": "/fixtures/polis/vtaiwan.uberx.json",
+    "revision": "3be5785c3f5975d31f4578ee8bbf4426d45b7bf2",
+    "license": "CC BY 4.0",
+    "attribution": "Data gathered using Polis; attribution to The Computational Democracy Project.",
+    "caseStudy": "https://compdemocracy.org/case-studies/2015-vtaiwan-uberx",
+    "sourceUrl": "https://github.com/compdemocracy/openData/tree/3be5785c3f5975d31f4578ee8bbf4426d45b7bf2/vtaiwan.uberx",
+    "sha256": "719de1220b72e1e2e323109a528f2685ce6e2eea006f7d5fa02c607eccbfa2d8",
+    "sourceRows": 197,
+    "selection": "First six approved rows in source order. Editorial test subset; not representative.",
+    "omitted": [
+      "author-id",
+      "timestamps",
+      "individual votes"
+    ],
+    "analysisUnavailable": [
+      "groups",
+      "pass counts",
+      "coverage",
+      "algorithm version"
+    ]
+  },
+  {
+    "id": "15-per-hour-seattle",
+    "title": "Seattle $15/hour",
+    "path": "/fixtures/polis/15-per-hour-seattle.json",
+    "revision": "3be5785c3f5975d31f4578ee8bbf4426d45b7bf2",
+    "license": "CC BY 4.0",
+    "attribution": "Data gathered using Polis; attribution to The Computational Democracy Project.",
+    "caseStudy": "https://compdemocracy.org/case-studies/2014-seattle-15-per-hour",
+    "sourceUrl": "https://github.com/compdemocracy/openData/tree/3be5785c3f5975d31f4578ee8bbf4426d45b7bf2/15-per-hour-seattle",
+    "sha256": "23306ea084fbecf5e924e78da03b13cd3ad289e5f9b533b658b8caa59f5c1981",
+    "sourceRows": 54,
+    "selection": "First six approved rows in source order. Editorial test subset; not representative.",
+    "omitted": [
+      "author-id",
+      "timestamps",
+      "individual votes"
+    ],
+    "analysisUnavailable": [
+      "groups",
+      "pass counts",
+      "coverage",
+      "algorithm version"
+    ]
+  },
+  {
+    "id": "canadian-electoral-reform",
+    "title": "Canadian electoral reform",
+    "path": "/fixtures/polis/canadian-electoral-reform.json",
+    "revision": "3be5785c3f5975d31f4578ee8bbf4426d45b7bf2",
+    "license": "CC BY 4.0",
+    "attribution": "Data gathered using Polis; attribution to The Computational Democracy Project.",
+    "caseStudy": "https://compdemocracy.org/case-studies/2016-canadian-electoral-reform",
+    "sourceUrl": "https://github.com/compdemocracy/openData/tree/3be5785c3f5975d31f4578ee8bbf4426d45b7bf2/canadian-electoral-reform",
+    "sha256": "f3fca647a6b13e218a454f06a9f8c985a0a7b63d64daf277b6f0916cf6d54a5d",
+    "sourceRows": 174,
+    "selection": "First six approved rows in source order. Editorial test subset; not representative.",
+    "omitted": [
+      "author-id",
+      "timestamps",
+      "individual votes"
+    ],
+    "analysisUnavailable": [
+      "groups",
+      "pass counts",
+      "coverage",
+      "algorithm version"
+    ]
+  }
+]

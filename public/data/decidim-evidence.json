@@ -1,0 +1,15 @@
+{
+  "checkedAt": "2026-09-23T12:21:01.275Z",
+  "origin": "https://meta.decidim.org",
+  "version": null,
+  "componentId": "122",
+  "sha256": "0aaab35b913f8ad5918ce1f6567917912cfc76de03c644674c3fa591d5f94863",
+  "proposals": 3,
+  "hasNextPage": true,
+  "excludedChanges": [
+    "state_published_at"
+  ],
+  "externalAcceptance": false,
+  "writes": 0,
+  "boundary": "Version endpoint returned null. Three records read, not a complete process. No partner acceptance or write-back."
+}

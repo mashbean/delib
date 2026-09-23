@@ -1,0 +1,86 @@
+{
+  "schema": "delib-polis-analysis/v1",
+  "conversationId": "vtaiwan.uberx",
+  "sourceFormat": "polis-open-data",
+  "sourceRevision": "3be5785c3f5975d31f4578ee8bbf4426d45b7bf2",
+  "statements": [
+    {
+      "statementId": 159,
+      "text": "不管法律層面前提下，uber的媒合效益比較好，計程車的距離效益比較好",
+      "status": "approved",
+      "isSeed": null,
+      "agrees": 67,
+      "disagrees": 29,
+      "passes": null
+    },
+    {
+      "statementId": 156,
+      "text": "我覺得UBER跟政府成立的共乘網 都是媒合平臺 都與交通部無關",
+      "status": "approved",
+      "isSeed": null,
+      "agrees": 44,
+      "disagrees": 95,
+      "passes": null
+    },
+    {
+      "statementId": 154,
+      "text": "我覺得UberX在計費上，晚上應該費用能提高，不能以低價只為了乘客，卻讓司機無力持續，造成車輛數減少。",
+      "status": "approved",
+      "isSeed": null,
+      "agrees": 78,
+      "disagrees": 38,
+      "passes": null
+    },
+    {
+      "statementId": 153,
+      "text": "我贊成uber合法化，讓消費者多一個選擇，讓計程車業者多一份良性競爭的動力，更讓兼職管道多方面開放。",
+      "status": "approved",
+      "isSeed": null,
+      "agrees": 139,
+      "disagrees": 20,
+      "passes": null
+    },
+    {
+      "statementId": 151,
+      "text": "我覺得目前管理職業客車的法規對分享經濟很不友善。應該要盡速修法，比較環保。",
+      "status": "approved",
+      "isSeed": null,
+      "agrees": 117,
+      "disagrees": 25,
+      "passes": null
+    },
+    {
+      "statementId": 77,
+      "text": "我覺得 UberX 應比照計程車，將登記證、執照、駕駛完整資訊擺設於車內明顯可見之處。",
+      "status": "approved",
+      "isSeed": null,
+      "agrees": 322,
+      "disagrees": 198,
+      "passes": null
+    }
+  ],
+  "analysis": null,
+  "synthesis": null,
+  "evidence": {
+    "title": "vTaiwan UberX",
+    "revision": "3be5785c3f5975d31f4578ee8bbf4426d45b7bf2",
+    "license": "CC BY 4.0",
+    "attribution": "Data gathered using Polis; attribution to The Computational Democracy Project.",
+    "caseStudy": "https://compdemocracy.org/case-studies/2015-vtaiwan-uberx",
+    "sourceUrl": "https://github.com/compdemocracy/openData/tree/3be5785c3f5975d31f4578ee8bbf4426d45b7bf2/vtaiwan.uberx",
+    "sha256": "719de1220b72e1e2e323109a528f2685ce6e2eea006f7d5fa02c607eccbfa2d8",
+    "sourceRows": 197,
+    "selection": "First six approved rows in source order. Editorial test subset; not representative.",
+    "omitted": [
+      "author-id",
+      "timestamps",
+      "individual votes"
+    ],
+    "analysisUnavailable": [
+      "groups",
+      "pass counts",
+      "coverage",
+      "algorithm version"
+    ]
+  }
+}

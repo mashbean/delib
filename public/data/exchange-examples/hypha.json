@@ -1,0 +1,73 @@
+{
+  "proposals": [
+    {
+      "id": "proposal-1",
+      "title": "Fictional access pilot / 虛構通行試辦",
+      "description": "A",
+      "vote": {
+        "type": "single-choice",
+        "options": [
+          "Yes",
+          "No",
+          "Abstain"
+        ],
+        "result": "A"
+      },
+      "vote_count": 4
+    }
+  ],
+  "githubIssues": [
+    {
+      "id": "issue-1",
+      "title": "Fictional ramp review / 虛構坡道檢查",
+      "url": "https://github.com/example/fictional/issues/1",
+      "assignee": "",
+      "created_by": "",
+      "created_at": "",
+      "updated_at": "",
+      "labels": [],
+      "org": "",
+      "repo": "",
+      "status": "",
+      "comments_count": 0
+    }
+  ],
+  "barChart": {
+    "series": [
+      {
+        "name": "Votes",
+        "labels": [
+          "A"
+        ],
+        "values": [
+          4
+        ]
+      }
+    ]
+  },
+  "lineGraph": {
+    "series": [
+      {
+        "name": "Trends",
+        "labels": [
+          "A"
+        ],
+        "values": [
+          4
+        ]
+      }
+    ]
+  },
+  "decisionLog": [
+    {
+      "id": "decision-1",
+      "date": "2026-09-23",
+      "short_title": "Fictional decision / 虛構決定",
+      "description": "Review before trial",
+      "deciding_group": "Fictional group",
+      "resolution": "Seek access feedback first",
+      "supplemental_materials": [],
+      "other_notes": ""
+    }
+  ]
+}

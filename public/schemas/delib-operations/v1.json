@@ -1,0 +1,478 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://delib.mashbean.net/schemas/delib-operations/v1.json",
+  "title": "Local facilitation operations; source links and transitions also require runtime validation",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "const": "delib-operations/v1"
+    },
+    "corrections": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "recordId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "roundId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "history": {
+            "type": "array",
+            "maxItems": 60,
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 120
+                },
+                "by": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "status": {
+                  "enum": [
+                    "requested",
+                    "accepted",
+                    "declined"
+                  ]
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2000
+                },
+                "owner": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "due": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "replacementRef": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "by",
+                "at",
+                "status",
+                "reason",
+                "owner",
+                "due",
+                "replacementRef"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 1
+          }
+        },
+        "required": [
+          "id",
+          "recordId",
+          "roundId",
+          "history"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "sessions": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "roundId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "history": {
+            "type": "array",
+            "maxItems": 60,
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 120
+                },
+                "by": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "status": {
+                  "enum": [
+                    "planned",
+                    "held",
+                    "reviewed"
+                  ]
+                },
+                "title": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "date": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "mode": {
+                  "enum": [
+                    "online",
+                    "offline",
+                    "hybrid"
+                  ]
+                },
+                "owner": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "notes": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2000
+                },
+                "agenda": {
+                  "type": "array",
+                  "maxItems": 20,
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "title": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 200
+                      },
+                      "minutes": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 240
+                      }
+                    },
+                    "required": [
+                      "title",
+                      "minutes"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "minItems": 1
+                },
+                "groups": {
+                  "type": "array",
+                  "maxItems": 20,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "minItems": 1,
+                  "uniqueItems": true
+                },
+                "observations": {
+                  "type": "array",
+                  "maxItems": 300,
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "participant": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100
+                      },
+                      "group": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100
+                      },
+                      "invited": {
+                        "type": "boolean"
+                      },
+                      "attended": {
+                        "type": "boolean"
+                      },
+                      "spoke": {
+                        "type": "boolean"
+                      },
+                      "voted": {
+                        "type": "boolean"
+                      },
+                      "barrier": {
+                        "type": "string",
+                        "maxLength": 1000
+                      }
+                    },
+                    "required": [
+                      "participant",
+                      "group",
+                      "invited",
+                      "attended",
+                      "spoke",
+                      "voted",
+                      "barrier"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "evaluations": {
+                  "type": "array",
+                  "maxItems": 300,
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "participant": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 100
+                      },
+                      "heard": {
+                        "type": [
+                          "integer",
+                          "null"
+                        ],
+                        "minimum": 1,
+                        "maximum": 5
+                      },
+                      "understood": {
+                        "type": [
+                          "integer",
+                          "null"
+                        ],
+                        "minimum": 1,
+                        "maximum": 5
+                      },
+                      "fair": {
+                        "type": [
+                          "integer",
+                          "null"
+                        ],
+                        "minimum": 1,
+                        "maximum": 5
+                      },
+                      "note": {
+                        "type": "string",
+                        "maxLength": 1000
+                      }
+                    },
+                    "required": [
+                      "participant",
+                      "heard",
+                      "understood",
+                      "fair",
+                      "note"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "id",
+                "by",
+                "at",
+                "status",
+                "title",
+                "date",
+                "mode",
+                "owner",
+                "notes",
+                "agenda",
+                "groups",
+                "observations",
+                "evaluations"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 1
+          }
+        },
+        "required": [
+          "id",
+          "roundId",
+          "history"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "progressions": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "roundId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "proposalRef": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "rule": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "owner": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "quorum": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "minSupport": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "history": {
+            "type": "array",
+            "maxItems": 60,
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 120
+                },
+                "by": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "stage": {
+                  "enum": [
+                    "draft",
+                    "review",
+                    "ready",
+                    "trial",
+                    "reviewed"
+                  ]
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2000
+                },
+                "evidenceRefs": {
+                  "type": "array",
+                  "maxItems": 100,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 120
+                  }
+                },
+                "eligible": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "support": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "oppose": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "abstain": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "minorityNote": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2000
+                },
+                "proposalReviewed": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "id",
+                "by",
+                "at",
+                "stage",
+                "reason",
+                "evidenceRefs",
+                "eligible",
+                "support",
+                "oppose",
+                "abstain",
+                "minorityNote"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 1
+          }
+        },
+        "required": [
+          "id",
+          "roundId",
+          "proposalRef",
+          "rule",
+          "owner",
+          "quorum",
+          "minSupport",
+          "history"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "schema",
+    "corrections",
+    "sessions",
+    "progressions"
+  ],
+  "additionalProperties": false
+}

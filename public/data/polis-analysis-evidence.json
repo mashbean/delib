@@ -1,0 +1,24 @@
+{
+  "checkedAt": "2026-09-23T12:16:08.444Z",
+  "source": "https://polis.mashbean.net/api/conversations/3ovoxq5c6o",
+  "readOnly": true,
+  "sourceRevision": null,
+  "synthesisRequested": false,
+  "externalAcceptance": false,
+  "statements": 25,
+  "groups": 2,
+  "coverage": {
+    "voteMatrix": 0.9745370370370371,
+    "clusteredShare": 0.9761904761904762
+  },
+  "files": [
+    {
+      "sha256": "b73baaa867069fe81a7200087c3e8ba5e6307467b5565763a191bd9b7579741a",
+      "bytes": 3375
+    },
+    {
+      "sha256": "38d40a82bb7a1bf5e4c2ebb417b87f516ddbab3beb45f9999e6622e2210e6d34",
+      "bytes": 11885
+    }
+  ]
+}
