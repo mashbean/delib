@@ -1,0 +1,24 @@
+{
+  "schema": "https://delib.mashbean.net/schemas/delib-workspace/v1.json",
+  "id": "fixture-access",
+  "title": "Accessible school street / 無障礙校門口",
+  "language": "zh",
+  "simulated": true,
+  "rounds": [
+    {
+      "id": "legacy-round",
+      "title": "Legacy round",
+      "step": 0,
+      "artifacts": [],
+      "inputs": [],
+      "connections": {},
+      "next": null
+    }
+  ],
+  "events": [],
+  "view": {
+    "roundId": "legacy-round",
+    "tab": "route",
+    "selected": ""
+  }
+}

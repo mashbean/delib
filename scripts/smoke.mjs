@@ -12,6 +12,16 @@ const expectedSha = flag("--expect-sha");
 const checks = [];
 const failures = [];
 
+await check("Data contracts, roadmap and local validator are published", async () => {
+  const paths=['/contracts','/contracts.js','/vendor/workspace-validator.js','/data/implementation-roadmap.json','/fixtures/contracts/workspace-linked.json'];
+  const responses=await Promise.all(paths.map(path=>get(path)));
+  responses.forEach((response,i)=>expect(response.status===200,`${paths[i]}: ${response.status}`));
+  expect((await responses[0].text()).includes('/contracts.js'),'missing contract entry');
+  const roadmap=await responses[3].json();expect(roadmap.services.length===12,'missing paper services');
+  expect(roadmap.phases.filter(p=>p.status==='implemented').map(p=>p.id).join(',')==='P1','unexpected roadmap status');
+  const project=await responses[4].json();expect(project.simulated===true&&project.rounds.length===2,'missing simulated contract fixture');
+});
+
 function flag(name) {
   const index = args.indexOf(name);
   return index >= 0 ? args[index + 1] || "" : "";

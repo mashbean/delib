@@ -1,0 +1,274 @@
+{
+  "schema": "delib-implementation-roadmap/v1",
+  "updatedAt": "2026-09-23",
+  "scope": {
+    "zh": "功能對應不代表原版相容；P1 為本次實作，其餘為規劃。",
+    "en": "Functional counterparts do not imply original-service compatibility. P1 is this implementation; later stages are planned."
+  },
+  "externalAcceptance": false,
+  "source": "https://doi.org/10.1145/3737609.3747119",
+  "reusePolicy": {
+    "zh": "重寫前核對功能需求、版本及授權；原始碼再利用需逐案審查，不假設可直接沿用名稱、資料或 API。",
+    "en": "Check requirements, versions and licensing before implementation. Review code reuse separately; do not assume rights to names, data or APIs."
+  },
+  "phases": [
+    {
+      "id": "P1",
+      "status": "implemented",
+      "title": {
+        "zh": "共通契約與驗收工具",
+        "en": "Contracts and conformance tools"
+      },
+      "scope": {
+        "zh": "補齊議題、紀錄、輪次與交接規格；保留舊版缺欄位狀態。",
+        "en": "Specify issue, record, round and handoff fields while preserving missing legacy context."
+      },
+      "acceptance": {
+        "zh": "新版與舊版範例可讀；錯誤欄位、來源斷鏈、秘密資訊及偽造交接均拒絕；瀏覽器與 CLI 使用同一驗證器。",
+        "en": "New and legacy fixtures pass; malformed fields, broken provenance, credentials and forged handoffs fail; browser and CLI share validation."
+      },
+      "dependsOn": []
+    },
+    {
+      "id": "P2",
+      "status": "planned",
+      "title": {
+        "zh": "接回 Pocket Polis 的完整分析",
+        "en": "Reconnect Pocket Polis analysis"
+      },
+      "scope": {
+        "zh": "盤點最新匯出；保留分群、支持度、模型／演算法版本、覆蓋率與引文，不將摘要當原話。",
+        "en": "Audit current exports; retain groups, support, model/algorithm versions, coverage and quotations separately from voices."
+      },
+      "acceptance": {
+        "zh": "固定版本公開資料往返；無法保存的欄位明列；票數與來源逐筆核對。",
+        "en": "Pinned public fixtures round-trip with field-level loss reporting and checked counts and source links."
+      },
+      "dependsOn": [
+        "P1"
+      ]
+    },
+    {
+      "id": "P3",
+      "status": "planned",
+      "title": {
+        "zh": "原版服務轉接與共同驗收",
+        "en": "Original-service adapters and joint acceptance"
+      },
+      "scope": {
+        "zh": "先做一個指定 Decidim 實例的唯讀匯入；再與 V2V／Assemblis 夥伴對照實際檔案。",
+        "en": "Start with read-only import from one pinned Decidim instance, then compare actual V2V / Assemblis partner exports."
+      },
+      "acceptance": {
+        "zh": "保存多語、版本、採納狀態與來源；讀取、寫回與對方驗收分開標示。",
+        "en": "Preserve multilingual text, revisions, adoption and provenance; report read, write-back and partner acceptance separately."
+      },
+      "dependsOn": [
+        "P1",
+        "P2"
+      ]
+    },
+    {
+      "id": "P4",
+      "status": "planned",
+      "title": {
+        "zh": "意見到決策的責任追蹤",
+        "en": "Accountable voice-to-decision trails"
+      },
+      "scope": {
+        "zh": "深化 V2V 類型功能：採納理由、未採納原因、更正申請、責任人及期限；延伸既有工作台。",
+        "en": "Extend the workspace with V2V-style adoption reasons, non-adoption, correction requests, owners and deadlines."
+      },
+      "acceptance": {
+        "zh": "一筆原話可查多來源提案與正式回覆；草稿不等於承諾；更正與撤回可追溯。",
+        "en": "Trace a voice through multi-source proposals and authorized responses; drafts stay distinct from commitments, with correction and withdrawal history."
+      },
+      "dependsOn": [
+        "P1",
+        "P3"
+      ]
+    },
+    {
+      "id": "P5",
+      "status": "planned",
+      "title": {
+        "zh": "現場審議與品質評估",
+        "en": "Facilitated sessions and quality assessment"
+      },
+      "scope": {
+        "zh": "建立 Assemblis 類型的輕量場次工具：議程、小組、主持紀錄、會後評估及參與支持。",
+        "en": "Build a lightweight Assemblis-style session module: agenda, groups, facilitation notes, post-session evaluation and participation support."
+      },
+      "acceptance": {
+        "zh": "完成一場模擬混合審議；區分受邀、出席、發言、投票人數；評估不推論代表性。",
+        "en": "Run a simulated hybrid session; distinguish invited, attending, speaking and voting counts without inferring representativeness."
+      },
+      "dependsOn": [
+        "P1",
+        "P4"
+      ]
+    },
+    {
+      "id": "P6",
+      "status": "planned",
+      "title": {
+        "zh": "協作提案與論證",
+        "en": "Collaborative proposals and argumentation"
+      },
+      "scope": {
+        "zh": "在 Pocket Proposals／Argument 補上 Evocracy、Swarmcheck 類型的分組推進、證據與修訂工作。",
+        "en": "Extend Pocket Proposals / Argument with Evocracy- and Swarmcheck-style group progression, evidence and revision workflows."
+      },
+      "acceptance": {
+        "zh": "有來源的論點支持或反對可追溯；代表推進規則明確；保留少數意見。",
+        "en": "Trace sourced supporting and opposing arguments, explicit advancement rules and minority views."
+      },
+      "dependsOn": [
+        "P4",
+        "P5"
+      ]
+    },
+    {
+      "id": "P7",
+      "status": "planned",
+      "title": {
+        "zh": "聯邦式整合與規模化諮詢",
+        "en": "Federated integration and larger consultations"
+      },
+      "scope": {
+        "zh": "評估 Hypha 整合介面及 Make.org 資料轉接；以實際匯出/API 與授權為前提。",
+        "en": "Evaluate Hypha integration and Make.org adapters against actual exports/APIs and permissions."
+      },
+      "acceptance": {
+        "zh": "取得版本、授權與實際格式後才列為支援；未提供接口時維持人工交接。",
+        "en": "Claim support only after version, licensing and actual-format verification; retain manual handoff where no interface exists."
+      },
+      "dependsOn": [
+        "P3",
+        "P6"
+      ]
+    }
+  ],
+  "services": [
+    {
+      "name": "Pol.is",
+      "local": "Pocket Polis",
+      "status": "implemented-lite",
+      "phase": "P2",
+      "approach": {
+        "zh": "補齊最新分析格式轉接",
+        "en": "Extend current analysis adapters"
+      }
+    },
+    {
+      "name": "Talk to the City",
+      "local": "Pocket TTTC",
+      "status": "implemented-lite",
+      "phase": "P2",
+      "approach": {
+        "zh": "持續驗證引文與版本",
+        "en": "Maintain quotation and version checks"
+      }
+    },
+    {
+      "name": "Harmonica",
+      "local": "Pocket Harmonica",
+      "status": "implemented-lite",
+      "phase": "P2",
+      "approach": {
+        "zh": "保持訪談者與參與者區別",
+        "en": "Keep interviewer and participant roles distinct"
+      }
+    },
+    {
+      "name": "MAPLE",
+      "local": "Pocket Maple",
+      "status": "implemented-lite",
+      "phase": "P3",
+      "approach": {
+        "zh": "保留臺灣立法情境；原版另做轉接",
+        "en": "Retain Taiwan legislative context; adapt originals separately"
+      }
+    },
+    {
+      "name": "HeyForm",
+      "local": "Pocket Form",
+      "status": "partial",
+      "phase": "P5",
+      "approach": {
+        "zh": "按活動需求補跳題與會後評估",
+        "en": "Add branching and evaluation only for session needs"
+      }
+    },
+    {
+      "name": "Decidim",
+      "local": "Pocket Proposals",
+      "status": "partial",
+      "phase": "P3",
+      "approach": {
+        "zh": "先接原版資料，不複製整套治理平台",
+        "en": "Import original data before expanding proposal modules"
+      }
+    },
+    {
+      "name": "Voice to Vision",
+      "local": "Delib workspace / Reply",
+      "status": "functional-overlap",
+      "phase": "P4",
+      "approach": {
+        "zh": "延伸意見到決策追蹤",
+        "en": "Extend voice-to-decision tracking"
+      }
+    },
+    {
+      "name": "Assemblis",
+      "local": "Planned session module",
+      "status": "not-reimplemented",
+      "phase": "P5",
+      "approach": {
+        "zh": "獨立實作輕量場次與品質評估",
+        "en": "Implement lightweight sessions and quality evaluation"
+      }
+    },
+    {
+      "name": "Evocracy",
+      "local": "Pocket Proposals",
+      "status": "functional-overlap",
+      "phase": "P6",
+      "approach": {
+        "zh": "擴充團隊協作與代表推進",
+        "en": "Extend team collaboration and representative advancement"
+      }
+    },
+    {
+      "name": "Swarmcheck",
+      "local": "Pocket Argument",
+      "status": "functional-overlap",
+      "phase": "P6",
+      "approach": {
+        "zh": "擴充證據、論證及來源連結",
+        "en": "Extend evidence, arguments and provenance"
+      }
+    },
+    {
+      "name": "Hypha",
+      "local": "Delib workspace",
+      "status": "functional-overlap",
+      "phase": "P7",
+      "approach": {
+        "zh": "優先整合既有工具",
+        "en": "Prioritize integration of existing tools"
+      }
+    },
+    {
+      "name": "Make.org",
+      "local": "No direct equivalent",
+      "status": "not-reimplemented",
+      "phase": "P7",
+      "approach": {
+        "zh": "先評估可授權轉接的資料，暫不完整重寫",
+        "en": "Evaluate permitted data adapters; full rewrite deferred"
+      }
+    }
+  ]
+}

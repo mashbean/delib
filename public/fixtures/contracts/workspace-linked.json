@@ -1,0 +1,216 @@
+{
+  "schema": "https://delib.mashbean.net/schemas/delib-workspace/v1.json",
+  "id": "fixture-access",
+  "title": "Accessible school street / 無障礙校門口",
+  "audience": "Fictional residents / 虛構居民",
+  "goal": "Review access and deliveries / 覆核通行與送貨",
+  "deadline": "2026-12-01",
+  "language": "zh",
+  "simulated": true,
+  "createdAt": "2026-09-23T10:00:00Z",
+  "updatedAt": "2026-09-23T10:00:00Z",
+  "rounds": [
+    {
+      "id": "round-1",
+      "title": "Round 1",
+      "step": 2,
+      "artifacts": [
+        {
+          "id": "voice-a",
+          "kind": "statement",
+          "text": "【虛構】輪椅接送需要空間。",
+          "source": {
+            "tool": "fixture",
+            "id": "voice-a"
+          },
+          "derivedFrom": [],
+          "relations": [],
+          "participantRef": null,
+          "supersedes": null,
+          "review": {
+            "checked": false,
+            "reviewer": "",
+            "at": null,
+            "quoteConfirmed": false
+          }
+        },
+        {
+          "id": "voice-b",
+          "kind": "statement",
+          "text": "【虛構】商家清晨需要送貨。",
+          "source": {
+            "tool": "fixture",
+            "id": "voice-b"
+          },
+          "derivedFrom": [],
+          "relations": [],
+          "participantRef": null,
+          "supersedes": null,
+          "review": {
+            "checked": false,
+            "reviewer": "",
+            "at": null,
+            "quoteConfirmed": false
+          }
+        },
+        {
+          "id": "theme",
+          "kind": "theme",
+          "text": "【演練】分時使用路側空間。",
+          "source": {
+            "tool": "fixture",
+            "id": "theme"
+          },
+          "derivedFrom": [
+            "voice-a",
+            "voice-b"
+          ],
+          "relations": [
+            {
+              "ref": "voice-a",
+              "type": "derived"
+            },
+            {
+              "ref": "voice-b",
+              "type": "derived"
+            }
+          ],
+          "participantRef": null,
+          "supersedes": null,
+          "review": {
+            "checked": false,
+            "reviewer": "",
+            "at": null,
+            "quoteConfirmed": false
+          }
+        },
+        {
+          "id": "reply",
+          "kind": "reply",
+          "text": "【草稿】先確認兩種需求的時段。",
+          "source": {
+            "tool": "fixture",
+            "id": "reply"
+          },
+          "derivedFrom": [
+            "voice-a",
+            "theme"
+          ],
+          "relations": [
+            {
+              "ref": "voice-a",
+              "type": "responds"
+            },
+            {
+              "ref": "theme",
+              "type": "context"
+            }
+          ],
+          "participantRef": null,
+          "supersedes": null,
+          "review": {
+            "checked": false,
+            "reviewer": "",
+            "at": null,
+            "quoteConfirmed": false
+          }
+        },
+        {
+          "id": "reply-revised",
+          "kind": "reply",
+          "text": "【修訂草稿】邀請兩方一起確認時段。",
+          "source": {
+            "tool": "fixture",
+            "id": "reply-revised"
+          },
+          "derivedFrom": [
+            "reply"
+          ],
+          "relations": [
+            {
+              "ref": "reply",
+              "type": "revises"
+            }
+          ],
+          "participantRef": null,
+          "supersedes": "reply",
+          "review": {
+            "checked": false,
+            "reviewer": "",
+            "at": null,
+            "quoteConfirmed": false
+          }
+        }
+      ],
+      "inputs": [
+        "voice-a",
+        "voice-b"
+      ],
+      "connections": {},
+      "next": {
+        "reason": "Check missing access evidence",
+        "owner": "Fictional facilitator",
+        "date": "2026-12-01",
+        "phase": "learn",
+        "carryForwardRefs": [
+          "voice-a",
+          "voice-b",
+          "theme",
+          "reply-revised"
+        ]
+      }
+    },
+    {
+      "id": "round-2",
+      "title": "Round 2",
+      "step": 0,
+      "artifacts": [
+        {
+          "id": "next-brief",
+          "kind": "brief",
+          "text": "【演練】與參與者核對尚未釐清的限制。",
+          "source": {
+            "tool": "fixture",
+            "id": "next-brief"
+          },
+          "derivedFrom": [
+            "voice-a",
+            "voice-b"
+          ],
+          "relations": [
+            {
+              "ref": "voice-a",
+              "type": "context"
+            },
+            {
+              "ref": "voice-b",
+              "type": "context"
+            }
+          ],
+          "participantRef": null,
+          "supersedes": null,
+          "review": {
+            "checked": false,
+            "reviewer": "",
+            "at": null,
+            "quoteConfirmed": false
+          }
+        }
+      ],
+      "inputs": [
+        "voice-a",
+        "voice-b",
+        "theme",
+        "reply-revised"
+      ],
+      "connections": {},
+      "next": null
+    }
+  ],
+  "events": [],
+  "view": {
+    "roundId": "round-2",
+    "tab": "flow",
+    "selected": "next-brief"
+  }
+}

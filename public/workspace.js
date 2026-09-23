@@ -1,3 +1,4 @@
+import {partitionWorkspaceBackups} from './workspace-contract-core.js';
 import {transferImpact} from './transfer-impact-core.js';
 import {transferImpactView} from './transfer-impact-view.js';
 import {createPersistence} from './workspace-persistence.js';
@@ -207,10 +208,13 @@ document.addEventListener('change',async e=>{try{
   if(e.target.id==='project-file'){const file=e.target.files[0];if(!file)return;if(file.size>6*1024*1024)throw new Error('Backup exceeds 6 MiB');const incoming=validateProject(JSON.parse(await file.text()));incoming.id=uid();project=incoming;setup=false;render();await save();}
   if(e.target.id==='source-file'){const file=e.target.files[0];if(!file)return;if(file.size>3*1024*1024)throw new Error('CSV exceeds 3 MiB');const csv=await file.text();let result;await commit(p=>{result=addSources(p,csv,`file-${uid()}`);});notice(`${L('已在本機匯入','Imported locally')}: ${result.added.length}${result.warnings.length?' · '+L('部分文字可能含直接識別資訊，交接前請檢查。','Possible direct identifiers; review before sending.'):''}`);}
 }catch(error){notice(error.message);}});
+let recoveryBackups=[];
+function renderRecovery(){const node=$('#backup-recovery');if(!node)return;node.innerHTML=recoveryBackups.length?`<details class="storage-note"><summary>${L('有','There are ')} ${recoveryBackups.length} ${L('份本機備份需要格式修復；原檔仍保留','local backups needing format repair; originals are retained')}</summary><p>${L('下載原檔後，先在資料契約檢查器核對；不要刪除本機資料。','Download originals and check their data contracts before repair. Do not clear local storage.')}</p><div class="actions">${recoveryBackups.map((_,i)=>`<button type="button" data-recovery-index="${i}">${L('下載原始備份','Download original backup')} ${i+1}</button>`).join('')}<a href="/contracts?lang=${lang}" target="_blank" rel="noreferrer">${L('資料契約檢查器','Data contract checker')} ↗</a></div></details>`:'';}
+document.addEventListener('click',e=>{const button=e.target.closest('[data-recovery-index]');if(button){const i=Number(button.dataset.recoveryIndex);if(Number.isInteger(i)&&i>=0&&i<recoveryBackups.length)download(recoveryBackups[i],`delib-recovery-${i+1}.json`);}});
 let searchTimer;document.addEventListener('input',e=>{if(e.target.id==='voice-query'){const value=e.target.value;clearTimeout(searchTimer);searchTimer=setTimeout(()=>{query=value;render();$('#voice-query').focus();},220);}});
-$('#work-language').addEventListener('click',async()=>{try{lang=lang==='zh'?'en':'zh';const u=new URL(location.href);u.searchParams.set('lang',lang);history.replaceState(null,'',u);if(project)await commit(p=>{p.language=lang;});else render();}catch(e){notice(e.message);}});
+$('#work-language').addEventListener('click',async()=>{try{lang=lang==='zh'?'en':'zh';const u=new URL(location.href);u.searchParams.set('lang',lang);history.replaceState(null,'',u);if(project)await commit(p=>{p.language=lang;});else render();renderRecovery();}catch(e){notice(e.message);}});
 document.addEventListener('visibilitychange',()=>{if(document.hidden)clearTimeout(poll);});
-try{projects=(await projectStore('list')).filter(p=>{try{return !!validateProject(p);}catch{return false;}});
+try{const stored=partitionWorkspaceBackups(await projectStore('list'));projects=stored.valid;recoveryBackups=stored.recovery;
  let last;try{last=sessionStorage.getItem('delib:last-project');}catch{}
  project=projects.find(p=>p.id===last)||projects.at(-1)||null;
  for(const p of projects)if(recoverInterruptedTransfers(p)){validateProject(p);try{await persistence.save(p);}catch{notice(L('中斷的交接已標示待確認；本機保存失敗，請重試。','Interrupted handoffs marked uncertain; local saving failed. Please retry.'));}}
@@ -221,6 +225,7 @@ if(new URLSearchParams(location.search).get('from')==='interop'){try{const ctx=J
 if(new URLSearchParams(location.search).get('from')==='interop'){const u=new URL(location.href);u.searchParams.delete('from');history.replaceState(null,'',u);}
 if(project&&metagovOpen)project.view.tab='transfer';
 render();
+renderRecovery();
 if(metagovOpen)$('#metagov-export')?.scrollIntoView({block:'start'});
 
 window.addEventListener('beforeunload',e=>{if(persistence.dirty().length){e.preventDefault();e.returnValue='';}});

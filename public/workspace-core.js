@@ -1,8 +1,9 @@
 import {validateMetagovMappings} from './metagov-mapping-core.js';
+import validateWorkspaceShape from './vendor/workspace-validator.js';
 import {validateSettings} from './workspace-setting-core.js';
 import { validateNativeImports, nativeRestrictions } from './workspace-import-core.js';
 import { validateTransfers } from './workspace-transfer-core.js';
-import { validateFacilitation, carryParticipation, roundFollowups, saveParticipation, setCommitment, setDisposition } from './facilitation-core.js';
+import { validateFacilitation, carryParticipation, roundFollowups, saveParticipation, setCommitment, setDisposition, validDate } from './facilitation-core.js';
 import { parseTttcCsv, tttcRowsToCsv } from './tttc-csv-core.js';
 export const WORKSPACE_SCHEMA='https://delib.mashbean.net/schemas/delib-workspace/v1.json';
 export const uid=()=>crypto.randomUUID();
@@ -13,7 +14,7 @@ export const allRecords=p=>p.rounds.flatMap(r=>r.artifacts);
 export const activeRecords=p=>{const all=allRecords(p),old=new Set(all.map(a=>a.supersedes).filter(Boolean));return all.filter(a=>!old.has(a.id));};
 export const currentRound=p=>p.rounds.find(r=>r.id===p.view.roundId)||p.rounds.at(-1);
 export function createProject({title,audience,deadline,goal,language='zh'}) {
-  if(!text(title,120)||!text(audience,500)||!text(goal,1000)||!/^\d{4}-\d{2}-\d{2}$/.test(deadline||''))throw new Error('請填寫議題、參與對象、目標與日期 / Complete the issue, audience, goal and date.');
+  if(!text(title,120)||!text(audience,500)||!text(goal,1000)||!validDate(deadline))throw new Error('請填寫議題、參與對象、目標與有效日期 / Complete the issue, audience, goal and valid date.');
   const id=uid(),roundId=uid();
   return {schema:WORKSPACE_SCHEMA,id,title,audience,deadline,goal,language,simulated:false,createdAt:now(),updatedAt:now(),view:{roundId,tab:'route',selected:'',mode:'focus'},rounds:[{id:roundId,title:language==='en'?'Round 1':'第 1 輪',step:0,artifacts:[],inputs:[],connections:{},next:null}],events:[]};
 }
@@ -39,7 +40,9 @@ export function validateProject(p) {
   const forbidden=o=>{if(!o||typeof o!=='object')return false;return Object.entries(o).some(([k,v])=>/^(adminToken|token|hostUrl|manageUrl|authorization)$/i.test(k)||forbidden(v));};
   if(forbidden(p))throw new Error('Remove management credentials before importing');
   if(p.view.flowVoice!==undefined && (typeof p.view.flowVoice!=='string'||(p.view.flowVoice&&!ids.has(p.view.flowVoice))))throw new Error('Unknown flow voice');
-  validateSettings(p);validateMetagovMappings(p);validateFacilitation(p);validateTransfers(p);validateNativeImports(p);return p;
+  validateSettings(p);validateMetagovMappings(p);validateFacilitation(p);validateTransfers(p);validateNativeImports(p);
+  if(!validateWorkspaceShape(p))throw new Error('議題欄位格式不符，請用資料契約檢查器核對 / Workspace fields do not match the schema; check the data contract.');
+  return p;
 }
 export function record(kind,value,source,refs=[],extra={}){return {id:uid(),kind,text:value,source,derivedFrom:[...new Set(refs)],relations:[...new Set(refs)].map(ref=>({ref,type:kind==='reply'?'responds':'derived'})),participantRef:null,supersedes:null,review:{checked:false,reviewer:'',at:null,quoteConfirmed:false},...extra};}
 export function addSources(p,csv,sourceId,{reconcile=false}={}){
@@ -93,7 +96,7 @@ export function reviseRecord(p,id,value,reviewer){
 }
 export function reviewRecord(p,id,{reviewer,quoteConfirmed=false,checked=true}){const a=allRecords(p).find(a=>a.id===id);if(!a||!text(reviewer,100))throw new Error('請填檢查者 / Enter a reviewer.');a.review={checked,reviewer,at:now(),quoteConfirmed};p.events.push({type:checked?'review':'reopen',recordId:id,by:reviewer,at:now()});}
 export function nextRound(p,{reason,owner,date,phase}){
-  if(!text(reason,1000)||!text(owner,100)||!/^\d{4}-\d{2}-\d{2}$/.test(date)||!['recruit','learn','deliberate','respond'].includes(phase))throw new Error('請填下一輪缺口、負責者與日期 / Complete the next round gap, owner and date.');
+  if(!text(reason,1000)||!text(owner,100)||!validDate(date)||!['recruit','learn','deliberate','respond'].includes(phase))throw new Error('請填下一輪缺口、負責者與有效日期 / Complete the next round gap, owner and valid date.');
   const prev=currentRound(p);if(prev!==p.rounds.at(-1))throw new Error('請從最新一輪延續 / Continue from the latest round.');
   const open=roundFollowups(p,prev);
   prev.next={reason,owner,date,phase,carryForwardRefs:open.map(a=>a.id)};
