@@ -1,0 +1,7 @@
+import {it,expect} from 'vitest';
+import {readFileSync} from 'node:fs';
+import {projectFromDemo,nextRound,validateProject} from '../public/workspace-core.js';
+import {nextRoundView} from '../public/workspace-next-view.js';
+const demo=lang=>projectFromDemo(JSON.parse(readFileSync(new URL('../public/data/flow-demo.json',import.meta.url))),lang);
+it.each(['zh','en'])('offers the existing follow-up instead of an unusable creation form: %s',lang=>{const p=demo(lang),before=JSON.stringify(p),html=nextRoundView(p,lang);expect(html).toContain('data-action="open-following-round"');expect(html).toContain(p.rounds[1].title);expect(html).not.toContain('id="next-round"');expect(()=>nextRound(p,{reason:'Follow up',owner:'Host',date:'2026-12-01',phase:'learn'})).toThrow(/latest/);expect(JSON.stringify(p)).toBe(before);});
+it.each(['zh','en'])('lets the latest round create a valid next round with retained sources: %s',lang=>{const p=demo(lang);p.view.roundId=p.rounds.at(-1).id;const html=nextRoundView(p,lang);expect(html).toContain('id="next-round-status"');expect(html).toContain('name="reason" maxlength="1000" required></textarea>');expect(html).not.toContain('open-following-round');const created=nextRound(p,{reason:'Follow up on missing evidence',owner:'Host',date:'2026-12-01',phase:'learn'});expect(p.rounds).toHaveLength(4);expect(created.inputs.length).toBeGreaterThan(0);expect(validateProject(JSON.parse(JSON.stringify(p)))).toEqual(p);});

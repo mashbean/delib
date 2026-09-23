@@ -1,3 +1,4 @@
+import {nextRoundView} from './workspace-next-view.js';
 import {partitionWorkspaceBackups} from './workspace-contract-core.js';
 import {transferImpact} from './transfer-impact-core.js';
 import {transferImpactView} from './transfer-impact-view.js';
@@ -83,7 +84,7 @@ function renderService(r,tool){
   if(tool==='form')return `${connection}${!c?`<form id="create-form">${area('question',L('想請參與者分享的問題（每行一題，最多 6 題）','Questions for participants (one per line, up to 6)'),project.goal,1500)}${area('purpose',L('收集用途、保存期限與聯絡方式','Purpose, retention and contact information'),' ',2000)}<button class="btn">${icon('file')}${L('預覽表單','Preview form')}</button></form>`:''}${connect}<details ${!c?'open':''}><summary>${icon('upload')} ${L('從 Form 或其他工具匯入 CSV','Import CSV from Form or another tool')}</summary><label>${L('選擇 id, interview, comment 格式的 CSV','Choose a CSV with id, interview, comment columns')}<input id="source-file" type="file" accept=".csv,text/csv"></label><p class="small">${L('在本機讀取，不會上傳。原始資料不會被摘要覆蓋。','Read locally without upload. Summaries never overwrite source text.')}</p></details>`;
   return `${connection}${!c?`<p>${tool==='tttc'?L('把本輪原話交給 TTTC 歸納；結果會依來源 ID 接回工作台。','Send this round’s voices to TTTC. Results reconnect by source ID.'):L('把原話與已檢查的主題交給 Reply，產生逐則回覆草稿。','Send the source voices and reviewed themes to Reply for individual reply drafts.')}</p>${tool==='reply'?`<form id="create-reply">${field('speaker',L('誰有權以自己的名義回覆？','Who is authorized to reply in their name?'))}<button class="btn">${icon('reply')}${L('預覽送給 Reply 的內容','Preview handoff to Reply')}</button></form>`:btn('create-tttc',L('預覽送給 TTTC 的內容','Preview handoff to TTTC'),'layers','btn')}`:''}${connect}`;
 }
-function renderNext(){return `${renderAdvice(project,lang)}${carrySummary(project,currentRound(project),lang)}<form id="next-round">${area('reason',L('哪些問題仍需下一輪處理？','What needs another round?'),' ',1000)}${field('owner',L('下一輪負責者','Next-round owner'))}${field('date',L('檢視日期','Review date'),project.deadline,'date')}<label>${L('建議重新開始的位置','Where to resume')}<select name="phase"><option value="recruit">${L('補招募 · 缺少聲音','Recruit · missing voices')}</option><option value="learn">${L('共同學習 · 缺少資料','Learn · missing evidence')}</option><option value="deliberate">${L('修訂方案 · 分歧未解','Revise · unresolved differences')}</option><option value="respond">${L('追問回覆 · 承諾未明','Respond · unclear commitments')}</option></select></label><button class="btn">${icon('loop')}${L('帶著未解問題開下一輪','Carry open questions into a new round')}</button></form>`;}
+function renderNext(){return nextRoundView(project,lang);}
 function renderVoices(){
   const sources=allRecords(project).filter(a=>['statement','question'].includes(a.kind)&&(!query||a.text.toLowerCase().includes(query.toLowerCase())||a.id.includes(query)));
   const selected=allRecords(project).find(a=>a.id===project.view.selected),trail=selected?traceVoice(project,selected.id):[];
@@ -122,13 +123,14 @@ async function handleAction(action){
   if(action==='import'){$('#project-file').click();return;}if(!project)return;
   if(action==='native-import'){clearTimeout(poll);nativePending=null;$('#send-preview').innerHTML=nativeImportForm(project,lang);$('#send-dialog').showModal();return;}
   if(action==='transfer'){transferRefs=null;transferTool='tttc';await commit(p=>{p.view.tab='transfer';p.view.selected='';});return;}
+  if(['plan-next-round','open-following-round','open-latest-round'].includes(action)){await commit(p=>{const i=p.rounds.findIndex(r=>r.id===p.view.roundId);if(action==='open-following-round'){const following=p.rounds[i+1];if(following)p.view.roundId=following.id;}else if(action==='open-latest-round')p.view.roundId=p.rounds.at(-1).id;p.view.tab='route';p.view.selected='';if(action!=='open-following-round')currentRound(p).step=3;});($('#next-round')||$('.next-round-existing')||$('#work-view'))?.scrollIntoView({block:'start'});$('#next-round [name=reason]')?.focus({preventScroll:true});return;}
   if(action==='use-next-advice'){const a=adviceText(project,lang);document.querySelector('#next-round [name=reason]').value=a.text;document.querySelector('#next-round [name=phase]').value=a.phase;return;}
   if(action==='download-impact'){const plan=planTransfer(project,{tool:transferTool,refs:transferRefs});download(transferImpact(plan),'delib-transfer-impact.json');notice(L('已準備欄位對照下載，不含原文、個人或紀錄代碼；這不是送達收據。','Field mapping download prepared without source text, people or record IDs; it is not a delivery receipt.'));return;}
   if(action==='download-transfer'){
     if(!$('#transfer-permission')?.checked)throw new Error(L('請先確認用途與轉交權限。','Confirm the purpose and permission first.'));
     const plan=planTransfer(project,{tool:transferTool,refs:transferRefs});if(sourceWarnings(plan).length)throw new Error(L('文字疑似含直接識別資訊，請檢查後再交接。','Possible direct identifiers; review before transfer.'));
     let id;await commit(p=>{const t=addTransfer(p,plan);id=t.id;advanceTransfer(t,'exported');});const t=project.transfers.find(t=>t.id===id);
-    download(transferCsv(plan),`delib-${transferTool}-${id}.csv`);download(exportTransfer(t),`delib-private-transfer-${id}.json`);notice(L('已準備下載；請確認瀏覽器已保存兩份檔案。尚未送到目的站。','Downloads prepared; check that your browser saved both files. Not sent to the destination.'));return;
+    download(transferCsv(plan),`delib-${transferTool}-${id}.csv`);download(exportTransfer(t),`delib-private-transfer-${id}.json`);notice(L('已產生 CSV 與私人對照檔。這只是在下載檔案，沒有上傳到工具；請先確認瀏覽器已保存。','CSV and private companion prepared. This downloads files without uploading them to the tool; check that your browser saved both.'));return;
   }
   if(action==='send-transfer'){
     if(currentRound(project).connections[transferTool])throw new Error(L('本輪已有這個工具的活動。請先讀取結果，或在下一輪建立新活動。','This tool is already connected. Read its results or create a new activity in the next round.'));
@@ -159,7 +161,8 @@ document.addEventListener('click',async e=>{const b=e.target.closest('button');i
   if(b.dataset.tab){const u=new URL(location.href);u.searchParams.set('view',b.dataset.tab);history.replaceState(null,'',u);await commit(p=>{p.view.tab=b.dataset.tab;});}
   if(b.dataset.step){await commit(p=>{currentRound(p).step=Number(b.dataset.step);p.view.selected='';});if(window.gsap&&!matchMedia('(prefers-reduced-motion: reduce)').matches)gsap.from('#work-view',{y:8,autoAlpha:.7,duration:.2});}
   if(b.dataset.record){await commit(p=>{p.view.selected=b.dataset.record;});if(project.view.tab!=='voices')$('#record-detail')?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'nearest'});}
-}catch(error){notice(error.message);}});
+}catch(error){notice(error.message);if($('#next-round-status'))$('#next-round-status').textContent=error.message;}});
+document.addEventListener('invalid',e=>{if(e.target.closest('#next-round'))$('#next-round-status').textContent=L('請填寫未解問題、下一輪負責者與有效的檢視日期。','Enter the open question, next-round owner and a valid review date.');},true);
 document.addEventListener('submit',async e=>{const form=e.target;if(form.method==='dialog')return;e.preventDefault();if(busy)return;const f=new FormData(form);try{
   if(form.id==='new-project'){project=createProject({...Object.fromEntries(f),language:lang});setup=false;render();await save();}
   else if(form.id==='native-file-form'){
@@ -181,7 +184,7 @@ document.addEventListener('submit',async e=>{const form=e.target;if(form.method=
   else if(form.id==='commitment-form'){await commit(p=>setCommitment(p,p.view.selected,{...Object.fromEntries(f),authorityConfirmed:f.has('authorityConfirmed')}));notice(L('承諾紀錄已保存在本機。','Commitment saved locally.'));}
   else if(form.id==='disposition-form'){await commit(p=>setDisposition(p,p.view.selected,Object.fromEntries(f)));notice(L('意見去向已保存，舊紀錄保留。','Disposition saved; earlier entries retained.'));}
   else if(form.id==='participation-form'){await commit(p=>saveParticipation(p,form.dataset.gapId,Object.fromEntries(f)));$('#send-dialog').close();notice(L('參與缺口已保存。','Participation gap saved.'));}
-  else if(form.id==='next-round')await commit(p=>nextRound(p,Object.fromEntries(f)));
+  else if(form.id==='next-round'){await commit(p=>nextRound(p,Object.fromEntries(f)));notice(L('已建立下一輪，未解問題與來源已保留。','Next round created with open questions and sources retained.'));$('#work-view')?.scrollIntoView({block:'start'});}
   else if(form.id==='review-record')await commit(p=>reviewRecord(p,p.view.selected,{reviewer:f.get('reviewer'),quoteConfirmed:f.has('quoteConfirmed')}));
   else if(form.id==='revise-record')await commit(p=>{p.view.selected=reviseRecord(p,p.view.selected,f.get('text'),f.get('reviewer')).id;});
   else if(form.id==='manual-record'){await commit(p=>{const refs=form.dataset.parent?[form.dataset.parent]:f.getAll('refs'),kind=f.get('kind');if(['theme','proposal','reply','decision'].includes(kind)&&!refs.length)throw new Error(L('請選擇來源。','Choose source records.'));const a=record(kind,f.get('text'),{tool:'facilitator',id:uid()},refs);currentRound(p).artifacts.push(a);if(kind==='statement')currentRound(p).inputs.push(a.id);p.view.selected=a.id;});$('#send-dialog').close();}
@@ -198,7 +201,7 @@ document.addEventListener('submit',async e=>{const form=e.target;if(form.method=
       await commit(p=>{if(transferId)advanceTransfer(p.transfers.find(t=>t.id===transferId),'received',{activityId:id});currentRound(p).connections[send.tool]={id,status:response.status,inputRefs:send.refs,contextRefs:send.contextRefs,...(transferId?{transferId}:{})};});$('#send-dialog').close();notice(L('已建立。請先複製私人管理連結；稍後會自動檢查結果。','Created. Copy the private management link; results will be checked automatically.'));if(send.tool!=='form'){clearTimeout(poll);pollCount=0;poll=setTimeout(()=>readResult(send.tool,true).catch(e=>notice(e.message)),8000);}
     }catch(error){if(transferId&&project.transfers.find(t=>t.id===transferId)?.history.at(-1).state==='submitted')await commit(p=>advanceTransfer(p.transfers.find(t=>t.id===transferId),'uncertain'));$('#send-dialog').close();throw new Error(`${error.message} · ${L('未自動重送。若服務已建立活動，請使用活動連結接回。','Not retried. If the service created the activity, reconnect with its link.')}`);}finally{busy=false;$('#work-main').inert=false;}
   }
-}catch(error){notice(error.message);}});
+}catch(error){notice(error.message);if($('#next-round-status'))$('#next-round-status').textContent=error.message;}});
 document.addEventListener('change',async e=>{try{
   if(e.target.id==='metagov-record'){metagovRecord=e.target.value;render();$('#metagov-record')?.focus();}
   if(e.target.id==='transfer-destination'){transferTool=e.target.value;render();$('#transfer-destination')?.focus();}
@@ -207,7 +210,7 @@ document.addEventListener('change',async e=>{try{
   if(e.target.id==='choose-round'){transferRefs=null;clearTimeout(poll);await commit(p=>{p.view.roundId=e.target.value;p.view.selected='';});}
   if(e.target.id==='project-file'){const file=e.target.files[0];if(!file)return;if(file.size>6*1024*1024)throw new Error('Backup exceeds 6 MiB');const incoming=validateProject(JSON.parse(await file.text()));incoming.id=uid();project=incoming;setup=false;render();await save();}
   if(e.target.id==='source-file'){const file=e.target.files[0];if(!file)return;if(file.size>3*1024*1024)throw new Error('CSV exceeds 3 MiB');const csv=await file.text();let result;await commit(p=>{result=addSources(p,csv,`file-${uid()}`);});notice(`${L('已在本機匯入','Imported locally')}: ${result.added.length}${result.warnings.length?' · '+L('部分文字可能含直接識別資訊，交接前請檢查。','Possible direct identifiers; review before sending.'):''}`);}
-}catch(error){notice(error.message);}});
+}catch(error){notice(error.message);if($('#next-round-status'))$('#next-round-status').textContent=error.message;}});
 let recoveryBackups=[];
 function renderRecovery(){const node=$('#backup-recovery');if(!node)return;node.innerHTML=recoveryBackups.length?`<details class="storage-note"><summary>${L('有','There are ')} ${recoveryBackups.length} ${L('份本機備份需要格式修復；原檔仍保留','local backups needing format repair; originals are retained')}</summary><p>${L('下載原檔後，先在資料契約檢查器核對；不要刪除本機資料。','Download originals and check their data contracts before repair. Do not clear local storage.')}</p><div class="actions">${recoveryBackups.map((_,i)=>`<button type="button" data-recovery-index="${i}">${L('下載原始備份','Download original backup')} ${i+1}</button>`).join('')}<a href="/contracts?lang=${lang}" target="_blank" rel="noreferrer">${L('資料契約檢查器','Data contract checker')} ↗</a></div></details>`:'';}
 document.addEventListener('click',e=>{const button=e.target.closest('[data-recovery-index]');if(button){const i=Number(button.dataset.recoveryIndex);if(Number.isInteger(i)&&i>=0&&i<recoveryBackups.length)download(recoveryBackups[i],`delib-recovery-${i+1}.json`);}});
