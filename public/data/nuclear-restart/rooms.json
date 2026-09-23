@@ -1,0 +1,94 @@
+{
+  "date": "2026-09-23",
+  "notice": "這是工具試玩用的虛構審議，種子人物、發言、票數、提案與回覆皆為模擬，不是民調、不代表政府或任何組織。後續試玩輸入會與種子資料一起顯示，仍不可當成民意。請勿填入真實個資。",
+  "rooms": [
+    {
+      "tool": "pocket-form",
+      "id": "809geqsnp1",
+      "url": "https://form.mashbean.net/f/809geqsnp1",
+      "stationUrl": "https://delib.mashbean.net/form/f/809geqsnp1?lang=zh",
+      "resultUrl": null,
+      "apiUrl": "https://form.mashbean.net/api/forms/809geqsnp1"
+    },
+    {
+      "tool": "pocket-polis",
+      "id": "6q62q43lz8",
+      "url": "https://polis.mashbean.net/c/6q62q43lz8",
+      "stationUrl": "https://delib.mashbean.net/polis/c/6q62q43lz8?lang=zh",
+      "resultUrl": "https://polis.mashbean.net/r/6q62q43lz8",
+      "apiUrl": "https://polis.mashbean.net/api/conversations/6q62q43lz8"
+    },
+    {
+      "tool": "pocket-harmonica",
+      "id": "9pkwyygb8i",
+      "url": "https://harmonica.mashbean.net/s/9pkwyygb8i",
+      "stationUrl": "https://delib.mashbean.net/harmonica/s/9pkwyygb8i?lang=zh",
+      "resultUrl": null,
+      "apiUrl": "https://harmonica.mashbean.net/api/sessions/9pkwyygb8i"
+    },
+    {
+      "tool": "pocket-values",
+      "id": "v9kgc0wxpj",
+      "url": "https://values.mashbean.net/v/v9kgc0wxpj",
+      "stationUrl": "https://delib.mashbean.net/values/v/v9kgc0wxpj?lang=zh",
+      "resultUrl": "https://values.mashbean.net/g/v9kgc0wxpj",
+      "apiUrl": "https://values.mashbean.net/api/sessions/v9kgc0wxpj"
+    },
+    {
+      "tool": "pocket-budget",
+      "id": "c9r02iuzle",
+      "url": "https://budget.mashbean.net/b/c9r02iuzle",
+      "stationUrl": "https://delib.mashbean.net/budget/b/c9r02iuzle?lang=zh",
+      "resultUrl": "https://budget.mashbean.net/r/c9r02iuzle",
+      "apiUrl": "https://budget.mashbean.net/api/budgets/c9r02iuzle"
+    },
+    {
+      "tool": "pocket-check",
+      "id": "h2dfldeaqk",
+      "url": "https://checks.mashbean.net/c/h2dfldeaqk",
+      "stationUrl": "https://delib.mashbean.net/checks/c/h2dfldeaqk?lang=zh",
+      "resultUrl": "https://checks.mashbean.net/r/h2dfldeaqk",
+      "apiUrl": "https://checks.mashbean.net/api/checks/h2dfldeaqk"
+    },
+    {
+      "tool": "pocket-proposals",
+      "id": "rzjpo6gm49",
+      "url": "https://proposals.mashbean.net/p/rzjpo6gm49",
+      "stationUrl": "https://delib.mashbean.net/proposals/p/rzjpo6gm49?lang=zh",
+      "resultUrl": "https://proposals.mashbean.net/r/rzjpo6gm49",
+      "apiUrl": "https://proposals.mashbean.net/api/spaces/rzjpo6gm49"
+    },
+    {
+      "tool": "pocket-argument",
+      "id": "f8sdd3kgcq",
+      "url": "https://argument.mashbean.net/a/f8sdd3kgcq",
+      "stationUrl": "https://delib.mashbean.net/argument/a/f8sdd3kgcq?lang=zh",
+      "resultUrl": "https://argument.mashbean.net/r/f8sdd3kgcq",
+      "apiUrl": "https://argument.mashbean.net/api/debates/f8sdd3kgcq"
+    },
+    {
+      "tool": "pocket-maple",
+      "id": "1sm1qzalp0",
+      "url": "https://maple-tw.mashbean.net/t/1sm1qzalp0",
+      "stationUrl": "https://delib.mashbean.net/maple/t/1sm1qzalp0?lang=zh",
+      "resultUrl": "https://maple-tw.mashbean.net/r/1sm1qzalp0",
+      "apiUrl": "https://maple-tw.mashbean.net/api/hearings/1sm1qzalp0"
+    },
+    {
+      "tool": "pocket-tttc",
+      "id": "82mq3nipps",
+      "url": "https://ttt-city.mashbean.net/r/82mq3nipps",
+      "stationUrl": "https://delib.mashbean.net/tttc/r/82mq3nipps?lang=zh",
+      "resultUrl": "https://ttt-city.mashbean.net/r/82mq3nipps",
+      "apiUrl": "https://ttt-city.mashbean.net/api/reports/82mq3nipps"
+    },
+    {
+      "tool": "pocket-reply",
+      "id": "iq3r71o5fl",
+      "url": "https://reply.mashbean.net/r/iq3r71o5fl",
+      "stationUrl": "https://delib.mashbean.net/reply/r/iq3r71o5fl?lang=zh",
+      "resultUrl": "https://reply.mashbean.net/r/iq3r71o5fl",
+      "apiUrl": "https://reply.mashbean.net/api/loops/iq3r71o5fl"
+    }
+  ]
+}

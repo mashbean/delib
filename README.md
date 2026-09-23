@@ -14,6 +14,8 @@ Three.js 提供真正的 WebGL 場景，GSAP 控制進場與視角／參與者�
 
 [Polis 分析交接 / Analysis](https://delib.mashbean.net/analysis?lang=zh) · [主持工作室 / Facilitation studio](https://delib.mashbean.net/facilitate?lang=zh) · [本輪實作與限制 / Delivery and limits](docs/stages-p2-p7-2026-09-23.md)
 
+[台灣重啟核電 Pocket 試玩室](https://delib.mashbean.net/nuclear-restart)：11 個已建立活動，附官方來源、12 位虛構角色與模擬提案／回覆；所有票數只供工具體驗，不代表民意。
+
 ## 現在能做什麼
 
 - **規劃**：從缺席聲音、證據、選項或回覆責任決定本輪起點，下載行動單。
