@@ -46,7 +46,6 @@ if(mode==='seed'){
   await once(`${p.id}-endorse`,()=>req(`${api('pocket-proposals')}/proposals/${pid}/endorse`,{participantId:state.participants.R09}));
   if(p.id==='P1')await once('P1-amend',()=>req(`${api('pocket-proposals')}/proposals/${pid}/amend`,{participantId:state.participants.R07,alias:roles[6].alias,body:p.body+' 比較還須公開長期核廢、除役及風險成本的假設，並保留未知範圍。',rationale:'【模擬修正理由】避免只比較短期支出而忽略世代責任。'}));
  }
- for(const [i,r] of roles.entries())await once(`arg-${r.id}`,()=>req(`${api('pocket-argument')}/arguments`,{participantId:state.participants[r.id],alias:r.alias,parentId:0,side:r.stance==='oppose'?'con':'pro',text:`【模擬論點${r.stance==='amend'?'・附條件':''}】${r.statement}`,source:[sources[5].url,sources[5].url,sources[2].url,sources[0].url,sources[2].url,sources[4].url][i%6]}));
  console.log('non-AI seeding complete');
 }
 if(mode==='ai'){
@@ -68,6 +67,21 @@ if(mode==='ai'){
   const participantId=state.participants[r.id];
   try{const p=await req(`${api('pocket-values')}/pairs`,{participantId});for(const [i,pair] of p.pairs.entries())await once(`judge-${r.id}-${i}`,()=>req(`${api('pocket-values')}/judge`,{participantId,wiser:pair[0].cardId,lessWise:pair[1].cardId,note:'【模擬判斷】為展示比較操作而設定，不代表社會價值排序。'}));}catch(e){console.log('judge',r.id,e.message);}
  }
+}
+if(mode==='repair-arguments'||mode==='seed'){
+ // Replace only our original seed nodes (soft removal), keeping the activity URL.
+ // A fictional opinion must never display an unrelated official URL as its source.
+ for(const r of roles){const old=state.done[`arg-${r.id}`]?.argument?.id;if(old)await once(`arg-retired-${r.id}`,()=>req(`${api('pocket-argument')}/arguments/${old}/remove`,{}, {'X-Debate-Admin':state.rooms['pocket-argument'].adminToken}));}
+ const nodes={};
+ for(const [i,r] of roles.entries()){
+  const parentRole={R09:'R01',R10:'R05',R11:'R09',R12:'R11'}[r.id];
+  const side=r.stance==='oppose'||r.id==='R09'?'con':'pro';
+  const text=r.id==='R09'?'【模擬反駁・未決立場】列入選項不等於現在就應重啟；在計畫審查、換照與裝填燃料的證據被清楚區分前，我保留判斷。':`【模擬論點${parentRole?'・只針對上層理由，不表示支持整體重啟':''}】${r.statement}`;
+  const result=await once(`arg-v2-${r.id}`,()=>req(`${api('pocket-argument')}/arguments`,{participantId:state.participants[r.id],alias:r.alias,parentId:parentRole?nodes[parentRole]:0,side,text,source:'作者設計的虛構角色觀點，非官方引文；考據與意見分開列於 '+ 'https://delib.mashbean.net/nuclear-restart#sources'}));
+  nodes[r.id]=result.argument.id;
+ }
+ for(const r of roles){const target=roles[(roles.indexOf(r)+4)%roles.length];await once(`arg-v2-rating-${r.id}`,()=>req(`${api('pocket-argument')}/arguments/${nodes[target.id]}/vote`,{participantId:state.participants[r.id],value:roles.indexOf(r)%2===0?1:-1}));}
+ console.log('12 seed arguments repaired: provenance labels and nested conditions; 12 synthetic ratings added');
 }
 // A strictly public manifest. Do not copy the raw creation responses here.
 const publicRooms=Object.entries(state.rooms).map(([k,r])=>{
