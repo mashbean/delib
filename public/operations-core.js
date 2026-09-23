@@ -23,6 +23,7 @@ export function validateOperations(p){
   if(e.status==='planned'&&e.observations.some(v=>v.attended||v.spoke||v.voted))fail();
   if(!list(e.evaluations,300)||!unique(e.evaluations.map(v=>v.participant)))fail();for(const v of e.evaluations){if(!e.observations.some(x=>x.participant===v.participant&&x.attended)||!['heard','understood','fair'].every(k=>v[k]===null||(Number.isInteger(v[k])&&v[k]>=1&&v[k]<=5))||typeof v.note!=='string'||v.note.length>1000)fail();}
   if(e.status==='planned'&&e.evaluations.length)fail();if(e.status==='reviewed'&&!e.evaluations.length)fail();
+  if(e.changeReason!==undefined&&!text(e.changeReason))fail();
  });}
  for(const g of o.progressions){if(!text(g.id,120)||!rounds.has(g.roundId)||!known.has(g.proposalRef)||known.get(g.proposalRef).kind!=='proposal'||!text(g.rule,2000)||!text(g.owner,100)||!Number.isInteger(g.quorum)||g.quorum<1||!Number.isInteger(g.minSupport)||g.minSupport<1||g.minSupport>g.quorum)fail();
   history(g.history,(e,prev)=>{const stages=['draft','review','ready','trial','reviewed'];if(!stages.includes(e.stage)||(!prev&&e.stage!=='draft')||(prev&&stages.indexOf(e.stage)!==stages.indexOf(prev.stage)+1)||!text(e.reason)||!knownRefs(e.evidenceRefs,known,e.stage==='draft'?0:1)||!['eligible','support','oppose','abstain'].every(k=>Number.isInteger(e[k])&&e[k]>=0)||e.support+e.oppose+e.abstain>e.eligible||!text(e.minorityNote))fail();

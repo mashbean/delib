@@ -41,19 +41,28 @@ export function validateRecordFollowup(record) {
 }
 export function validateFacilitation(project) {
   if(project.view.mode !== undefined && !['focus','overview'].includes(project.view.mode)) throw new Error('Invalid workspace mode');
-  const priorGapIds = new Set();
+  const priorGapIds = new Set(),priorGaps=new Map(),supportRoots=new Map();
   for(const r of project.rounds) {
     if(r.participation !== undefined) {
       if(!Array.isArray(r.participation) || r.participation.length > 100) throw new Error('Invalid participation register');
       const ids = new Set();
       for(const gap of r.participation) {
         if(!validText(gap.id,120) || ids.has(gap.id) || priorGapIds.has(gap.id) || (gap.carriedFrom !== undefined && !priorGapIds.has(gap.carriedFrom))) throw new Error('Invalid participation lineage');
+        const parent=priorGaps.get(gap.carriedFrom);
+        if(parent?.sessionSource&&['sessionId','entryId','participant'].some(k=>parent.sessionSource[k]!==gap.sessionSource?.[k]))throw new Error('Support source lineage changed');
+        if(gap.sessionSource){
+          const source=gap.sessionSource,session=project.operations?.sessions.find(s=>s.id===source.sessionId),entry=session?.history.find(e=>e.id===source.entryId),observation=entry?.observations.find(v=>v.participant===source.participant);
+          if(!observation?.barrier.trim()||gap.history?.[0]?.barrier!==observation.barrier||project.rounds.findIndex(x=>x.id===session.roundId)>project.rounds.indexOf(r))throw new Error('Invalid session support source');
+          const key=JSON.stringify([source.sessionId,source.participant]);
+          if(supportRoots.has(key)&&supportRoots.get(key)!==gap.carriedFrom)throw new Error('Duplicate session support');
+          supportRoots.set(key,gap.id);
+        }
         validateHistory(gap.history,entry => {
           if(!participationStates.includes(entry.status) || !validText(entry.group,200) || !validText(entry.barrier,1000) || !validText(entry.action,1000) || !validText(entry.note,2000) || !responsibility(entry)) throw new Error('Invalid participation entry');
         });
         ids.add(gap.id);
       }
-      ids.forEach(id => priorGapIds.add(id));
+      ids.forEach(id => priorGapIds.add(id));r.participation.forEach(g=>priorGaps.set(g.id,g));
     }
     r.artifacts.forEach(validateRecordFollowup);
   }
@@ -85,8 +94,16 @@ export function saveParticipation(project,gapId,input) {
   r.participation = next;return gap;
 }
 export const openParticipation = r => (r.participation || []).filter(g => latest(g.history)?.status !== 'heard');
-export function carryParticipation(r) {
-  return openParticipation(r).map(g => ({id:crypto.randomUUID(),carriedFrom:g.id,history:structuredClone(g.history)}));
+export function pendingParticipation(project,r=round(project)) {
+  const leaves=new Map();
+  for(const prior of project?project.rounds.slice(0,project.rounds.indexOf(r)+1):[r])for(const g of prior.participation||[]){
+    if(g.carriedFrom)leaves.delete(g.carriedFrom);leaves.set(g.id,g);
+  }
+  return [...leaves.values()].filter(g=>latest(g.history)?.status!=='heard');
+}
+export function carryParticipation(r,project) {
+  // Late entries from an earlier round still need follow-up; carry only the latest lineage leaf.
+  return pendingParticipation(project,r).map(g => ({id:crypto.randomUUID(),carriedFrom:g.id,history:structuredClone(g.history),...(g.sessionSource?{sessionSource:structuredClone(g.sessionSource)}:{})}));
 }
 export function needsFollowup(record) {
   const disposition = latest(record.dispositions),commitment = latest(record.commitments);

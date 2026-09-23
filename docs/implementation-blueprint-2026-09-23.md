@@ -32,6 +32,8 @@ P1, P2 and local baseline features for P4–P6 are implemented. P3/P7 remain par
 
 P4–P6 now connect [round reviews and next-round planning](round-review-2026-09-23.md), including per-session feedback, open corrections, proposal checks and evidence carry-forward.
 
+P5 續作已交付 [場次規劃與參與支持 / Session planning and support](session-support-2026-09-23.md)：議程及邀請修訂、障礙來源連結、支持任務與跨輪承接。
+
 ## 論文服務盤點與重寫策略 / Paper services and implementation strategy
 
 | 服務 / Service | 目前對應 / Current counterpart | 後續工作 / Next work |

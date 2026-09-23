@@ -123,8 +123,8 @@
         "P4"
       ],
       "delivery": {
-        "zh": "已加入議程、分組、線上／實體場次、分開的參與紀錄與會後回饋；為本機主持工具，非即時多人會議服務。 輪次回顧分場呈現參與障礙、回饋缺值與逐題分母。",
-        "en": "Added agendas, groups, settings, distinct participation observations and post-session feedback. A local facilitation tool, not a live conferencing service. Round reviews show session barriers, missing feedback and per-question denominators."
+        "zh": "已加入議程、分組、線上／實體場次、分開的參與紀錄與會後回饋；為本機主持工具，非即時多人會議服務。 輪次回顧分場呈現參與障礙、回饋缺值與逐題分母；可修訂議程及追加受邀代稱，確認後將障礙轉成可跨輪追蹤的支持任務。",
+        "en": "Added agendas, groups, settings, distinct participation observations and post-session feedback. A local facilitation tool, not a live conferencing service. Round reviews show session barriers, missing feedback and per-question denominators; plans and invitees can be revised, and confirmed support tasks retain barrier sources across rounds."
       },
       "implementationLevel": "local-baseline"
     },

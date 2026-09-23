@@ -85,3 +85,8 @@ Current Metagov scope remains selected Statement export with private provenance 
 `operations` 是 workspace v1 的可選延伸，保存更正、場次與提案推進歷程；既有備份仍可使用。Polis 分析、Metadecidim 與 Hypha 以具名、有限範圍的 adapter 接入，不代表整套原服務重寫或共同驗收。欄位、損失與驗證界線見 [P2–P7 實作說明](stages-p2-p7-2026-09-23.md)。
 
 The optional workspace `operations` extension stores correction, session and proposal histories while preserving old backup compatibility. Polis analysis, Metadecidim and Hypha adapters support scoped contracts, not complete upstream reimplementations or partner acceptance. See the linked bilingual delivery notes for fields, losses and evidence.
+
+
+## Session support extension / 場次支持擴充
+
+Optional `participationGap.sessionSource` links a task to a historical session observation; optional session `changeReason` records plan revisions. Old v1 backups remain valid. Runtime validates source text, version, alias, round ordering and carry-forward lineage. See [implementation and limits / 實作及限制](session-support-2026-09-23.md).

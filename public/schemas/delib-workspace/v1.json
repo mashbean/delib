@@ -869,6 +869,32 @@
           "items": {
             "$ref": "#/$defs/participationEntry"
           }
+        },
+        "sessionSource": {
+          "type": "object",
+          "properties": {
+            "sessionId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            },
+            "entryId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            },
+            "participant": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            }
+          },
+          "required": [
+            "sessionId",
+            "entryId",
+            "participant"
+          ],
+          "additionalProperties": false
         }
       }
     }

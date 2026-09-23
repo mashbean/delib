@@ -102,7 +102,7 @@ export function nextRound(p,{reason,owner,date,phase}){
   const open=roundFollowups(p,prev);
   prev.next={reason,owner,date,phase,carryForwardRefs:open.map(a=>a.id)};
   const brief=record('brief',reason,{tool:'facilitator',id:uid()},open.map(a=>a.id));
-  const r={id:uid(),title:p.language==='en'?`Round ${p.rounds.length+1}`:`第 ${p.rounds.length+1} 輪`,step:({recruit:0,learn:0,deliberate:1,respond:2})[phase],artifacts:[brief],inputs:open.map(a=>a.id),connections:{},next:null,participation:carryParticipation(prev)};
+  const r={id:uid(),title:p.language==='en'?`Round ${p.rounds.length+1}`:`第 ${p.rounds.length+1} 輪`,step:({recruit:0,learn:0,deliberate:1,respond:2})[phase],artifacts:[brief],inputs:open.map(a=>a.id),connections:{},next:null,participation:carryParticipation(prev,p)};
   p.rounds.push(r);p.view.roundId=r.id;p.view.tab='route';p.view.selected=brief.id;return r;
 }
 export function traceVoice(p,id){

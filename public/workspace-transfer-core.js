@@ -1,7 +1,7 @@
 import { nativeRestrictions } from './workspace-import-core.js';
 // Delib-specific mapping, not a Metagov ontology or remote publication protocol.
 import { tttcRowsToCsv, parseTttcCsv } from './tttc-csv-core.js';
-import { openParticipation, roundFollowups, latest } from './facilitation-core.js';
+import { pendingParticipation, roundFollowups, latest } from './facilitation-core.js';
 export const TRANSFER_SCHEMA = 'delib-workspace-transfer/v1';
 export const transferStates = ['prepared','exported','submitted','received','completed','reconnected','uncertain','failed'];
 const transitions = {prepared:['exported','submitted'],exported:[],submitted:['received','uncertain','failed'],received:['completed','failed'],completed:['reconnected'],reconnected:[],uncertain:[],failed:[]};
@@ -97,7 +97,7 @@ export function validateTransfers(p) {
   for(const r of p.rounds)for(const [tool,c] of Object.entries(r.connections))if(c.transferId){const t=p.transfers.find(t=>t.id===c.transferId);if(!t||t.roundId!==r.id||t.tool!==tool||t.activityId!==c.id||JSON.stringify(c.inputRefs)!==JSON.stringify(t.inputs.map(a=>a.id))||JSON.stringify(c.contextRefs)!==JSON.stringify(t.annotations.map(a=>a.id)))throw new Error('Transfer connection mismatch');}
 }
 export function nextStepAdvice(p){
-  const r=round(p),gaps=openParticipation(r),open=roundFollowups(p,r);
+  const r=round(p),gaps=pendingParticipation(p,r),open=roundFollowups(p,r);
   if(gaps.length)return {phase:'recruit',kind:'participation',count:gaps.length,refs:gaps.map(g=>g.id)};
   const unchecked=open.filter(a=>!a.review.checked);if(unchecked.length)return {phase:'learn',kind:'review',count:unchecked.length,refs:unchecked.map(a=>a.id)};
   const commitments=open.filter(a=>latest(a.commitments)&&latest(a.commitments).status!=='closed');if(commitments.length)return {phase:'respond',kind:'commitment',count:commitments.length,refs:commitments.map(a=>a.id)};

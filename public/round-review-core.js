@@ -1,5 +1,5 @@
 import {sessionCounts,correctionImpact} from './operations-core.js';
-import {openParticipation,roundFollowups} from './facilitation-core.js';
+import {pendingParticipation,roundFollowups} from './facilitation-core.js';
 import {nativeRestrictions} from './workspace-import-core.js';
 
 // A live, local reading of recorded evidence. No inferred identities or consensus score.
@@ -34,7 +34,7 @@ export function roundReview(project,roundId=project.view.roundId) {
     return {...g,current:e,text:proposal.text,checks,attention:Object.keys(checks).filter(k=>checks[k])};
   });
   return {roundId:round.id,title:round.title,simulated:project.simulated,corrections,sessions,progressions,
-    gaps:openParticipation(round).map(g=>({...g.history.at(-1),id:g.id})),
+    gaps:pendingParticipation(project,round).map(g=>({...g.history.at(-1),id:g.id})),
     carryRefs:roundFollowups(project,round).map(r=>r.id)};
 }
 
