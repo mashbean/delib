@@ -99,7 +99,8 @@
             "changes",
             "participation",
             "transfer",
-            "flow"
+            "flow",
+            "guide"
           ]
         },
         "selected": {
@@ -659,6 +660,32 @@
           "items": {
             "$ref": "#/$defs/participationGap"
           }
+        },
+        "facilitator": {
+          "type": "object",
+          "properties": {
+            "phase": {
+              "enum": [
+                "frame",
+                "recruit",
+                "sortition",
+                "learn",
+                "listen",
+                "deliberate",
+                "respond",
+                "feedback"
+              ]
+            },
+            "note": {
+              "type": "string",
+              "maxLength": 1000
+            }
+          },
+          "required": [
+            "phase",
+            "note"
+          ],
+          "additionalProperties": false
         }
       }
     },

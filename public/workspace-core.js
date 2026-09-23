@@ -17,7 +17,7 @@ export const currentRound=p=>p.rounds.find(r=>r.id===p.view.roundId)||p.rounds.a
 export function createProject({title,audience,deadline,goal,language='zh'}) {
   if(!text(title,120)||!text(audience,500)||!text(goal,1000)||!validDate(deadline))throw new Error('請填寫議題、參與對象、目標與有效日期 / Complete the issue, audience, goal and valid date.');
   const id=uid(),roundId=uid();
-  return {schema:WORKSPACE_SCHEMA,id,title,audience,deadline,goal,language,simulated:false,createdAt:now(),updatedAt:now(),view:{roundId,tab:'route',selected:'',mode:'focus'},rounds:[{id:roundId,title:language==='en'?'Round 1':'第 1 輪',step:0,artifacts:[],inputs:[],connections:{},next:null}],events:[]};
+  return {schema:WORKSPACE_SCHEMA,id,title,audience,deadline,goal,language,simulated:false,createdAt:now(),updatedAt:now(),view:{roundId,tab:'guide',selected:'',mode:'focus'},rounds:[{id:roundId,title:language==='en'?'Round 1':'第 1 輪',step:0,facilitator:{phase:'frame',note:''},artifacts:[],inputs:[],connections:{},next:null}],events:[]};
 }
 export function validateProject(p) {
   if(!p||p.schema!==WORKSPACE_SCHEMA||!text(p.id,120)||!text(p.title,120)||typeof p.simulated!=='boolean'||!['zh','en'].includes(p.language)||!Array.isArray(p.rounds)||!p.rounds.length||p.rounds.length>30||!Array.isArray(p.events)||p.events.length>2000||!p.view)throw new Error('Invalid workspace');
@@ -36,7 +36,7 @@ export function validateProject(p) {
     for(const [tool,c] of Object.entries(r.connections)){if(!['form','tttc','reply'].includes(tool)||!c||!/^[a-z0-9]{10}$/.test(c.id||'')||!Array.isArray(c.inputRefs)||c.inputRefs.some(id=>!ids.has(id))||!Array.isArray(c.contextRefs)||c.contextRefs.some(id=>!ids.has(id)))throw new Error('Invalid service connection');}
     if(r.next&&(!text(r.next.reason,1000)||!text(r.next.owner,100)||!text(r.next.date,50)||!Array.isArray(r.next.carryForwardRefs)||r.next.carryForwardRefs.some(id=>!ids.has(id))))throw new Error('Invalid next-round commitment');
   }
-  if(!rounds.has(p.view.roundId)||!['route','voices','changes','participation','transfer','flow'].includes(p.view.tab))throw new Error('Invalid view');
+  if(!rounds.has(p.view.roundId)||!['guide','route','voices','changes','participation','transfer','flow'].includes(p.view.tab))throw new Error('Invalid view');
   // Credential fields are never part of a project or backup. UI credentials live in memory.
   const forbidden=o=>{if(!o||typeof o!=='object')return false;return Object.entries(o).some(([k,v])=>/^(adminToken|token|hostUrl|manageUrl|authorization)$/i.test(k)||forbidden(v));};
   if(forbidden(p))throw new Error('Remove management credentials before importing');

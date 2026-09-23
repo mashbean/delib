@@ -23,7 +23,7 @@ await check("Data contracts, roadmap and local validator are published", async (
 });
 
 await check("Analysis, facilitator workflows and scoped adapters are published", async () => {
-  const paths=['/analysis','/facilitate','/operations-core.js','/round-review-core.js','/round-review-view.js','/session-planning-core.js','/session-planning-view.js','/polis-analysis-core.js','/decidim-import-core.js','/hypha-import-core.js','/schemas/delib-operations/v1.json'];
+  const paths=['/analysis','/facilitate','/operations-core.js','/round-review-core.js','/round-review-view.js','/session-planning-core.js','/session-planning-view.js','/facilitator-guide-core.js','/facilitator-guide-view.js','/facilitator-guide.css','/workspace-position.js','/workspace-snapshot-writer.js','/polis-analysis-core.js','/decidim-import-core.js','/hypha-import-core.js','/schemas/delib-operations/v1.json'];
   for(const path of paths)expect((await get(path)).status===200,`missing ${path}`);
   const manifest=await(await get('/data/polis-datasets.json')).json();expect(manifest.length===3,'missing pinned datasets');
   const partners=await(await get('/data/partner-acceptance.json')).json();expect(partners.externalAcceptance===false,'unexpected partner acceptance');
